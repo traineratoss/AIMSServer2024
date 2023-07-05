@@ -1,0 +1,29 @@
+name: CI
+#Created based on https://www.youtube.com/watch?v=vBEcTN5lwJc&ab_channel=CameronMcKenzie
+
+on:
+  push:
+    branches: [ main ]
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout main branch from GitHub
+        uses: actions/checkout@v2
+      
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+          
+      - name: Compile code with Maven
+        run: mvn compile
+        
+      - name: Run Maven clean install
+        run: mvn clean install
+          
+      - name: Build Maven Project
+        run: mvn -B package --file pom.xml
+      
