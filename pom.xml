@@ -19,6 +19,10 @@
 		<checkstyle-plugin.version>3.2.1</checkstyle-plugin.version>
 		<checkstyle.version>10.3</checkstyle.version>
 		<jxr-plugin.version>3.3.0</jxr-plugin.version>
+		
+		<!-- site plugin -->
+		<site-plugin.version>4.0.0-M8</site-plugin.version>
+		<site.port.number>9000</site.port.number>
 
 		<!-- Configuration of checkstyle plugin. See https://maven.apache.org/plugins/maven-checkstyle-plugin/check-mojo.html -->
 		<checkstyle.config.location>src/main/resources/checkstyle/checkstyle.xml</checkstyle.config.location>
@@ -61,6 +65,14 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>4.0.0-M8</version>
+				<configuration>
+					<port>${site.port.number}</port>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
