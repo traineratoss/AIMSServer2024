@@ -17,7 +17,7 @@
 		<java.version>17</java.version>
 
 		<checkstyle-plugin.version>3.2.1</checkstyle-plugin.version>
-		<checkstyle.version>10.3</checkstyle.version>
+		<checkstyle.puppycrawl.version>10.3</checkstyle.puppycrawl.version>
 		<jxr-plugin.version>3.3.0</jxr-plugin.version>
 		
 		<!-- site plugin -->
@@ -26,7 +26,6 @@
 
 		<!-- Configuration of checkstyle plugin. See https://maven.apache.org/plugins/maven-checkstyle-plugin/check-mojo.html -->
 		<checkstyle.config.location>src/main/resources/checkstyle/checkstyle.xml</checkstyle.config.location>
-		<checkstyle.violationSeverity>warning</checkstyle.violationSeverity>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -55,7 +54,7 @@
 					<dependency>
 						<groupId>com.puppycrawl.tools</groupId>
 						<artifactId>checkstyle</artifactId>
-						<version>${checkstyle.version}</version>
+						<version>${checkstyle.puppycrawl.version}</version>
 					</dependency>
 				</dependencies>
 				<executions>
@@ -69,7 +68,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>4.0.0-M8</version>
+				<version>${site-plugin.version}</version>
 				<configuration>
 					<port>${site.port.number}</port>
 				</configuration>
