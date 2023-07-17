@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.1.2-SNAPSHOT</version>
-		<relativePath/>
+		<relativePath />
 	</parent>
 	<groupId>com.atoss</groupId>
 	<artifactId>idea.management.system</artifactId>
@@ -19,7 +20,7 @@
 		<checkstyle-plugin.version>3.2.1</checkstyle-plugin.version>
 		<checkstyle.puppycrawl.version>10.3</checkstyle.puppycrawl.version>
 		<jxr-plugin.version>3.3.0</jxr-plugin.version>
-		
+
 		<!-- site plugin -->
 		<site-plugin.version>4.0.0-M8</site-plugin.version>
 		<site.port.number>9000</site.port.number>
@@ -27,16 +28,25 @@
 		<!-- Configuration of checkstyle plugin. See https://maven.apache.org/plugins/maven-checkstyle-plugin/check-mojo.html -->
 		<checkstyle.config.location>src/main/resources/checkstyle/checkstyle.xml</checkstyle.config.location>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 
