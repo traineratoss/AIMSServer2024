@@ -43,7 +43,6 @@ public class Idea {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
-    @Column(name = "image")
     private Image image;
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -56,7 +55,7 @@ public class Idea {
     private List<Category> categoryList;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @Column(name = "user")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @JsonManagedReference

@@ -1,7 +1,5 @@
 package com.atoss.idea.management.system.repository.dto;
 
-import com.atoss.idea.management.system.repository.entity.Idea;
-import com.atoss.idea.management.system.repository.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,10 +16,10 @@ public class CommentDTO {
     private Long id;
 
     // to be replaced with userDTO
-    private User user;
+    private UserDTO user;
 
     // to be replaced with ideaDTO
-    private Idea idea;
+    private IdeaDTO idea;
 
     private Long parentId;
 
