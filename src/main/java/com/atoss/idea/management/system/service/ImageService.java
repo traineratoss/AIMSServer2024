@@ -1,4 +1,7 @@
 package com.atoss.idea.management.system.service;
 
-public interface ImageService {
+import com.atoss.idea.management.system.repository.entity.Image;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ImageService extends JpaRepository<Image, Long> {
 }
