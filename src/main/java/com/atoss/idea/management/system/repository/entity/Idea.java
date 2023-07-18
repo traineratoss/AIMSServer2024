@@ -55,7 +55,7 @@ public class Idea {
     private List<Category> categoryList;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
     @JsonManagedReference

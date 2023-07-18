@@ -38,7 +38,7 @@ public class User {
     private Role role;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "avatar_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "avatar_id")
     @JsonBackReference
     private Avatar avatar;
 
