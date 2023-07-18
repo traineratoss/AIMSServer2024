@@ -40,8 +40,9 @@ public class Comment {
     @JoinColumn(name = "idea_id", referencedColumnName = "idea_id", nullable = false)
     private Idea idea;
 
-    @Column(name = "comment")
-    private Comment comment;
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Comment reply;
 
     @Column(name = "comment_text")
     private String commentText;
