@@ -1,10 +1,14 @@
 package com.atoss.idea.management.system.repository.entity;
 
 
-import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.FetchType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,14 +30,18 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "user_id")
-    private Long userId;
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User user;
 
-    @Column(name = "idea_id")
-    private Long ideaId;
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idea_id", referencedColumnName = "id", nullable = false)
+    private Idea idea;
 
-    @Column(name = "parent_id")
-    private Long parentId;
+    @Column(name = "comment")
+    private Comment comment;
 
     @Column(name = "comment_text")
     private String commentText;
