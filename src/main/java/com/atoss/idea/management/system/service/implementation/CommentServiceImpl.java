@@ -19,12 +19,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDTO addComment(Comment comment, Long ideaId) {
+    public Comment addComment(String text, Long ideaId, Long userID) {
         return null;
     }
 
     @Override
-    public CommentDTO addReply(Comment comment, Long parentId) {
+    public Comment addReply(String text, Long parentId, Long userId) {
         return null;
     }
 
@@ -49,9 +49,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDTO updateComment(Comment comment) {
+    public Comment updateComment(Comment comment) {
         return null;
     }
+
 
     @Override
     public void deleteComment(Long id) {

@@ -1,6 +1,5 @@
 package com.atoss.idea.management.system.service;
 
-
 import com.atoss.idea.management.system.repository.dto.CommentDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
 import org.springframework.stereotype.Service;
@@ -8,9 +7,9 @@ import java.util.List;
 
 @Service
 public interface CommentService {
-    CommentDTO addComment(Comment comment, Long ideaId);
+    Comment addComment(String text, Long ideaId, Long userId);
 
-    CommentDTO addReply(Comment comment, Long parentId);
+    Comment addReply(String text, Long parentId, Long userId);
 
     CommentDTO getComment(Long commentId);
 
@@ -20,7 +19,7 @@ public interface CommentService {
 
     List<CommentDTO> getAllRepliesByCommentId(Long parentId);
 
-    CommentDTO updateComment(Comment comment);
+    Comment updateComment(Comment comment);
 
     void deleteComment(Long id);
 
