@@ -52,7 +52,7 @@ public class UserController {
 
     @PutMapping("/profile")
     public UserResponseDTO updateUserProfile(@RequestParam(name = "full_name") String fullName,
-                                             @RequestParam(name = "user_name") String username,
+                                             @RequestParam(name = "username") String username,
                                              @RequestParam(name = "new_username") String newUsername,
                                              @RequestParam(name = "email") String email,
                                              @RequestBody AvatarDTO avatar) {
