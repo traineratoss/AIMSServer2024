@@ -2,49 +2,51 @@ package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.exception.ValidationException;
 import com.atoss.idea.management.system.repository.dto.IdeaDTO;
-import com.atoss.idea.management.system.repository.entity.Idea;
-import com.atoss.idea.management.system.service.IdeaService;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
+import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
 
 @RestController
-@RequestMapping("/idea")
+@RequestMapping("/ideas")
 public class IdeaController {
 
-    private final IdeaService ideaService;
+    private final IdeaServiceImpl ideaService;
 
-    public IdeaController(IdeaService ideaService) {
+    public IdeaController(IdeaServiceImpl ideaService) {
         this.ideaService = ideaService;
     }
 
-    @PostMapping
-    public IdeaDTO addIdea(@RequestBody Idea idea) throws ValidationException {
+
+    @PostMapping("/createIdea")
+    public IdeaDTO addIdea(@RequestBody IdeaDTO idea) throws ValidationException {
         return ideaService.addIdea(idea);
     }
 
-    @GetMapping("/{id}")
-    public IdeaDTO getIdeaById(@PathVariable("id") Long id) throws ValidationException {
+    @GetMapping("getIdea/id/{idea_id}")
+    public IdeaDTO getIdeaById(@PathVariable("idea_id") Long id) throws ValidationException {
         return ideaService.getIdeaById(id);
     }
 
-    @PutMapping
-    public IdeaDTO updateIdeaById(@RequestBody IdeaDTO ideaDTO) throws ValidationException {
-        return ideaService.updateIdeaById(ideaDTO);
+    @PatchMapping("updateIdea/id/{id}")
+    public IdeaDTO updateIdeaById(@PathVariable(value = "id") Long id,
+                                  @RequestBody IdeaUpdateDTO ideaUpdateDTO) throws ValidationException {
+        return ideaService.updateIdeaById(id, ideaUpdateDTO);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("deleteIdea/id/{id}")
     public void deleteIdeaById(@PathVariable("id") Long id) throws ValidationException {
         ideaService.deleteIdeaById(id);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/getAllIdeas")
     public List<IdeaDTO> getAllIdeas() throws ValidationException {
         return ideaService.getAllIdeas();
     }

@@ -25,6 +25,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = ValidationException.class)
     public ResponseEntity<Object> idException(ValidationException exception) {
-        return new ResponseEntity<>("Id not found", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -36,5 +37,6 @@ public class Image {
     private byte[] image;
 
     @OneToOne(mappedBy = "image")
+    @JsonBackReference(value = "idea-image")
     private Idea idea;
 }
