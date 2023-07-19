@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.service.implementation;
 
+import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.AvatarDTO;
 import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
@@ -8,7 +9,11 @@ import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.UserService;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -26,7 +31,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO addUser(String username, String email) {
         if (userRepository.findByUsernameOrEmail(username, email).isPresent()) {
-            throw new RuntimeException("Already exist!");
+            throw new UserAlreadyExistException("User already exist!");
         }
         User user = new User();
         user.setUsername(username);
@@ -58,7 +63,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO getUserByUsername(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Already exist!"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserAlreadyExistException("Already exist!"));
         return modelMapper.map(user, UserResponseDTO.class);
+    }
+
+    @Override
+    public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
+        return modelMapper.map(userRepository.findAll(pageable), new TypeToken<Page<UserResponseDTO>>() {}.getType());
     }
 }

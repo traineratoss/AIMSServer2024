@@ -4,6 +4,8 @@ import com.atoss.idea.management.system.repository.dto.AvatarDTO;
 import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
 import com.atoss.idea.management.system.repository.entity.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,5 +21,7 @@ public interface UserService {
     UserResponseDTO updateUserProfile(String fullName, String username, String newUsername, String email, AvatarDTO avatar);
 
     UserResponseDTO getUserByUsername(String username);
+
+    Page<UserResponseDTO> getAllUsers(Pageable pageable);
 
 }

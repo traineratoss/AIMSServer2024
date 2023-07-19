@@ -5,6 +5,10 @@ import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
 
@@ -58,5 +62,10 @@ public class UserController {
     @GetMapping
     public UserResponseDTO getUserByUsername(@RequestParam(name = "username") String username) {
         return userService.getUserByUsername(username);
+    }
+
+    @GetMapping("/all")
+    public Page<UserResponseDTO> getAllUsers(@PageableDefault(sort = "username", direction = Sort.Direction.ASC, size = 10) Pageable pageable) {
+        return userService.getAllUsers(pageable);
     }
 }
