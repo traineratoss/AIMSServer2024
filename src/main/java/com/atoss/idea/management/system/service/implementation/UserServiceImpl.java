@@ -10,8 +10,8 @@ import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.UserService;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -85,6 +85,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
-        return modelMapper.map(userRepository.findAll(pageable), new TypeToken<Page<UserResponseDTO>>() {}.getType());
+        return new PageImpl<UserResponseDTO>(
+                userRepository.findAll(pageable)
+                                        .stream()
+                                        .map(user -> modelMapper.map(user, UserResponseDTO.class))
+                                        .toList()
+        );
     }
 }

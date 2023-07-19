@@ -6,6 +6,7 @@ import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.service.UserService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -65,7 +66,8 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public Page<UserResponseDTO> getAllUsers(@PageableDefault(sort = "username", direction = Sort.Direction.ASC, size = 10) Pageable pageable) {
-        return userService.getAllUsers(pageable);
+    public Page<UserResponseDTO> getAllUsers(@PageableDefault(sort = "username", direction = Sort.Direction.ASC, size = 2, page = 2)
+                                                 Pageable pageable) {
+        return userService.getAllUsers(PageRequest.of(0, 2, Sort.by(Sort.Direction.ASC, "username")));
     }
 }
