@@ -1,6 +1,5 @@
 package com.atoss.idea.management.system.repository.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
@@ -34,14 +33,14 @@ public class Comment {
     @Column(name = "comment_id")
     private Long id;
 
-    @JsonBackReference(value = "user-comments")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
+    @JsonBackReference(value = "user-comments")
     private User user;
 
-    @JsonBackReference(value = "idea-comments")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idea_id", referencedColumnName = "idea_id", nullable = false)
+    @JsonBackReference(value = "idea-comments")
     private Idea idea;
 
     @ManyToOne

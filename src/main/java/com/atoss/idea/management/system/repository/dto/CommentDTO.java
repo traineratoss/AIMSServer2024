@@ -6,20 +6,15 @@ import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import java.util.Date;
 
-
 @Component
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentDTO {
 
-    private Long id;
+    private Long userId;
 
-    // to be replaced with userDTO
-    private UserResponseDTO user;
-
-    // to be replaced with ideaDTO
-    private IdeaDTO idea;
+    private Long ideaId;
 
     private Long parentId;
 

@@ -8,12 +8,15 @@ import com.atoss.idea.management.system.repository.dto.CategoryDTO;
 import com.atoss.idea.management.system.repository.entity.Category;
 import com.atoss.idea.management.system.service.CategoryService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
+    @Autowired
     private final CategoryRepository categoryRepository;
     private final ModelMapper  modelMapper;
 
@@ -25,9 +28,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category addCategory(CategoryDTO categoryDTO) throws Exception {
         Category savedCategory = modelMapper.map(categoryDTO, Category.class);
-        Category existCategory = categoryRepository.findByText(savedCategory.getText());
+        Optional<Category> existCategory = Optional.ofNullable(categoryRepository.findByText(savedCategory.getText()));
 
-        if (existCategory.getText().equals(categoryDTO.getText())) {
+        if (existCategory.isPresent()) {
 
             throw new CategoryAlreadyExistsException();
         } else {
@@ -37,9 +40,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDTO getCategory(long id) throws RuntimeException {
+    public CategoryDTO getCategory(Long id) throws RuntimeException {
         if (id > 0) {
-            return modelMapper.map(categoryRepository.findById(id), CategoryDTO.class);
+            return modelMapper.map(categoryRepository.findCategoryById(id), CategoryDTO.class);
         } else {
             throw new ValidationException();
         }

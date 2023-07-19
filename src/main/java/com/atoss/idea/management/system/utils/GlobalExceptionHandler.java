@@ -2,6 +2,7 @@ package com.atoss.idea.management.system.utils;
 
 import com.atoss.idea.management.system.exception.CategoryAlreadyExistsException;
 import com.atoss.idea.management.system.exception.CategoryNotFoundException;
+import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.exception.ValidationException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -26,5 +27,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ValidationException.class)
     public ResponseEntity<Object> idException(ValidationException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = UserAlreadyExistException.class)
+    public ResponseEntity<Object> userAlreadyExistException(UserAlreadyExistException userAlreadyExistException) {
+        return new ResponseEntity<>(userAlreadyExistException.getMessage(), HttpStatus.CONFLICT);
     }
 }
