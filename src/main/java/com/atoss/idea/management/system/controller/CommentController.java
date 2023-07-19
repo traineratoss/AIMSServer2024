@@ -26,7 +26,7 @@ public class CommentController {
 
     @PostMapping("/ideas/{idea_id}/comments/{comment_id}")
     public CommentDTO addReply(@RequestBody Comment reply, @PathVariable("idea_id") Long ideaId, @PathVariable("comment_id") Long commentId) {
-        return commentService.addReply(reply);
+        return commentService.addReply(reply, ideaId, commentId);
     }
 
     @GetMapping("/ideas/{idea_id}/comments")
@@ -36,7 +36,7 @@ public class CommentController {
 
     @GetMapping("/ideas/{idea_id}/comments/{comment_id}")
     public List<CommentDTO> getAllRepliesByCommentId(@PathVariable("idea_id") Long ideaId, @PathVariable("comment_id") Long commentId) {
-        return commentService.getAllRepliesByCommentId(commentId);
+        return commentService.getAllRepliesByCommentId(ideaId, commentId);
     }
 
 }

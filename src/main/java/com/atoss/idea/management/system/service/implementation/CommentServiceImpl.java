@@ -22,7 +22,7 @@ public class CommentServiceImpl implements CommentService {
     private final ModelMapper modelMapper;
 
     public CommentServiceImpl(CommentRepository commentRepository, IdeaRepository ideaRepository,
-                               UserRepository userRepository, ModelMapper modelMapper) {
+                              UserRepository userRepository, ModelMapper modelMapper) {
         this.commentRepository = commentRepository;
         this.ideaRepository = ideaRepository;
         this.userRepository = userRepository;
@@ -51,14 +51,19 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDTO addReply(Comment reply) {
-        if (!userRepository.existsById(reply.getUser().getUserId())) {
-            throw new RuntimeException();
-        }
+    public CommentDTO addReply(Comment reply, Long ideaId, Long commentId) {
 
-        if (!commentRepository.existsById(reply.getParent().getId())) {
-            throw new RuntimeException();
-        }
+        Optional<Idea> ideaOptional = ideaRepository.findById(ideaId);
+
+        Idea idea = ideaOptional.orElse(null);
+
+        reply.setIdea(idea);
+
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+
+        Comment comment = commentOptional.orElse(null);
+
+        reply.setParent(comment);
 
         commentRepository.save(reply);
 
@@ -94,12 +99,13 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDTO> getAllRepliesByCommentId(Long commentId) {
+    public List<CommentDTO> getAllRepliesByCommentId(Long ideaId, Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new RuntimeException();
         }
 
-        List<CommentDTO> filteredList = commentRepository.findAllById(commentId).stream()
+        List<CommentDTO> filteredList = commentRepository.findAllByIdeaId(ideaId).stream()
+                .filter(comment -> comment.getParent().getId() != null)
                 .map(comment -> modelMapper.map(comment, CommentDTO.class))
                 .collect(Collectors.toList());
 
@@ -110,7 +116,6 @@ public class CommentServiceImpl implements CommentService {
     public CommentDTO updateComment(Comment comment) {
         return null;
     }
-
 
     @Override
     public void deleteComment(Long id) {

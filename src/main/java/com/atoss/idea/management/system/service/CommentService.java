@@ -7,7 +7,7 @@ import java.util.List;
 public interface CommentService {
     CommentDTO addComment(Comment comment, Long ideaId);
 
-    CommentDTO addReply(Comment reply);
+    CommentDTO addReply(Comment reply, Long ideaId, Long commentId);
 
     CommentDTO getComment(Long commentId);
 
@@ -17,7 +17,7 @@ public interface CommentService {
 
     List<CommentDTO> getAllCommentsByIdeaId(Long ideaId);
 
-    List<CommentDTO> getAllRepliesByCommentId(Long commentId);
+    List<CommentDTO> getAllRepliesByCommentId(Long ideaId, Long commentId);
 
     CommentDTO updateComment(Comment comment);
 

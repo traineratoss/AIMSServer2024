@@ -58,10 +58,10 @@ public class Idea {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    @JsonBackReference
+    @JsonBackReference(value = "user-ideas")
     private User user;
 
-    @JsonManagedReference
+    @JsonManagedReference(value = "idea-comments")
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL)
     private List<Comment> commentList;
 }
