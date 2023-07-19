@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
 import jakarta.persistence.FetchType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +24,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "comment")
 public class Comment {
 
     @Id
@@ -39,9 +41,6 @@ public class Comment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idea_id", referencedColumnName = "idea_id", nullable = false)
     private Idea idea;
-
-    @Column(name = "comment")
-    private Comment comment;
 
     @Column(name = "comment_text")
     private String commentText;

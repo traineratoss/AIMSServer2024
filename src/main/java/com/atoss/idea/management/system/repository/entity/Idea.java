@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,7 +43,7 @@ public class Idea {
     private String text;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    @JoinColumn(name = "image_id", referencedColumnName = "image_id")
     private Image image;
 
     @ManyToMany(cascade = CascadeType.ALL)
@@ -51,15 +52,14 @@ public class Idea {
             joinColumns = { @JoinColumn(name = "idea_id") },
             inverseJoinColumns = { @JoinColumn(name = "category_id") }
     )
-    @Column(name = "categoryList")
     private List<Category> categoryList;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JsonBackReference
     private User user;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL)
-    @Column(name = "comment_list")
     private List<Comment> commentList;
 }

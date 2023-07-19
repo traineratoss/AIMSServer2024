@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import jakarta.persistence.Column;
 import java.sql.Blob;
 
 @Entity
@@ -23,6 +24,7 @@ public class Image {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "image_id")
     private Long id;
 
     @Lob
