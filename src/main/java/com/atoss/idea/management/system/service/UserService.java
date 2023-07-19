@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.service;
 
+import com.atoss.idea.management.system.repository.dto.AvatarDTO;
 import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
 import com.atoss.idea.management.system.repository.entity.Role;
@@ -15,7 +16,7 @@ public interface UserService {
 
     UserRequestDTO updateUserPassword(String username, String password);
 
-    UserResponseDTO updateUserProfile(String username, String fullName, String email);
+    UserResponseDTO updateUserProfile(String fullName, String username, String newUsername, String email, AvatarDTO avatar);
 
     UserResponseDTO getUserByUsername(String username);
 

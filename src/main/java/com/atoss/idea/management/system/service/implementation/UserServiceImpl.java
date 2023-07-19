@@ -1,16 +1,14 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.repository.UserRepository;
+import com.atoss.idea.management.system.repository.dto.AvatarDTO;
 import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.UserService;
-import com.atoss.idea.management.system.utils.PasswordGenerator;
-import com.google.common.hash.Hashing;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import java.nio.charset.StandardCharsets;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -34,11 +32,6 @@ public class UserServiceImpl implements UserService {
         user.setUsername(username);
         user.setEmail(email);
         user.setIsActive(false);
-        String password = PasswordGenerator.generatePassayPassword(15);
-        String hashPassword = Hashing.sha256()
-                .hashString(password, StandardCharsets.UTF_8)
-                .toString();
-        user.setPassword(hashPassword);
         userRepository.save(user);
         return modelMapper.map(user, UserResponseDTO.class);
     }
@@ -59,7 +52,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDTO updateUserProfile(String username, String fullName, String email) {
+    public UserResponseDTO updateUserProfile(String fullName, String username, String newUsername, String email, AvatarDTO avatar) {
         return null;
     }
 
