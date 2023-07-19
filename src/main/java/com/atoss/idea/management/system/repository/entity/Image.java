@@ -8,12 +8,13 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.Data;
 import jakarta.persistence.Column;
-import java.sql.Blob;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
+
 
 @Data
 @Entity
@@ -22,6 +23,7 @@ import java.sql.Blob;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Image {
 
     @Id
@@ -30,7 +32,8 @@ public class Image {
     private Long id;
 
     @Lob
-    private Blob image;
+    @Column(name = "photo", length = 1000)
+    private byte[] image;
 
     @OneToOne(mappedBy = "image")
     private Idea idea;
