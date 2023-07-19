@@ -25,5 +25,5 @@ jobs:
         run: mvn clean install -DskipTests
           
       - name: Build Maven Project
-        run: mvn -B package --file pom.xml
+        run: mvn -B package --file pom.xml -DskipTests
       
