@@ -51,10 +51,10 @@ public class User {
     private Boolean isActive;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value = "user-ideas")
     private List<Idea> ideas;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonManagedReference(value = "user-comments")
     private List<Comment> comments;
 }
