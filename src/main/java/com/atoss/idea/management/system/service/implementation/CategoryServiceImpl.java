@@ -40,9 +40,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryDTO getCategory(long id) throws RuntimeException {
+    public CategoryDTO getCategory(Long id) throws RuntimeException {
         if (id > 0) {
-            return modelMapper.map(categoryRepository.findById(id), CategoryDTO.class);
+            return modelMapper.map(categoryRepository.findCategoryById(id), CategoryDTO.class);
         } else {
             throw new ValidationException();
         }

@@ -28,7 +28,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public CategoryDTO getCategory(@PathVariable("id") long id) throws RuntimeException {
+    public CategoryDTO getCategory(@PathVariable("id") Long id) throws RuntimeException {
         return categoryServiceImpl.getCategory(id);
     }
 
