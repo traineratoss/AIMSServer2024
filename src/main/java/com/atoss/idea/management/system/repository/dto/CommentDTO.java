@@ -16,7 +16,7 @@ public class CommentDTO {
     private Long id;
 
     // to be replaced with userDTO
-    private UserDTO user;
+    private UserResponseDTO user;
 
     // to be replaced with ideaDTO
     private IdeaDTO idea;

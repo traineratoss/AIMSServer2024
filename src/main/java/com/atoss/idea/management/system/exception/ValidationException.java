@@ -1,6 +1,6 @@
 package com.atoss.idea.management.system.exception;
 
-public class ValidationException extends Exception {
+public class ValidationException extends RuntimeException {
 
     public ValidationException() {
 

@@ -11,9 +11,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Data;
 import jakarta.persistence.Column;
 import java.sql.Blob;
 
+@Data
 @Entity
 @Table(name = "image")
 @Getter
