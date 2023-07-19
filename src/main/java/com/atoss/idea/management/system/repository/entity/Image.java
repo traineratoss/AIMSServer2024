@@ -37,4 +37,12 @@ public class Image {
 
     @OneToOne(mappedBy = "image")
     private Idea idea;
+    private String fileName;
+    private String fileType;
+
+    public Image(String fileName, String fileType, byte[] image) {
+        this.fileName = fileName;
+        this.fileType = fileType;
+        this.image = image;
+    }
 }

@@ -8,7 +8,7 @@ public interface CategoryService {
 
     Category addCategory(CategoryDTO category) throws Exception;
 
-    CategoryDTO getCategory(long id) throws Exception;
+    CategoryDTO getCategory(long id) throws RuntimeException;
 
     List<CategoryDTO> getAllCategory() throws Exception;
 }

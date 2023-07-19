@@ -2,26 +2,33 @@ package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.repository.ImageRepository;
 import com.atoss.idea.management.system.repository.entity.Image;
-import com.atoss.idea.management.system.service.ImageService;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
+import java.io.IOException;
+import java.util.stream.Stream;
 
 @Service
-public class ImageServiceImpl implements ImageService {
+public class ImageServiceImpl {
+    private final ImageRepository imageRepository;
 
-    public final ImageRepository imageRepository;
-    public final ModelMapper modelMapper;
-
-    public ImageServiceImpl(ImageRepository imageRepository, ModelMapper modelMapper) {
+    public  ImageServiceImpl(ImageRepository imageRepository) {
         this.imageRepository = imageRepository;
-        this.modelMapper = modelMapper;
+
     }
 
-    @Override
-    public Image addImage(MultipartFile imageFile) throws Exception {
-        return null;
+    public Image addImage(MultipartFile file) throws IOException {
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        Image image = new Image(fileName, file.getContentType(), file.getBytes());
+        return imageRepository.save(image);
     }
+
+    public Image getImage(String id) {
+        return imageRepository.findById(Long.valueOf(id)).orElse(null);
+    }
+
+    public Stream<Image> getAllImage() {
+        return imageRepository.findAll().stream();
+    }
+
 }
-
