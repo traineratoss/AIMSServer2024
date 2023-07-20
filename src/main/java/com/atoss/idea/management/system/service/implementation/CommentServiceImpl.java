@@ -5,14 +5,13 @@ import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.CommentDTO;
 import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
+import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
-import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.service.CommentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,23 +57,31 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDTO addReply(Comment reply, Long ideaId, Long commentId) {
+    public CommentDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO) {
 
-        Optional<Idea> ideaOptional = ideaRepository.findById(ideaId);
+        if (userRepository.findByUsername(requestCommentReplyDTO.getUsername()).isEmpty()) {
+            throw new RuntimeException();
+        }
 
-        Idea idea = ideaOptional.orElse(null);
+        if (!commentRepository.existsById(requestCommentReplyDTO.getParentId())) {
+            throw new RuntimeException();
+        }
 
-        reply.setIdea(idea);
+        java.util.Date creationDate = new java.util.Date();
 
-        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+        Comment newReply =  new Comment();
 
-        Comment comment = commentOptional.orElse(null);
+        newReply.setUser(userRepository.findUserByUsername(requestCommentReplyDTO.getUsername()));
+        newReply.setIdea(null);
+        newReply.setCommentText(requestCommentReplyDTO.getCommentText());
+        newReply.setCreationDate(creationDate);
+        newReply.setParent(commentRepository.findById(requestCommentReplyDTO.getParentId()).get());
 
-        reply.setParent(comment);
+        commentRepository.save(newReply);
 
-        commentRepository.save(reply);
+        // TODO add ResponseCommentDTO
 
-        return modelMapper.map(reply, CommentDTO.class);
+        return modelMapper.map(newReply, CommentDTO.class);
     }
 
     @Override

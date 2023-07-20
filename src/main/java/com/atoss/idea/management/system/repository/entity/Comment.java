@@ -39,7 +39,7 @@ public class Comment {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "idea_id", referencedColumnName = "idea_id", nullable = false)
+    @JoinColumn(name = "idea_id", referencedColumnName = "idea_id", nullable = true)
     @JsonBackReference(value = "idea-comments")
     private Idea idea;
 
