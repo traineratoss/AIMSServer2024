@@ -2,11 +2,10 @@ package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.AvatarDTO;
 import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
+import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
 import com.atoss.idea.management.system.repository.entity.Avatar;
-import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.UserService;
 import org.modelmapper.ModelMapper;
@@ -43,22 +42,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDTO updateUserStatus(String username, Boolean isActive) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User dose not exist!"));
-        user.setIsActive(isActive);
-        userRepository.save(user);
-        return modelMapper.map(user, UserResponseDTO.class);
-    }
-
-    @Override
-    public UserResponseDTO updateUserRole(String username, Role role) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User dose not exist!"));
-        user.setRole(role);
-        userRepository.save(user);
-        return modelMapper.map(user, UserResponseDTO.class);
-    }
-
-    @Override
     public UserRequestDTO updateUserPassword(String username, String password) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User dose not exist!"));
         user.setPassword(password);
@@ -67,12 +50,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDTO updateUserProfile(String fullName, String username, String newUsername, String email, AvatarDTO avatar) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User dose not exist!"));
-        user.setUsername(newUsername);
-        user.setFullName(fullName);
-        user.setEmail(email);
-        user.setAvatar(modelMapper.map(avatar, Avatar.class));
+    public UserResponseDTO updateUserByUsername(String username, UserUpdateDTO userUpdateDTO) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        if (userUpdateDTO.getUsername() != null) {
+            user.setUsername(userUpdateDTO.getUsername());
+        }
+        if (userUpdateDTO.getEmail() != null) {
+            user.setEmail(userUpdateDTO.getEmail());
+        }
+        if (userUpdateDTO.getAvatar() != null) {
+            user.setAvatar(modelMapper.map(user.getAvatar(), Avatar.class));
+        }
+        if (userUpdateDTO.getFullName() != null) {
+            user.setFullName(userUpdateDTO.getFullName());
+        }
+        if (userUpdateDTO.getRole() != null) {
+            user.setRole(userUpdateDTO.getRole());
+        }
         userRepository.save(user);
         return modelMapper.map(user, UserResponseDTO.class);
     }

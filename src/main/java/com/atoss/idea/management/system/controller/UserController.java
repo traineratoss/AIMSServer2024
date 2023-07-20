@@ -1,9 +1,8 @@
 package com.atoss.idea.management.system.controller;
 
-import com.atoss.idea.management.system.repository.dto.AvatarDTO;
 import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
-import com.atoss.idea.management.system.repository.entity.Role;
+import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
 import com.atoss.idea.management.system.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,12 +10,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/users")
@@ -33,31 +33,15 @@ public class UserController {
         return userService.addUser(username, email);
     }
 
-    @PutMapping("/role")
-    public UserResponseDTO updateUserRole(@RequestParam(name = "username") String username,
-                                          @RequestParam(name = "role") Role role) {
-        return userService.updateUserRole(username, role);
-    }
-
-    @PutMapping("/status")
-    public UserResponseDTO updateUserStatus(@RequestParam(name = "username") String username,
-                                            @RequestParam(name = "is_active") Boolean isActive) {
-        return userService.updateUserStatus(username, isActive);
-    }
-
     @PutMapping("/password")
     public UserRequestDTO updateUserPassword(@RequestParam(name = "username") String username,
                                              @RequestParam(name = "password") String password) {
         return userService.updateUserPassword(username, password);
     }
 
-    @PutMapping("/profile")
-    public UserResponseDTO updateUserProfile(@RequestParam(name = "full_name") String fullName,
-                                             @RequestParam(name = "username") String username,
-                                             @RequestParam(name = "new_username") String newUsername,
-                                             @RequestParam(name = "email") String email,
-                                             @RequestBody AvatarDTO avatar) {
-        return userService.updateUserProfile(fullName, username, newUsername, email, avatar);
+    @PatchMapping
+    public UserResponseDTO updateUserByUsername(@RequestParam(value = "username") String username, @RequestBody UserUpdateDTO userUpdateDTO) {
+        return userService.updateUserByUsername(username, userUpdateDTO);
     }
 
     @GetMapping
