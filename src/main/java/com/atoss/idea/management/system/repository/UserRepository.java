@@ -13,5 +13,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // FlorinCP : added to ensure better functionality to a method ,
     //              the basic one , findById was troublesome
+    //              + findUserByUsername
     User findUserById(Long userId);
+
+    User findUserByUsername(String username);
+
 }

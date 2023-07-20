@@ -2,8 +2,11 @@ package com.atoss.idea.management.system.controller;
 
 import java.util.List;
 import com.atoss.idea.management.system.repository.dto.CommentDTO;
+import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
 import com.atoss.idea.management.system.repository.entity.Comment;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,19 +24,23 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    //--------------------This section will be used for test endpoints------------------------
-    @PostMapping("/test/{idea_id}")
-    public CommentDTO addCommentTest(@RequestBody Comment comment, @PathVariable("idea_id") Long ideaId) {
-        return commentService.addComment(comment, ideaId);
+    // TODO check if the mapping is good
+    @PostMapping("/")
+    public ResponseEntity<Object> addComment(@RequestBody RequestCommentDTO newComment) {
+
+        commentService.addComment(newComment);
+
+        return new ResponseEntity<>("Comment was dope", HttpStatus.OK);
     }
+
+    //--------------------This section will be used for test endpoints------------------------
+    //    @PostMapping("/test")
+
 
 
     //--------------------------------------------
 
-    @PostMapping("/{idea_id}/comments")
-    public CommentDTO addComment(@RequestBody Comment comment, @PathVariable("idea_id") Long ideaId) {
-        return commentService.addComment(comment, ideaId);
-    }
+
 
     @PostMapping("/{idea_id}/comments/{comment_id}")
     public CommentDTO addReply(@RequestBody Comment reply, @PathVariable("idea_id") Long ideaId, @PathVariable("comment_id") Long commentId) {

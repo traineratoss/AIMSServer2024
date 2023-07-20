@@ -1,13 +1,12 @@
 package com.atoss.idea.management.system.service;
 
 import com.atoss.idea.management.system.repository.dto.CommentDTO;
+import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
 import java.util.List;
 
 public interface CommentService {
-    CommentDTO addComment(Comment comment, Long ideaId);
-
-    CommentDTO addCommentPeana(String text, Long ideaId, Long userId);
+    CommentDTO addComment(RequestCommentDTO newComment);
 
     CommentDTO addReply(Comment reply, Long ideaId, Long commentId);
 

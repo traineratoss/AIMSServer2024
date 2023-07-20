@@ -4,6 +4,7 @@ import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.CommentDTO;
+import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.service.CommentService;
@@ -30,48 +31,29 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDTO addComment(Comment comment, Long ideaId) {
+    public CommentDTO addComment(RequestCommentDTO requestCommentDTO) {
 
-        if (!userRepository.existsById(comment.getUser().getId())) {
+        if (!userRepository.findByUsername(requestCommentDTO.getUsername()).isPresent()) {
             throw new RuntimeException();
         }
 
-        if (!ideaRepository.existsById(ideaId)) {
+        if (!ideaRepository.existsById(requestCommentDTO.getIdeaId())) {
             throw new RuntimeException();
         }
 
-        Optional<Idea> ideaOptional = ideaRepository.findById(ideaId);
-
-        Idea idea = ideaOptional.orElse(null);
-
-        comment.setIdea(idea);
-
-        commentRepository.save(comment);
-
-        return modelMapper.map(comment, CommentDTO.class);
-    }
-
-    @Override
-    public CommentDTO addCommentPeana(String text, Long ideaId, Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new RuntimeException();
-        }
-        if (!ideaRepository.existsById(ideaId)) {
-            throw new RuntimeException();
-        }
-
-        // some sort of verification for commentText must be done sometime
-
-        Comment newComment = new Comment();
         java.util.Date creationDate = new java.util.Date();
 
-        newComment.setUser(userRepository.findUserById(userId));
-        newComment.setIdea(ideaRepository.findIdeaById(ideaId));
-        newComment.setCommentText(text);
+        Comment newComment =  new Comment();
+
+        newComment.setUser(userRepository.findUserByUsername(requestCommentDTO.getUsername()));
+        newComment.setIdea(ideaRepository.findIdeaById(requestCommentDTO.getIdeaId()));
+        newComment.setCommentText(requestCommentDTO.getCommentText());
         newComment.setCreationDate(creationDate);
+        newComment.setParent(null);
 
         commentRepository.save(newComment);
 
+        // TODO add ResponseCommentDTO
         return modelMapper.map(newComment, CommentDTO.class);
     }
 
