@@ -31,7 +31,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentDTO addComment(Comment comment, Long ideaId) {
-        if (!userRepository.existsById(comment.getUser().getUserId())) {
+        if (!userRepository.existsById(comment.getUser().getId())) {
             throw new RuntimeException();
         }
 
