@@ -7,6 +7,8 @@ import java.util.List;
 public interface CommentService {
     CommentDTO addComment(Comment comment, Long ideaId);
 
+    CommentDTO addCommentPeana(String text, Long ideaId, Long userId);
+
     CommentDTO addReply(Comment reply, Long ideaId, Long commentId);
 
     CommentDTO getComment(Long commentId);

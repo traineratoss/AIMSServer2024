@@ -14,7 +14,6 @@ import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import lombok.Builder;
 
 
 @Data
@@ -24,7 +23,6 @@ import lombok.Builder;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class Image {
 
     @Id

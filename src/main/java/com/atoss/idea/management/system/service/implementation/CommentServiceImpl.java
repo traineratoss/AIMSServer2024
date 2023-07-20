@@ -31,6 +31,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentDTO addComment(Comment comment, Long ideaId) {
+
         if (!userRepository.existsById(comment.getUser().getId())) {
             throw new RuntimeException();
         }
@@ -48,6 +49,30 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.save(comment);
 
         return modelMapper.map(comment, CommentDTO.class);
+    }
+
+    @Override
+    public CommentDTO addCommentPeana(String text, Long ideaId, Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException();
+        }
+        if (!ideaRepository.existsById(ideaId)) {
+            throw new RuntimeException();
+        }
+
+        // some sort of verification for commentText must be done sometime
+
+        Comment newComment = new Comment();
+        java.util.Date creationDate = new java.util.Date();
+
+        newComment.setUser(userRepository.findUserById(userId));
+        newComment.setIdea(ideaRepository.findIdeaById(ideaId));
+        newComment.setCommentText(text);
+        newComment.setCreationDate(creationDate);
+
+        commentRepository.save(newComment);
+
+        return modelMapper.map(newComment, CommentDTO.class);
     }
 
     @Override
