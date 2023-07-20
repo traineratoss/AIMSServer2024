@@ -1,6 +1,6 @@
 package com.atoss.idea.management.system.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -29,7 +29,7 @@ public class Category {
     private String text;
 
     @ManyToMany(mappedBy = "categoryList", cascade = CascadeType.ALL)
-    @JsonBackReference(value = "idea-category")
+    @JsonIgnoreProperties("categoryList")
     private List<Idea> ideaList;
 
 }

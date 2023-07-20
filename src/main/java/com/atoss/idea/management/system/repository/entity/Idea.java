@@ -1,6 +1,5 @@
 package com.atoss.idea.management.system.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
@@ -20,11 +19,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.Data;
 import java.util.Date;
 import java.util.List;
 
-@Data
 @Entity
 @Table(name = "idea")
 @Getter
@@ -63,12 +60,22 @@ public class Idea {
     @JsonIgnoreProperties("ideaList")
     private List<Category> categoryList;
 
+    @JsonIgnoreProperties("ideas")
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    @JsonBackReference(value = "user-ideas")
     private User user;
 
-    @JsonManagedReference(value = "idea-comments")
+    @JsonIgnoreProperties("idea")
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL)
     private List<Comment> commentList;
+
+    @Override
+    public String toString() {
+        return "Idea{"
+                + "id=" + id
+                + ", title='" + title + '\''
+                + ", status='" + status + '\''
+                + ", text='" + text + '\''
+                + '}';
+    }
 }

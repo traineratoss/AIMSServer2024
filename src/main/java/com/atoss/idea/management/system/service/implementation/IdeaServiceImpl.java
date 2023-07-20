@@ -8,6 +8,7 @@ import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.repository.entity.Category;
 import com.atoss.idea.management.system.repository.entity.Idea;
+import com.atoss.idea.management.system.repository.entity.Image;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.IdeaService;
 import lombok.extern.log4j.Log4j2;
@@ -49,7 +50,10 @@ public class IdeaServiceImpl implements IdeaService {
         Idea savedIdea = new Idea();
         User user = userRepository.findById(1L).orElseThrow(() -> new ValidationException("Invalid user ID."));
         savedIdea.setUser(user);
-        savedIdea.setImage(idea.getImage());
+        if (idea.getImage() != null) {
+            Image image = modelMapper.map(idea.getImage(), Image.class);
+            savedIdea.setImage(image);
+        }
         savedIdea.setStatus(idea.getStatus());
         savedIdea.setText(idea.getText());
         savedIdea.setTitle(idea.getTitle());
