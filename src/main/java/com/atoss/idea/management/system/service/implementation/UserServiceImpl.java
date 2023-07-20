@@ -94,4 +94,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found!"));
         return modelMapper.map(user, UserRegisterDTO.class);
     }
+
+    @Override
+    public Page<UserResponseDTO> getAllUsersByUsername(String username) {
+        return new PageImpl<UserResponseDTO>(
+                userRepository.findByUsernameStartsWith(username)
+                        .stream()
+                        .map(user -> modelMapper.map(user, UserResponseDTO.class))
+                        .toList()
+        );
+    }
 }
