@@ -33,8 +33,6 @@ public class CommentController {
         return new ResponseEntity<>("Comment was dope", HttpStatus.OK);
     }
 
-    //--------------------This section will be used for test endpoints------------------------
-
     @PostMapping("/comments")
     public ResponseEntity<Object> addReply(@RequestBody RequestCommentReplyDTO requestCommentReplyDTO) {
 
@@ -43,14 +41,12 @@ public class CommentController {
         return new ResponseEntity<>("Reply fired", HttpStatus.OK);
     }
 
-    //--------------------------------------------
-
-    @GetMapping("/{idea_id}/comments")
+    @GetMapping("/")
     public List<CommentDTO> getAllCommentsByIdeaId(@PathVariable("idea_id") Long ideaId) {
         return commentService.getAllCommentsByIdeaId(ideaId);
     }
 
-    @GetMapping("/{idea_id}/comments/{comment_id}")
+    @GetMapping("/comments")
     public List<CommentDTO> getAllRepliesByCommentId(@PathVariable("idea_id") Long ideaId, @PathVariable("comment_id") Long commentId) {
         return commentService.getAllRepliesByCommentId(ideaId, commentId);
     }
