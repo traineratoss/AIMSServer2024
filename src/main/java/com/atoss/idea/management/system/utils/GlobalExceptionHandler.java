@@ -3,6 +3,7 @@ package com.atoss.idea.management.system.utils;
 import com.atoss.idea.management.system.exception.CategoryAlreadyExistsException;
 import com.atoss.idea.management.system.exception.CategoryNotFoundException;
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
+import com.atoss.idea.management.system.exception.ImageNotFoundException;
 import com.atoss.idea.management.system.exception.ValidationException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -32,5 +33,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = UserAlreadyExistException.class)
     public ResponseEntity<Object> userAlreadyExistException(UserAlreadyExistException userAlreadyExistException) {
         return new ResponseEntity<>(userAlreadyExistException.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(value = ImageNotFoundException.class)
+    public ResponseEntity<Object> imageNotFoundException(ImageNotFoundException exception) {
+        return new ResponseEntity<>("Category not found!", HttpStatus.NOT_FOUND);
     }
 }

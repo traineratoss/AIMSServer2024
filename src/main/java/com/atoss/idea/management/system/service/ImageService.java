@@ -1,9 +1,16 @@
 package com.atoss.idea.management.system.service;
 
-import com.atoss.idea.management.system.repository.entity.Image;
+import com.atoss.idea.management.system.repository.dto.ImageDTO;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.util.List;
 
 public interface ImageService {
 
-    Image addImage(MultipartFile imageFile) throws Exception;
+    ImageDTO addImage(MultipartFile imageFile) throws IOException;
+
+    ImageDTO getImage(Long id) throws Exception;
+
+    List<ImageDTO> getAllImage();
+
 }
