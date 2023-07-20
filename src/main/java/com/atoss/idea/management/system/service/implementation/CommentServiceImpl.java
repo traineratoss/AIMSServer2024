@@ -11,6 +11,11 @@ import com.atoss.idea.management.system.service.CommentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,9 +35,28 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public String getElapsedTime(Date creationDate) {
+
+        LocalDate oldDate =  creationDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate currentDate = LocalDate.now();
+
+        Period elapsedTime = Period.between(currentDate, oldDate);
+        elapsedTime.get(ChronoUnit.HOURS);
+
+        Long test = ChronoUnit.HOURS.between(currentDate, oldDate);
+
+        String response = elapsedTime + " h ago";
+        return response;
+    }
+
+    @Override
     public CommentDTO addComment(RequestCommentDTO requestCommentDTO) {
 
         if (!userRepository.findByUsername(requestCommentDTO.getUsername()).isPresent()) {
+            throw new RuntimeException();
+        }
+
+        if (!ideaRepository.existsById(requestCommentDTO.getIdeaId())) {
             throw new RuntimeException();
         }
 

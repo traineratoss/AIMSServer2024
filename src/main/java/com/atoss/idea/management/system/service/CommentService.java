@@ -4,9 +4,14 @@ import com.atoss.idea.management.system.repository.dto.CommentDTO;
 import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
 import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
+
+import java.util.Date;
 import java.util.List;
 
 public interface CommentService {
+
+    String getElapsedTime(Date creationDate);
+
     CommentDTO addComment(RequestCommentDTO newComment);
 
     CommentDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO);
