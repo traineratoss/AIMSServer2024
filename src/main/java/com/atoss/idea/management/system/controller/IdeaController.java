@@ -4,6 +4,10 @@ import com.atoss.idea.management.system.exception.ValidationException;
 import com.atoss.idea.management.system.repository.dto.IdeaDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,8 +50,15 @@ public class IdeaController {
         ideaService.deleteIdeaById(id);
     }
 
-    @GetMapping("/getAllIdeas")
-    public List<IdeaDTO> getAllIdeas() throws ValidationException {
-        return ideaService.getAllIdeas();
+    @GetMapping("/getAllIdeas/page/{pageNumber}/size/{pageSize}")
+    public Page<IdeaDTO> getAllIdeas(@PathVariable("pageSize") int pageSize,
+                                     @PathVariable("pageNumber") int pageNumber) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, "title"));
+        return ideaService.getAllIdeas(pageable);
+    }
+
+    @GetMapping("/getAllIdeasByUserId/userId/{id}")
+    public List<IdeaDTO> getAllIdeasByUserId(@PathVariable("id") Long id) {
+        return ideaService.getAllIdeasByUserId(id);
     }
 }
