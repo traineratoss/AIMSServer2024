@@ -6,7 +6,9 @@ import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.CommentDTO;
 import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
 import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
+import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
+import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
 import com.atoss.idea.management.system.service.CommentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public CommentDTO addComment(RequestCommentDTO requestCommentDTO) {
+    public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) {
 
         if (!userRepository.findByUsername(requestCommentDTO.getUsername()).isPresent()) {
             throw new RuntimeException();
@@ -73,11 +75,11 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.save(newComment);
 
         // TODO add ResponseCommentDTO
-        return modelMapper.map(newComment, CommentDTO.class);
+        return modelMapper.map(newComment, ResponseCommentDTO.class);
     }
 
     @Override
-    public CommentDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO) {
+    public ResponseCommentDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO) {
 
         if (userRepository.findByUsername(requestCommentReplyDTO.getUsername()).isEmpty()) {
             throw new RuntimeException();
@@ -101,7 +103,43 @@ public class CommentServiceImpl implements CommentService {
 
         // TODO add ResponseCommentDTO
 
-        return modelMapper.map(newReply, CommentDTO.class);
+        return modelMapper.map(newReply, ResponseCommentDTO.class);
+    }
+
+    @Override
+    public List<ResponseCommentDTO> getAllCommentsByIdeaId(RequestCommentDTO requestCommentDTO) {
+        if (!ideaRepository.existsById(requestCommentDTO.getIdeaId())) {
+            throw new RuntimeException();
+        }
+
+        List<ResponseCommentDTO> filteredList = commentRepository.findAllByIdeaId(requestCommentDTO.getIdeaId()).stream()
+                .map(comment -> modelMapper.map(comment, ResponseCommentDTO.class))
+                .collect(Collectors.toList());
+
+        return filteredList;
+    }
+
+    @Override
+    public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(RequestCommentReplyDTO requestCommentReplyDTO) {
+        if (!commentRepository.existsById(requestCommentReplyDTO.getParentId())) {
+            throw new RuntimeException();
+        }
+
+        List<ResponseCommentReplyDTO> filteredList = commentRepository.findById(requestCommentReplyDTO.getParentId()).get().getReplies().stream()
+                .map(comment -> modelMapper.map(comment, ResponseCommentReplyDTO.class))
+                .collect(Collectors.toList());
+
+        return filteredList;
+    }
+
+    @Override
+    public CommentDTO updateComment(Comment comment) {
+        return null;
+    }
+
+    @Override
+    public void deleteComment(Long id) {
+
     }
 
     @Override
@@ -119,39 +157,4 @@ public class CommentServiceImpl implements CommentService {
         return null;
     }
 
-    @Override
-    public List<RequestCommentDTO> getAllCommentsByIdeaId(RequestCommentDTO requestCommentDTO) {
-        if (!ideaRepository.existsById(requestCommentDTO.getIdeaId())) {
-            throw new RuntimeException();
-        }
-
-        List<RequestCommentDTO> filteredList = commentRepository.findAllByIdeaId(requestCommentDTO.getIdeaId()).stream()
-                .map(comment -> modelMapper.map(comment, RequestCommentDTO.class))
-                .collect(Collectors.toList());
-
-        return filteredList;
-    }
-
-    @Override
-    public List<RequestCommentReplyDTO> getAllRepliesByCommentId(RequestCommentReplyDTO requestCommentReplyDTO) {
-        if (!commentRepository.existsById(requestCommentReplyDTO.getParentId())) {
-            throw new RuntimeException();
-        }
-
-        List<RequestCommentReplyDTO> filteredList = commentRepository.findById(requestCommentReplyDTO.getParentId()).get().getReplies().stream()
-                .map(comment -> modelMapper.map(comment, RequestCommentReplyDTO.class))
-                .collect(Collectors.toList());
-
-        return filteredList;
-    }
-
-    @Override
-    public CommentDTO updateComment(Comment comment) {
-        return null;
-    }
-
-    @Override
-    public void deleteComment(Long id) {
-
-    }
 }

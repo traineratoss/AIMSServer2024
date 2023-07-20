@@ -3,6 +3,8 @@ package com.atoss.idea.management.system.controller;
 import java.util.List;
 import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
 import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
+import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
+import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,12 +42,12 @@ public class CommentController {
     }
 
     @GetMapping("/")
-    public List<RequestCommentDTO> getAllCommentsByIdeaId(@RequestBody RequestCommentDTO requestCommentDTO) {
+    public List<ResponseCommentDTO> getAllCommentsByIdeaId(@RequestBody RequestCommentDTO requestCommentDTO) {
         return commentService.getAllCommentsByIdeaId(requestCommentDTO);
     }
 
     @GetMapping("/comments")
-    public List<RequestCommentReplyDTO> getAllRepliesByCommentId(@RequestBody RequestCommentReplyDTO requestCommentReplyDTO) {
+    public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(@RequestBody RequestCommentReplyDTO requestCommentReplyDTO) {
         return commentService.getAllRepliesByCommentId(requestCommentReplyDTO);
     }
 

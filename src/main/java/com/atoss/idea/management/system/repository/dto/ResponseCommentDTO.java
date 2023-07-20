@@ -24,7 +24,7 @@ public class ResponseCommentDTO {
 
     private String commentText;
 
-    private List<ResponseCommentReplyDTO> responseCommentReplyDTOs;
+    private List<ResponseCommentReplyDTO> replies;
 
     private String elapsedTime;
 
