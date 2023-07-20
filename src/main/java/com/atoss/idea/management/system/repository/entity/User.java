@@ -1,6 +1,5 @@
 package com.atoss.idea.management.system.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,7 +42,7 @@ public class User {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "avatar_id")
-    @JsonBackReference
+    @JsonManagedReference(value = "user-avatar")
     private Avatar avatar;
 
     @Column(name = "is_active")

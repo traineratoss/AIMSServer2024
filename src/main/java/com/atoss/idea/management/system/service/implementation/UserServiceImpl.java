@@ -1,7 +1,9 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
+import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.repository.UserRepository;
+import com.atoss.idea.management.system.repository.dto.UserRegisterDTO;
 import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
 import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
@@ -85,5 +87,11 @@ public class UserServiceImpl implements UserService {
                                         .map(user -> modelMapper.map(user, UserResponseDTO.class))
                                         .toList()
         );
+    }
+
+    @Override
+    public UserRegisterDTO getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found!"));
+        return modelMapper.map(user, UserRegisterDTO.class);
     }
 }

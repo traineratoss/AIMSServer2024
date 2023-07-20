@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.service;
 
+import com.atoss.idea.management.system.repository.dto.UserRegisterDTO;
 import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
 import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
@@ -18,5 +19,7 @@ public interface UserService {
     UserResponseDTO getUserByUsername(String username);
 
     Page<UserResponseDTO> getAllUsers(Pageable pageable);
+
+    UserRegisterDTO getUserByEmail(String email);
 
 }
