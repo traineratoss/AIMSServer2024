@@ -2,7 +2,7 @@ package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.repository.dto.CategoryDTO;
 import com.atoss.idea.management.system.repository.entity.Category;
-import com.atoss.idea.management.system.service.implementation.CategoryServiceImpl;
+import com.atoss.idea.management.system.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,25 +15,25 @@ import java.util.List;
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
-    private final CategoryServiceImpl categoryServiceImpl;
+    private final CategoryService categoryService;
 
     @Autowired
-    public CategoryController(CategoryServiceImpl categoryServiceImpl) {
-        this.categoryServiceImpl = categoryServiceImpl;
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
     }
 
     @PostMapping
     public Category addCategory(@RequestBody CategoryDTO category) throws Exception {
-        return categoryServiceImpl.addCategory(category);
+        return categoryService.addCategory(category);
     }
 
     @GetMapping("/{id}")
     public CategoryDTO getCategory(@PathVariable("id") Long id) throws RuntimeException {
-        return categoryServiceImpl.getCategory(id);
+        return categoryService.getCategory(id);
     }
 
     @GetMapping
     public List<CategoryDTO> getAllCategory() throws Exception {
-        return categoryServiceImpl.getAllCategory();
+        return categoryService.getAllCategory();
     }
 }

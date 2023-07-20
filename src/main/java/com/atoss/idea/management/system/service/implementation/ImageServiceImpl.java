@@ -26,6 +26,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     public ImageDTO addImage(MultipartFile file) throws IOException {
+
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         Image image = new Image(fileName, file.getContentType(), file.getBytes());
         return modelMapper.map(imageRepository.save(image), ImageDTO.class);
