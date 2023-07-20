@@ -1,7 +1,7 @@
 package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.exception.ValidationException;
-import com.atoss.idea.management.system.repository.dto.IdeaDTO;
+import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import org.springframework.data.domain.Page;
@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/ideas")
 public class IdeaController {
@@ -31,18 +29,18 @@ public class IdeaController {
 
 
     @PostMapping("/createIdea")
-    public IdeaDTO addIdea(@RequestBody IdeaDTO idea) throws ValidationException {
+    public IdeaRequestDTO addIdea(@RequestBody IdeaRequestDTO idea) throws ValidationException {
         return ideaService.addIdea(idea);
     }
 
     @GetMapping("getIdea/id")
-    public IdeaDTO getIdeaById(@RequestParam(required = true) Long id) throws ValidationException {
+    public IdeaRequestDTO getIdeaById(@RequestParam(required = true) Long id) throws ValidationException {
         return ideaService.getIdeaById(id);
     }
 
     @PatchMapping("updateIdea/id")
-    public IdeaDTO updateIdeaById(@RequestParam(required = true) Long id,
-                                  @RequestBody IdeaUpdateDTO ideaUpdateDTO) throws ValidationException {
+    public IdeaRequestDTO updateIdeaById(@RequestParam(required = true) Long id,
+                                         @RequestBody IdeaUpdateDTO ideaUpdateDTO) throws ValidationException {
         return ideaService.updateIdeaById(id, ideaUpdateDTO);
     }
 
@@ -51,16 +49,21 @@ public class IdeaController {
         ideaService.deleteIdeaById(id);
     }
 
+    // We can sort the ideas based on a category we introduce manually, sorting a page based on it and a page size.
     @GetMapping("/getAllIdeas/page")
-    public Page<IdeaDTO> getAllIdeas(@RequestParam(required = true) int pageSize,
-                                     @RequestParam(required = true) int pageNumber,
-                                     @RequestParam(required = true) String sortCategory) {
+    public Page<IdeaRequestDTO> getAllIdeas(@RequestParam(required = true) int pageSize,
+                                            @RequestParam(required = true) int pageNumber,
+                                            @RequestParam(required = true) String sortCategory) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
         return ideaService.getAllIdeas(pageable);
     }
 
     @GetMapping("/getAllIdeasByUserId/userId")
-    public List<IdeaDTO> getAllIdeasByUserId(@RequestParam(required = true) Long id) {
-        return ideaService.getAllIdeasByUserId(id);
+    public Page<IdeaRequestDTO> getAllIdeasByUserId(@RequestParam(required = true) Long id,
+                                                    @RequestParam(required = true) int pageSize,
+                                                    @RequestParam(required = true) int pageNumber,
+                                                    @RequestParam(required = true) String sortCategory) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
+        return ideaService.getAllIdeasByUserId(id, pageable);
     }
 }

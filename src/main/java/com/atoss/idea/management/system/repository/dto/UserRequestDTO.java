@@ -13,5 +13,5 @@ public class UserRequestDTO {
     private String password;
     private Role role;
     private AvatarDTO avatar;
-    private List<IdeaDTO> ideas;
+    private List<IdeaRequestDTO> ideas;
 }

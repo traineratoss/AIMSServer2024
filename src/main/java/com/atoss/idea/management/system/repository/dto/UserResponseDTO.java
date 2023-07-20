@@ -12,5 +12,5 @@ public class UserResponseDTO {
     private String email;
     private Role role;
     private AvatarDTO avatar;
-    private List<IdeaDTO> ideas;
+    private List<IdeaRequestDTO> ideas;
 }

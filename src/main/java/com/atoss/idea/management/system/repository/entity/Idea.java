@@ -63,7 +63,7 @@ public class Idea {
     @JsonIgnoreProperties("ideaList")
     private List<Category> categoryList;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @JsonBackReference(value = "user-ideas")
     private User user;
