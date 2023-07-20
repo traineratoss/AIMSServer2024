@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Data;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -44,6 +45,9 @@ public class Idea {
 
     @Column(name = "text")
     private String text;
+
+    @Column(name = "date")
+    private Date date;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", referencedColumnName = "image_id")

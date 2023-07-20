@@ -5,6 +5,7 @@ import com.atoss.idea.management.system.repository.entity.Image;
 import com.atoss.idea.management.system.repository.entity.User;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -15,4 +16,5 @@ public class IdeaDTO {
     private List<Category> categoryList;
     private Image image;
     private String text;
+    private Date date;
 }
