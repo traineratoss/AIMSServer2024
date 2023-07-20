@@ -13,4 +13,6 @@ public class AtossIdeaManagementSystemApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AtossIdeaManagementSystemApplication.class, args);
 	}
+
+
 }

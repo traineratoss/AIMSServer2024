@@ -10,4 +10,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsernameOrEmail(String username, String email);
 
     Optional<User> findByUsername(String username);
+
+    // FlorinCP : added to ensure better functionality to a method ,
+    //              the basic one , findById was troublesome
+    User findUserById(Long userId);
 }
