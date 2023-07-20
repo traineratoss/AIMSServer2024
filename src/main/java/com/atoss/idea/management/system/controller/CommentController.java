@@ -1,7 +1,6 @@
 package com.atoss.idea.management.system.controller;
 
 import java.util.List;
-import com.atoss.idea.management.system.repository.dto.CommentDTO;
 import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
 import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
@@ -42,13 +40,13 @@ public class CommentController {
     }
 
     @GetMapping("/")
-    public List<CommentDTO> getAllCommentsByIdeaId(@PathVariable("idea_id") Long ideaId) {
-        return commentService.getAllCommentsByIdeaId(ideaId);
+    public List<RequestCommentDTO> getAllCommentsByIdeaId(@RequestBody RequestCommentDTO requestCommentDTO) {
+        return commentService.getAllCommentsByIdeaId(requestCommentDTO);
     }
 
     @GetMapping("/comments")
-    public List<CommentDTO> getAllRepliesByCommentId(@PathVariable("idea_id") Long ideaId, @PathVariable("comment_id") Long commentId) {
-        return commentService.getAllRepliesByCommentId(ideaId, commentId);
+    public List<RequestCommentReplyDTO> getAllRepliesByCommentId(@RequestBody RequestCommentReplyDTO requestCommentReplyDTO) {
+        return commentService.getAllRepliesByCommentId(requestCommentReplyDTO);
     }
 
 }

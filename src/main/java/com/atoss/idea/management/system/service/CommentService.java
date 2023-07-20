@@ -17,9 +17,9 @@ public interface CommentService {
 
     List<CommentDTO> getAllComments();
 
-    List<CommentDTO> getAllCommentsByIdeaId(Long ideaId);
+    List<RequestCommentDTO> getAllCommentsByIdeaId(RequestCommentDTO requestCommentDTO);
 
-    List<CommentDTO> getAllRepliesByCommentId(Long ideaId, Long commentId);
+    List<RequestCommentReplyDTO> getAllRepliesByCommentId(RequestCommentReplyDTO requestCommentReplyDTO);
 
     CommentDTO updateComment(Comment comment);
 
