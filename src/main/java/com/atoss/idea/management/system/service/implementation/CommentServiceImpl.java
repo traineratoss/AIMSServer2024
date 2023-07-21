@@ -10,6 +10,7 @@ import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
+import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
@@ -68,6 +69,9 @@ public class CommentServiceImpl implements CommentService {
     public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) {
 
         User user = userRepository.findByUsername(requestCommentDTO.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found!"));
+        user.setAvatar(null);
+
+        Idea idea = ideaRepository.findIdeaById(requestCommentDTO.getIdeaId());
 
         if (!ideaRepository.existsById(requestCommentDTO.getIdeaId())) {
             throw new RuntimeException();

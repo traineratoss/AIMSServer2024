@@ -19,4 +19,12 @@ public interface IdeaService {
 
     Page<IdeaResponseDTO> getAllIdeasByUserId(Long id, Pageable pageable);
 
+    Page<IdeaResponseDTO> filterIdeasByTitle(String title, Pageable pageable);
+
+    Page<IdeaResponseDTO> filterIdeasByText(String text, Pageable pageable);
+
+    Page<IdeaResponseDTO> filterIdeasByStatus(String status, Pageable pageable);
+
+    Page<IdeaResponseDTO> filterIdeasByCategory(String category, Pageable pageable);
+
 }
