@@ -3,18 +3,23 @@ package com.atoss.idea.management.system.service.implementation;
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.UserRegisterDTO;
-import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
+import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
+import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.UserRegisterDTO;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.User;
+import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.service.UserService;
+import com.google.common.hash.Hashing;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
 
 
 @Service
@@ -24,10 +29,13 @@ public class UserServiceImpl implements UserService {
 
     private final ModelMapper modelMapper;
 
+    private final SendEmailService sendEmailService;
 
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
+
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, SendEmailService sendEmailService) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.sendEmailService = sendEmailService;
     }
 
     @Override
@@ -40,12 +48,13 @@ public class UserServiceImpl implements UserService {
         user.setEmail(email);
         user.setIsActive(false);
         userRepository.save(user);
+        sendEmailService.sendEmailToAdmin(username);
         return modelMapper.map(user, UserResponseDTO.class);
     }
 
     @Override
     public UserRequestDTO updateUserPassword(String username, String password) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User dose not exist!"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserAlreadyExistException("User already exist!"));
         user.setPassword(password);
         userRepository.save(user);
         return modelMapper.map(user, UserRequestDTO.class);
@@ -53,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO updateUserByUsername(String username, UserUpdateDTO userUpdateDTO) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         if (userUpdateDTO.getUsername() != null) {
             user.setUsername(userUpdateDTO.getUsername());
         }
@@ -75,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO getUserByUsername(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Already exist!"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         return modelMapper.map(user, UserResponseDTO.class);
     }
 
@@ -103,5 +112,39 @@ public class UserServiceImpl implements UserService {
                         .map(user -> modelMapper.map(user, UserResponseDTO.class))
                         .toList()
         );
+    }
+
+    @Override
+    public Page<UserResponseDTO> getAllPendingUsers(boolean isActive) {
+        return new PageImpl<UserResponseDTO>(
+          userRepository.findByIsActive(isActive)
+                  .stream()
+                  .map(user -> modelMapper.map(user, UserResponseDTO.class))
+                  .toList()
+        );
+    }
+
+    @Override
+    public boolean changePassword(ChangePasswordDTO changePasswordDTO) {
+        String username = changePasswordDTO.getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserAlreadyExistException("User already exist!"));
+        String databasePassword = user.getPassword();
+        String hashFrontendOldPassword = Hashing.sha256()
+                .hashString(changePasswordDTO.getOldPassword(), StandardCharsets.UTF_8)
+                .toString();
+        String hashFrontendNewPassword = Hashing.sha256()
+                .hashString(changePasswordDTO.getNewPassword(), StandardCharsets.UTF_8)
+                .toString();
+        if (!hashFrontendOldPassword.equals(databasePassword)) {
+            return false;
+        }
+        user.setPassword(hashFrontendNewPassword);
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public void sendEmail(String username) {
+        sendEmailService.sendEmailToUser(username);
     }
 }
