@@ -6,6 +6,8 @@ import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
 import java.util.List;
@@ -27,6 +29,8 @@ public interface CommentService {
     List<CommentDTO> getAllComments();
 
     List<ResponseCommentDTO> getAllCommentsByIdeaId(RequestCommentDTO requestCommentDTO);
+
+    Page<ResponseCommentDTO> getAllCommentsByIdeaIdWithPaging(Long ideaId, Pageable pageable);
 
     List<ResponseCommentReplyDTO> getAllRepliesByCommentId(RequestCommentReplyDTO requestCommentReplyDTO);
 

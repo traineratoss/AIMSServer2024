@@ -15,6 +15,9 @@ import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
@@ -138,6 +141,36 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toList());
 
         return filteredList;
+    }
+
+    @Override
+    public Page<ResponseCommentDTO> getAllCommentsByIdeaIdWithPaging(Long ideaId, Pageable pageable) {
+        if (!ideaRepository.existsById(ideaId)) {
+            throw new RuntimeException();
+        }
+
+        return new PageImpl<ResponseCommentDTO>(
+                commentRepository.findAll(pageable)
+                        .stream()
+                        .filter(comment -> comment.getIdea() != null)
+                        .filter(comment -> comment.getIdea().getId() == ideaId)
+                        .map(comment -> {
+                            List<ResponseCommentReplyDTO> replies = comment.getReplies().stream()
+                                    .map(reply -> {
+                                        String username = reply.getUser().getUsername();
+                                        ResponseCommentReplyDTO responseCommentReplyDTO = modelMapper.map(reply, ResponseCommentReplyDTO.class);
+                                        responseCommentReplyDTO.setUsername(username);
+                                        return responseCommentReplyDTO;
+                                    })
+                                    .toList();
+                            String username = comment.getUser().getUsername();
+                            ResponseCommentDTO responseCommentDTO = modelMapper.map(comment, ResponseCommentDTO.class);
+                            responseCommentDTO.setUsername(username);
+                            responseCommentDTO.setReplies(replies);
+                            return responseCommentDTO;
+                        })
+                        .toList()
+        );
     }
 
     @Override

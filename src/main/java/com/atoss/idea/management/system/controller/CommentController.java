@@ -6,6 +6,10 @@ import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
+import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,6 +44,17 @@ public class CommentController {
         commentService.addReply(requestCommentReplyDTO);
 
         return new ResponseEntity<>("Reply fired", HttpStatus.OK);
+    }
+
+    @Transactional
+    @GetMapping("/all")
+    public  ResponseEntity<Page<ResponseCommentDTO>> getAllCommentsByIdeaIdWithPaging(
+                                                                 @RequestParam(required = true) Long ideaId,
+                                                                 @RequestParam(required = true) int pageSize,
+                                                                 @RequestParam(required = true) int pageNumber,
+                                                                 @RequestParam(required = true) String sortCategory) {
+        return new ResponseEntity<>(commentService.getAllCommentsByIdeaIdWithPaging(ideaId,
+                PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory))), HttpStatus.OK);
     }
 
     @GetMapping("/")
