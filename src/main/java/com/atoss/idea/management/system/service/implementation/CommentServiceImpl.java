@@ -14,11 +14,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,19 +40,29 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public String getTimeForComment(Long id) {
+        Optional<Comment> comment = commentRepository.findById(id);
+        Date creationDate =  comment.get().getCreationDate();
+
+        return getElapsedTime(creationDate);
+    }
+
+    @Override
     public String getElapsedTime(Date creationDate) {
 
-        LocalDate oldDate =  creationDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDate currentDate = LocalDate.now();
+        Date currentDate = new Date();
+        Long seconds = (currentDate.getTime()-creationDate.getTime())/1000;
 
-        Period elapsedTime = Period.between(currentDate, oldDate);
-        elapsedTime.get(ChronoUnit.HOURS);
+        Long minutes = seconds/60;
 
-        Long test = ChronoUnit.HOURS.between(currentDate, oldDate);
+        Long hours = minutes/60;
 
-        String response = elapsedTime + " h ago";
-        return response;
+        Long days = hours/24;
+
+        return seconds + " s " + minutes + " m " + hours + " h " + days + " d ";
     }
+
+
 
     @Override
     public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) {

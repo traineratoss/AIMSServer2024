@@ -6,13 +6,10 @@ import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/ideas")
@@ -51,4 +48,8 @@ public class CommentController {
         return commentService.getAllRepliesByCommentId(requestCommentReplyDTO);
     }
 
+    @GetMapping("/test")
+    public String getTime(@RequestParam(name = "id") Long id) {
+        return commentService.getTimeForComment(id);
+    }
 }

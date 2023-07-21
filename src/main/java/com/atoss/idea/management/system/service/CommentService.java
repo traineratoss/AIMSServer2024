@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface CommentService {
 
+    public String getTimeForComment(Long id);
+
     String getElapsedTime(Date creationDate);
 
     ResponseCommentDTO addComment(RequestCommentDTO newComment);
