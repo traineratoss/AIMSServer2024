@@ -3,6 +3,8 @@ package com.atoss.idea.management.system.repository;
 import com.atoss.idea.management.system.repository.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,4 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findUserByUsername(String username);
 
     Optional<User> findByEmail(String email);
+
+    List<User> findByUsernameStartsWith(String username);
 }

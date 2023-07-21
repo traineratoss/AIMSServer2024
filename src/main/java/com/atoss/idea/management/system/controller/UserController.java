@@ -60,4 +60,10 @@ public class UserController {
                                                  Pageable pageable) {
         return userService.getAllUsers(PageRequest.of(0, 2, Sort.by(Sort.Direction.ASC, "username")));
     }
+
+    @Transactional
+    @GetMapping("/allByUsername")
+    public Page<UserResponseDTO> getAllUserByUsername(@RequestParam(name = "username") String username) {
+        return userService.getAllUsersByUsername(username);
+    }
 }

@@ -22,4 +22,6 @@ public interface UserService {
 
     UserRegisterDTO getUserByEmail(String email);
 
+    Page<UserResponseDTO> getAllUsersByUsername(String username);
+
 }
