@@ -2,6 +2,7 @@ package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
+import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
@@ -31,11 +32,17 @@ public class UserServiceImpl implements UserService {
 
     private final SendEmailService sendEmailService;
 
+    private final AvatarRepository avatarRepository;
 
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, SendEmailService sendEmailService) {
+
+    public UserServiceImpl(UserRepository userRepository,
+                           ModelMapper modelMapper,
+                           SendEmailService sendEmailService,
+                           AvatarRepository avatarRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.sendEmailService = sendEmailService;
+        this.avatarRepository = avatarRepository;
     }
 
     @Override
@@ -69,8 +76,8 @@ public class UserServiceImpl implements UserService {
         if (userUpdateDTO.getEmail() != null) {
             user.setEmail(userUpdateDTO.getEmail());
         }
-        if (userUpdateDTO.getAvatar() != null) {
-            user.setAvatar(modelMapper.map(user.getAvatar(), Avatar.class));
+        if (userUpdateDTO.getAvatarId() != null) {
+            user.setAvatar(modelMapper.map(avatarRepository.findAvatarById(userUpdateDTO.getAvatarId()), Avatar.class));
         }
         if (userUpdateDTO.getFullName() != null) {
             user.setFullName(userUpdateDTO.getFullName());
@@ -119,7 +126,7 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<UserResponseDTO>(
           userRepository.findAll(pageable)
                   .stream()
-                  .filter(user -> user.getIsActive().equals(isActive))
+                  .filter(user -> user.getIsActive() != null && user.getIsActive().equals(isActive))
                   .map(user -> modelMapper.map(user, UserResponseDTO.class))
                   .toList()
         );

@@ -91,17 +91,17 @@ public class UserController {
         );
     }
 
+    @Transactional
     @PostMapping("/change-password")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+    public ResponseEntity<Object> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
         boolean passwordChanged = userService.changePassword(changePasswordDTO);
-
         if (passwordChanged) {
-            return ResponseEntity.ok("Parola a fost actualizată cu succes!");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Parola veche este incorectă");
+            return new ResponseEntity<>(HttpStatus.OK);
         }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @Transactional
     @PostMapping("/send-email")
     public void sendEmail(@RequestBody String username) {
         userService.sendEmail(username);

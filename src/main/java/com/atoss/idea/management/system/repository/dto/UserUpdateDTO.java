@@ -10,5 +10,5 @@ public class UserUpdateDTO {
     private String username;
     private String fullName;
     private String email;
-    private AvatarDTO avatar;
+    private Long avatarId;
 }
