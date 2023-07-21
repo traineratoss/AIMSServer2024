@@ -25,7 +25,7 @@ public interface UserService {
 
     Page<UserResponseDTO> getAllUsersByUsername(String username);
 
-    Page<UserResponseDTO> getAllPendingUsers(boolean isActiv);
+    Page<UserResponseDTO> getAllPendingUsers(boolean isActive, Pageable pageable);
 
     boolean changePassword(ChangePasswordDTO changePasswordDTO);
 

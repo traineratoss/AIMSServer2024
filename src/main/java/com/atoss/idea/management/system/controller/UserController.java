@@ -7,9 +7,7 @@ import com.atoss.idea.management.system.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,9 +32,9 @@ public class UserController {
 
     @Transactional
     @PostMapping
-    public UserResponseDTO addUser(@RequestParam(name = "username") String username,
-                                   @RequestParam(name = "email") String email) {
-        return userService.addUser(username, email);
+    public ResponseEntity<UserResponseDTO> addUser(@RequestParam(name = "username") String username,
+                                                   @RequestParam(name = "email") String email) {
+        return new ResponseEntity<>(userService.addUser(username, email), HttpStatus.CREATED);
     }
 
     @Transactional
@@ -53,9 +51,19 @@ public class UserController {
 
     @Transactional
     @GetMapping("/all")
-    public Page<UserResponseDTO> getAllUsers(@PageableDefault(sort = "username", direction = Sort.Direction.ASC, size = 2, page = 2)
-                                                 Pageable pageable) {
-        return userService.getAllUsers(PageRequest.of(0, 2, Sort.by(Sort.Direction.ASC, "username")));
+    public  ResponseEntity<Page<UserResponseDTO>> getAllUsers(@RequestParam(required = true) int pageSize,
+                                                              @RequestParam(required = true) int pageNumber,
+                                                              @RequestParam(required = true) String sortCategory) {
+        return new ResponseEntity<>(
+                userService.getAllUsers(
+                        PageRequest.of(
+                                pageNumber,
+                                pageSize,
+                                Sort.by(Sort.Direction.ASC, sortCategory)
+                        )
+                ),
+                HttpStatus.OK
+        );
     }
 
     @Transactional
@@ -66,8 +74,21 @@ public class UserController {
 
     @Transactional
     @GetMapping("/allByIsActive")
-    public Page<UserResponseDTO> getAllUserByIsActive(@RequestParam(name = "isActive") boolean isActive) {
-        return userService.getAllPendingUsers(isActive);
+    public ResponseEntity<Page<UserResponseDTO>> getAllUserByIsActive(@RequestParam(name = "isActive") boolean isActive,
+                                                                      @RequestParam(required = true) int pageSize,
+                                                                      @RequestParam(required = true) int pageNumber,
+                                                                      @RequestParam(required = true) String sortCategory) {
+        return new ResponseEntity<>(
+                userService.getAllPendingUsers(
+                        isActive,
+                        PageRequest.of(
+                            pageNumber,
+                            pageSize,
+                            Sort.by(Sort.Direction.ASC, sortCategory)
+                        )
+                ),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping("/change-password")
