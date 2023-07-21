@@ -69,13 +69,8 @@ public class CommentServiceImpl implements CommentService {
     public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) {
 
         User user = userRepository.findByUsername(requestCommentDTO.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found!"));
-        user.setAvatar(null);
 
         Idea idea = ideaRepository.findIdeaById(requestCommentDTO.getIdeaId());
-
-        if (!ideaRepository.existsById(requestCommentDTO.getIdeaId())) {
-            throw new RuntimeException();
-        }
 
         java.util.Date creationDate = new java.util.Date();
 
@@ -89,16 +84,16 @@ public class CommentServiceImpl implements CommentService {
 
         commentRepository.save(newComment);
 
+        ResponseCommentDTO responseCommentDTO = modelMapper.map(newComment, ResponseCommentDTO.class);
+        responseCommentDTO.setUsername(user.getUsername());
         // TODO add ResponseCommentDTO
-        return modelMapper.map(newComment, ResponseCommentDTO.class);
+        return responseCommentDTO;
     }
 
     @Override
-    public ResponseCommentDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO) {
+    public ResponseCommentReplyDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO) {
 
-        if (userRepository.findByUsername(requestCommentReplyDTO.getUsername()).isEmpty()) {
-            throw new RuntimeException();
-        }
+        User user = userRepository.findByUsername(requestCommentReplyDTO.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found!"));
 
         if (!commentRepository.existsById(requestCommentReplyDTO.getParentId())) {
             throw new RuntimeException();
@@ -116,9 +111,10 @@ public class CommentServiceImpl implements CommentService {
 
         commentRepository.save(newReply);
 
-        // TODO add ResponseCommentDTO
+        ResponseCommentReplyDTO responseCommentReplyDTO = modelMapper.map(newReply, ResponseCommentReplyDTO.class);
+        responseCommentReplyDTO.setUsername(user.getUsername());
 
-        return modelMapper.map(newReply, ResponseCommentDTO.class);
+        return responseCommentReplyDTO;
     }
 
     @Override

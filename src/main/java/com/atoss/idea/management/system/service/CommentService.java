@@ -20,7 +20,7 @@ public interface CommentService {
 
     ResponseCommentDTO addComment(RequestCommentDTO newComment);
 
-    ResponseCommentDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO);
+    ResponseCommentReplyDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO);
 
     CommentDTO getComment(Long commentId);
 

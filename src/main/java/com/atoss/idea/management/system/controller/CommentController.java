@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,21 +32,21 @@ public class CommentController {
         this.commentService = commentService;
     }
 
-    // TODO check if the mapping is good
-    @PostMapping("/")
+    @PostMapping("/comments")
+    @ResponseBody
     public ResponseEntity<Object> addComment(@RequestBody RequestCommentDTO newComment) {
 
-        commentService.addComment(newComment);
+        Object responseCommentDTO = commentService.addComment(newComment);
 
-        return new ResponseEntity<>("Comment was dope", HttpStatus.OK);
+        return new ResponseEntity<>(responseCommentDTO, HttpStatus.OK);
     }
 
-    @PostMapping("/comments")
+    @PostMapping("/comments/reply")
     public ResponseEntity<Object> addReply(@RequestBody RequestCommentReplyDTO requestCommentReplyDTO) {
 
-        commentService.addReply(requestCommentReplyDTO);
+        Object responseCommentReplyDTO = commentService.addReply(requestCommentReplyDTO);
 
-        return new ResponseEntity<>("Reply fired", HttpStatus.OK);
+        return new ResponseEntity<>(responseCommentReplyDTO, HttpStatus.OK);
     }
 
     @Transactional
