@@ -8,13 +8,15 @@ import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/ideas")
 public class CommentController {
@@ -42,12 +44,12 @@ public class CommentController {
         return new ResponseEntity<>("Reply fired", HttpStatus.OK);
     }
 
-    @GetMapping("/")
+    @GetMapping("/comments")
     public List<ResponseCommentDTO> getAllCommentsByIdeaId(@RequestBody RequestCommentDTO requestCommentDTO) {
         return commentService.getAllCommentsByIdeaId(requestCommentDTO);
     }
 
-    @GetMapping("/comments")
+    @GetMapping("/comments/replies")
     public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(@RequestBody RequestCommentReplyDTO requestCommentReplyDTO) {
         return commentService.getAllRepliesByCommentId(requestCommentReplyDTO);
     }

@@ -10,15 +10,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/ideas")
 public class IdeaController {
@@ -37,18 +40,18 @@ public class IdeaController {
         return new ResponseEntity<>(ideaService.addIdea(idea, username), HttpStatus.OK);
     }
 
-    @GetMapping("getIdea/id")
+    @GetMapping("/getIdea/id")
     public ResponseEntity<IdeaResponseDTO> getIdeaById(@RequestParam(required = true) Long id) {
         return new ResponseEntity<>(ideaService.getIdeaById(id), HttpStatus.OK);
     }
 
-    @PatchMapping("updateIdea/id")
+    @PatchMapping("/updateIdea/id")
     public ResponseEntity<IdeaResponseDTO> updateIdeaById(@RequestParam(required = true) Long id,
                                                           @RequestBody IdeaUpdateDTO ideaUpdateDTO) {
         return new ResponseEntity<>(ideaService.updateIdeaById(id, ideaUpdateDTO), HttpStatus.OK);
     }
 
-    @DeleteMapping("deleteIdea/id")
+    @DeleteMapping("/deleteIdea/id")
     public ResponseEntity<String> deleteIdeaById(@RequestParam(required = true) Long id)  {
         ideaService.deleteIdeaById(id);
         return new ResponseEntity<>("Idea successfully deleted", HttpStatus.OK);
