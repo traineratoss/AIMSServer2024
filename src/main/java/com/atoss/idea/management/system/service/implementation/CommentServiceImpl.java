@@ -93,7 +93,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public ResponseCommentReplyDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO) {
 
-        User user = userRepository.findByUsername(requestCommentReplyDTO.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found!"));
+        User user = userRepository.findByUsername(requestCommentReplyDTO.getUsername())
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
 
         if (!commentRepository.existsById(requestCommentReplyDTO.getParentId())) {
             throw new RuntimeException();
@@ -103,7 +104,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comment newReply =  new Comment();
 
-        newReply.setUser(userRepository.findUserByUsername(requestCommentReplyDTO.getUsername()));
+        newReply.setUser(user);
         newReply.setIdea(null);
         newReply.setParent(commentRepository.findById(requestCommentReplyDTO.getParentId()).get());
         newReply.setCommentText(requestCommentReplyDTO.getCommentText());

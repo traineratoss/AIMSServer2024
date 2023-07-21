@@ -50,7 +50,7 @@ public class CommentController {
     }
 
     @Transactional
-    @GetMapping("/all")
+    @GetMapping("/comments")
     public  ResponseEntity<Page<ResponseCommentDTO>> getAllCommentsByIdeaIdWithPaging(
                                                                  @RequestParam(required = true) Long ideaId,
                                                                  @RequestParam(required = true) int pageSize,
@@ -60,7 +60,7 @@ public class CommentController {
                 PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory))), HttpStatus.OK);
     }
 
-    @GetMapping("/comments")
+    @GetMapping("/comments/test")
     public List<ResponseCommentDTO> getAllCommentsByIdeaId(@RequestParam(name = "ideaId") Long ideaId) {
         return commentService.getAllCommentsByIdeaId(ideaId);
     }
