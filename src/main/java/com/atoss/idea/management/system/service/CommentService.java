@@ -28,7 +28,7 @@ public interface CommentService {
 
     List<CommentDTO> getAllComments();
 
-    List<ResponseCommentDTO> getAllCommentsByIdeaId(RequestCommentDTO requestCommentDTO);
+    List<ResponseCommentDTO> getAllCommentsByIdeaId(Long ideaId);
 
     Page<ResponseCommentDTO> getAllCommentsByIdeaIdWithPaging(Long ideaId, Pageable pageable);
 

@@ -122,12 +122,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<ResponseCommentDTO> getAllCommentsByIdeaId(RequestCommentDTO requestCommentDTO) {
-        if (!ideaRepository.existsById(requestCommentDTO.getIdeaId())) {
+    public List<ResponseCommentDTO> getAllCommentsByIdeaId(Long ideaId) {
+        if (!ideaRepository.existsById(ideaId)) {
             throw new RuntimeException();
         }
 
-        List<ResponseCommentDTO> filteredList = commentRepository.findAllByIdeaId(requestCommentDTO.getIdeaId()).stream()
+        List<ResponseCommentDTO> filteredList = commentRepository.findAllByIdeaId(ideaId).stream()
                 .map(comment -> modelMapper.map(comment, ResponseCommentDTO.class))
                 .collect(Collectors.toList());
 

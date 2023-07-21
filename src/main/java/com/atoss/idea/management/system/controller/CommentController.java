@@ -15,10 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -61,8 +60,8 @@ public class CommentController {
     }
 
     @GetMapping("/comments")
-    public List<ResponseCommentDTO> getAllCommentsByIdeaId(@RequestBody RequestCommentDTO requestCommentDTO) {
-        return commentService.getAllCommentsByIdeaId(requestCommentDTO);
+    public List<ResponseCommentDTO> getAllCommentsByIdeaId(@RequestParam(name = "ideaId") Long ideaId) {
+        return commentService.getAllCommentsByIdeaId(ideaId);
     }
 
     @GetMapping("/comments/replies")
