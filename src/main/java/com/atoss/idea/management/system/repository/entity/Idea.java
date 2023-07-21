@@ -51,7 +51,7 @@ public class Idea {
     @JsonManagedReference(value = "idea-image")
     private Image image;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "idea_category",
             joinColumns = { @JoinColumn(name = "idea_id") },

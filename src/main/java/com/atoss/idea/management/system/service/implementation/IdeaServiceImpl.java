@@ -1,10 +1,14 @@
 package com.atoss.idea.management.system.service.implementation;
 
-import com.atoss.idea.management.system.exception.ValidationException;
+import com.atoss.idea.management.system.exception.IdeaNotFoundException;
+import com.atoss.idea.management.system.exception.UserNotFoundException;
+import com.atoss.idea.management.system.exception.IdNotValidException;
+import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.CategoryDTO;
+import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
+import com.atoss.idea.management.system.repository.dto.CategoryDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.repository.entity.Category;
 import com.atoss.idea.management.system.repository.entity.Idea;
@@ -17,7 +21,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,27 +34,36 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final UserRepository userRepository;
 
+    private final CategoryRepository categoryRepository;
+
     private final ModelMapper modelMapper;
 
-    public IdeaServiceImpl(IdeaRepository ideaRepository, UserRepository userRepository, ModelMapper modelMapper) {
+    public IdeaServiceImpl(IdeaRepository ideaRepository,
+                           UserRepository userRepository,
+                           CategoryRepository categoryRepository,
+                           ModelMapper modelMapper) {
         this.ideaRepository = ideaRepository;
         this.userRepository = userRepository;
+        this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
     }
 
     @Override
-    public IdeaRequestDTO addIdea(IdeaRequestDTO idea) throws ValidationException {
+    public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) {
         if (idea.getTitle() == null || idea.getTitle().isEmpty()) {
-            throw new ValidationException("Please enter a valid title for the idea.");
+            throw new IdNotValidException("Please enter a valid title for the idea.");
         }
         if (idea.getStatus() == null || idea.getStatus().isEmpty()) {
-            throw new ValidationException("Please enter a valid status for the idea.");
+            throw new IdNotValidException("Please enter a valid status for the idea.");
         }
         if (idea.getCategoryList() == null || idea.getCategoryList().size() <= 0) {
-            throw new ValidationException("Please enter a valid category for the idea.");
+            throw new IdNotValidException("Please enter a valid category for the idea.");
+        }
+        if (idea.getText() == null || idea.getText().isEmpty()) {
+            throw new IdNotValidException("Please enter a valid text for the idea.");
         }
         Idea savedIdea = new Idea();
-        User user = userRepository.findById(1L).orElseThrow(() -> new ValidationException("Invalid user ID."));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("No user found by this username."));
         savedIdea.setUser(user);
         if (idea.getImage() != null) {
             Image image = modelMapper.map(idea.getImage(), Image.class);
@@ -59,29 +74,33 @@ public class IdeaServiceImpl implements IdeaService {
         savedIdea.setTitle(idea.getTitle());
         savedIdea.setCategoryList(new ArrayList<>());
         for (CategoryDTO categoryDTO : idea.getCategoryList()) {
-            Category category = modelMapper.map(categoryDTO, Category.class);
-            savedIdea.getCategoryList().add(category);
+            Category category = categoryRepository.findByText(modelMapper.map(categoryDTO, Category.class).getText());
+            if (category == null) {
+                savedIdea.getCategoryList().add(modelMapper.map(categoryDTO, Category.class));
+            } else {
+                savedIdea.getCategoryList().add(category);
+            }
         }
+        savedIdea.setDate(new Date());
         user.getIdeas().add(savedIdea);
-        return modelMapper.map(ideaRepository.save(savedIdea), IdeaRequestDTO.class);
+        return modelMapper.map(ideaRepository.save(savedIdea), IdeaResponseDTO.class);
     }
 
-
     @Override
-    public IdeaRequestDTO getIdeaById(Long id) throws ValidationException {
+    public IdeaResponseDTO getIdeaById(Long id) throws IdNotValidException {
         if (ideaRepository.existsById(id)) {
             Idea idea = ideaRepository.findIdeaById(id);
-            return modelMapper.map(ideaRepository.findIdeaById(id), IdeaRequestDTO.class);
+            return modelMapper.map(ideaRepository.findIdeaById(id), IdeaResponseDTO.class);
         } else {
-            throw new ValidationException("Idea doesn't exist.");
+            throw new IdeaNotFoundException("Idea doesn't exist.");
         }
     }
 
     @Override
-    public IdeaRequestDTO updateIdeaById(Long id, IdeaUpdateDTO ideaUpdateDTO) throws ValidationException {
+    public IdeaResponseDTO updateIdeaById(Long id, IdeaUpdateDTO ideaUpdateDTO) {
         if (ideaRepository.existsById(id)) {
             Idea idea = ideaRepository.findById(id).orElseThrow(
-                    () -> new ValidationException("Idea doesn't exist."));
+                    () -> new IdeaNotFoundException("Idea doesn't exist."));
             if (ideaUpdateDTO.getText() != null) {
                 idea.setText(ideaUpdateDTO.getText());
             }
@@ -100,48 +119,51 @@ public class IdeaServiceImpl implements IdeaService {
                     idea.getCategoryList().add(category);
                 }
             }
-            ideaRepository.save(idea);
+            return modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);
         } else {
-            throw new ValidationException("Idea doesn't exist.");
+            throw new IdeaNotFoundException("Idea doesn't exist.");
         }
-        return null;
     }
 
     @Override
-    public void deleteIdeaById(Long id) throws ValidationException {
+    public void deleteIdeaById(Long id) {
         if (ideaRepository.existsById(id)) {
             ideaRepository.deleteById(id);
         } else {
-            throw new ValidationException("Idea doesn't exist.");
+            throw new IdeaNotFoundException("Idea doesn't exist.");
         }
     }
 
     @Override
-    public Page<IdeaRequestDTO> getAllIdeas(Pageable pageable) {
-        return new PageImpl<IdeaRequestDTO>(
+    public Page<IdeaResponseDTO> getAllIdeas(Pageable pageable) {
+        if (ideaRepository.findAll().size() == 0) {
+            throw new IdNotValidException("No ideas found.");
+        }
+        return new PageImpl<IdeaResponseDTO>(
                 ideaRepository.findAll(pageable)
                         .stream()
-                        .map(user -> modelMapper.map(user, IdeaRequestDTO.class))
+                        .map(user -> modelMapper.map(user, IdeaResponseDTO.class))
                         .toList()
         );
     }
 
     @Override
-    public Page<IdeaRequestDTO> getAllIdeasByUserId(Long id, Pageable pageable) throws ValidationException {
+    public Page<IdeaResponseDTO> getAllIdeasByUserId(Long id, Pageable pageable) {
         if (id < 0) {
-            throw new ValidationException("Please enter a valid ID.");
+            throw new IdNotValidException("Please enter a valid ID.");
         }
         if (!userRepository.existsById(id)) {
-            throw new ValidationException("User doesn't exist.");
+            throw new UserNotFoundException("User doesn't exist.");
         }
-        if (userRepository.findById(id).orElseThrow(() -> new ValidationException("User doesn't exist."))
+        if (userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User doesn't exist."))
                 .getIdeas().isEmpty()) {
-            throw new ValidationException("User doesn't have any ideas.");
+            throw new IdNotValidException("No ideas found.");
         }
-        return new PageImpl<IdeaRequestDTO>(
+        return new PageImpl<IdeaResponseDTO>(
                 ideaRepository.findAllByUserId(id, pageable)
                         .stream()
-                        .map(idea -> modelMapper.map(idea, IdeaRequestDTO.class))
+                        .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
                         .collect(Collectors.toList()));
     }
 }
+

@@ -8,7 +8,6 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.CascadeType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,7 +27,7 @@ public class Category {
     @Column(name = "text")
     private String text;
 
-    @ManyToMany(mappedBy = "categoryList", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "categoryList")
     @JsonIgnoreProperties("categoryList")
     private List<Idea> ideaList;
 

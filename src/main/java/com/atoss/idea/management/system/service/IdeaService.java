@@ -1,22 +1,22 @@
 package com.atoss.idea.management.system.service;
 
-import com.atoss.idea.management.system.exception.ValidationException;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
+import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface IdeaService {
-    IdeaRequestDTO addIdea(IdeaRequestDTO idea) throws ValidationException;
+    IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username);
 
-    IdeaRequestDTO getIdeaById(Long id) throws ValidationException;
+    IdeaResponseDTO getIdeaById(Long id);
 
-    IdeaRequestDTO updateIdeaById(Long id, IdeaUpdateDTO ideaUpdateDTO) throws ValidationException;
+    IdeaResponseDTO updateIdeaById(Long id, IdeaUpdateDTO ideaUpdateDTO);
 
-    void deleteIdeaById(Long id) throws ValidationException;
+    void deleteIdeaById(Long id);
 
-    Page<IdeaRequestDTO> getAllIdeas(Pageable pageable) throws ValidationException;
+    Page<IdeaResponseDTO> getAllIdeas(Pageable pageable);
 
-    Page<IdeaRequestDTO> getAllIdeasByUserId(Long id, Pageable pageable) throws ValidationException;
+    Page<IdeaResponseDTO> getAllIdeasByUserId(Long id, Pageable pageable);
 
 }
