@@ -165,5 +165,53 @@ public class IdeaServiceImpl implements IdeaService {
                         .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
                         .collect(Collectors.toList()));
     }
+
+    @Override
+    public Page<IdeaResponseDTO> filterIdeasByTitle(String title, Pageable pageable) {
+        if (!title.isEmpty()) {
+            return new PageImpl<IdeaResponseDTO>(
+                    ideaRepository.findAllByTitle(title, pageable)
+                            .stream()
+                            .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
+                            .collect(Collectors.toList()));
+        }
+        return null;
+    }
+
+    @Override
+    public Page<IdeaResponseDTO> filterIdeasByText(String text, Pageable pageable) {
+        if (!text.isEmpty()) {
+            return new PageImpl<IdeaResponseDTO>(
+                    ideaRepository.findAllByText(text, pageable)
+                            .stream()
+                            .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
+                            .collect(Collectors.toList()));
+        }
+        return null;
+    }
+
+    @Override
+    public Page<IdeaResponseDTO> filterIdeasByStatus(String status, Pageable pageable) {
+        if (!status.isEmpty()) {
+            return new PageImpl<IdeaResponseDTO>(
+                    ideaRepository.findAllByStatus(status, pageable)
+                            .stream()
+                            .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
+                            .collect(Collectors.toList()));
+        }
+        return null;
+    }
+
+    @Override
+    public Page<IdeaResponseDTO> filterIdeasByCategory(String category, Pageable pageable) {
+        if (!category.isEmpty()) {
+            return new PageImpl<IdeaResponseDTO>(
+                    ideaRepository.findAllByCategoryName(category, pageable)
+                            .stream()
+                            .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
+                            .collect(Collectors.toList()));
+        }
+        return null;
+    }
 }
 
