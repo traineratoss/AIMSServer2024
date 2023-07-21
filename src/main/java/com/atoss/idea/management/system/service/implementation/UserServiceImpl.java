@@ -115,10 +115,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserResponseDTO> getAllPendingUsers(boolean isActive) {
+    public Page<UserResponseDTO> getAllPendingUsers(boolean isActive, Pageable pageable) {
         return new PageImpl<UserResponseDTO>(
-          userRepository.findByIsActive(isActive)
+          userRepository.findAll(pageable)
                   .stream()
+                  .filter(user -> user.getIsActive().equals(isActive))
                   .map(user -> modelMapper.map(user, UserResponseDTO.class))
                   .toList()
         );

@@ -1,6 +1,6 @@
 package com.atoss.idea.management.system.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -8,10 +8,12 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Lob;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -29,9 +31,9 @@ public class Avatar {
     @Column(name = "data")
     private byte[] data;
 
-    @OneToOne(mappedBy = "avatar")
-    @JsonBackReference(value = "user-avatar")
-    private User user;
+    @OneToMany(mappedBy = "avatar")
+    @JsonManagedReference(value = "users-avatar")
+    private List<User> users;
 
     @Column(name = "file_name")
     private String fileName;
