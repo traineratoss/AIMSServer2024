@@ -12,16 +12,9 @@ import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
 import com.atoss.idea.management.system.service.CommentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,13 +44,13 @@ public class CommentServiceImpl implements CommentService {
     public String getElapsedTime(Date creationDate) {
 
         Date currentDate = new Date();
-        Long seconds = (currentDate.getTime()-creationDate.getTime())/1000;
+        Long seconds = (currentDate.getTime() - creationDate.getTime()) / 1000;
 
-        Long minutes = seconds/60;
+        Long minutes = seconds / 60;
 
-        Long hours = minutes/60;
+        Long hours = minutes / 60;
 
-        Long days = hours/24;
+        Long days = hours / 24;
 
         return seconds + " s " + minutes + " m " + hours + " h " + days + " d ";
     }
