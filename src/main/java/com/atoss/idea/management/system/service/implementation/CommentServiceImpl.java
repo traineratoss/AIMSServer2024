@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.service.implementation;
 
+import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
@@ -9,7 +10,10 @@ import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
+import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.CommentService;
+import jakarta.transaction.Transactional;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import java.util.Date;
@@ -17,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Log4j2
 @Service
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
@@ -55,14 +60,11 @@ public class CommentServiceImpl implements CommentService {
         return seconds + " s " + minutes + " m " + hours + " h " + days + " d ";
     }
 
-
-
+    @Transactional
     @Override
     public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) {
 
-        if (!userRepository.findByUsername(requestCommentDTO.getUsername()).isPresent()) {
-            throw new RuntimeException();
-        }
+        User user = userRepository.findByUsername(requestCommentDTO.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found!"));
 
         if (!ideaRepository.existsById(requestCommentDTO.getIdeaId())) {
             throw new RuntimeException();
@@ -72,11 +74,11 @@ public class CommentServiceImpl implements CommentService {
 
         Comment newComment =  new Comment();
 
-        newComment.setUser(userRepository.findUserByUsername(requestCommentDTO.getUsername()));
+        newComment.setUser(user);
         newComment.setIdea(ideaRepository.findIdeaById(requestCommentDTO.getIdeaId()));
+        newComment.setParent(null);
         newComment.setCommentText(requestCommentDTO.getCommentText());
         newComment.setCreationDate(creationDate);
-        newComment.setParent(null);
 
         commentRepository.save(newComment);
 
@@ -101,9 +103,9 @@ public class CommentServiceImpl implements CommentService {
 
         newReply.setUser(userRepository.findUserByUsername(requestCommentReplyDTO.getUsername()));
         newReply.setIdea(null);
+        newReply.setParent(commentRepository.findById(requestCommentReplyDTO.getParentId()).get());
         newReply.setCommentText(requestCommentReplyDTO.getCommentText());
         newReply.setCreationDate(creationDate);
-        newReply.setParent(commentRepository.findById(requestCommentReplyDTO.getParentId()).get());
 
         commentRepository.save(newReply);
 
