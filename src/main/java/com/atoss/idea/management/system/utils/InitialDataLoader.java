@@ -58,7 +58,7 @@ public class InitialDataLoader implements CommandLineRunner {
         if (ddlValue.equals("create")) {
             Avatar avatar1 = avatarRepository.save(
                     createAvatar(
-                        "C:/Internship/AIMSServer2023/src/main/java/com/atoss/idea/management/system/utils/image/avatar/avatar1.svg",
+                        "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar1.svg",
                         "avatar1",
                         ".svg"
                     )
@@ -66,48 +66,48 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Avatar avatar2 = avatarRepository.save(
                     createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/java/com/atoss/idea/management/system/utils/image/avatar/avatar2.svg",
-                            "avatar1",
+                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar2.svg",
+                            "avatar2",
                             ".svg"
                     )
             );
 
             Avatar avatar3 = avatarRepository.save(
                     createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/java/com/atoss/idea/management/system/utils/image/avatar/avatar3.svg",
-                            "avatar1",
+                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar3.svg",
+                            "avatar3",
                             ".svg"
                     )
             );
 
             Avatar avatar4 = avatarRepository.save(
                     createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/java/com/atoss/idea/management/system/utils/image/avatar/avatar4.svg",
-                            "avatar1",
+                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar4.svg",
+                            "avatar4",
                             ".svg"
                     )
             );
 
             Avatar avatar5 = avatarRepository.save(
                     createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/java/com/atoss/idea/management/system/utils/image/avatar/avatar5.svg",
-                            "avatar1",
+                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar5.svg",
+                            "avatar5",
                             ".svg"
                     )
             );
 
             Avatar avatar6 = avatarRepository.save(
                     createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/java/com/atoss/idea/management/system/utils/image/avatar/avatar6.svg",
-                            "avatar1",
+                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar6.svg",
+                            "avatar6",
                             ".svg"
                     )
             );
 
             Avatar avatar7 = avatarRepository.save(
                     createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/java/com/atoss/idea/management/system/utils/image/avatar/avatar7.svg",
-                            "avatar1",
+                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar7.svg",
+                            "avatar7",
                             ".svg"
                     )
             );
@@ -129,7 +129,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Image image1 = createImage("image1",
                     ".png",
-                    "C:/Internship/AIMSServer2023/src/main/java/com/atoss/idea/management/system/utils/image/idea/img.png"
+                    "C:/Internship/AIMSServer2023/src/main/resources/image/idea/img.png"
             );
             imageRepository.save(image1);
 
@@ -139,7 +139,7 @@ public class InitialDataLoader implements CommandLineRunner {
             Idea idea1 = createIdea(
                     user1,
                     "Open",
-                    "saifhsgkdasjadgshdagkhsjkldagbsdafn;   dafasfjksdaf jsgdafsyda",
+                    "First idea",
                     "Test1",
                     image1,
                     new Date(),
@@ -149,7 +149,7 @@ public class InitialDataLoader implements CommandLineRunner {
             Idea idea2 = createIdea(
                     user1,
                     "Draft",
-                    "sd865243 h73b 23 9806b 1l4571 bt5iu2bt 5tg",
+                    "Second idea",
                     "Test2",
                     null,
                     new Date(),
@@ -159,7 +159,7 @@ public class InitialDataLoader implements CommandLineRunner {
             Idea idea3 = createIdea(
                     user1,
                     "Implemented",
-                    "4375 542356 546 547 5637 575 63735 743 5 6743",
+                    "Third idea",
                     "Test3",
                     null,
                     new Date(),
@@ -174,7 +174,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     idea1,
                     null,
                     user1,
-                    "test mafklshsdakgh fildqghuidsg  sfhkhgbkhdbgksfdbgk"
+                    "First comment"
             );
             commentRepository.save(comment1);
         }
