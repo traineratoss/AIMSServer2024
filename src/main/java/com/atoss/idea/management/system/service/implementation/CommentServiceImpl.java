@@ -153,6 +153,15 @@ public class CommentServiceImpl implements CommentService {
             throw new RuntimeException();
         }
 
+        // Dragos B.
+        // The original Comment entity stores a User object
+        // ResponseCommentDTO and ResponseCommentReplyDTO store the username
+        // of their respective user (String)
+        // A direct conversion between the two is impossible
+        // My Workaround:
+        // - find and store the username in a local variable
+        // - map the comment to its corespondent response class
+        // - update the username for the new object
         return new PageImpl<ResponseCommentDTO>(
                 commentRepository.findAll(pageable)
                         .stream()
