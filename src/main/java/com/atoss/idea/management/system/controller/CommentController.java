@@ -34,19 +34,19 @@ public class CommentController {
 
     @PostMapping("/comments")
     @ResponseBody
-    public ResponseEntity<Object> addComment(@RequestBody RequestCommentDTO newComment) {
+    public ResponseEntity<ResponseCommentDTO> addComment(@RequestBody RequestCommentDTO newComment) {
 
-        Object responseCommentDTO = commentService.addComment(newComment);
+        ResponseCommentDTO responseCommentDTO = commentService.addComment(newComment);
 
-        return new ResponseEntity<>(responseCommentDTO, HttpStatus.OK);
+        return new ResponseEntity<ResponseCommentDTO>(responseCommentDTO, HttpStatus.OK);
     }
 
     @PostMapping("/comments/reply")
-    public ResponseEntity<Object> addReply(@RequestBody RequestCommentReplyDTO requestCommentReplyDTO) {
+    public ResponseEntity<ResponseCommentReplyDTO> addReply(@RequestBody RequestCommentReplyDTO requestCommentReplyDTO) {
 
-        Object responseCommentReplyDTO = commentService.addReply(requestCommentReplyDTO);
+        ResponseCommentReplyDTO responseCommentReplyDTO = commentService.addReply(requestCommentReplyDTO);
 
-        return new ResponseEntity<>(responseCommentReplyDTO, HttpStatus.OK);
+        return new ResponseEntity<ResponseCommentReplyDTO>(responseCommentReplyDTO, HttpStatus.OK);
     }
 
     @Transactional
