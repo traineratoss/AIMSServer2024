@@ -118,4 +118,11 @@ public class UserController {
                                                 @RequestBody String password) {
         return new ResponseEntity<>(userService.checkPassword(username, password), HttpStatus.OK);
     }
+
+    @Transactional
+    @PostMapping("/send-forgot-password")
+    public void sendForgotPassword(@RequestBody String usernameOrEmail) {
+        userService.sendForgotPassword(usernameOrEmail);
+    }
+
 }

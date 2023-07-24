@@ -171,4 +171,12 @@ public class UserServiceImpl implements UserService {
                 );
         return user.getPassword().equals(password);
     }
+
+    @Override
+    public void sendForgotPassword(String usernameOrEmail) {
+        User user = userRepository
+                .findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new UserNotFoundException("User or email not found"));
+        sendEmailService.sendEmailForgotPassword(user.getUsername());
+    }
 }
