@@ -11,7 +11,6 @@ import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.Image;
 import com.atoss.idea.management.system.repository.entity.Category;
 import com.atoss.idea.management.system.repository.entity.Comment;
-import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.google.common.hash.Hashing;
@@ -120,7 +119,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Idea idea1 = createIdea(
                     user1,
-                    Status.OPEN,
+                    "OPEN",
                     "First idea",
                     "Test1",
                     image1,
@@ -130,7 +129,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Idea idea2 = createIdea(
                     user1,
-                    Status.DRAFT,
+                    "DRAFT",
                     "Second idea",
                     "Test2",
                     null,
@@ -140,7 +139,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Idea idea3 = createIdea(
                     user1,
-                    Status.IMPLEMENTED,
+                    "IMPLEMENTED",
                     "Third idea",
                     "Test3",
                     null,
@@ -217,7 +216,7 @@ public class InitialDataLoader implements CommandLineRunner {
     }
 
     private static Idea createIdea(User user,
-                                   Status status,
+                                   String status,
                                    String text,
                                    String title,
                                    Image image,
