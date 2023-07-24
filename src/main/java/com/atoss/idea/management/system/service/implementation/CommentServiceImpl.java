@@ -120,7 +120,7 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new UserNotFoundException("User not found!"));
 
         if (!commentRepository.existsById(requestCommentReplyDTO.getParentId())) {
-            throw new RuntimeException();
+            throw new CommentNotFoundException();
         }
 
         java.util.Date creationDate = new java.util.Date();
