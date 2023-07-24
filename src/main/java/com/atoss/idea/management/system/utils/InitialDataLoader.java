@@ -20,6 +20,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -35,8 +36,10 @@ public class InitialDataLoader implements CommandLineRunner {
     private final IdeaRepository ideaRepository;
     private final CommentRepository commentRepository;
 
+
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlValue;
+
 
     public InitialDataLoader(AvatarRepository avatarRepository,
                              UserRepository userRepository,
@@ -52,65 +55,50 @@ public class InitialDataLoader implements CommandLineRunner {
         this.ideaRepository = ideaRepository;
     }
 
+    private String getResourcePath(String resourceName) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL resourceURL = classLoader.getResource(resourceName);
+        if (resourceURL != null) {
+            return resourceURL.getPath();
+        } else {
+            throw new IllegalArgumentException("Resource not found: " + resourceName);
+        }
+    }
+
+
     @Transactional
     @Override
     public void run(String... args) throws Exception {
+        ClassLoader classLoader = getClass().getClassLoader();
         if (ddlValue.equals("create")) {
+            String avatarFilePath = "image/avatar/";
             Avatar avatar1 = avatarRepository.save(
-                    createAvatar(
-                        "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar1.svg",
-                        "avatar1",
-                        ".svg"
-                    )
-            );
+                    createAvatar(classLoader.getResource(avatarFilePath + "avatar1.svg").getPath(), "avatar1", ".svg"));
 
             Avatar avatar2 = avatarRepository.save(
-                    createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar2.svg",
-                            "avatar2",
-                            ".svg"
-                    )
-            );
+                    createAvatar(classLoader.getResource(avatarFilePath + "avatar2.svg").getPath(), "avatar2", ".svg"));
 
             Avatar avatar3 = avatarRepository.save(
-                    createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar3.svg",
-                            "avatar3",
-                            ".svg"
-                    )
-            );
+                    createAvatar(classLoader.getResource(avatarFilePath + "avatar3.svg").getPath(), "avatar3", ".svg"));
 
             Avatar avatar4 = avatarRepository.save(
-                    createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar4.svg",
-                            "avatar4",
-                            ".svg"
-                    )
-            );
+                    createAvatar(classLoader.getResource(avatarFilePath + "avatar4.svg").getPath(), "avatar4", ".svg"));
 
             Avatar avatar5 = avatarRepository.save(
-                    createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar5.svg",
-                            "avatar5",
-                            ".svg"
-                    )
-            );
+                    createAvatar(classLoader.getResource(avatarFilePath + "avatar5.svg").getPath(), "avatar5", ".svg"));
 
             Avatar avatar6 = avatarRepository.save(
-                    createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar6.svg",
-                            "avatar6",
-                            ".svg"
-                    )
-            );
+                    createAvatar(classLoader.getResource(avatarFilePath + "avatar6.svg").getPath(), "avatar6", ".svg"));
 
             Avatar avatar7 = avatarRepository.save(
-                    createAvatar(
-                            "C:/Internship/AIMSServer2023/src/main/resources/image/avatar/avatar7.svg",
-                            "avatar7",
-                            ".svg"
-                    )
-            );
+                    createAvatar(classLoader.getResource(avatarFilePath + "avatar7.svg").getPath(), "avatar7", ".svg"));
+
+            Avatar avatar9 = avatarRepository.save(
+                    createAvatar(classLoader.getResource(avatarFilePath + "avatar7.svg").getPath(), "avatar7", ".svg"));
+
+            Avatar avatar10 = avatarRepository.save(
+                    createAvatar(classLoader.getResource(avatarFilePath + "avatar7.svg").getPath(), "avatar1", ".svg"));
+
 
             User user1 = createUser(true,
                     Role.ADMIN,
@@ -129,9 +117,10 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Image image1 = createImage("image1",
                     ".png",
-                    "C:/Internship/AIMSServer2023/src/main/resources/image/idea/img.png"
+                    getResourcePath("image/idea/img.png")
             );
             imageRepository.save(image1);
+
 
             List<Category> categories = new ArrayList<>();
             categories.add(category1);
