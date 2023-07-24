@@ -1,14 +1,15 @@
 package com.atoss.idea.management.system.service.implementation;
 
+import com.atoss.idea.management.system.exception.EmailAlreadyExistException;
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
+import com.atoss.idea.management.system.exception.UsernameAlreadyExistException;
 import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
 import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
-import com.atoss.idea.management.system.repository.dto.UserRegisterDTO;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
@@ -19,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.nio.charset.StandardCharsets;
 
 
@@ -71,9 +71,15 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO updateUserByUsername(String username, UserUpdateDTO userUpdateDTO) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         if (userUpdateDTO.getUsername() != null) {
+            if (userRepository.findByUsername(userUpdateDTO.getUsername()).isPresent()) {
+                throw new UsernameAlreadyExistException("This username is already in use!");
+            }
             user.setUsername(userUpdateDTO.getUsername());
         }
         if (userUpdateDTO.getEmail() != null) {
+            if (userRepository.findByEmail(userUpdateDTO.getEmail()).isPresent()) {
+                throw new EmailAlreadyExistException("This email is already in use!");
+            }
             user.setEmail(userUpdateDTO.getEmail());
         }
         if (userUpdateDTO.getAvatarId() != null) {
@@ -106,9 +112,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserRegisterDTO getUserByEmail(String email) {
+    public UserResponseDTO getUserByEmail(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found!"));
-        return modelMapper.map(user, UserRegisterDTO.class);
+        return modelMapper.map(user, UserResponseDTO.class);
     }
 
     @Override

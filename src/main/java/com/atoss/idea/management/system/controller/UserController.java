@@ -44,9 +44,15 @@ public class UserController {
     }
 
     @Transactional
-    @GetMapping
+    @GetMapping("/username")
     public UserResponseDTO getUserByUsername(@RequestParam(name = "username") String username) {
         return userService.getUserByUsername(username);
+    }
+
+    @Transactional
+    @GetMapping("/email")
+    public UserResponseDTO getUserByEmail(@RequestParam(name = "username") String email) {
+        return userService.getUserByEmail(email);
     }
 
     @Transactional

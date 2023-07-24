@@ -1,11 +1,13 @@
 package com.atoss.idea.management.system.utils;
 
 import com.atoss.idea.management.system.exception.CategoryAlreadyExistsException;
-import com.atoss.idea.management.system.exception.CategoryNotFoundException;
-import com.atoss.idea.management.system.exception.UserNotFoundException;
+import com.atoss.idea.management.system.exception.EmailAlreadyExistException;
+import com.atoss.idea.management.system.exception.UsernameAlreadyExistException;
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
-import com.atoss.idea.management.system.exception.AvatarNotFoundException;
+import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
+import com.atoss.idea.management.system.exception.AvatarNotFoundException;
+import com.atoss.idea.management.system.exception.CategoryNotFoundException;
 import com.atoss.idea.management.system.exception.FieldValidationException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -57,5 +59,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = IdeaNotFoundException.class)
     public ResponseEntity<Object> ideaNotFoundException(IdeaNotFoundException ideaNotFoundException) {
         return new ResponseEntity<>(ideaNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = UsernameAlreadyExistException.class)
+    public ResponseEntity<Object> usernameAlreadyExistException(UsernameAlreadyExistException usernameAlreadyExistException) {
+        return new ResponseEntity<>(usernameAlreadyExistException.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(value = EmailAlreadyExistException.class)
+    public ResponseEntity<Object> emailAlreadyExistException(EmailAlreadyExistException emailAlreadyExistException) {
+        return new ResponseEntity<>(emailAlreadyExistException.getMessage(), HttpStatus.CONFLICT);
     }
 }
