@@ -2,7 +2,7 @@ package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
-import com.atoss.idea.management.system.exception.IdNotValidException;
+import com.atoss.idea.management.system.exception.FieldValidationException;
 import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import com.atoss.idea.management.system.repository.entity.Status;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,16 +52,16 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) {
         if (idea.getTitle() == null || idea.getTitle().isEmpty()) {
-            throw new IdNotValidException("Please enter a valid title for the idea.");
+            throw new FieldValidationException("Please enter a valid title for the idea.");
         }
-        if (idea.getStatus() == null || idea.getStatus().isEmpty()) {
-            throw new IdNotValidException("Please enter a valid status for the idea.");
+        if (idea.getStatus() == null) {
+            throw new FieldValidationException("Please enter a valid status for the idea.");
         }
         if (idea.getCategoryList() == null || idea.getCategoryList().size() <= 0) {
-            throw new IdNotValidException("Please enter a valid category for the idea.");
+            throw new FieldValidationException("Please enter a valid category for the idea.");
         }
         if (idea.getText() == null || idea.getText().isEmpty()) {
-            throw new IdNotValidException("Please enter a valid text for the idea.");
+            throw new FieldValidationException("Please enter a valid text for the idea.");
         }
         Idea savedIdea = new Idea();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("No user found by this username."));
@@ -87,9 +88,8 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public IdeaResponseDTO getIdeaById(Long id) throws IdNotValidException {
+    public IdeaResponseDTO getIdeaById(Long id) {
         if (ideaRepository.existsById(id)) {
-            Idea idea = ideaRepository.findIdeaById(id);
             return modelMapper.map(ideaRepository.findIdeaById(id), IdeaResponseDTO.class);
         } else {
             throw new IdeaNotFoundException("Idea doesn't exist.");
@@ -120,6 +120,8 @@ public class IdeaServiceImpl implements IdeaService {
                 }
             }
             return modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);
+        } else if (ideaUpdateDTO == null) {
+            throw new FieldValidationException("Please enter at least one field to update.");
         } else {
             throw new IdeaNotFoundException("Idea doesn't exist.");
         }
@@ -137,7 +139,7 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public Page<IdeaResponseDTO> getAllIdeas(Pageable pageable) {
         if (ideaRepository.findAll().size() == 0) {
-            throw new IdNotValidException("No ideas found.");
+            throw new FieldValidationException("No ideas found.");
         }
         return new PageImpl<IdeaResponseDTO>(
                 ideaRepository.findAll(pageable)
@@ -150,14 +152,14 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public Page<IdeaResponseDTO> getAllIdeasByUserId(Long id, Pageable pageable) {
         if (id < 0) {
-            throw new IdNotValidException("Please enter a valid ID.");
+            throw new FieldValidationException("Please enter a valid ID.");
         }
         if (!userRepository.existsById(id)) {
             throw new UserNotFoundException("User doesn't exist.");
         }
         if (userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User doesn't exist."))
                 .getIdeas().isEmpty()) {
-            throw new IdNotValidException("No ideas found.");
+            throw new FieldValidationException("No ideas found.");
         }
         return new PageImpl<IdeaResponseDTO>(
                 ideaRepository.findAllByUserId(id, pageable)
@@ -174,8 +176,9 @@ public class IdeaServiceImpl implements IdeaService {
                             .stream()
                             .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
                             .collect(Collectors.toList()));
+        } else {
+            throw new FieldValidationException("Please enter a valid title for the filter search.");
         }
-        return null;
     }
 
     @Override
@@ -186,20 +189,22 @@ public class IdeaServiceImpl implements IdeaService {
                             .stream()
                             .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
                             .collect(Collectors.toList()));
+        } else {
+            throw new FieldValidationException("Please enter a valid text for the filter search.");
         }
-        return null;
     }
 
     @Override
-    public Page<IdeaResponseDTO> filterIdeasByStatus(String status, Pageable pageable) {
-        if (!status.isEmpty()) {
+    public Page<IdeaResponseDTO> filterIdeasByStatus(Status status, Pageable pageable) {
+        if (status != null) {
             return new PageImpl<IdeaResponseDTO>(
                     ideaRepository.findAllByStatus(status, pageable)
                             .stream()
                             .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
                             .collect(Collectors.toList()));
+        } else {
+            throw new FieldValidationException("Please enter a valid status for the filter search.");
         }
-        return null;
     }
 
     @Override
@@ -210,8 +215,17 @@ public class IdeaServiceImpl implements IdeaService {
                             .stream()
                             .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
                             .collect(Collectors.toList()));
+        } else {
+            throw new FieldValidationException("Please enter a valid category for the filter search.");
         }
-        return null;
+    }
+
+    @Override
+    public Page<IdeaResponseDTO> filterIdeasByAll(String title, String text, Status status, String category, Pageable pageable) {
+        return new PageImpl<>(
+                ideaRepository.findIdeasByParameters(title, text, status, category, pageable)
+                        .stream()
+                        .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
+                        .collect(Collectors.toList()));
     }
 }
-

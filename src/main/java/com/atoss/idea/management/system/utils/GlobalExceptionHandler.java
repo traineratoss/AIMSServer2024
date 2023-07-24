@@ -2,11 +2,11 @@ package com.atoss.idea.management.system.utils;
 
 import com.atoss.idea.management.system.exception.CategoryAlreadyExistsException;
 import com.atoss.idea.management.system.exception.CategoryNotFoundException;
-import com.atoss.idea.management.system.exception.IdNotValidException;
-import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
+import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.exception.AvatarNotFoundException;
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
+import com.atoss.idea.management.system.exception.FieldValidationException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +29,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(value = IdNotValidException.class)
-    public ResponseEntity<Object> idNotValidException(IdNotValidException exception) {
+    @ExceptionHandler(value = FieldValidationException.class)
+    public ResponseEntity<Object> idNotValidException(FieldValidationException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

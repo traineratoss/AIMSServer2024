@@ -3,6 +3,7 @@ package com.atoss.idea.management.system.service;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
+import com.atoss.idea.management.system.repository.entity.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,8 +24,10 @@ public interface IdeaService {
 
     Page<IdeaResponseDTO> filterIdeasByText(String text, Pageable pageable);
 
-    Page<IdeaResponseDTO> filterIdeasByStatus(String status, Pageable pageable);
+    Page<IdeaResponseDTO> filterIdeasByStatus(Status status, Pageable pageable);
 
     Page<IdeaResponseDTO> filterIdeasByCategory(String category, Pageable pageable);
+
+    Page<IdeaResponseDTO> filterIdeasByAll(String title, String text, Status status, String category, Pageable pageable);
 
 }
