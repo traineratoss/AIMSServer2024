@@ -1,5 +1,7 @@
 package com.atoss.idea.management.system.service.implementation;
 
+import com.atoss.idea.management.system.exception.CommentNotFoundException;
+import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
@@ -61,7 +63,28 @@ public class CommentServiceImpl implements CommentService {
 
         Long days = hours / 24;
 
-        return seconds + " s " + minutes + " m " + hours + " h " + days + " d ";
+        Long months = days / 28;
+
+        StringBuilder sb = new StringBuilder();
+
+        if (seconds >= 60) {
+            if (minutes >= 60) {
+                if (hours >= 24) {
+                    if (days >= 28) {
+                        sb.append(months + "months");
+                    } else {
+                        sb.append(days + "days");
+                    }
+                } else {
+                    sb.append(hours + "hours");
+                }
+            } else {
+                sb.append(minutes + "mins");
+            }
+        } else {
+            sb.append(seconds + "seconds");
+        }
+        return sb.toString();
     }
 
     @Transactional
@@ -121,7 +144,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<ResponseCommentDTO> getAllCommentsByIdeaId(Long ideaId) {
         if (!ideaRepository.existsById(ideaId)) {
-            throw new RuntimeException();
+            throw new IdeaNotFoundException();
         }
 
         List<ResponseCommentDTO> filteredList = commentRepository.findAllByIdeaId(ideaId).stream()
@@ -134,7 +157,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(RequestCommentReplyDTO requestCommentReplyDTO) {
         if (!commentRepository.existsById(requestCommentReplyDTO.getParentId())) {
-            throw new RuntimeException();
+            throw new CommentNotFoundException();
         }
 
         List<ResponseCommentReplyDTO> filteredList = commentRepository.findById(requestCommentReplyDTO.getParentId()).get().getReplies().stream()
@@ -144,12 +167,13 @@ public class CommentServiceImpl implements CommentService {
         return filteredList;
     }
 
+
+
     @Override
     public Page<ResponseCommentDTO> getAllCommentsByIdeaIdWithPaging(Long ideaId, Pageable pageable) {
         if (!ideaRepository.existsById(ideaId)) {
-            throw new RuntimeException();
+            throw new IdeaNotFoundException();
         }
-
         // Dragos B.
         // The original Comment entity stores a User object
         // ResponseCommentDTO and ResponseCommentReplyDTO store the username
@@ -159,6 +183,7 @@ public class CommentServiceImpl implements CommentService {
         // - find and store the username in a local variable
         // - map the comment to its corespondent response class
         // - update the username for the new object
+
         return new PageImpl<ResponseCommentDTO>(
                 commentRepository.findAll(pageable)
                         .stream()
@@ -170,6 +195,8 @@ public class CommentServiceImpl implements CommentService {
                                         String username = reply.getUser().getUsername();
                                         ResponseCommentReplyDTO responseCommentReplyDTO = modelMapper.map(reply, ResponseCommentReplyDTO.class);
                                         responseCommentReplyDTO.setUsername(username);
+                                        String time = getTimeForComment(reply.getId());
+                                        responseCommentReplyDTO.setElapsedTime(time);
                                         return responseCommentReplyDTO;
                                     })
                                     .toList();
@@ -177,11 +204,14 @@ public class CommentServiceImpl implements CommentService {
                             ResponseCommentDTO responseCommentDTO = modelMapper.map(comment, ResponseCommentDTO.class);
                             responseCommentDTO.setUsername(username);
                             responseCommentDTO.setReplies(replies);
+                            String time = getTimeForComment(comment.getId());
+                            responseCommentDTO.setElapsedTime(time);
                             return responseCommentDTO;
                         })
                         .toList()
         );
     }
+
 
     @Override
     public CommentDTO updateComment(Comment comment) {

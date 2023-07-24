@@ -2,6 +2,8 @@ package com.atoss.idea.management.system.utils;
 
 import com.atoss.idea.management.system.exception.CategoryAlreadyExistsException;
 import com.atoss.idea.management.system.exception.CategoryNotFoundException;
+import com.atoss.idea.management.system.exception.CommentNotFoundException;
+import com.atoss.idea.management.system.exception.CommentTooLongException;
 import com.atoss.idea.management.system.exception.IdNotValidException;
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
@@ -57,5 +59,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = IdeaNotFoundException.class)
     public ResponseEntity<Object> ideaNotFoundException(IdeaNotFoundException ideaNotFoundException) {
         return new ResponseEntity<>(ideaNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = CommentNotFoundException.class)
+    public ResponseEntity<Object>  commentNotFoundException(CommentNotFoundException commentNotFoundException) {
+        return new ResponseEntity<>("Comment not Found", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(value = CommentTooLongException.class)
+    public ResponseEntity<Object> commentTooLongException(CommentTooLongException commentTooLongException) {
+        return new ResponseEntity<>("Comment Too Long", HttpStatus.PAYLOAD_TOO_LARGE);
     }
 }
