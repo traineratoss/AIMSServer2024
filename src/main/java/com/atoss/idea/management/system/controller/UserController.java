@@ -51,7 +51,7 @@ public class UserController {
 
     @Transactional
     @GetMapping("/email")
-    public UserResponseDTO getUserByEmail(@RequestParam(name = "username") String email) {
+    public UserResponseDTO getUserByEmail(@RequestParam(name = "email") String email) {
         return userService.getUserByEmail(email);
     }
 
@@ -111,5 +111,11 @@ public class UserController {
     @PostMapping("/send-email")
     public void sendEmail(@RequestBody String username) {
         userService.sendEmail(username);
+    }
+
+    @PostMapping("/check-password")
+    public ResponseEntity<Boolean> checkPassword(@RequestParam(name = "username") String username,
+                                                @RequestBody String password) {
+        return new ResponseEntity<>(userService.checkPassword(username, password), HttpStatus.OK);
     }
 }

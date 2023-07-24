@@ -30,4 +30,5 @@ public interface UserService {
 
     void sendEmail(String username);
 
+    boolean checkPassword(String username, String password);
 }

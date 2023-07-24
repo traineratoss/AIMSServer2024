@@ -161,4 +161,14 @@ public class UserServiceImpl implements UserService {
     public void sendEmail(String username) {
         sendEmailService.sendEmailToUser(username);
     }
+
+    @Override
+    public boolean checkPassword(String username, String password) {
+        User user = userRepository
+                .findByUsernameOrEmail(username, username)
+                .orElseThrow(
+                    () -> new UserNotFoundException("User not found!")
+                );
+        return user.getPassword().equals(password);
+    }
 }
