@@ -6,13 +6,14 @@ import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.ImageRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
-import com.atoss.idea.management.system.repository.entity.Avatar;
-import com.atoss.idea.management.system.repository.entity.User;
-import com.atoss.idea.management.system.repository.entity.Comment;
-import com.atoss.idea.management.system.repository.entity.Category;
-import com.atoss.idea.management.system.repository.entity.Image;
 import com.atoss.idea.management.system.repository.entity.Idea;
+import com.atoss.idea.management.system.repository.entity.Avatar;
+import com.atoss.idea.management.system.repository.entity.Image;
+import com.atoss.idea.management.system.repository.entity.Category;
+import com.atoss.idea.management.system.repository.entity.Comment;
+import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.repository.entity.Role;
+import com.atoss.idea.management.system.repository.entity.User;
 import com.google.common.hash.Hashing;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,10 +37,8 @@ public class InitialDataLoader implements CommandLineRunner {
     private final IdeaRepository ideaRepository;
     private final CommentRepository commentRepository;
 
-
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlValue;
-
 
     public InitialDataLoader(AvatarRepository avatarRepository,
                              UserRepository userRepository,
@@ -64,7 +63,6 @@ public class InitialDataLoader implements CommandLineRunner {
             throw new IllegalArgumentException("Resource not found: " + resourceName);
         }
     }
-
 
     @Transactional
     @Override
@@ -96,10 +94,6 @@ public class InitialDataLoader implements CommandLineRunner {
             Avatar avatar9 = avatarRepository.save(
                     createAvatar(classLoader.getResource(avatarFilePath + "avatar7.svg").getPath(), "avatar7", ".svg"));
 
-            Avatar avatar10 = avatarRepository.save(
-                    createAvatar(classLoader.getResource(avatarFilePath + "avatar7.svg").getPath(), "avatar1", ".svg"));
-
-
             User user1 = createUser(true,
                     Role.ADMIN,
                     avatar1,
@@ -121,23 +115,22 @@ public class InitialDataLoader implements CommandLineRunner {
             );
             imageRepository.save(image1);
 
-
             List<Category> categories = new ArrayList<>();
             categories.add(category1);
 
             Idea idea1 = createIdea(
                     user1,
-                    "Open",
+                    Status.OPEN,
                     "First idea",
                     "Test1",
                     image1,
                     new Date(),
                     categories
-                );
+            );
 
             Idea idea2 = createIdea(
                     user1,
-                    "Draft",
+                    Status.DRAFT,
                     "Second idea",
                     "Test2",
                     null,
@@ -147,7 +140,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Idea idea3 = createIdea(
                     user1,
-                    "Implemented",
+                    Status.IMPLEMENTED,
                     "Third idea",
                     "Test3",
                     null,
@@ -224,7 +217,7 @@ public class InitialDataLoader implements CommandLineRunner {
     }
 
     private static Idea createIdea(User user,
-                                   String status,
+                                   Status status,
                                    String text,
                                    String title,
                                    Image image,
