@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Component
+// @Component
 public class InitialDataLoader implements CommandLineRunner {
     private final AvatarRepository avatarRepository;
     private final UserRepository userRepository;
