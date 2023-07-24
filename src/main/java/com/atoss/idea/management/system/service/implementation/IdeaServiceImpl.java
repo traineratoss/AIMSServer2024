@@ -10,10 +10,11 @@ import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.CategoryDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
-import com.atoss.idea.management.system.repository.entity.Category;
+import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.repository.entity.Idea;
-import com.atoss.idea.management.system.repository.entity.Image;
 import com.atoss.idea.management.system.repository.entity.User;
+import com.atoss.idea.management.system.repository.entity.Image;
+import com.atoss.idea.management.system.repository.entity.Category;
 import com.atoss.idea.management.system.service.IdeaService;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -21,10 +22,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.atoss.idea.management.system.repository.entity.Status;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,13 +85,18 @@ public class IdeaServiceImpl implements IdeaService {
         }
         savedIdea.setDate(new Date());
         user.getIdeas().add(savedIdea);
-        return modelMapper.map(ideaRepository.save(savedIdea), IdeaResponseDTO.class);
+        IdeaResponseDTO ideaResponseDTO = modelMapper.map(ideaRepository.save(savedIdea), IdeaResponseDTO.class);
+        ideaResponseDTO.setUsername(username);
+        ideaResponseDTO.setCategoryList(new ArrayList<>());
+        return ideaResponseDTO;
     }
 
     @Override
     public IdeaResponseDTO getIdeaById(Long id) {
         if (ideaRepository.existsById(id)) {
-            return modelMapper.map(ideaRepository.findIdeaById(id), IdeaResponseDTO.class);
+            IdeaResponseDTO ideaResponseDTO = modelMapper.map(ideaRepository.findIdeaById(id), IdeaResponseDTO.class);
+            ideaResponseDTO.setUsername(ideaRepository.findIdeaById(id).getUser().getUsername());
+            return ideaResponseDTO;
         } else {
             throw new IdeaNotFoundException("Idea doesn't exist.");
         }
@@ -119,7 +125,9 @@ public class IdeaServiceImpl implements IdeaService {
                     idea.getCategoryList().add(category);
                 }
             }
-            return modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);
+            IdeaResponseDTO ideaResponseDTO = modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);
+            ideaResponseDTO.setUsername(ideaRepository.findIdeaById(id).getUser().getUsername());
+            return ideaResponseDTO;
         } else if (ideaUpdateDTO == null) {
             throw new FieldValidationException("Please enter at least one field to update.");
         } else {
@@ -138,15 +146,21 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Page<IdeaResponseDTO> getAllIdeas(Pageable pageable) {
-        if (ideaRepository.findAll().size() == 0) {
+        List<Idea> ideas = ideaRepository.findAll();
+        if (ideas.isEmpty()) {
             throw new FieldValidationException("No ideas found.");
         }
-        return new PageImpl<IdeaResponseDTO>(
-                ideaRepository.findAll(pageable)
-                        .stream()
-                        .map(user -> modelMapper.map(user, IdeaResponseDTO.class))
-                        .toList()
-        );
+
+        List<IdeaResponseDTO> ideaResponseDTOs = ideas
+                .stream()
+                .map(idea -> {
+                    IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
+                    responseDTO.setUsername(idea.getUser().getUsername());
+                    return responseDTO;
+                })
+                .toList();
+
+        return new PageImpl<>(ideaResponseDTOs, pageable, ideas.size());
     }
 
     @Override
@@ -154,18 +168,24 @@ public class IdeaServiceImpl implements IdeaService {
         if (id < 0) {
             throw new FieldValidationException("Please enter a valid ID.");
         }
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("User doesn't exist.");
-        }
-        if (userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User doesn't exist."))
-                .getIdeas().isEmpty()) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
+
+        if (user.getIdeas().isEmpty()) {
             throw new FieldValidationException("No ideas found.");
         }
-        return new PageImpl<IdeaResponseDTO>(
-                ideaRepository.findAllByUserId(id, pageable)
-                        .stream()
-                        .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
-                        .collect(Collectors.toList()));
+
+        List<IdeaResponseDTO> ideaResponseDTOs = ideaRepository.findAllByUserId(id, pageable)
+                .stream()
+                .map(idea -> {
+                    IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
+                    responseDTO.setUsername(user.getUsername());
+                    return responseDTO;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(ideaResponseDTOs, pageable, ideaResponseDTOs.size());
     }
 
     @Override

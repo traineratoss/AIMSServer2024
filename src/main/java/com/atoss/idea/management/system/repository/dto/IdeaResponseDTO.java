@@ -11,9 +11,11 @@ import java.util.List;
 @Data
 public class IdeaResponseDTO {
     private Long id;
+    private String username;
     private String title;
     private Status status;
     private List<CategoryDTO> categoryList;
+    private List<CommentDTO> commentList;
     private ImageDTO image;
     private String text;
     private Date date;
