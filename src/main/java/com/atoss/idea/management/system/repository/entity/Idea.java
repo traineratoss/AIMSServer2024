@@ -38,7 +38,7 @@ public class Idea {
     private String title;
 
     @Column(name = "status")
-    private String status;
+    private Status status;
 
     @Column(name = "text")
     private String text;

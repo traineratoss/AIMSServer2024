@@ -2,11 +2,13 @@ package com.atoss.idea.management.system.repository.dto;
 
 import com.atoss.idea.management.system.repository.entity.Category;
 import com.atoss.idea.management.system.repository.entity.Image;
+import com.atoss.idea.management.system.repository.entity.Status;
+
 import java.util.List;
 
 public class IdeaUpdateDTO {
     private String title;
-    private String status;
+    private Status status;
     private List<Category> categoryList;
     private Image image;
     private String text;
@@ -19,11 +21,11 @@ public class IdeaUpdateDTO {
         this.title = title;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

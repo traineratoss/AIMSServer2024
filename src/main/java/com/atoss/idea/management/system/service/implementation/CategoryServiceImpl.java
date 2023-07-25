@@ -2,7 +2,7 @@ package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.CategoryAlreadyExistsException;
 import com.atoss.idea.management.system.exception.CategoryNotFoundException;
-import com.atoss.idea.management.system.exception.IdNotValidException;
+import com.atoss.idea.management.system.exception.FieldValidationException;
 import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.dto.CategoryDTO;
 import com.atoss.idea.management.system.repository.entity.Category;
@@ -44,7 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (id > 0) {
             return modelMapper.map(categoryRepository.findCategoryById(id), CategoryDTO.class);
         } else {
-            throw new IdNotValidException();
+            throw new FieldValidationException();
         }
     }
 

@@ -6,13 +6,7 @@ import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.ImageRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
-import com.atoss.idea.management.system.repository.entity.Idea;
-import com.atoss.idea.management.system.repository.entity.Avatar;
-import com.atoss.idea.management.system.repository.entity.Image;
-import com.atoss.idea.management.system.repository.entity.Category;
-import com.atoss.idea.management.system.repository.entity.Comment;
-import com.atoss.idea.management.system.repository.entity.Role;
-import com.atoss.idea.management.system.repository.entity.User;
+import com.atoss.idea.management.system.repository.entity.*;
 import com.google.common.hash.Hashing;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
@@ -119,7 +113,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Idea idea1 = createIdea(
                     user1,
-                    "OPEN",
+                    Status.OPEN,
                     "First idea",
                     "Test1",
                     image1,
@@ -129,7 +123,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Idea idea2 = createIdea(
                     user1,
-                    "DRAFT",
+                    Status.DRAFT,
                     "Second idea",
                     "Test2",
                     null,
@@ -139,7 +133,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Idea idea3 = createIdea(
                     user1,
-                    "IMPLEMENTED",
+                    Status.IMPLEMENTED,
                     "Third idea",
                     "Test3",
                     null,
@@ -216,7 +210,7 @@ public class InitialDataLoader implements CommandLineRunner {
     }
 
     private static Idea createIdea(User user,
-                                   String status,
+                                   Status status,
                                    String text,
                                    String title,
                                    Image image,
