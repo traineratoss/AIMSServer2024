@@ -66,7 +66,7 @@ public class CommentController {
     }
 
     @GetMapping("/comments/replies")
-    public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(@RequestParam Long commentId) {
+    public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(@RequestParam(name = "commentId") Long commentId) {
         return commentService.getAllRepliesByCommentId(commentId);
     }
 

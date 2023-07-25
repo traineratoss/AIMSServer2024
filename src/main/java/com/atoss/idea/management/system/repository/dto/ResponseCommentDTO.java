@@ -25,6 +25,8 @@ public class ResponseCommentDTO {
 
     private String commentText;
 
+    private boolean hasReplies;
+    // to be  deleted later
     private List<ResponseCommentReplyDTO> replies;
 
     private String elapsedTime;

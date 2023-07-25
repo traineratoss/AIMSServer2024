@@ -149,7 +149,13 @@ public class CommentServiceImpl implements CommentService {
         }
 
         List<ResponseCommentDTO> filteredList = commentRepository.findAllByIdeaId(ideaId).stream()
-                .map(comment -> modelMapper.map(comment, ResponseCommentDTO.class))
+                .map(comment -> {
+                    boolean hasReplies = comment.getReplies().size() > 0;
+                    ResponseCommentDTO responseCommentDTO = new ResponseCommentDTO();
+                    responseCommentDTO = modelMapper.map(comment, ResponseCommentDTO.class);
+                    responseCommentDTO.setHasReplies(hasReplies);
+                    return responseCommentDTO;
+                })
                 .collect(Collectors.toList());
 
         return filteredList;
@@ -209,11 +215,13 @@ public class CommentServiceImpl implements CommentService {
                                     })
                                     .toList();
                             String username = comment.getUser().getUsername();
+                            boolean hasReplies = comment.getReplies().size() > 0;
+                            String time = getTimeForComment(comment.getId());
                             ResponseCommentDTO responseCommentDTO = modelMapper.map(comment, ResponseCommentDTO.class);
                             responseCommentDTO.setUsername(username);
-                            responseCommentDTO.setReplies(replies);
-                            String time = getTimeForComment(comment.getId());
+                            responseCommentDTO.setReplies(null);
                             responseCommentDTO.setElapsedTime(time);
+                            responseCommentDTO.setHasReplies(hasReplies);
                             return responseCommentDTO;
                         })
                         .toList()
