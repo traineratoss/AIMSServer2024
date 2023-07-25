@@ -155,16 +155,23 @@ public class CommentServiceImpl implements CommentService {
         return filteredList;
     }
 
+    @Transactional
     @Override
-    public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(RequestCommentReplyDTO requestCommentReplyDTO) {
-        if (!commentRepository.existsById(requestCommentReplyDTO.getParentId())) {
+    public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
 
-        List<ResponseCommentReplyDTO> filteredList = commentRepository.findById(requestCommentReplyDTO.getParentId()).get().getReplies().stream()
-                .map(comment -> modelMapper.map(comment, ResponseCommentReplyDTO.class))
+        List<ResponseCommentReplyDTO> filteredList = commentRepository.findById(commentId).get().getReplies().stream()
+                .map(reply -> {
+                    String username = reply.getUser().getUsername();
+                    ResponseCommentReplyDTO responseCommentReplyDTO = modelMapper.map(reply, ResponseCommentReplyDTO.class);
+                    responseCommentReplyDTO.setUsername(username);
+                    String time = getTimeForComment(reply.getId());
+                    responseCommentReplyDTO.setElapsedTime(time);
+                    return responseCommentReplyDTO;
+                })
                 .collect(Collectors.toList());
-
         return filteredList;
     }
 
