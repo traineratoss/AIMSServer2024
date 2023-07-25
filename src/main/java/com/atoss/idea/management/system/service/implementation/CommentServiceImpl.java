@@ -100,7 +100,7 @@ public class CommentServiceImpl implements CommentService {
         Comment newComment =  new Comment();
 
         newComment.setUser(user);
-        newComment.setIdea(ideaRepository.findIdeaById(requestCommentDTO.getIdeaId()));
+        newComment.setIdea(idea);
         newComment.setParent(null);
         newComment.setCommentText(requestCommentDTO.getCommentText());
         newComment.setCreationDate(creationDate);
@@ -113,6 +113,7 @@ public class CommentServiceImpl implements CommentService {
         return responseCommentDTO;
     }
 
+    @Transactional
     @Override
     public ResponseCommentReplyDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO) {
 
@@ -211,7 +212,6 @@ public class CommentServiceImpl implements CommentService {
                         .toList()
         );
     }
-
 
     @Override
     public CommentDTO updateComment(Comment comment) {
