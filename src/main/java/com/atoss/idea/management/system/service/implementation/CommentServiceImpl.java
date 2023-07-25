@@ -201,13 +201,11 @@ public class CommentServiceImpl implements CommentService {
                                     })
                                     .toList();
                             String username = comment.getUser().getUsername();
-                            String time = getTimeForComment(comment.getId());
-                            boolean hasReplies = comment.getReplies().size() > 0;
                             ResponseCommentDTO responseCommentDTO = modelMapper.map(comment, ResponseCommentDTO.class);
                             responseCommentDTO.setUsername(username);
                             responseCommentDTO.setReplies(replies);
+                            String time = getTimeForComment(comment.getId());
                             responseCommentDTO.setElapsedTime(time);
-                            responseCommentDTO.setHasReplies(hasReplies);
                             return responseCommentDTO;
                         })
                         .toList()

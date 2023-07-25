@@ -1,6 +1,5 @@
 package com.atoss.idea.management.system.repository.dto;
 
-import com.atoss.idea.management.system.repository.entity.Status;
 import lombok.Data;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.List;
 @Data
 public class IdeaRequestDTO {
     private String title;
-    private Status status;
+    private String status;
     private List<CategoryDTO> categoryList; //BIG PROBLEM HERE!!!!!!!!!!!!!!!! DON'T EDIT
     private ImageDTO image;
     private String text;

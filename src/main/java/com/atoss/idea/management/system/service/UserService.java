@@ -4,6 +4,7 @@ import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
 import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.UserRegisterDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public interface UserService {
 
     Page<UserResponseDTO> getAllUsers(Pageable pageable);
 
-    UserResponseDTO getUserByEmail(String email);
+    UserRegisterDTO getUserByEmail(String email);
 
     Page<UserResponseDTO> getAllUsersByUsername(String username);
 
@@ -29,9 +30,5 @@ public interface UserService {
     boolean changePassword(ChangePasswordDTO changePasswordDTO);
 
     void sendEmail(String username);
-
-    boolean checkPassword(String username, String password);
-
-    void sendForgotPassword(String usernameOrEmail);
 
 }

@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
@@ -37,7 +38,7 @@ public class Idea {
     private String title;
 
     @Column(name = "status")
-    private Status status;
+    private String status;
 
     @Column(name = "text")
     private String text;
@@ -45,7 +46,7 @@ public class Idea {
     @Column(name = "date")
     private Date date;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", referencedColumnName = "image_id")
     @JsonManagedReference(value = "idea-image")
     private Image image;

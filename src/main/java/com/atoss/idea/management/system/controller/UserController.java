@@ -44,15 +44,9 @@ public class UserController {
     }
 
     @Transactional
-    @GetMapping("/username")
+    @GetMapping
     public UserResponseDTO getUserByUsername(@RequestParam(name = "username") String username) {
         return userService.getUserByUsername(username);
-    }
-
-    @Transactional
-    @GetMapping("/email")
-    public UserResponseDTO getUserByEmail(@RequestParam(name = "email") String email) {
-        return userService.getUserByEmail(email);
     }
 
     @Transactional
@@ -112,17 +106,4 @@ public class UserController {
     public void sendEmail(@RequestBody String username) {
         userService.sendEmail(username);
     }
-
-    @PostMapping("/check-password")
-    public ResponseEntity<Boolean> checkPassword(@RequestParam(name = "username") String username,
-                                                @RequestBody String password) {
-        return new ResponseEntity<>(userService.checkPassword(username, password), HttpStatus.OK);
-    }
-
-    @Transactional
-    @PostMapping("/send-forgot-password")
-    public void sendForgotPassword(@RequestBody String usernameOrEmail) {
-        userService.sendForgotPassword(usernameOrEmail);
-    }
-
 }

@@ -2,7 +2,7 @@ package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
-import com.atoss.idea.management.system.exception.FieldValidationException;
+import com.atoss.idea.management.system.exception.IdNotValidException;
 import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
@@ -10,11 +10,10 @@ import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.CategoryDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
-import com.atoss.idea.management.system.repository.entity.Status;
-import com.atoss.idea.management.system.repository.entity.Idea;
-import com.atoss.idea.management.system.repository.entity.User;
-import com.atoss.idea.management.system.repository.entity.Image;
 import com.atoss.idea.management.system.repository.entity.Category;
+import com.atoss.idea.management.system.repository.entity.Idea;
+import com.atoss.idea.management.system.repository.entity.Image;
+import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.IdeaService;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,16 +51,16 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) {
         if (idea.getTitle() == null || idea.getTitle().isEmpty()) {
-            throw new FieldValidationException("Please enter a valid title for the idea.");
+            throw new IdNotValidException("Please enter a valid title for the idea.");
         }
-        if (idea.getStatus() == null) {
-            throw new FieldValidationException("Please enter a valid status for the idea.");
+        if (idea.getStatus() == null || idea.getStatus().isEmpty()) {
+            throw new IdNotValidException("Please enter a valid status for the idea.");
         }
         if (idea.getCategoryList() == null || idea.getCategoryList().size() <= 0) {
-            throw new FieldValidationException("Please enter a valid category for the idea.");
+            throw new IdNotValidException("Please enter a valid category for the idea.");
         }
         if (idea.getText() == null || idea.getText().isEmpty()) {
-            throw new FieldValidationException("Please enter a valid text for the idea.");
+            throw new IdNotValidException("Please enter a valid text for the idea.");
         }
         Idea savedIdea = new Idea();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("No user found by this username."));
@@ -85,18 +83,14 @@ public class IdeaServiceImpl implements IdeaService {
         }
         savedIdea.setDate(new Date());
         user.getIdeas().add(savedIdea);
-        IdeaResponseDTO ideaResponseDTO = modelMapper.map(ideaRepository.save(savedIdea), IdeaResponseDTO.class);
-        ideaResponseDTO.setUsername(username);
-        ideaResponseDTO.setCategoryList(new ArrayList<>());
-        return ideaResponseDTO;
+        return modelMapper.map(ideaRepository.save(savedIdea), IdeaResponseDTO.class);
     }
 
     @Override
-    public IdeaResponseDTO getIdeaById(Long id) {
+    public IdeaResponseDTO getIdeaById(Long id) throws IdNotValidException {
         if (ideaRepository.existsById(id)) {
-            IdeaResponseDTO ideaResponseDTO = modelMapper.map(ideaRepository.findIdeaById(id), IdeaResponseDTO.class);
-            ideaResponseDTO.setUsername(ideaRepository.findIdeaById(id).getUser().getUsername());
-            return ideaResponseDTO;
+            Idea idea = ideaRepository.findIdeaById(id);
+            return modelMapper.map(ideaRepository.findIdeaById(id), IdeaResponseDTO.class);
         } else {
             throw new IdeaNotFoundException("Idea doesn't exist.");
         }
@@ -125,11 +119,7 @@ public class IdeaServiceImpl implements IdeaService {
                     idea.getCategoryList().add(category);
                 }
             }
-            IdeaResponseDTO ideaResponseDTO = modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);
-            ideaResponseDTO.setUsername(ideaRepository.findIdeaById(id).getUser().getUsername());
-            return ideaResponseDTO;
-        } else if (ideaUpdateDTO == null) {
-            throw new FieldValidationException("Please enter at least one field to update.");
+            return modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);
         } else {
             throw new IdeaNotFoundException("Idea doesn't exist.");
         }
@@ -146,46 +136,34 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Page<IdeaResponseDTO> getAllIdeas(Pageable pageable) {
-        List<Idea> ideas = ideaRepository.findAll();
-        if (ideas.isEmpty()) {
-            throw new FieldValidationException("No ideas found.");
+        if (ideaRepository.findAll().size() == 0) {
+            throw new IdNotValidException("No ideas found.");
         }
-
-        List<IdeaResponseDTO> ideaResponseDTOs = ideas
-                .stream()
-                .map(idea -> {
-                    IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
-                    responseDTO.setUsername(idea.getUser().getUsername());
-                    return responseDTO;
-                })
-                .toList();
-
-        return new PageImpl<>(ideaResponseDTOs, pageable, ideas.size());
+        return new PageImpl<IdeaResponseDTO>(
+                ideaRepository.findAll(pageable)
+                        .stream()
+                        .map(user -> modelMapper.map(user, IdeaResponseDTO.class))
+                        .toList()
+        );
     }
 
     @Override
     public Page<IdeaResponseDTO> getAllIdeasByUserId(Long id, Pageable pageable) {
         if (id < 0) {
-            throw new FieldValidationException("Please enter a valid ID.");
+            throw new IdNotValidException("Please enter a valid ID.");
         }
-
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
-
-        if (user.getIdeas().isEmpty()) {
-            throw new FieldValidationException("No ideas found.");
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("User doesn't exist.");
         }
-
-        List<IdeaResponseDTO> ideaResponseDTOs = ideaRepository.findAllByUserId(id, pageable)
-                .stream()
-                .map(idea -> {
-                    IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
-                    responseDTO.setUsername(user.getUsername());
-                    return responseDTO;
-                })
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(ideaResponseDTOs, pageable, ideaResponseDTOs.size());
+        if (userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User doesn't exist."))
+                .getIdeas().isEmpty()) {
+            throw new IdNotValidException("No ideas found.");
+        }
+        return new PageImpl<IdeaResponseDTO>(
+                ideaRepository.findAllByUserId(id, pageable)
+                        .stream()
+                        .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
+                        .collect(Collectors.toList()));
     }
 
     @Override
@@ -196,9 +174,8 @@ public class IdeaServiceImpl implements IdeaService {
                             .stream()
                             .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
                             .collect(Collectors.toList()));
-        } else {
-            throw new FieldValidationException("Please enter a valid title for the filter search.");
         }
+        return null;
     }
 
     @Override
@@ -209,22 +186,20 @@ public class IdeaServiceImpl implements IdeaService {
                             .stream()
                             .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
                             .collect(Collectors.toList()));
-        } else {
-            throw new FieldValidationException("Please enter a valid text for the filter search.");
         }
+        return null;
     }
 
     @Override
-    public Page<IdeaResponseDTO> filterIdeasByStatus(Status status, Pageable pageable) {
-        if (status != null) {
+    public Page<IdeaResponseDTO> filterIdeasByStatus(String status, Pageable pageable) {
+        if (!status.isEmpty()) {
             return new PageImpl<IdeaResponseDTO>(
                     ideaRepository.findAllByStatus(status, pageable)
                             .stream()
                             .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
                             .collect(Collectors.toList()));
-        } else {
-            throw new FieldValidationException("Please enter a valid status for the filter search.");
         }
+        return null;
     }
 
     @Override
@@ -235,17 +210,8 @@ public class IdeaServiceImpl implements IdeaService {
                             .stream()
                             .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
                             .collect(Collectors.toList()));
-        } else {
-            throw new FieldValidationException("Please enter a valid category for the filter search.");
         }
-    }
-
-    @Override
-    public Page<IdeaResponseDTO> filterIdeasByAll(String title, String text, Status status, String category, Pageable pageable) {
-        return new PageImpl<>(
-                ideaRepository.findIdeasByParameters(title, text, status, category, pageable)
-                        .stream()
-                        .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
-                        .collect(Collectors.toList()));
+        return null;
     }
 }
+

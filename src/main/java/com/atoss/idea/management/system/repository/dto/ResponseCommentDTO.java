@@ -29,5 +29,4 @@ public class ResponseCommentDTO {
 
     private String elapsedTime;
 
-    private Boolean hasReplies;
 }
