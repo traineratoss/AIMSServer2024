@@ -32,7 +32,7 @@ public interface CommentService {
 
     Page<ResponseCommentDTO> getAllCommentsByIdeaIdWithPaging(Long ideaId, Pageable pageable);
 
-    List<ResponseCommentReplyDTO> getAllRepliesByCommentId(RequestCommentReplyDTO requestCommentReplyDTO);
+    List<ResponseCommentReplyDTO> getAllRepliesByCommentId(Long commentId);
 
     CommentDTO updateComment(Comment comment);
 

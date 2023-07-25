@@ -66,8 +66,8 @@ public class CommentController {
     }
 
     @GetMapping("/comments/replies")
-    public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(@RequestBody RequestCommentReplyDTO requestCommentReplyDTO) {
-        return commentService.getAllRepliesByCommentId(requestCommentReplyDTO);
+    public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(@RequestParam Long commentId) {
+        return commentService.getAllRepliesByCommentId(commentId);
     }
 
     @GetMapping("/test")
