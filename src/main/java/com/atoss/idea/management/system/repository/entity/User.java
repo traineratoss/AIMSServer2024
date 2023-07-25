@@ -14,6 +14,8 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
+import org.checkerframework.common.aliasing.qual.Unique;
+
 import java.util.List;
 
 @Data
@@ -26,12 +28,14 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
+    @Unique
     @Column(name = "username")
     private String username;
 
     @Column(name = "full_name")
     private String fullName;
 
+    @Unique
     @Column(name = "email")
     private String email;
 
