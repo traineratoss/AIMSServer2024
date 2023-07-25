@@ -7,6 +7,7 @@ import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
 import com.atoss.idea.management.system.repository.dto.UserRegisterDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,5 +31,9 @@ public interface UserService {
     boolean changePassword(ChangePasswordDTO changePasswordDTO);
 
     void sendEmail(String username);
+
+    ResponseEntity<UserResponseDTO> login(String usernameOrEmail, String password);
+
+    ResponseEntity<UserResponseDTO> sendForgotPassword(String usernameOrEmail);
 
 }

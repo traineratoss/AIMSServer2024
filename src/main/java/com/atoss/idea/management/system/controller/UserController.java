@@ -106,4 +106,16 @@ public class UserController {
     public void sendEmail(@RequestBody String username) {
         userService.sendEmail(username);
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponseDTO> checkPassword(@RequestParam(name = "username") String username,
+                                                         @RequestBody String password) {
+        return userService.login(username, password);
+    }
+
+    @Transactional
+    @PostMapping("/send-forgot-password")
+    public ResponseEntity<UserResponseDTO> sendForgotPassword(@RequestBody String usernameOrEmail) {
+        return userService.sendForgotPassword(usernameOrEmail);
+    }
 }

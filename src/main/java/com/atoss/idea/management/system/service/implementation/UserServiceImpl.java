@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.service.implementation;
 
+import com.atoss.idea.management.system.exception.IncorrectPasswordException;
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.repository.AvatarRepository;
@@ -18,6 +19,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -154,5 +157,30 @@ public class UserServiceImpl implements UserService {
     @Override
     public void sendEmail(String username) {
         sendEmailService.sendEmailToUser(username);
+    }
+
+    @Override
+    public ResponseEntity<UserResponseDTO> login(String usernameOrEmail, String password) {
+        String hashFrontendPassword = Hashing.sha256()
+                .hashString(password, StandardCharsets.UTF_8)
+                .toString();
+        User user = userRepository
+                .findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(
+                        () -> new UserNotFoundException("User not found!")
+                );
+        if (!user.getPassword().equals(hashFrontendPassword)) {
+            throw new IncorrectPasswordException("Bad credentials!");
+        }
+        return new ResponseEntity<>(modelMapper.map(user, UserResponseDTO.class), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<UserResponseDTO> sendForgotPassword(String usernameOrEmail) {
+        User user = userRepository
+                .findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new UserNotFoundException("User or email not found"));
+        sendEmailService.sendEmailForgotPassword(user.getUsername());
+        return new ResponseEntity<>(modelMapper.map(user, UserResponseDTO.class), HttpStatus.OK);
     }
 }

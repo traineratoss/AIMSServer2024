@@ -4,4 +4,6 @@ public interface SendEmailService {
     void sendEmailToUser(String username);
 
     void sendEmailToAdmin(String username);
+
+    void sendEmailForgotPassword(String username);
 }
