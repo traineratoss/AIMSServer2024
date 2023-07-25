@@ -33,4 +33,5 @@ public interface UserService {
 
     ResponseEntity<UserResponseDTO> sendForgotPassword(String usernameOrEmail);
 
+    Boolean deleteUser(String username);
 }

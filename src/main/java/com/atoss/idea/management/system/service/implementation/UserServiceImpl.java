@@ -176,4 +176,14 @@ public class UserServiceImpl implements UserService {
         sendEmailService.sendEmailForgotPassword(user.getUsername());
         return new ResponseEntity<>(modelMapper.map(user, UserResponseDTO.class), HttpStatus.OK);
     }
+
+    @Override
+    public Boolean deleteUser(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!"));
+        if (user.getIsActive()) {
+            return false;
+        }
+        userRepository.delete(user);
+        return true;
+    }
 }

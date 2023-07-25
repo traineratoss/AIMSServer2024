@@ -10,14 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -108,7 +101,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> checkPassword(@RequestParam(name = "username") String username,
+    public ResponseEntity<UserResponseDTO> login(@RequestParam(name = "username") String username,
                                                          @RequestBody String password) {
         return userService.login(username, password);
     }
@@ -117,5 +110,11 @@ public class UserController {
     @PostMapping("/send-forgot-password")
     public ResponseEntity<UserResponseDTO> sendForgotPassword(@RequestBody String usernameOrEmail) {
         return userService.sendForgotPassword(usernameOrEmail);
+    }
+
+    @Transactional
+    @DeleteMapping
+    public ResponseEntity<Boolean> deleteUser(@RequestBody String username) {
+        return new ResponseEntity<>(userService.deleteUser(username), HttpStatus.OK);
     }
 }
