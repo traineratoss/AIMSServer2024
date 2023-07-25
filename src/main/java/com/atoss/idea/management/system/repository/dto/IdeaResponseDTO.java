@@ -10,6 +10,7 @@ import java.util.List;
 // This is the DTO we send from the server
 @Data
 public class IdeaResponseDTO {
+    private Long id;
     private String username;
     private String title;
     private Status status;
