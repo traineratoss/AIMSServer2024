@@ -6,7 +6,14 @@ import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.ImageRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
-import com.atoss.idea.management.system.repository.entity.*;
+import com.atoss.idea.management.system.repository.entity.Idea;
+import com.atoss.idea.management.system.repository.entity.Avatar;
+import com.atoss.idea.management.system.repository.entity.Image;
+import com.atoss.idea.management.system.repository.entity.Category;
+import com.atoss.idea.management.system.repository.entity.Comment;
+import com.atoss.idea.management.system.repository.entity.Role;
+import com.atoss.idea.management.system.repository.entity.Status;
+import com.atoss.idea.management.system.repository.entity.User;
 import com.google.common.hash.Hashing;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +21,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -47,49 +53,36 @@ public class InitialDataLoader implements CommandLineRunner {
         this.ideaRepository = ideaRepository;
     }
 
-    private String getResourcePath(String resourceName) {
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL resourceURL = classLoader.getResource(resourceName);
-        if (resourceURL != null) {
-            return resourceURL.getPath();
-        } else {
-            throw new IllegalArgumentException("Resource not found: " + resourceName);
-        }
-    }
 
     @Transactional
     @Override
     public void run(String... args) throws Exception {
         ClassLoader classLoader = getClass().getClassLoader();
         if (ddlValue.equals("create")) {
+            String[] avatarFileNames = {
+                "avatar1.svg",
+                "avatar2.svg",
+                "avatar3.svg",
+                "avatar4.svg",
+                "avatar5.svg",
+                "avatar6.svg",
+                "avatar7.svg"
+            };
+            Avatar defaultAvatar = new Avatar();
+            int count = 0;
             String avatarFilePath = "image/avatar/";
-            Avatar avatar1 = avatarRepository.save(
-                    createAvatar(classLoader.getResource(avatarFilePath + "avatar1.svg").getPath(), "avatar1", ".svg"));
+            for (String fileName : avatarFileNames) {
+                String filePath = classLoader.getResource(avatarFilePath + fileName).getPath();
+                Avatar avatar = avatarRepository.save(createAvatar(filePath, fileName.split("\\.", 2)));
+                if (count == 0) {
+                    defaultAvatar = avatar;
+                }
+            }
 
-            Avatar avatar2 = avatarRepository.save(
-                    createAvatar(classLoader.getResource(avatarFilePath + "avatar2.svg").getPath(), "avatar2", ".svg"));
-
-            Avatar avatar3 = avatarRepository.save(
-                    createAvatar(classLoader.getResource(avatarFilePath + "avatar3.svg").getPath(), "avatar3", ".svg"));
-
-            Avatar avatar4 = avatarRepository.save(
-                    createAvatar(classLoader.getResource(avatarFilePath + "avatar4.svg").getPath(), "avatar4", ".svg"));
-
-            Avatar avatar5 = avatarRepository.save(
-                    createAvatar(classLoader.getResource(avatarFilePath + "avatar5.svg").getPath(), "avatar5", ".svg"));
-
-            Avatar avatar6 = avatarRepository.save(
-                    createAvatar(classLoader.getResource(avatarFilePath + "avatar6.svg").getPath(), "avatar6", ".svg"));
-
-            Avatar avatar7 = avatarRepository.save(
-                    createAvatar(classLoader.getResource(avatarFilePath + "avatar7.svg").getPath(), "avatar7", ".svg"));
-
-            Avatar avatar9 = avatarRepository.save(
-                    createAvatar(classLoader.getResource(avatarFilePath + "avatar7.svg").getPath(), "avatar7", ".svg"));
 
             User user1 = createUser(true,
                     Role.ADMIN,
-                    avatar1,
+                    defaultAvatar,
                     "ap6548088@gmail.com",
                     "AdminPopescu1",
                     "Admin Popescu",
@@ -102,10 +95,8 @@ public class InitialDataLoader implements CommandLineRunner {
             Category category1 = createCategory("Innovation");
             categoryRepository.save(category1);
 
-            Image image1 = createImage("image1",
-                    ".png",
-                    getResourcePath("image/idea/img.png")
-            );
+            Image image1 = imageRepository.save(
+                    createImage("img", ".png", classLoader.getResource("image/idea/img.png").getPath()));
             imageRepository.save(image1);
 
             List<Category> categories = new ArrayList<>();
@@ -155,6 +146,7 @@ public class InitialDataLoader implements CommandLineRunner {
         }
     }
 
+
     private static User createUser(Boolean isActive,
                                    Role role,
                                    Avatar avatar,
@@ -183,15 +175,21 @@ public class InitialDataLoader implements CommandLineRunner {
 
 
     private static Avatar createAvatar(String filename,
-                                       String avatarName,
-                                       String fileType
+                                       String[] split
     ) throws IOException {
+        String avatarName = new String();
+        String fileType = new String();
+        for (String a : split) {
+            avatarName = split[0];
+            fileType = split[1];
+        }
         Avatar avatar = new Avatar();
         File file = new File(filename);
         byte[] imageByte = Files.readAllBytes(file.toPath());
         avatar.setData(imageByte);
         avatar.setFileName(avatarName);
         avatar.setFileType(fileType);
+
         return avatar;
     }
 
