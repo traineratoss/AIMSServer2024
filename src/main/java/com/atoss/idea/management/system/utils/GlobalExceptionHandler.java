@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = UserAlreadyExistException.class)
     public ResponseEntity<Object> userAlreadyExistException(UserAlreadyExistException userAlreadyExistException) {
-        return new ResponseEntity<>(userAlreadyExistException.getMessage(), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(userAlreadyExistException.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = UserNotFoundException.class)
@@ -65,16 +65,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = UsernameAlreadyExistException.class)
     public ResponseEntity<Object> usernameAlreadyExistException(UsernameAlreadyExistException usernameAlreadyExistException) {
-        return new ResponseEntity<>(usernameAlreadyExistException.getMessage(), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(usernameAlreadyExistException.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = EmailAlreadyExistException.class)
     public ResponseEntity<Object> emailAlreadyExistException(EmailAlreadyExistException emailAlreadyExistException) {
-        return new ResponseEntity<>(emailAlreadyExistException.getMessage(), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(emailAlreadyExistException.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = IncorrectPasswordException.class)
     public ResponseEntity<Object> incorrectPasswordException(IncorrectPasswordException incorrectPasswordException) {
         return new ResponseEntity<Object>(incorrectPasswordException.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = EmailFailedException.class)
+    public ResponseEntity<Object> emailFailedException(EmailFailedException emailFailedException) {
+        return new ResponseEntity<Object>(emailFailedException.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = UserStatusIsActiveException.class)
+    public ResponseEntity<Object> userStatusIsActiveException(UserStatusIsActiveException userStatusIsActiveException) {
+        return new ResponseEntity<Object>(userStatusIsActiveException.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

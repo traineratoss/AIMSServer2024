@@ -95,9 +95,15 @@ public class UserController {
     }
 
     @Transactional
-    @PostMapping("/send-email")
-    public void sendEmail(@RequestBody String username) {
-        userService.sendEmail(username);
+    @PostMapping("/send-approve-email")
+    public void sendApproveEmail(@RequestBody String username) {
+        userService.sendApproveEmail(username);
+    }
+
+    @Transactional
+    @PostMapping("/send-decline-email")
+    public ResponseEntity<Object> sendDeclineEmail(@RequestBody String username) {
+        return userService.sendDeclineEmail(username);
     }
 
     @PostMapping("/login")
@@ -117,4 +123,19 @@ public class UserController {
     public ResponseEntity<Boolean> deleteUser(@RequestBody String username) {
         return new ResponseEntity<>(userService.deleteUser(username), HttpStatus.OK);
     }
+
+    @Transactional
+    @PostMapping("/send-deactivate-message")
+    public ResponseEntity<Object> sendDeactivateMessage(@RequestBody String username) {
+        return userService.sendDeactivateEmail(username);
+    }
+
+    @Transactional
+    @PostMapping("/send-activate-message")
+    public ResponseEntity<Object> sendActivateMessage(@RequestBody String username) {
+        return userService.sendActivateEmail(username);
+    }
+
+
+
 }

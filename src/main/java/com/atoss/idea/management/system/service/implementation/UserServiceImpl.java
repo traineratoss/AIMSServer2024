@@ -1,13 +1,10 @@
 package com.atoss.idea.management.system.service.implementation;
 
-import com.atoss.idea.management.system.exception.IncorrectPasswordException;
-import com.atoss.idea.management.system.exception.UserAlreadyExistException;
-import com.atoss.idea.management.system.exception.UserNotFoundException;
+import com.atoss.idea.management.system.exception.*;
 import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
 import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
-import com.atoss.idea.management.system.repository.dto.UserRequestDTO;
 import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.User;
@@ -62,14 +59,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserRequestDTO updateUserPassword(String username, String password) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserAlreadyExistException("User already exist!"));
-        user.setPassword(password);
-        userRepository.save(user);
-        return modelMapper.map(user, UserRequestDTO.class);
-    }
-
-    @Override
     public UserResponseDTO updateUserByUsername(String username, UserUpdateDTO userUpdateDTO) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         if (userUpdateDTO.getUsername() != null) {
@@ -99,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
-        return new PageImpl<UserResponseDTO>(
+        return new PageImpl<>(
                 userRepository.findAll(pageable)
                                         .stream()
                                         .map(user -> modelMapper.map(user, UserResponseDTO.class))
@@ -109,7 +98,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponseDTO> getAllUsersByUsername(String username) {
-        return new PageImpl<UserResponseDTO>(
+        return new PageImpl<>(
                 userRepository.findByUsernameStartsWith(username)
                         .stream()
                         .map(user -> modelMapper.map(user, UserResponseDTO.class))
@@ -119,7 +108,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserResponseDTO> getAllPendingUsers(boolean isActive, Pageable pageable) {
-        return new PageImpl<UserResponseDTO>(
+        return new PageImpl<>(
           userRepository.findAll(pageable)
                   .stream()
                   .filter(user -> user.getIsActive() != null && user.getIsActive().equals(isActive))
@@ -148,8 +137,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void sendEmail(String username) {
-        sendEmailService.sendEmailToUser(username);
+    public void sendApproveEmail(String username) {
+        sendEmailService.sendApproveEmailToUser(username);
+    }
+
+    @Override
+    public ResponseEntity<Object> sendDeclineEmail(String username) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            sendEmailService.sendDeclineEmailToUser(username);
+            if (deleteUser(username)) {
+                return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+            }
+            throw new UserStatusIsActiveException("User status is active");
+        }
+        throw new UserNotFoundException("User not found!");
     }
 
     @Override
@@ -185,5 +186,21 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.delete(user);
         return true;
+    }
+
+    @Override
+    public ResponseEntity<Object> sendDeactivateEmail(String username) {
+        if (sendEmailService.sendDeactivateEmailToUser(username)) {
+            return new ResponseEntity<>("Email send", HttpStatus.OK);
+        }
+        throw new EmailFailedException("Sending email failed");
+    }
+
+    @Override
+    public ResponseEntity<Object> sendActivateEmail(String username) {
+        if (sendEmailService.sendActivateEmailToUser(username)) {
+            return new ResponseEntity<>("Email send", HttpStatus.OK);
+        }
+        throw new EmailFailedException("Sending email failed");
     }
 }
