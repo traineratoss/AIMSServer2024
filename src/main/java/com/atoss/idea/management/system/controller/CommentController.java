@@ -32,6 +32,7 @@ public class CommentController {
         this.commentService = commentService;
     }
 
+    @Transactional
     @PostMapping("/comments")
     @ResponseBody
     public ResponseEntity<ResponseCommentDTO> addComment(@RequestBody RequestCommentDTO newComment) {
@@ -41,6 +42,7 @@ public class CommentController {
         return new ResponseEntity<ResponseCommentDTO>(responseCommentDTO, HttpStatus.OK);
     }
 
+    @Transactional
     @PostMapping("/comments/reply")
     public ResponseEntity<ResponseCommentReplyDTO> addReply(@RequestBody RequestCommentReplyDTO requestCommentReplyDTO) {
 
@@ -48,6 +50,7 @@ public class CommentController {
 
         return new ResponseEntity<ResponseCommentReplyDTO>(responseCommentReplyDTO, HttpStatus.OK);
     }
+
 
     @Transactional
     @GetMapping("/comments")
@@ -57,19 +60,22 @@ public class CommentController {
                                                                  @RequestParam(required = true) int pageNumber,
                                                                  @RequestParam(required = true) String sortCategory) {
         return new ResponseEntity<>(commentService.getAllCommentsByIdeaIdWithPaging(ideaId,
-                PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory))), HttpStatus.OK);
+                PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory))), HttpStatus.OK);
     }
 
+    @Transactional
     @GetMapping("/comments/test")
     public List<ResponseCommentDTO> getAllCommentsByIdeaId(@RequestParam(name = "ideaId") Long ideaId) {
         return commentService.getAllCommentsByIdeaId(ideaId);
     }
 
+    @Transactional
     @GetMapping("/comments/replies")
     public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(@RequestParam(name = "commentId") Long commentId) {
         return commentService.getAllRepliesByCommentId(commentId);
     }
 
+    @Transactional
     @GetMapping("/test")
     public String getTime(@RequestParam(name = "id") Long id) {
         return commentService.getTimeForComment(id);
