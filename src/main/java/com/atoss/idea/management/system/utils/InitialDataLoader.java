@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -92,6 +94,18 @@ public class InitialDataLoader implements CommandLineRunner {
             );
             userRepository.save(user1);
 
+            User user2 = createUser(true,
+                    Role.STANDARD,
+                    defaultAvatar,
+                    "standardemail@gmail.com",
+                    "AnaStandard",
+                    "Ana Standard",
+                    Hashing.sha256()
+                            .hashString("StandardUser", StandardCharsets.UTF_8)
+                            .toString()
+            );
+            userRepository.save(user2);
+
             Category category1 = createCategory("Innovation");
             categoryRepository.save(category1);
 
@@ -102,13 +116,27 @@ public class InitialDataLoader implements CommandLineRunner {
             List<Category> categories = new ArrayList<>();
             categories.add(category1);
 
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String staticDateString = "2023-07-26 12:00:00";
+            String staticDateString2 = "2023-06-26 12:00:00";
+            Date staticDate;
+            Date staticDate2;
+
+            try {
+                staticDate = sdf.parse(staticDateString);
+                staticDate2 = sdf.parse(staticDateString2);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                return;
+            }
+
             Idea idea1 = createIdea(
                     user1,
                     Status.OPEN,
                     "First idea",
                     "Test1",
                     image1,
-                    new Date(),
+                    staticDate,
                     categories
             );
 
@@ -118,7 +146,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     "Second idea",
                     "Test2",
                     null,
-                    new Date(),
+                    staticDate2,
                     categories
             );
 
