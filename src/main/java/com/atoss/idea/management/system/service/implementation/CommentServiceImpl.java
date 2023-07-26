@@ -240,8 +240,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(Long id) {
+    public void deleteComment(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
 
+        commentRepository.deleteById(commentId);
     }
 
     @Override

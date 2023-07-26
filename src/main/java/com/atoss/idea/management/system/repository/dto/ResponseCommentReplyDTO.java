@@ -15,6 +15,7 @@ public class ResponseCommentReplyDTO {
      *
      * @author FlorinCP
      */
+    private Long id;
 
     private String username;
 
