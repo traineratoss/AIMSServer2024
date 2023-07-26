@@ -235,12 +235,18 @@ public class IdeaServiceImpl implements IdeaService {
     }*/
 
     @Override
-    public Page<IdeaResponseDTO> filterIdeasByAll(String title, String text, Status status, String category, Pageable pageable) {
-        return new PageImpl<>(
-                ideaRepository.findIdeasByParameters(title, text, status, category, pageable)
-                        .stream()
-                        .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
-                        .collect(Collectors.toList()));
+    public Page<IdeaResponseDTO> filterIdeasByAll(String title, String text, Status status, List<String> categories, String user, Pageable pageable) {
+        List<Idea> ideaList = ideaRepository.findIdeasByParameters(title, text, status, user, pageable);
+        List<IdeaResponseDTO> result = ideaList.stream()
+                .filter(idea -> categories == null || categories.isEmpty() || idea.getCategoryList()
+                        .stream().anyMatch(category -> categories.contains(category.getText())))
+                .map(idea -> {
+                    IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
+                    responseDTO.setUsername(idea.getUser().getUsername());
+                    return responseDTO;
+                })
+                .toList();
+        return new PageImpl<>(result, pageable, result.size());
     }
 }
 

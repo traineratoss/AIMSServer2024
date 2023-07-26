@@ -7,6 +7,8 @@ import com.atoss.idea.management.system.repository.entity.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface IdeaService {
     IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username);
 
@@ -28,6 +30,6 @@ public interface IdeaService {
 
     Page<IdeaResponseDTO> filterIdeasByCategory(String category, Pageable pageable);*/
 
-    Page<IdeaResponseDTO> filterIdeasByAll(String title, String text, Status status, String category, Pageable pageable);
+    Page<IdeaResponseDTO> filterIdeasByAll(String title, String text, Status status, List<String> categories, String user, Pageable pageable);
 
 }

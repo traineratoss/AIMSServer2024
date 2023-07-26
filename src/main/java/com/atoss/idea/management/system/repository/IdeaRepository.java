@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface IdeaRepository extends JpaRepository<Idea, Long> {
     Idea findIdeaById(Long id);
@@ -27,14 +29,16 @@ public interface IdeaRepository extends JpaRepository<Idea, Long> {
     @Query("SELECT DISTINCT i FROM Idea i JOIN i.categoryList c WHERE c.text LIKE %:category%")
     Page<Idea> findAllByCategoryName(@Param("category") String categoryName, Pageable pageable);*/
 
-    @Query("SELECT i FROM Idea i JOIN i.categoryList c "
+    @Query("SELECT i FROM Idea i JOIN i.categoryList c JOIN i.user u "
             + "WHERE (:title is null or i.title LIKE %:title%) "
             + "AND (:text is null or i.text LIKE %:text%) "
             + "AND (:status is null or i.status = :status) "
-            + "AND (:category is null or c.text LIKE %:category%)")
-    Page<Idea> findIdeasByParameters(@Param("title") String title,
+            + "AND (:user is null or u.username = :user)")
+    List<Idea> findIdeasByParameters(@Param("title") String title,
                                      @Param("text") String text,
                                      @Param("status") Status status,
-                                     @Param("category") String category,
+                                     @Param("user") String user,
                                      Pageable pageable);
+
+
 }

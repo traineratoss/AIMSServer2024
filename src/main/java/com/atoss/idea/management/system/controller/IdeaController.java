@@ -22,6 +22,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -203,27 +207,24 @@ public class IdeaController {
 
     @Transactional
     @GetMapping("/filterIdeas")
-    public ResponseEntity<Page<IdeaResponseDTO>> filterAllIdeasByParameters(@RequestParam(required = false) String title,
-                                                                            @RequestParam(required = false) String text,
-                                                                            @RequestParam(required = false) String status,
-                                                                            @RequestParam(required = false) String category,
-                                                                            @RequestParam(required = true) int pageSize,
-                                                                            @RequestParam(required = true) int pageNumber,
-                                                                            @RequestParam(required = true) String sortCategory,
-                                                                            @RequestParam(required = true) Sort.Direction sortDirection) {
+    public ResponseEntity<Page<IdeaResponseDTO>> filterAllIdeasByParameters(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String text,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String user,
+            @RequestParam(required = true) int pageNumber,
+            @RequestParam(required = true) Sort.Direction sortDirection) {
+
         Status statusEnum = (status != null) ? Status.valueOf(status) : null;
-        switch (sortDirection) {
-            case ASC -> {
-                Pageable pageableAsc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
-                return new ResponseEntity<>(ideaService.filterIdeasByAll(title, text, statusEnum, category, pageableAsc), HttpStatus.OK);
-            }
-            case DESC -> {
-                Pageable pageableDesc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
-                return new ResponseEntity<>(ideaService.filterIdeasByAll(title, text, statusEnum, category, pageableDesc), HttpStatus.OK);
-            }
-            default -> {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
+
+        List<String> categories = new ArrayList<>();
+        if (category != null && !category.isEmpty()) {
+            categories = Arrays.asList(category.split(","));
         }
+
+        Pageable pageableAsc = PageRequest.of(pageNumber, 2, Sort.by(sortDirection, "date"));
+
+        return new ResponseEntity<>(ideaService.filterIdeasByAll(title, text, statusEnum, categories, user, pageableAsc), HttpStatus.OK);
     }
 }
