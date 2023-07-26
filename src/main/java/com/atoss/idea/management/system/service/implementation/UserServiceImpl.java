@@ -161,7 +161,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository
                 .findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(
-                        () -> new UserNotFoundException("User not found!")
+                        () -> new UserNotFoundException("User not found !")
                 );
         if (!user.getPassword().equals(hashFrontendPassword)) {
             throw new IncorrectPasswordException("Bad credentials!");
