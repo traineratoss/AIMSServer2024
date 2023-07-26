@@ -10,17 +10,14 @@ import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.service.UserService;
-import com.google.common.hash.Hashing;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.nio.charset.StandardCharsets;
-
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -33,15 +30,18 @@ public class UserServiceImpl implements UserService {
 
     private final AvatarRepository avatarRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
 
     public UserServiceImpl(UserRepository userRepository,
                            ModelMapper modelMapper,
                            SendEmailService sendEmailService,
-                           AvatarRepository avatarRepository) {
+                           AvatarRepository avatarRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.sendEmailService = sendEmailService;
         this.avatarRepository = avatarRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -122,12 +122,8 @@ public class UserServiceImpl implements UserService {
         String username = changePasswordDTO.getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserAlreadyExistException("User already exist!"));
         String databasePassword = user.getPassword();
-        String hashFrontendOldPassword = Hashing.sha256()
-                .hashString(changePasswordDTO.getOldPassword(), StandardCharsets.UTF_8)
-                .toString();
-        String hashFrontendNewPassword = Hashing.sha256()
-                .hashString(changePasswordDTO.getNewPassword(), StandardCharsets.UTF_8)
-                .toString();
+        String hashFrontendOldPassword = passwordEncoder.encode(changePasswordDTO.getOldPassword());
+        String hashFrontendNewPassword = passwordEncoder.encode(changePasswordDTO.getNewPassword());
         if (!hashFrontendOldPassword.equals(databasePassword)) {
             return false;
         }
@@ -155,9 +151,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<UserResponseDTO> login(String usernameOrEmail, String password) {
-        String hashFrontendPassword = Hashing.sha256()
-                .hashString(password, StandardCharsets.UTF_8)
-                .toString();
+        String hashFrontendPassword = passwordEncoder.encode(password);
         User user = userRepository
                 .findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(

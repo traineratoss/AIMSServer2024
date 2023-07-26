@@ -29,4 +29,7 @@ spring:
     test-connection: false
     protocol: smtp
 
-
+aims:
+  app:
+    jwtExpirationMs: '86400000'
+    jwtSecret: ======================BezKoder=Spring===========================

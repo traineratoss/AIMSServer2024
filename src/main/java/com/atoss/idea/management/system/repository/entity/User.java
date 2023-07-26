@@ -13,16 +13,19 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.checkerframework.common.aliasing.qual.Unique;
-
 import java.util.List;
+
 
 @Data
 @Entity
 @Table(name = "\"user\"")
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "user_id")
@@ -60,6 +63,11 @@ public class User {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     @JsonManagedReference(value = "user-comments")
     private List<Comment> comments;
+
+    public User(String username, String email) {
+        this.username = username;
+        this.email = email;
+    }
 
     @Override
     public String toString() {
