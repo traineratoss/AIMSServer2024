@@ -22,9 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -161,6 +160,7 @@ public class CommentServiceImpl implements CommentService {
         return filteredList;
     }
 
+
     @Transactional
     @Override
     public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(Long commentId) {
@@ -177,9 +177,15 @@ public class CommentServiceImpl implements CommentService {
                     responseCommentReplyDTO.setElapsedTime(time);
                     return responseCommentReplyDTO;
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(),
+                        list -> {
+                            Collections.reverse(list);
+                            return list; // Return the reversed list
+                        }));
+
         return filteredList;
     }
+
 
 
 
