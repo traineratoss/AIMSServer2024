@@ -42,8 +42,7 @@ public class Comment {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> replies;
 
-    @Lob
-    @Column(name = "comment_text")
+    @Column(name = "comment_text", columnDefinition = "CLOB")
     private String commentText;
 
     @Column(name = "creation_date")

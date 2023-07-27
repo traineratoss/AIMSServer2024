@@ -34,7 +34,6 @@ public class IdeaController {
 
     private final IdeaServiceImpl ideaService;
 
-
     public IdeaController(IdeaServiceImpl ideaService) {
         this.ideaService = ideaService;
     }
@@ -110,100 +109,6 @@ public class IdeaController {
             }
         }
     }
-
-    /*@Transactional
-    @GetMapping("/filterIdeasByTitle")
-    public ResponseEntity<Page<IdeaResponseDTO>> getIdeasByTitle(@RequestParam(required = true) String title,
-                                                                 @RequestParam(required = true) int pageSize,
-                                                                 @RequestParam(required = true) int pageNumber,
-                                                                 @RequestParam(required = true) String sortCategory,
-                                                                 @RequestParam(required = true) Sort.Direction sortDirection) {
-        switch (sortDirection) {
-            case ASC -> {
-                Pageable pageableAsc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
-                return new ResponseEntity<>(ideaService.filterIdeasByTitle(title, pageableAsc), HttpStatus.OK);
-            }
-            case DESC -> {
-                Pageable pageableDesc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
-                return new ResponseEntity<>(ideaService.filterIdeasByTitle(title, pageableDesc), HttpStatus.OK);
-            }
-            default -> {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-        }
-    }
-
-    @Transactional
-    @GetMapping("/filterIdeasByText")
-    public ResponseEntity<Page<IdeaResponseDTO>> getIdeasByText(@RequestParam(required = true) String text,
-                                                                @RequestParam(required = true) int pageSize,
-                                                                @RequestParam(required = true) int pageNumber,
-                                                                @RequestParam(required = true) String sortCategory,
-                                                                @RequestParam(required = true) Sort.Direction sortDirection) {
-        switch (sortDirection) {
-            case ASC -> {
-                Pageable pageableAsc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
-                return new ResponseEntity<>(ideaService.filterIdeasByText(text, pageableAsc), HttpStatus.OK);
-            }
-            case DESC -> {
-                Pageable pageableDesc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
-                return new ResponseEntity<>(ideaService.filterIdeasByText(text, pageableDesc), HttpStatus.OK);
-            }
-            default -> {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-        }
-    }
-
-    @Transactional
-    @GetMapping("/filterIdeasByStatus")
-    public ResponseEntity<Page<IdeaResponseDTO>> getIdeasByStatus(@RequestParam(required = true) String status,
-                                                                  @RequestParam(required = true) int pageSize,
-                                                                  @RequestParam(required = true) int pageNumber,
-                                                                  @RequestParam(required = true) String sortCategory,
-                                                                  @RequestParam(required = true) Sort.Direction sortDirection) {
-        Status statusEnum;
-        try {
-            statusEnum = Status.valueOf(status);
-        } catch (IllegalArgumentException ex) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        switch (sortDirection) {
-            case ASC -> {
-                Pageable pageableAsc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
-                return new ResponseEntity<>(ideaService.filterIdeasByStatus(statusEnum, pageableAsc), HttpStatus.OK);
-            }
-            case DESC -> {
-                Pageable pageableDesc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
-                return new ResponseEntity<>(ideaService.filterIdeasByStatus(statusEnum, pageableDesc), HttpStatus.OK);
-            }
-            default -> {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-        }
-    }
-
-    @Transactional
-    @GetMapping("/filterIdeasByCategory")
-    public ResponseEntity<Page<IdeaResponseDTO>> getIdeasByCategory(@RequestParam(required = true) String category,
-                                                                    @RequestParam(required = true) int pageSize,
-                                                                    @RequestParam(required = true) int pageNumber,
-                                                                    @RequestParam(required = true) String sortCategory,
-                                                                    @RequestParam(required = true) Sort.Direction sortDirection) {
-        switch (sortDirection) {
-            case ASC -> {
-                Pageable pageableAsc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
-                return new ResponseEntity<>(ideaService.filterIdeasByCategory(category, pageableAsc), HttpStatus.OK);
-            }
-            case DESC -> {
-                Pageable pageableDesc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
-                return new ResponseEntity<>(ideaService.filterIdeasByCategory(category, pageableDesc), HttpStatus.OK);
-            }
-            default -> {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-        }
-    }*/
 
     @Transactional
     @GetMapping("/filterIdeas")
