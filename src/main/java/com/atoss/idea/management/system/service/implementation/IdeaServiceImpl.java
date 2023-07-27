@@ -5,6 +5,7 @@ import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.FieldValidationException;
 import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
+import com.atoss.idea.management.system.repository.IdeaRepositoryCustom;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
@@ -30,6 +31,8 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final IdeaRepository ideaRepository;
 
+    private final IdeaRepositoryCustom ideaRepositoryCustom;
+
     private final UserRepository userRepository;
 
     private final CategoryRepository categoryRepository;
@@ -37,10 +40,12 @@ public class IdeaServiceImpl implements IdeaService {
     private final ModelMapper modelMapper;
 
     public IdeaServiceImpl(IdeaRepository ideaRepository,
+                           IdeaRepositoryCustom ideaRepositoryCustom,
                            UserRepository userRepository,
                            CategoryRepository categoryRepository,
                            ModelMapper modelMapper) {
         this.ideaRepository = ideaRepository;
+        this.ideaRepositoryCustom = ideaRepositoryCustom;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
@@ -182,64 +187,15 @@ public class IdeaServiceImpl implements IdeaService {
         return new PageImpl<>(ideaResponseDTOs, pageable, ideaResponseDTOs.size());
     }
 
-    /*@Override
-    public Page<IdeaResponseDTO> filterIdeasByTitle(String title, Pageable pageable) {
-        if (!title.isEmpty()) {
-            return new PageImpl<IdeaResponseDTO>(
-                    ideaRepository.findAllByTitle(title, pageable)
-                            .stream()
-                            .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
-                            .collect(Collectors.toList()));
-        } else {
-            throw new FieldValidationException("Please enter a valid title for the filter search.");
-        }
-    }
-
     @Override
-    public Page<IdeaResponseDTO> filterIdeasByText(String text, Pageable pageable) {
-        if (!text.isEmpty()) {
-            return new PageImpl<IdeaResponseDTO>(
-                    ideaRepository.findAllByText(text, pageable)
-                            .stream()
-                            .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
-                            .collect(Collectors.toList()));
-        } else {
-            throw new FieldValidationException("Please enter a valid text for the filter search.");
-        }
-    }
-
-    @Override
-    public Page<IdeaResponseDTO> filterIdeasByStatus(Status status, Pageable pageable) {
-        if (status != null) {
-            return new PageImpl<IdeaResponseDTO>(
-                    ideaRepository.findAllByStatus(status, pageable)
-                            .stream()
-                            .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
-                            .collect(Collectors.toList()));
-        } else {
-            throw new FieldValidationException("Please enter a valid status for the filter search.");
-        }
-    }
-
-    @Override
-    public Page<IdeaResponseDTO> filterIdeasByCategory(String category, Pageable pageable) {
-        if (!category.isEmpty()) {
-            return new PageImpl<IdeaResponseDTO>(
-                    ideaRepository.findAllByCategoryName(category, pageable)
-                            .stream()
-                            .map(idea -> modelMapper.map(idea, IdeaResponseDTO.class))
-                            .collect(Collectors.toList()));
-        } else {
-            throw new FieldValidationException("Please enter a valid category for the filter search.");
-        }
-    }*/
-
-    @Override
-    public Page<IdeaResponseDTO> filterIdeasByAll(String title, String text, Status status, List<String> categories, String user, Pageable pageable) {
-        List<Idea> ideaList = ideaRepository.findIdeasByParameters(title, text, status, user, pageable);
+    public Page<IdeaResponseDTO> filterIdeasByAll(String title,
+                                                  String text,
+                                                  List<Status> statuses,
+                                                  List<String> categories,
+                                                  List<String> users,
+                                                  Pageable pageable) {
+        Page<Idea> ideaList = ideaRepositoryCustom.findIdeasByParameters(title, text, statuses, categories, users, pageable);
         List<IdeaResponseDTO> result = ideaList.stream()
-                .filter(idea -> categories == null || categories.isEmpty() || idea.getCategoryList()
-                        .stream().anyMatch(category -> categories.contains(category.getText())))
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
                     responseDTO.setUsername(idea.getUser().getUsername());

@@ -216,15 +216,25 @@ public class IdeaController {
             @RequestParam(required = true) int pageNumber,
             @RequestParam(required = true) Sort.Direction sortDirection) {
 
-        Status statusEnum = (status != null) ? Status.valueOf(status) : null;
-
         List<String> categories = new ArrayList<>();
         if (category != null && !category.isEmpty()) {
             categories = Arrays.asList(category.split(","));
         }
 
+        List<String> users = new ArrayList<>();
+        if (user != null && !user.isEmpty()) {
+            users = Arrays.asList(user.split(","));
+        }
+
+        List<String> statusStrings = new ArrayList<>();
+        if (status != null && !status.isEmpty()) {
+            statusStrings = Arrays.asList(status.split(","));
+        }
+        List<Status> statusEnums = statusStrings.stream().map(s -> Status.valueOf(s)).toList();
+        // pentru a converti corect, din String in Status nu stie in QueryCreator
+
         Pageable pageableAsc = PageRequest.of(pageNumber, 2, Sort.by(sortDirection, "date"));
 
-        return new ResponseEntity<>(ideaService.filterIdeasByAll(title, text, statusEnum, categories, user, pageableAsc), HttpStatus.OK);
+        return new ResponseEntity<>(ideaService.filterIdeasByAll(title, text, statusEnums, categories, users, pageableAsc), HttpStatus.OK);
     }
 }

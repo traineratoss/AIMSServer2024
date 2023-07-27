@@ -22,14 +22,11 @@ public interface IdeaService {
 
     Page<IdeaResponseDTO> getAllIdeasByUserId(Long id, Pageable pageable);
 
-    /*Page<IdeaResponseDTO> filterIdeasByTitle(String title, Pageable pageable);
-
-    Page<IdeaResponseDTO> filterIdeasByText(String text, Pageable pageable);
-
-    Page<IdeaResponseDTO> filterIdeasByStatus(Status status, Pageable pageable);
-
-    Page<IdeaResponseDTO> filterIdeasByCategory(String category, Pageable pageable);*/
-
-    Page<IdeaResponseDTO> filterIdeasByAll(String title, String text, Status status, List<String> categories, String user, Pageable pageable);
+    Page<IdeaResponseDTO> filterIdeasByAll(String title,
+                                           String text,
+                                           List<Status> status,
+                                           List<String> categories,
+                                           List<String> user,
+                                           Pageable pageable);
 
 }
