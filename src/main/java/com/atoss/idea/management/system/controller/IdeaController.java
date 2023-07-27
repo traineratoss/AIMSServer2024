@@ -119,6 +119,8 @@ public class IdeaController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String user,
+            @RequestParam(required = false) String selectedDateFrom,
+            @RequestParam(required = false) String selectedDateTo,
             @RequestParam(required = true) int pageNumber,
             @RequestParam(required = true) String sortDirection) {
 
@@ -142,6 +144,6 @@ public class IdeaController {
         Pageable pageableAsc = PageRequest.of(pageNumber, 2);
 
         return new ResponseEntity<>(ideaService.filterIdeasByAll(title,
-                text, statusEnums, categories, users, sortDirection, pageableAsc), HttpStatus.OK);
+                text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, pageableAsc), HttpStatus.OK);
     }
 }

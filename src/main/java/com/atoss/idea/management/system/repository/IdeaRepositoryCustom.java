@@ -14,6 +14,8 @@ public interface IdeaRepositoryCustom {
                                       List<Status> status,
                                       List<String> categories,
                                       List<String> user,
+                                      String selectedDateFrom,
+                                      String selectedDateTo,
                                       String sortDirection,
                                       Pageable pageable);
 }

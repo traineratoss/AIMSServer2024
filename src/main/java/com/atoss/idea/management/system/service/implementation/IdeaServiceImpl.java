@@ -190,9 +190,12 @@ public class IdeaServiceImpl implements IdeaService {
                                         List<Status> statuses,
                                         List<String> categories,
                                         List<String> users,
+                                        String selectedDateFrom,
+                                        String selectedDateTo,
                                         String sortDirection,
                                         Pageable pageable) {
-        IdeaPageDTO ideaList = ideaRepositoryCustom.findIdeasByParameters(title, text, statuses, categories, users, sortDirection, pageable);
+        IdeaPageDTO ideaList = ideaRepositoryCustom.findIdeasByParameters(
+                title, text, statuses, categories, users, selectedDateFrom, selectedDateTo, sortDirection, pageable);
         List<IdeaResponseDTO> result = ideaList.getPagedIdeas().stream()
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);

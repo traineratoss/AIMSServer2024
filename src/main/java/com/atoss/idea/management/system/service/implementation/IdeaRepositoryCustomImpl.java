@@ -12,7 +12,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,6 +31,8 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
                                              List<Status> statuses,
                                              List<String> categories,
                                              List<String> users,
+                                             String selectedDateFrom,
+                                             String selectedDateTo,
                                              String sortDirection,
                                              Pageable pageable) {
 
@@ -57,11 +62,44 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
             predicates.add(root.join("categoryList").get("text").in(categories));
         }
 
+        // filtering by the from and to date
+
+        if (selectedDateFrom != null && selectedDateTo == null) {
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
+                predicates.add(cb.greaterThanOrEqualTo(root.get("date"), fromDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (selectedDateFrom == null && selectedDateTo != null) {
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                predicates.add(cb.lessThanOrEqualTo(root.get("date"), toDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (selectedDateFrom != null && selectedDateTo != null) {
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
+                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                predicates.add(cb.between(root.get("date"), fromDate, toDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
         //sorting by date
 
         List<Order> orders = new ArrayList<>();
 
-        if (Objects.equals(sortDirection, "ASC")) {
+        if (!Objects.equals(sortDirection, "ASC")) {
             orders.add(cb.asc(root.get("date")));
         } else {
             orders.add(cb.desc(root.get("date")));
