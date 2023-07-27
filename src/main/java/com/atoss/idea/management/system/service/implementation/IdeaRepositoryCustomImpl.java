@@ -1,14 +1,15 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.repository.IdeaRepositoryCustom;
+import com.atoss.idea.management.system.repository.dto.IdeaPageDTO;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.Status;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +20,19 @@ import java.util.List;
 public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
 
     @PersistenceContext
-    private EntityManager em;
+    private EntityManager entityManager;
+
+    private ModelMapper modelMapper;
 
     @Override
-    public Page<Idea> findIdeasByParameters(String title,
-                                            String text,
-                                            List<Status> statuses,
-                                            List<String> categories,
-                                            List<String> users,
-                                            Pageable pageable) {
+    public IdeaPageDTO findIdeasByParameters(String title,
+                                             String text,
+                                             List<Status> statuses,
+                                             List<String> categories,
+                                             List<String> users,
+                                             Pageable pageable) {
 
-        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
         Root<Idea> root = criteriaQuery.from(Idea.class);
 
@@ -56,7 +59,7 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
         }
 
         criteriaQuery.where(predicates.toArray(new Predicate[0]));
-        TypedQuery<Idea> query = em.createQuery(criteriaQuery);
+        TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
         int total = query.getResultList().size();
 
         List<Idea> allIdeas = query.getResultList();
@@ -73,7 +76,10 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
                     firstIndex = firstIndex + 1;
                 }
             }
-            return new PageImpl<>(pagedIdeas, pageable, total);
+            IdeaPageDTO ideaPageDTO = new IdeaPageDTO();
+            ideaPageDTO.setPagedIdeas(new PageImpl<>(pagedIdeas, pageable, total));
+            ideaPageDTO.setTotal(total);
+            return ideaPageDTO;
         }
 
         return null;

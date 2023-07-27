@@ -7,10 +7,7 @@ import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.IdeaRepositoryCustom;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
-import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
-import com.atoss.idea.management.system.repository.dto.CategoryDTO;
-import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.*;
 import com.atoss.idea.management.system.service.IdeaService;
 import lombok.extern.log4j.Log4j2;
@@ -188,21 +185,21 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public Page<IdeaResponseDTO> filterIdeasByAll(String title,
-                                                  String text,
-                                                  List<Status> statuses,
-                                                  List<String> categories,
-                                                  List<String> users,
-                                                  Pageable pageable) {
-        Page<Idea> ideaList = ideaRepositoryCustom.findIdeasByParameters(title, text, statuses, categories, users, pageable);
-        List<IdeaResponseDTO> result = ideaList.stream()
+    public IdeaPageDTO filterIdeasByAll(String title,
+                                        String text,
+                                        List<Status> statuses,
+                                        List<String> categories,
+                                        List<String> users,
+                                        Pageable pageable) {
+        IdeaPageDTO ideaList = ideaRepositoryCustom.findIdeasByParameters(title, text, statuses, categories, users, pageable);
+        List<IdeaResponseDTO> result = ideaList.getPagedIdeas().stream()
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
                     responseDTO.setUsername(idea.getUser().getUsername());
                     return responseDTO;
                 })
                 .toList();
-        return new PageImpl<>(result, pageable, result.size());
+        return new IdeaPageDTO(ideaList.getTotal(), new PageImpl(result, pageable, result.size()));
     }
 }
 

@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.service;
 
+import com.atoss.idea.management.system.repository.dto.IdeaPageDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
@@ -22,11 +23,11 @@ public interface IdeaService {
 
     Page<IdeaResponseDTO> getAllIdeasByUserId(Long id, Pageable pageable);
 
-    Page<IdeaResponseDTO> filterIdeasByAll(String title,
-                                           String text,
-                                           List<Status> status,
-                                           List<String> categories,
-                                           List<String> user,
-                                           Pageable pageable);
+    IdeaPageDTO filterIdeasByAll(String title,
+                                 String text,
+                                 List<Status> status,
+                                 List<String> categories,
+                                 List<String> user,
+                                 Pageable pageable);
 
 }
