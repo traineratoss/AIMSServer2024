@@ -30,7 +30,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/ideas")
+@RequestMapping("/aims/api/v1/ideas")
 public class IdeaController {
 
     private final IdeaServiceImpl ideaService;
@@ -40,27 +40,27 @@ public class IdeaController {
     }
 
 
-    @PostMapping("/createIdea")
+    @PostMapping("/create")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> addIdea(@RequestBody IdeaRequestDTO idea,
                                                    @RequestParam String username) {
         return new ResponseEntity<>(ideaService.addIdea(idea, username), HttpStatus.OK);
     }
 
-    @GetMapping("/getIdea/id")
+    @GetMapping("/get/id")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> getIdeaById(@RequestParam(required = true) Long id) {
         return new ResponseEntity<>(ideaService.getIdeaById(id), HttpStatus.OK);
     }
 
-    @PatchMapping("/updateIdea/id")
+    @PatchMapping("/update/id")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> updateIdeaById(@RequestParam(required = true) Long id,
                                                           @RequestBody IdeaUpdateDTO ideaUpdateDTO) {
         return new ResponseEntity<>(ideaService.updateIdeaById(id, ideaUpdateDTO), HttpStatus.OK);
     }
 
-    @DeleteMapping("/deleteIdea/id")
+    @DeleteMapping("/delete/id")
     @Transactional
     public ResponseEntity<String> deleteIdeaById(@RequestParam(required = true) Long id)  {
         ideaService.deleteIdeaById(id);
@@ -69,7 +69,7 @@ public class IdeaController {
 
     // We can sort the ideas based on a category we introduce manually, sorting a page based on it and a page size.
     @Transactional
-    @GetMapping("/getAllIdeas/page")
+    @GetMapping("/all")
     public ResponseEntity<Page<IdeaResponseDTO>> getAllIdeas(@RequestParam(required = true) int pageSize,
                                                              @RequestParam(required = true) int pageNumber,
                                                              @RequestParam(required = true) String sortCategory,
@@ -90,7 +90,7 @@ public class IdeaController {
     }
 
     @Transactional
-    @GetMapping("/getAllIdeasByUserId/userId")
+    @GetMapping("/allByUser/id")
     public ResponseEntity<Page<IdeaResponseDTO>> getAllIdeasByUserId(@RequestParam(required = true) Long id,
                                                                      @RequestParam(required = true) int pageSize,
                                                                      @RequestParam(required = true) int pageNumber,
@@ -112,7 +112,7 @@ public class IdeaController {
     }
 
     @Transactional
-    @GetMapping("/filterIdeas")
+    @GetMapping("/filter")
     public ResponseEntity<IdeaPageDTO> filterAllIdeasByParameters(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String text,
