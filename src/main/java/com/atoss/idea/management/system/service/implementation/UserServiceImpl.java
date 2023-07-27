@@ -16,8 +16,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -124,7 +127,7 @@ public class UserServiceImpl implements UserService {
         String databasePassword = user.getPassword();
         String hashFrontendOldPassword = passwordEncoder.encode(changePasswordDTO.getOldPassword());
         String hashFrontendNewPassword = passwordEncoder.encode(changePasswordDTO.getNewPassword());
-        if (!hashFrontendOldPassword.equals(databasePassword)) {
+        if (!BCrypt.checkpw(changePasswordDTO.getOldPassword(), user.getPassword())) {
             return false;
         }
         user.setPassword(hashFrontendNewPassword);
@@ -151,16 +154,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<UserResponseDTO> login(String usernameOrEmail, String password) {
-        String hashFrontendPassword = passwordEncoder.encode(password);
-        User user = userRepository
-                .findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-                .orElseThrow(
-                        () -> new UserNotFoundException("User not found !")
-                );
-        if (!user.getPassword().equals(hashFrontendPassword)) {
-            throw new IncorrectPasswordException("Bad credentials!");
+        Optional<User> user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+        if (user.isPresent()) {
+            UserResponseDTO userResponseDTO = modelMapper.map(
+                    user.get(),
+                    UserResponseDTO.class
+            );
+            return new ResponseEntity<>(userResponseDTO, HttpStatus.OK);
         }
-        return new ResponseEntity<>(modelMapper.map(user, UserResponseDTO.class), HttpStatus.OK);
+
+        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 
     @Override

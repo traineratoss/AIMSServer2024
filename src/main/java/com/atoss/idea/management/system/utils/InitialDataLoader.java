@@ -7,14 +7,13 @@ import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.ImageRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.entity.*;
-import com.google.common.hash.Hashing;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -31,6 +30,8 @@ public class InitialDataLoader implements CommandLineRunner {
     private final IdeaRepository ideaRepository;
     private final CommentRepository commentRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlValue;
 
@@ -39,13 +40,14 @@ public class InitialDataLoader implements CommandLineRunner {
                              CategoryRepository categoryRepository,
                              ImageRepository imageRepository,
                              CommentRepository commentRepository,
-                             IdeaRepository ideaRepository) {
+                             IdeaRepository ideaRepository, PasswordEncoder passwordEncoder) {
         this.avatarRepository = avatarRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.imageRepository = imageRepository;
         this.commentRepository = commentRepository;
         this.ideaRepository = ideaRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -81,9 +83,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     "ap6548088@gmail.com",
                     "AdminPopescu1",
                     "Admin Popescu",
-                    Hashing.sha256()
-                            .hashString("AtossAdmin123", StandardCharsets.UTF_8)
-                            .toString()
+                    passwordEncoder.encode("AtossAdmin123")
             );
             userRepository.save(user1);
 
@@ -93,9 +93,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     "standardemail@gmail.com",
                     "AnaStandard",
                     "Ana Standard",
-                    Hashing.sha256()
-                            .hashString("StandardUser", StandardCharsets.UTF_8)
-                            .toString()
+                    passwordEncoder.encode("StandardUser")
             );
             userRepository.save(user2);
 
@@ -182,6 +180,7 @@ public class InitialDataLoader implements CommandLineRunner {
         user.setFullName(fullname);
         user.setIsActive(isActive);
         user.setAvatar(avatar);
+        user.setRole(role);
         return user;
     }
 

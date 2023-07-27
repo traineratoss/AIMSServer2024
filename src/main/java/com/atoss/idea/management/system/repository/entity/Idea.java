@@ -28,7 +28,7 @@ public class Idea {
     @Column(name = "status")
     private Status status;
 
-    @Column(name = "text")
+    @Column(name = "text", length = 2000)
     private String text;
 
     @Column(name = "date")
@@ -53,7 +53,6 @@ public class Idea {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
-    @Lob
     @JsonIgnoreProperties("idea")
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL)
     private List<Comment> commentList;

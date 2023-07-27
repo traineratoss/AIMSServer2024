@@ -9,6 +9,7 @@ import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.security.request.LoginRequest;
 import com.atoss.idea.management.system.security.request.SignupRequest;
 import com.atoss.idea.management.system.security.response.JwtResponse;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,7 @@ public class AuthController {
         this.jwtUtils = jwtUtils;
     }
 
+    @Transactional
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -59,6 +61,7 @@ public class AuthController {
                 .ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
     }
 
+    @Transactional
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.findByUsername(signUpRequest.getUsername()).isPresent()) {

@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "comment")
 public class Comment {
 
     @Id
@@ -42,7 +43,8 @@ public class Comment {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> replies;
 
-    @Column(name = "comment_text", columnDefinition = "CLOB")
+
+    @Column(name = "comment_text", length = 2000)
     private String commentText;
 
     @Column(name = "creation_date")

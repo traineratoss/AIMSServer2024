@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Lob;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import jakarta.persistence.Column;
@@ -30,7 +29,6 @@ public class Image {
     @Column(name = "image_id")
     private Long id;
 
-    @Lob
     @Column(name = "photo", length = 1000)
     private byte[] image;
 

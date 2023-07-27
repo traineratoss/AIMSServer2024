@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,8 +26,7 @@ public class Avatar {
     @Column(name = "avatar_id")
     private Long id;
 
-    @Lob
-    @Column(name = "data")
+    @Column(name = "data", length = 2000)
     private byte[] data;
 
     @OneToMany(mappedBy = "avatar")

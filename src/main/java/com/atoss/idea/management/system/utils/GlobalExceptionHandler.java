@@ -29,23 +29,23 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = UserAlreadyExistException.class)
-    public ResponseEntity<Object> userAlreadyExistException(UserAlreadyExistException userAlreadyExistException) {
-        return new ResponseEntity<>(userAlreadyExistException.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<UserAlreadyExistException> userAlreadyExistException(UserAlreadyExistException userAlreadyExistException) {
+        return new ResponseEntity<>(userAlreadyExistException, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = UserNotFoundException.class)
-    public ResponseEntity<Object> userNotFoundException(UserNotFoundException userNotFoundException) {
-        return new ResponseEntity<>(userNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<UserNotFoundException> userNotFoundException(UserNotFoundException userNotFoundException) {
+        return new ResponseEntity<>(userNotFoundException, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = IOException.class)
-    public ResponseEntity<Object> userNotFoundException(IOException ioException) {
-        return new ResponseEntity<>(ioException.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<IOException> userNotFoundException(IOException ioException) {
+        return new ResponseEntity<>(ioException, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = AvatarNotFoundException.class)
-    public ResponseEntity<Object> userNotFoundException(AvatarNotFoundException avatarNotFoundException) {
-        return new ResponseEntity<>(avatarNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<AvatarNotFoundException> userNotFoundException(AvatarNotFoundException avatarNotFoundException) {
+        return new ResponseEntity<>(avatarNotFoundException, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = IdeaNotFoundException.class)
@@ -64,27 +64,27 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = UsernameAlreadyExistException.class)
-    public ResponseEntity<Object> usernameAlreadyExistException(UsernameAlreadyExistException usernameAlreadyExistException) {
-        return new ResponseEntity<>(usernameAlreadyExistException.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<UsernameAlreadyExistException> usernameAlreadyExistException(UsernameAlreadyExistException usernameAlreadyExistException) {
+        return new ResponseEntity<>(usernameAlreadyExistException, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = EmailAlreadyExistException.class)
-    public ResponseEntity<Object> emailAlreadyExistException(EmailAlreadyExistException emailAlreadyExistException) {
-        return new ResponseEntity<>(emailAlreadyExistException.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<EmailAlreadyExistException> emailAlreadyExistException(EmailAlreadyExistException emailAlreadyExistException) {
+        return new ResponseEntity<>(emailAlreadyExistException, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = IncorrectPasswordException.class)
-    public ResponseEntity<Object> incorrectPasswordException(IncorrectPasswordException incorrectPasswordException) {
-        return new ResponseEntity<Object>(incorrectPasswordException.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<IncorrectPasswordException> incorrectPasswordException(IncorrectPasswordException incorrectPasswordException) {
+        return new ResponseEntity<>(incorrectPasswordException, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = EmailFailedException.class)
-    public ResponseEntity<Object> emailFailedException(EmailFailedException emailFailedException) {
-        return new ResponseEntity<Object>(emailFailedException.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<EmailFailedException> emailFailedException(EmailFailedException emailFailedException) {
+        return new ResponseEntity<>(emailFailedException, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = UserStatusIsActiveException.class)
-    public ResponseEntity<Object> userStatusIsActiveException(UserStatusIsActiveException userStatusIsActiveException) {
-        return new ResponseEntity<Object>(userStatusIsActiveException.getMessage(), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<UserStatusIsActiveException> userStatusIsActiveException(UserStatusIsActiveException userStatusIsActiveException) {
+        return new ResponseEntity<>(userStatusIsActiveException, HttpStatus.BAD_REQUEST);
     }
 }
