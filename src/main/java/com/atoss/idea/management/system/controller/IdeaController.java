@@ -120,7 +120,7 @@ public class IdeaController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String user,
             @RequestParam(required = true) int pageNumber,
-            @RequestParam(required = true) Sort.Direction sortDirection) {
+            @RequestParam(required = true) String sortDirection) {
 
         List<String> categories = new ArrayList<>();
         if (category != null && !category.isEmpty()) {
@@ -139,8 +139,9 @@ public class IdeaController {
         List<Status> statusEnums = statusStrings.stream().map(s -> Status.valueOf(s)).toList();
         // pentru a converti corect, din String in Status nu stie in QueryCreator
 
-        Pageable pageableAsc = PageRequest.of(pageNumber, 2, Sort.by(sortDirection, "date"));
+        Pageable pageableAsc = PageRequest.of(pageNumber, 2);
 
-        return new ResponseEntity<>(ideaService.filterIdeasByAll(title, text, statusEnums, categories, users, pageableAsc), HttpStatus.OK);
+        return new ResponseEntity<>(ideaService.filterIdeasByAll(title,
+                text, statusEnums, categories, users, sortDirection, pageableAsc), HttpStatus.OK);
     }
 }

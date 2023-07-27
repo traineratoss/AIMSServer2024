@@ -9,5 +9,11 @@ import java.util.List;
 
 @Repository
 public interface IdeaRepositoryCustom {
-    IdeaPageDTO findIdeasByParameters(String title, String text, List<Status> status, List<String> categories, List<String> user, Pageable pageable);
+    IdeaPageDTO findIdeasByParameters(String title,
+                                      String text,
+                                      List<Status> status,
+                                      List<String> categories,
+                                      List<String> user,
+                                      String sortDirection,
+                                      Pageable pageable);
 }

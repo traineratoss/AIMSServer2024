@@ -28,6 +28,7 @@ public interface IdeaService {
                                  List<Status> status,
                                  List<String> categories,
                                  List<String> user,
+                                 String sortDirection,
                                  Pageable pageable);
 
 }

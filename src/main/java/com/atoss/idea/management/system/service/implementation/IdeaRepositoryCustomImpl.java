@@ -8,13 +8,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
@@ -22,14 +22,13 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private ModelMapper modelMapper;
-
     @Override
     public IdeaPageDTO findIdeasByParameters(String title,
                                              String text,
                                              List<Status> statuses,
                                              List<String> categories,
                                              List<String> users,
+                                             String sortDirection,
                                              Pageable pageable) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -58,8 +57,22 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
             predicates.add(root.join("categoryList").get("text").in(categories));
         }
 
+        //sorting by date
+
+        List<Order> orders = new ArrayList<>();
+
+        if (Objects.equals(sortDirection, "ASC")) {
+            orders.add(cb.asc(root.get("date")));
+        } else {
+            orders.add(cb.desc(root.get("date")));
+        }
+
+        criteriaQuery.orderBy(orders);
         criteriaQuery.where(predicates.toArray(new Predicate[0]));
         TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
+
+        //getting total and paginating
+
         int total = query.getResultList().size();
 
         List<Idea> allIdeas = query.getResultList();
