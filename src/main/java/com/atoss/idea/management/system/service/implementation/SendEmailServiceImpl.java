@@ -11,6 +11,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -23,12 +24,15 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     private final JavaMailSender emailSender;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Value("${spring.mail.username}")
     private String adminEmail;
 
-    public SendEmailServiceImpl(UserRepository userRepository, JavaMailSender emailSender) {
+    public SendEmailServiceImpl(UserRepository userRepository, JavaMailSender emailSender, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.emailSender = emailSender;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -37,9 +41,7 @@ public class SendEmailServiceImpl implements SendEmailService {
                 .orElseThrow(() -> new RuntimeException("User dose not exist!"));
         String companyName = "Company Name";
         String password = PasswordGenerator.generatePassayPassword(15);
-        String hashPassword = Hashing.sha256()
-                .hashString(password, StandardCharsets.UTF_8)
-                .toString();
+        String hashPassword = passwordEncoder.encode(password);
         String emailTo = user.getEmail();
         String subject = "Account Activation for [Company Name] App";
         String text = "Dear "
@@ -164,9 +166,7 @@ public class SendEmailServiceImpl implements SendEmailService {
                 .orElseThrow(() -> new RuntimeException("User dose not exist!"));
         String companyName = "Company Name";
         String password = PasswordGenerator.generatePassayPassword(15);
-        String hashPassword = Hashing.sha256()
-                .hashString(password, StandardCharsets.UTF_8)
-                .toString();
+        String hashPassword = passwordEncoder.encode(password);
         Date date = new Date();
         String emailTo = user.getEmail();
         String subject = "Account Reactivation Notice - Welcome Back!";
@@ -259,9 +259,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         String link = "http://127.0.0.1:5173/login";
         String companyName = "Company Name";
         String password = PasswordGenerator.generatePassayPassword(15);
-        String hashPassword = Hashing.sha256()
-                .hashString(password, StandardCharsets.UTF_8)
-                .toString();
+        String hashPassword = passwordEncoder.encode(password);
         String emailTo = user.getEmail();
         String subject = "Password Reset Request";
         String text = "Dear "
