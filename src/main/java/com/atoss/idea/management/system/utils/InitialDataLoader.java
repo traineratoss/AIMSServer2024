@@ -179,6 +179,8 @@ public class InitialDataLoader implements CommandLineRunner {
         user.setEmail(email);
         user.setFullName(fullname);
         user.setIsActive(isActive);
+        user.setRole(role);
+        user.setHasPassword(true);
         user.setAvatar(avatar);
         user.setRole(role);
         return user;

@@ -1,8 +1,6 @@
 package com.atoss.idea.management.system.service;
 
-import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
-import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
-import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +13,8 @@ public interface UserService {
     UserResponseDTO updateUserByUsername(String username, UserUpdateDTO userUpdateDTO);
 
     UserResponseDTO getUserByUsername(String username);
+
+    Page<UserAdminDashboardResponseDTO> getAllUsersForAdmin(Pageable pageable);
 
     Page<UserResponseDTO> getAllUsers(Pageable pageable);
 

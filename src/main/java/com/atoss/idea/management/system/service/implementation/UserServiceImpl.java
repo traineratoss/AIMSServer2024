@@ -3,9 +3,7 @@ package com.atoss.idea.management.system.service.implementation;
 import com.atoss.idea.management.system.exception.*;
 import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
-import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
-import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
@@ -21,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import java.util.Comparator;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -56,6 +56,7 @@ public class UserServiceImpl implements UserService {
         user.setUsername(username);
         user.setEmail(email);
         user.setIsActive(false);
+        user.setHasPassword(false);
         userRepository.save(user);
         sendEmailService.sendEmailToAdmin(username);
         return modelMapper.map(user, UserResponseDTO.class);
@@ -65,19 +66,24 @@ public class UserServiceImpl implements UserService {
     public UserResponseDTO updateUserByUsername(String username, UserUpdateDTO userUpdateDTO) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         if (userUpdateDTO.getUsername() != null) {
-            user.setUsername(userUpdateDTO.getUsername());
+            if (userRepository.findByUsername(userUpdateDTO.getUsername()).isEmpty()) {
+                user.setUsername(userUpdateDTO.getUsername());
+            } else {
+                throw new UsernameAlreadyExistException("Username already exists!");
+            }
         }
         if (userUpdateDTO.getEmail() != null) {
-            user.setEmail(userUpdateDTO.getEmail());
+            if (userRepository.findByEmail(userUpdateDTO.getEmail()).isEmpty()) {
+                user.setEmail(userUpdateDTO.getEmail());
+            } else {
+                throw new EmailAlreadyExistException("Email already exists!");
+            }
         }
         if (userUpdateDTO.getAvatarId() != null) {
             user.setAvatar(modelMapper.map(avatarRepository.findAvatarById(userUpdateDTO.getAvatarId()), Avatar.class));
         }
         if (userUpdateDTO.getFullName() != null) {
             user.setFullName(userUpdateDTO.getFullName());
-        }
-        if (userUpdateDTO.getRole() != null) {
-            user.setRole(userUpdateDTO.getRole());
         }
         userRepository.save(user);
         return modelMapper.map(user, UserResponseDTO.class);
@@ -90,12 +96,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
+    public Page<UserAdminDashboardResponseDTO> getAllUsersForAdmin(Pageable pageable) {
         return new PageImpl<>(
                 userRepository.findAll(pageable)
                                         .stream()
-                                        .map(user -> modelMapper.map(user, UserResponseDTO.class))
+                                        .sorted(Comparator.comparing(user -> user.getHasPassword() == true))
+                                        .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
                                         .toList()
+        );
+    }
+
+    @Override
+    public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
+        return new PageImpl<>(
+                userRepository.findAll(pageable)
+                        .stream()
+                        .map(user -> modelMapper.map(user, UserResponseDTO.class))
+                        .toList()
         );
     }
 

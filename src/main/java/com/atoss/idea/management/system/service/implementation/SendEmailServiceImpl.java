@@ -70,6 +70,7 @@ public class SendEmailServiceImpl implements SendEmailService {
             //Set the password, status and isActive for user
             user.setPassword(hashPassword);
             user.setIsActive(true);
+            user.setHasPassword(true);
             user.setRole(Role.STANDARD);
             userRepository.save(user);
             System.out.println("Email sent successfully to: " + emailTo);

@@ -45,6 +45,9 @@ public class User {
     @Column(name = "password")
     private String password;
 
+    @Column(name = "has_password")
+    private Boolean hasPassword;
+
     @Column(name = "role")
     private Role role;
 

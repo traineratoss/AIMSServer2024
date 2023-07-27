@@ -1,8 +1,6 @@
 package com.atoss.idea.management.system.controller;
 
-import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
-import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
-import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -31,7 +29,7 @@ public class UserController {
     }
 
     @Transactional
-    @PatchMapping
+    @PatchMapping("/update-profile")
     public UserResponseDTO updateUserByUsername(@RequestParam(value = "username") String username, @RequestBody UserUpdateDTO userUpdateDTO) {
         return userService.updateUserByUsername(username, userUpdateDTO);
     }
@@ -40,6 +38,23 @@ public class UserController {
     @GetMapping
     public UserResponseDTO getUserByUsername(@RequestParam(name = "username") String username) {
         return userService.getUserByUsername(username);
+    }
+
+    @Transactional
+    @GetMapping("/allUsers")
+    public  ResponseEntity<Page<UserAdminDashboardResponseDTO>> getAllUsersForAdmin(@RequestParam(required = true) int pageSize,
+                                                                                    @RequestParam(required = true) int pageNumber,
+                                                                                    @RequestParam(required = true) String sortCategory) {
+        return new ResponseEntity<>(
+                userService.getAllUsersForAdmin(
+                        PageRequest.of(
+                                pageNumber,
+                                pageSize,
+                                Sort.by(Sort.Direction.ASC, sortCategory)
+                        )
+                ),
+                HttpStatus.OK
+        );
     }
 
     @Transactional
