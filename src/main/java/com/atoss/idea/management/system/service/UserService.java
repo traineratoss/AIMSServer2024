@@ -14,9 +14,9 @@ public interface UserService {
 
     UserResponseDTO getUserByUsername(String username);
 
-    Page<UserAdminDashboardResponseDTO> getAllUsersForAdmin(Pageable pageable);
+    UserPageDTO getAllUsersForAdmin(Pageable pageable);
 
-    UserPageDTO getAllUsers(Pageable pageable);
+    Page<UserResponseDTO> getAllUsers(Pageable pageable);
 
     Page<UserResponseDTO> getAllUsersByUsername(String username);
 

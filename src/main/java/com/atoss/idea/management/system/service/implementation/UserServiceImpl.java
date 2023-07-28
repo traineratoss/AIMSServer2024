@@ -97,26 +97,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserAdminDashboardResponseDTO> getAllUsersForAdmin(Pageable pageable) {
-        return new PageImpl<>(
-                userRepository.findAll(pageable)
-                                        .stream()
-                                        .sorted(Comparator.comparing(user -> user.getHasPassword() == true))
-                                        .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
-                                        .toList()
-        );
+    public UserPageDTO getAllUsersForAdmin(Pageable pageable) {
+        UserPageDTO userPageDTO = new UserPageDTO();
+        userPageDTO.setTotal(userRepository.findAll().size());
+        List<UserAdminDashboardResponseDTO> result = userRepository.findAll(pageable)
+                                    .stream()
+                                    .sorted(Comparator.comparing(user -> user.getHasPassword() == true))
+                                    .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
+                                    .toList();
+
+        return new UserPageDTO(userPageDTO.getTotal(), new PageImpl(result, pageable, result.size()));
     }
 
     @Override
-    public UserPageDTO getAllUsers(Pageable pageable) {
-
-        UserPageDTO userPageDTO = new UserPageDTO();
-        userPageDTO.setTotal(userRepository.findAll().size());
-        List<UserResponseDTO> result = userRepository.findAll(pageable).getContent()
-                .stream()
-                .map(user -> modelMapper.map(user, UserResponseDTO.class))
-                .toList();
-        return new UserPageDTO(userPageDTO.getTotal(), new PageImpl(result, pageable, result.size()));
+    public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
+        return new PageImpl<>(
+                userRepository.findAll(pageable)
+                        .stream()
+                        .map(user -> modelMapper.map(user, UserResponseDTO.class))
+                        .toList()
+        );
     }
 
     @Override
