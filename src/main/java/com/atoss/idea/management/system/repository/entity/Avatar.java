@@ -35,12 +35,9 @@ public class Avatar {
 
     @Column(name = "file_name")
     private String fileName;
-    @Column(name = "file_type")
-    private String fileType;
 
-    public Avatar(String fileName, String fileType, byte[] data) {
+    public Avatar(String fileName, byte[] data) {
         this.fileName = fileName;
-        this.fileType = fileType;
         this.data = data;
     }
 }

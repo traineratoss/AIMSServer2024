@@ -70,18 +70,18 @@ public class CommentServiceImpl implements CommentService {
             if (minutes >= 60) {
                 if (hours >= 24) {
                     if (days >= 28) {
-                        sb.append(months + "months");
+                        sb.append(months + " months");
                     } else {
-                        sb.append(days + "days");
+                        sb.append(days + " days");
                     }
                 } else {
-                    sb.append(hours + "hours");
+                    sb.append(hours + " hours");
                 }
             } else {
-                sb.append(minutes + "mins");
+                sb.append(minutes + " minutes");
             }
         } else {
-            sb.append(seconds + "seconds");
+            sb.append(seconds + " seconds");
         }
         return sb.toString();
     }
