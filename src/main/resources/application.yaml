@@ -33,3 +33,5 @@ aims:
   app:
     jwtExpirationMs: '86400000'
     jwtSecret: ======================BezKoder=Spring===========================
+    bcrypt:
+      salt: $2a$10$QkRidA35ea0Fzm/ObrOEgO

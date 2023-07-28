@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -173,17 +174,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<UserResponseDTO> login(String usernameOrEmail, String password) {
-        Optional<User> user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
-        if (user.isPresent()) {
-            UserResponseDTO userResponseDTO = modelMapper.map(
-                    user.get(),
-                    UserResponseDTO.class
-            );
-            return new ResponseEntity<>(userResponseDTO, HttpStatus.OK);
+    public UserSecurityDTO login(String usernameOrEmail, String password) {
+        Optional<User> optionalUser = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            if (password.equals(user.getPassword())) {
+                UserSecurityDTO userSecurityDTO = modelMapper.map(
+                        user,
+                        UserSecurityDTO.class
+                );
+                return userSecurityDTO;
+            }
         }
-
-        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        throw new BadCredentialsException("Bad credentials");
     }
 
     @Override

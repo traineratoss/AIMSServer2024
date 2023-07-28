@@ -28,7 +28,7 @@ public interface UserService {
 
     ResponseEntity<Object> sendDeclineEmail(String user);
 
-    ResponseEntity<UserResponseDTO> login(String usernameOrEmail, String password);
+    UserSecurityDTO login(String usernameOrEmail, String password);
 
     ResponseEntity<UserResponseDTO> sendForgotPassword(String usernameOrEmail);
 

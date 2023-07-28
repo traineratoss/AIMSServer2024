@@ -106,7 +106,8 @@ public class UserController {
         if (passwordChanged) {
             return new ResponseEntity<>(HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        ResponseEntity<Object> entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return entity;
     }
 
     @Transactional
@@ -122,7 +123,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> login(@RequestParam(name = "username") String username,
+    public UserSecurityDTO login(@RequestParam(name = "username") String username,
                                                          @RequestBody String password) {
         return userService.login(username, password);
     }

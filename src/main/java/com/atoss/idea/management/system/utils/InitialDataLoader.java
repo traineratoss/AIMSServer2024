@@ -10,6 +10,7 @@ import com.atoss.idea.management.system.repository.entity.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import java.io.File;
@@ -30,7 +31,8 @@ public class InitialDataLoader implements CommandLineRunner {
     private final IdeaRepository ideaRepository;
     private final CommentRepository commentRepository;
 
-    private final PasswordEncoder passwordEncoder;
+    @Value("${aims.app.bcrypt.salt}")
+    private String bcryptSalt;
 
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlValue;
@@ -47,7 +49,6 @@ public class InitialDataLoader implements CommandLineRunner {
         this.imageRepository = imageRepository;
         this.commentRepository = commentRepository;
         this.ideaRepository = ideaRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -83,7 +84,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     "ap6548088@gmail.com",
                     "AdminPopescu1",
                     "Admin Popescu",
-                    passwordEncoder.encode("AtossAdmin123")
+                    BCrypt.hashpw("AtossAdmin123", bcryptSalt)
             );
             userRepository.save(user1);
 
@@ -93,7 +94,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     "standardemail@gmail.com",
                     "AnaStandard",
                     "Ana Standard",
-                    passwordEncoder.encode("StandardUser")
+                    BCrypt.hashpw("StandardUser", bcryptSalt)
             );
             userRepository.save(user2);
 
