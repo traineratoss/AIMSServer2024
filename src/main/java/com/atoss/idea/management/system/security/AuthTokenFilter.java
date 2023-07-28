@@ -25,7 +25,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 Cookie[] cookie = request.getCookies();
             }
         } catch (Exception e) {
-            log.error("Cannot set user authentication: {}", e);
+            log.error("Cannot set user authentication: {} ", e);
         }
 
         filterChain.doFilter(request, response);
