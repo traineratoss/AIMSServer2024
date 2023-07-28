@@ -58,13 +58,13 @@ public class InitialDataLoader implements CommandLineRunner {
         ClassLoader classLoader = getClass().getClassLoader();
         if (ddlValue.equals("create")) {
             String[] avatarFileNames = {
-                    "avatar1.svg",
-                    "avatar2.svg",
-                    "avatar3.svg",
-                    "avatar4.svg",
-                    "avatar5.svg",
-                    "avatar6.svg",
-                    "avatar7.svg"
+                "avatar1.svg",
+                "avatar2.svg",
+                "avatar3.svg",
+                "avatar4.svg",
+                "avatar5.svg",
+                "avatar6.svg",
+                "avatar7.svg"
             };
             ArrayList<Avatar> avatarList = new ArrayList<>();
 
