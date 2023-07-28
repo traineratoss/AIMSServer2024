@@ -22,12 +22,6 @@ public interface CommentService {
 
     ResponseCommentReplyDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO);
 
-    CommentDTO getComment(Long commentId);
-
-    CommentDTO getReply(Long commentID);
-
-    List<CommentDTO> getAllComments();
-
     List<ResponseCommentDTO> getAllCommentsByIdeaId(Long ideaId);
 
     Page<ResponseCommentDTO> getAllCommentsByIdeaIdWithPaging(Long ideaId, Pageable pageable);

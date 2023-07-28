@@ -248,19 +248,4 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteById(commentId);
     }
 
-    @Override
-    public CommentDTO getComment(Long id) {
-        return null;
-    }
-
-    @Override
-    public CommentDTO getReply(Long parentID) {
-        return null;
-    }
-
-    @Override
-    public List<CommentDTO> getAllComments() {
-        return null;
-    }
-
 }
