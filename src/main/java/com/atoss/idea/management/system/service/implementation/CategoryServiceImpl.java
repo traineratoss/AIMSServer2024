@@ -2,7 +2,6 @@ package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.CategoryAlreadyExistsException;
 import com.atoss.idea.management.system.exception.CategoryNotFoundException;
-import com.atoss.idea.management.system.exception.FieldValidationException;
 import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.dto.CategoryDTO;
 import com.atoss.idea.management.system.repository.entity.Category;
@@ -26,34 +25,36 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category addCategory(CategoryDTO categoryDTO) throws Exception {
+    public CategoryDTO addCategory(CategoryDTO categoryDTO) {
+
         Category savedCategory = modelMapper.map(categoryDTO, Category.class);
         Optional<Category> existCategory = Optional.ofNullable(categoryRepository.findByText(savedCategory.getText()));
 
         if (existCategory.isPresent()) {
-
-            throw new CategoryAlreadyExistsException();
+            throw new CategoryAlreadyExistsException("Category already exists");
         } else {
             savedCategory.setText(categoryDTO.getText());
-            return modelMapper.map(categoryRepository.save(savedCategory), Category.class);
+            return modelMapper.map(categoryRepository.save(savedCategory), CategoryDTO.class);
         }
     }
 
     @Override
-    public CategoryDTO getCategory(Long id) throws RuntimeException {
-        if (id > 0) {
+    public CategoryDTO getCategory(Long id) {
+
+        if (categoryRepository.existsById(id)) {
             return modelMapper.map(categoryRepository.findCategoryById(id), CategoryDTO.class);
         } else {
-            throw new FieldValidationException();
+            throw new CategoryNotFoundException("No category found.");
         }
     }
 
     @Override
-    public List<CategoryDTO> getAllCategory() throws Exception {
+    public List<CategoryDTO> getAllCategory() {
+
         if (categoryRepository.findAll().size() > 0) {
             return Arrays.asList(modelMapper.map(categoryRepository.findAll(), CategoryDTO[].class));
         } else {
-            throw new CategoryNotFoundException();
+            throw new CategoryNotFoundException("No categories found.");
         }
 
     }

@@ -34,12 +34,12 @@ public class Idea {
     @Column(name = "date")
     private Date date;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id", referencedColumnName = "image_id")
     @JsonManagedReference(value = "idea-image")
     private Image image;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name = "idea_category",
             joinColumns = { @JoinColumn(name = "idea_id") },
@@ -54,7 +54,7 @@ public class Idea {
     private User user;
 
     @JsonIgnoreProperties("idea")
-    @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> commentList;
 
     @Override

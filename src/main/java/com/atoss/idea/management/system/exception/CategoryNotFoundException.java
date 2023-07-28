@@ -1,4 +1,12 @@
 package com.atoss.idea.management.system.exception;
 
-public class CategoryNotFoundException extends Exception{
+public class CategoryNotFoundException extends RuntimeException {
+
+    public CategoryNotFoundException() {
+
+    }
+
+    public CategoryNotFoundException(String message) {
+        super(message);
+    }
 }

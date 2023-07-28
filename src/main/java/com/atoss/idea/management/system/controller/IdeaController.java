@@ -47,27 +47,26 @@ public class IdeaController {
         return new ResponseEntity<>(ideaService.addIdea(idea, username), HttpStatus.OK);
     }
 
-    @GetMapping("/get/id")
+    @GetMapping("/get")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> getIdeaById(@RequestParam(required = true) Long id) {
         return new ResponseEntity<>(ideaService.getIdeaById(id), HttpStatus.OK);
     }
 
-    @PatchMapping("/update/id")
+    @PatchMapping("/update")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> updateIdeaById(@RequestParam(required = true) Long id,
                                                           @RequestBody IdeaUpdateDTO ideaUpdateDTO) {
         return new ResponseEntity<>(ideaService.updateIdeaById(id, ideaUpdateDTO), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/id")
+    @DeleteMapping("/delete")
     @Transactional
     public ResponseEntity<String> deleteIdeaById(@RequestParam(required = true) Long id)  {
         ideaService.deleteIdeaById(id);
         return new ResponseEntity<>("Idea successfully deleted", HttpStatus.OK);
     }
 
-    // We can sort the ideas based on a category we introduce manually, sorting a page based on it and a page size.
     @Transactional
     @GetMapping("/all")
     public ResponseEntity<Page<IdeaResponseDTO>> getAllIdeas(@RequestParam(required = true) int pageSize,
@@ -90,7 +89,7 @@ public class IdeaController {
     }
 
     @Transactional
-    @GetMapping("/allByUser/id")
+    @GetMapping("/allByUser")
     public ResponseEntity<Page<IdeaResponseDTO>> getAllIdeasByUserId(@RequestParam(required = true) Long id,
                                                                      @RequestParam(required = true) int pageSize,
                                                                      @RequestParam(required = true) int pageNumber,
