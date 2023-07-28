@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import java.util.Comparator;
@@ -107,13 +108,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
-        return new PageImpl<>(
-                userRepository.findAll(pageable)
-                        .stream()
-                        .map(user -> modelMapper.map(user, UserResponseDTO.class))
-                        .toList()
-        );
+    public UserPageDTO getAllUsers(Pageable pageable) {
+
+        UserPageDTO userPageDTO = new UserPageDTO();
+        userPageDTO.setTotal(userRepository.findAll().size());
+        List<UserResponseDTO> result = userRepository.findAll(pageable).getContent()
+                .stream()
+                .map(user -> modelMapper.map(user, UserResponseDTO.class))
+                .toList();
+        return new UserPageDTO(userPageDTO.getTotal(), new PageImpl(result, pageable, result.size()));
     }
 
     @Override

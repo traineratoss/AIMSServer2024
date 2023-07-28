@@ -59,7 +59,7 @@ public class UserController {
 
     @Transactional
     @GetMapping("/all")
-    public  ResponseEntity<Page<UserResponseDTO>> getAllUsers(@RequestParam(required = true) int pageSize,
+    public  ResponseEntity<UserPageDTO> getAllUsers(@RequestParam(required = true) int pageSize,
                                                               @RequestParam(required = true) int pageNumber,
                                                               @RequestParam(required = true) String sortCategory) {
         return new ResponseEntity<>(
