@@ -73,21 +73,18 @@ public class IdeaServiceImpl implements IdeaService {
 
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("No user found by this username."));
         savedIdea.setUser(user);
+        savedIdea.setStatus(idea.getStatus());
+        savedIdea.setText(idea.getText());
+        savedIdea.setTitle(idea.getTitle());
+        savedIdea.setCategoryList(new ArrayList<>());
+        savedIdea.setDate(new Date());
 
         if (idea.getImage() != null) {
             Image image = modelMapper.map(idea.getImage(), Image.class);
             savedIdea.setImage(image);
         }
 
-        savedIdea.setStatus(idea.getStatus());
-
-        savedIdea.setText(idea.getText());
-
-        savedIdea.setTitle(idea.getTitle());
-
-        savedIdea.setCategoryList(new ArrayList<>());
         for (CategoryDTO categoryDTO : idea.getCategoryList()) {
-
             Category category = categoryRepository.findByText(modelMapper.map(categoryDTO, Category.class).getText());
 
             if (category == null) {
@@ -97,11 +94,10 @@ public class IdeaServiceImpl implements IdeaService {
             }
         }
 
-        savedIdea.setDate(new Date());
-
         if (user.getIdeas() == null) {
             user.setIdeas(new ArrayList<>());
         }
+
         user.getIdeas().add(savedIdea);
 
         IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.save(savedIdea), IdeaResponseDTO.class);
@@ -171,13 +167,17 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public Page<IdeaResponseDTO> getAllIdeas(Pageable pageable) {
+    public IdeaPageDTO getAllIdeas(Pageable pageable) {
 
-        Page<Idea> ideas = ideaRepository.findAll(pageable);
+        IdeaPageDTO ideaPageDTO = new IdeaPageDTO();
 
-        if (ideas.isEmpty()) {
+        if (ideaRepository.findAll().size() > 0) {
+            ideaPageDTO.setTotal(ideaRepository.findAll().size());
+        } else {
             throw new FieldValidationException("No ideas found.");
         }
+
+        Page<Idea> ideas = ideaRepository.findAll(pageable);
 
         List<IdeaResponseDTO> ideaResponseDTOs = ideas.stream()
                 .map(idea -> {
@@ -187,18 +187,24 @@ public class IdeaServiceImpl implements IdeaService {
                 })
                 .toList();
 
-        return new PageImpl<>(ideaResponseDTOs, pageable, ideas.getTotalElements());
+        ideaPageDTO.setPagedIdeas(new PageImpl(ideaResponseDTOs, pageable, ideas.getTotalElements()));
+
+        return ideaPageDTO;
     }
 
     @Override
-    public Page<IdeaResponseDTO> getAllIdeasByUserId(Long id, Pageable pageable) {
+    public IdeaPageDTO getAllIdeasByUserId(Long id, Pageable pageable) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
 
-        if (user.getIdeas().isEmpty()) {
+        if (user.getIdeas() == null || user.getIdeas().isEmpty()) {
             throw new FieldValidationException("No ideas found.");
         }
+
+        IdeaPageDTO ideaPageDTO = new IdeaPageDTO();
+
+        ideaPageDTO.setTotal(userRepository.findById(id).get().getIdeas().size());
 
         List<IdeaResponseDTO> ideaResponseDTOs = ideaRepository.findAllByUserId(id, pageable)
                 .stream()
@@ -209,7 +215,9 @@ public class IdeaServiceImpl implements IdeaService {
                 })
                 .toList();
 
-        return new PageImpl<>(ideaResponseDTOs, pageable, ideaResponseDTOs.size());
+        ideaPageDTO.setPagedIdeas(new PageImpl(ideaResponseDTOs, pageable, ideaResponseDTOs.size()));
+
+        return ideaPageDTO;
     }
 
     @Override
@@ -222,8 +230,10 @@ public class IdeaServiceImpl implements IdeaService {
                                         String selectedDateTo,
                                         String sortDirection,
                                         Pageable pageable) {
+
         IdeaPageDTO ideaList = ideaRepositoryCustom.findIdeasByParameters(
                 title, text, statuses, categories, users, selectedDateFrom, selectedDateTo, sortDirection, pageable);
+
         List<IdeaResponseDTO> result = ideaList.getPagedIdeas().stream()
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
@@ -231,6 +241,7 @@ public class IdeaServiceImpl implements IdeaService {
                     return responseDTO;
                 })
                 .toList();
+
         return new IdeaPageDTO(ideaList.getTotal(), new PageImpl(result, pageable, result.size()));
     }
 }

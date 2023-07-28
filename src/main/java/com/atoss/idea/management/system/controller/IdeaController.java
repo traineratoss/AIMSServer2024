@@ -7,7 +7,6 @@ import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import jakarta.transaction.Transactional;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -69,7 +68,7 @@ public class IdeaController {
 
     @Transactional
     @GetMapping("/all")
-    public ResponseEntity<Page<IdeaResponseDTO>> getAllIdeas(@RequestParam(required = true) int pageSize,
+    public ResponseEntity<IdeaPageDTO> getAllIdeas(@RequestParam(required = true) int pageSize,
                                                              @RequestParam(required = true) int pageNumber,
                                                              @RequestParam(required = true) String sortCategory,
                                                              @RequestParam(required = true) Sort.Direction sortDirection) {
@@ -90,7 +89,7 @@ public class IdeaController {
 
     @Transactional
     @GetMapping("/allByUser")
-    public ResponseEntity<Page<IdeaResponseDTO>> getAllIdeasByUserId(@RequestParam(required = true) Long id,
+    public ResponseEntity<IdeaPageDTO> getAllIdeasByUserId(@RequestParam(required = true) Long id,
                                                                      @RequestParam(required = true) int pageSize,
                                                                      @RequestParam(required = true) int pageNumber,
                                                                      @RequestParam(required = true) String sortCategory,
