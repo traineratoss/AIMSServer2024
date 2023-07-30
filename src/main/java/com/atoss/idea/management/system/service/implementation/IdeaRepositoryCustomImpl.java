@@ -99,7 +99,7 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
 
         List<Order> orders = new ArrayList<>();
 
-        if (!Objects.equals(sortDirection, "ASC")) {
+        if (Objects.equals(sortDirection, "ASC")) {
             orders.add(cb.asc(root.get("date")));
         } else {
             orders.add(cb.desc(root.get("date")));
