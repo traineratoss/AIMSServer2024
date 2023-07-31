@@ -113,7 +113,7 @@ public class CommentServiceImpl implements CommentService {
 
         ResponseCommentDTO responseCommentDTO = modelMapper.map(newComment, ResponseCommentDTO.class);
         responseCommentDTO.setUsername(user.getUsername());
-        // TODO add ResponseCommentDTO
+
         return responseCommentDTO;
     }
 
@@ -165,7 +165,6 @@ public class CommentServiceImpl implements CommentService {
         return filteredList;
     }
 
-
     @Transactional
     @Override
     public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(Long commentId) {
@@ -191,9 +190,6 @@ public class CommentServiceImpl implements CommentService {
         return filteredList;
     }
 
-
-
-
     @Override
     public Page<ResponseCommentDTO> getAllCommentsByIdeaIdWithPaging(Long ideaId, Pageable pageable) {
         if (!ideaRepository.existsById(ideaId)) {
@@ -201,7 +197,7 @@ public class CommentServiceImpl implements CommentService {
         }
         // Dragos B.
         // The original Comment entity stores a User object
-        // ResponseCommentDTO and ResponseCommentReplyDTO store the username
+        // ResponseCommentDTO stores the username
         // of their respective user (String)
         // A direct conversion between the two is impossible
         // My Workaround:
@@ -215,16 +211,6 @@ public class CommentServiceImpl implements CommentService {
                         .filter(comment -> comment.getIdea() != null)
                         .filter(comment -> comment.getIdea().getId() == ideaId)
                         .map(comment -> {
-                            List<ResponseCommentReplyDTO> replies = comment.getReplies().stream()
-                                    .map(reply -> {
-                                        String username = reply.getUser().getUsername();
-                                        ResponseCommentReplyDTO responseCommentReplyDTO = modelMapper.map(reply, ResponseCommentReplyDTO.class);
-                                        responseCommentReplyDTO.setUsername(username);
-                                        String time = getTimeForComment(reply.getId());
-                                        responseCommentReplyDTO.setElapsedTime(time);
-                                        return responseCommentReplyDTO;
-                                    })
-                                    .toList();
                             String username = comment.getUser().getUsername();
                             boolean hasReplies = comment.getReplies().size() > 0;
                             String time = getTimeForComment(comment.getId());
@@ -249,8 +235,6 @@ public class CommentServiceImpl implements CommentService {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
-
         commentRepository.deleteById(commentId);
     }
-
 }
