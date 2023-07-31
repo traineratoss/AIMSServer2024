@@ -11,11 +11,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestCommentDTO {
-    /**
-     * This class will be used for creating comments
-     *
-     * @author FlorinCP
-     */
 
     private String username;
 

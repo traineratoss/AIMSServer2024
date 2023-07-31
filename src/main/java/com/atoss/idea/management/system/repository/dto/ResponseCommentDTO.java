@@ -12,11 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseCommentDTO {
-    /**
-     * This class will be used for returning comments
-     *
-     * @author FlorinCP
-     */
+
     private Long id;
 
     private String username;
@@ -26,7 +22,7 @@ public class ResponseCommentDTO {
     private String commentText;
 
     private boolean hasReplies;
-    // to be  deleted later
+
     private List<ResponseCommentReplyDTO> replies;
 
     private String elapsedTime;

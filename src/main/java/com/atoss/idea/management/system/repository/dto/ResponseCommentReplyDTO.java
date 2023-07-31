@@ -10,11 +10,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResponseCommentReplyDTO {
-    /**
-     * This class will be used for returning replies of an existing comment
-     *
-     * @author FlorinCP
-     */
+
     private Long id;
 
     private String username;
@@ -23,8 +19,6 @@ public class ResponseCommentReplyDTO {
 
     private String commentText;
 
-    // here we will display the diff. between creation date and fetch date
-    // we will need some sort of method for that
     private String elapsedTime;
 
 }

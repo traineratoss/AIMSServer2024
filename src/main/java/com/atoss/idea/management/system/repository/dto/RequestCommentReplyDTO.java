@@ -10,11 +10,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RequestCommentReplyDTO {
-    /**
-     * This class will be used for adding replies to an existing comment
-     *
-     * @author FlorinCP
-     */
 
     private String username;
 

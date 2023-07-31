@@ -43,7 +43,6 @@ public class Comment {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> replies;
 
-
     @Column(name = "comment_text", length = 2000)
     private String commentText;
 
