@@ -5,6 +5,7 @@ import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Avatar;
+import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.service.UserService;
@@ -90,6 +91,17 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return modelMapper.map(user, UserResponseDTO.class);
     }
+
+    @Override
+    public UserResponseDTO updateUserRole(String username, Role role) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
+        user.setRole(role);
+        userRepository.save(user);
+
+        return modelMapper.map(user, UserResponseDTO.class);
+    }
+
+
 
     @Override
     public UserResponseDTO getUserByUsername(String username) {
