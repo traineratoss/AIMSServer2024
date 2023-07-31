@@ -23,7 +23,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -57,38 +62,40 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public String getElapsedTime(Date creationDate) {
-
         Date currentDate = new Date();
-        Long seconds = (currentDate.getTime() - creationDate.getTime()) / 1000;
 
-        Long minutes = seconds / 60;
+        long milliSeconds = currentDate.getTime() - creationDate.getTime();
 
-        Long hours = minutes / 60;
-
-        Long days = hours / 24;
-
-        Long months = days / 28;
-
-        StringBuilder sb = new StringBuilder();
-
-        if (seconds >= 60) {
-            if (minutes >= 60) {
-                if (hours >= 24) {
-                    if (days >= 28) {
-                        sb.append(months + " months");
-                    } else {
-                        sb.append(days + " days");
-                    }
-                } else {
-                    sb.append(hours + " hours");
-                }
-            } else {
-                sb.append(minutes + " minutes");
-            }
-        } else {
-            sb.append(seconds + " seconds");
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliSeconds);
+        if (seconds < 60) {
+            return seconds + " seconds";
         }
-        return sb.toString();
+
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(milliSeconds);
+        if (minutes < 60) {
+            return minutes + " minutes";
+        }
+
+        long hours = TimeUnit.MILLISECONDS.toHours(milliSeconds);
+        if (hours < 24) {
+            return hours + " hours";
+        }
+
+        Calendar calForCreationDate = Calendar.getInstance();
+        calForCreationDate.setTime(creationDate);
+
+        Calendar calForCurrentDate = Calendar.getInstance();
+        calForCurrentDate.setTime(currentDate);
+
+        int years = calForCurrentDate.get(Calendar.YEAR) - calForCreationDate.get(Calendar.YEAR);
+        int months = calForCurrentDate.get(java.util.Calendar.MONTH) - calForCreationDate.get(Calendar.MONTH);
+
+        int elapsedMonths = years * 12 + months;
+
+        if (elapsedMonths < 12) {
+            return elapsedMonths + " months";
+        }
+        return years + " years";
     }
 
     @Transactional
