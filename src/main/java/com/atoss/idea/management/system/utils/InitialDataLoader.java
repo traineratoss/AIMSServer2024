@@ -92,32 +92,31 @@ public class InitialDataLoader implements CommandLineRunner {
                 String username = usernamePrefix + String.format("%02d", j);
                 String name = namePrefix + " " + j;
 
-                User user = createUser(true, Role.STANDARD, avatar1, email, username, name, password);
+                User user = createUser(true, Role.STANDARD, avatar1, email, username, name, password, true);
                 userList.add(user);
                 userRepository.save(user);
             }
 
 
             User user1 = createUser(true, Role.ADMIN, avatar1, "ap6548088@gmail.com", "Adrian22",
-                    "Adrian Popescu", BCrypt.hashpw("AtossAdmin123", bcryptSalt));
+                    "Adrian Popescu", BCrypt.hashpw("AtossAdmin123", bcryptSalt), true);
             userRepository.save(user1);
 
             User user2 = createUser(true, Role.STANDARD, avatar1, "anaburlacu020626@gmail.com", "AnaS26",
-                    "Ana Burlacu", BCrypt.hashpw("StandardUser", bcryptSalt)
-            );
+                    "Ana Burlacu", BCrypt.hashpw("StandardUser", bcryptSalt), true);
             userRepository.save(user2);
 
             User user3 = createUser(true, Role.ADMIN, avatar1, "aA12332111114@gmail.com", "Ale009",
-                    "Alexandra Moise", BCrypt.hashpw("AleAdmin2676", bcryptSalt));
+                    "Alexandra Moise", BCrypt.hashpw("AleAdmin2676", bcryptSalt), true);
             userRepository.save(user3);
 
-            User user4 = createUser(true, Role.STANDARD, avatar1, "andreiuser973@gmail.com", "Andrei09888",
-                    "Andrei Rusu", BCrypt.hashpw("AndreiUser4555454", bcryptSalt));
+            User user4 = createUser(false, null, null, "andreiuser973@gmail.com", "Andrei09888",
+                    null, null, false);
             userRepository.save(user4);
 
-            User user5 = createUser(true, Role.STANDARD, avatar1, "usercristian91@gmail.com", "Cosmin4455",
-                    "Cosmin Cojocaru", BCrypt.hashpw("CosminUser4555454", bcryptSalt));
-            userRepository.save(user4);
+            User user5 = createUser(false, null, null, "usercristian91@gmail.com", "Cosmin4455",
+                    null, null, false);
+            userRepository.save(user5);
 
             Category category1 = createCategory("Innovation");
             categoryRepository.save(category1);
@@ -197,54 +196,67 @@ public class InitialDataLoader implements CommandLineRunner {
             String text = "Test";
             Date date = new Date();
 
+            int k = 1;
             for (User user : userList) {
-                String title = "Idea for " + "' " + idea1.getTitle() + " '";
+                String title = "New Idea " + k;
                 Idea idea = createIdea(user, status, text, title, null, date, categories);
                 ideaList.add(idea);
                 ideaRepository.save(idea);
+                k++;
             }
 
-            Comment comment1 = createComment(new Date(), idea1, null,
+
+            Comment comment1 = createComment(staticDate, idea1, null,
                     user1, "It's unnecessary");
             commentRepository.save(comment1);
 
-            Comment comment2 = createComment(new Date(), idea2, null,
+            Comment comment2 = createComment(staticDate2, idea2, null,
                     user2, "It's a great idea");
             commentRepository.save(comment2);
+            ArrayList<Comment> commentList = new ArrayList<>();
+            commentList.add(comment1);
+            commentList.add(comment2);
 
-            Comment reply1 = createReply(new Date(), comment2, user1, "I don't think so");
+            Comment reply1 = createReply(new Date(), comment2, idea2, user1, "I don't think so");
             commentRepository.save(reply1);
             List<Category> categoryList = new ArrayList<>();
 
+            int n = 0;
             int numberOfCommentsPerIdea = 4;
-
-            for (User user : userList) {
-                for (Idea idea : ideaList) {
-                    for (int i = 0; i < numberOfCommentsPerIdea; i++) {
-                        String commentText = "Comment for: " + idea.getTitle() + " - Comment ";
-                        Comment comment = createComment(date, idea, null, user, commentText);
-                        commentRepository.save(comment);
-                    }
+            for (Idea idea : ideaList) {
+                for (int i = 0; i < numberOfCommentsPerIdea; i++) {
+                    String commentText = "Comment " + n + " for: " + idea.getTitle();
+                    Comment comment = createComment(date, idea, null, user1, commentText);
+                    commentRepository.save(comment);
+                    commentList.add(comment);
+                    n++;
                 }
             }
-            for (Idea idea: ideaList) {
-                Comment reply = createComment(date, idea, comment1, user2, "reply text for comment : " + comment1.getCommentText());
-                commentRepository.save(reply);
+
+            int m = 0;
+            int numberOfRepliesPerComment = 2;
+            for (Comment comment : commentList) {
+                for (int i = 0; i < numberOfRepliesPerComment; i++) {
+                    String replyText = "Reply " + m + " for: " + comment.getCommentText();
+                    Comment reply = createReply(date, comment1, idea2, user2, replyText);
+                    commentRepository.save(reply);
+                    m++;
+                }
             }
         }
     }
 
     private static User createUser(Boolean isActive, Role role, Avatar avatar,
-                                   String email, String username, String fullname,
-                                   String hashPassword) {
+                                   String email, String username, String fullName,
+                                   String hashPassword, Boolean hasPassword) {
         User user = new User();
         user.setUsername(username);
         user.setPassword(hashPassword);
         user.setEmail(email);
-        user.setFullName(fullname);
+        user.setFullName(fullName);
         user.setIsActive(isActive);
         user.setRole(role);
-        user.setHasPassword(true);
+        user.setHasPassword(hasPassword);
         user.setAvatar(avatar);
         user.setRole(role);
         return user;
@@ -300,10 +312,11 @@ public class InitialDataLoader implements CommandLineRunner {
     }
 
 
-    private static Comment createReply(Date date, Comment commentId,
+    private static Comment createReply(Date date, Comment commentId, Idea ideaId,
                                        User user, String text) {
         Comment comment = new Comment();
         comment.setCreationDate(date);
+        comment.setIdea(ideaId);
         comment.setParent(commentId);
         comment.setUser(user);
         comment.setCommentText(text);
