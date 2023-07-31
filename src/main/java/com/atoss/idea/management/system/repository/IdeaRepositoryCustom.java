@@ -17,5 +17,6 @@ public interface IdeaRepositoryCustom {
                                       String selectedDateFrom,
                                       String selectedDateTo,
                                       String sortDirection,
+                                      String username,
                                       Pageable pageable);
 }

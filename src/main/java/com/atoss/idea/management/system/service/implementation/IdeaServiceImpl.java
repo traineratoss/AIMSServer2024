@@ -193,9 +193,9 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public IdeaPageDTO getAllIdeasByUserId(Long id, Pageable pageable) {
+    public IdeaPageDTO getAllIdeasByUserUsername(String username, Pageable pageable) {
 
-        User user = userRepository.findById(id)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
 
         if (user.getIdeas() == null || user.getIdeas().isEmpty()) {
@@ -204,9 +204,9 @@ public class IdeaServiceImpl implements IdeaService {
 
         IdeaPageDTO ideaPageDTO = new IdeaPageDTO();
 
-        ideaPageDTO.setTotal(userRepository.findById(id).get().getIdeas().size());
+        ideaPageDTO.setTotal(userRepository.findByUsername(username).get().getIdeas().size());
 
-        List<IdeaResponseDTO> ideaResponseDTOs = ideaRepository.findAllByUserId(id, pageable)
+        List<IdeaResponseDTO> ideaResponseDTOs = ideaRepository.findAllByUserUsername(username, pageable)
                 .stream()
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
@@ -214,7 +214,6 @@ public class IdeaServiceImpl implements IdeaService {
                     return responseDTO;
                 })
                 .toList();
-
         ideaPageDTO.setPagedIdeas(new PageImpl(ideaResponseDTOs, pageable, ideaResponseDTOs.size()));
 
         return ideaPageDTO;
@@ -229,10 +228,11 @@ public class IdeaServiceImpl implements IdeaService {
                                         String selectedDateFrom,
                                         String selectedDateTo,
                                         String sortDirection,
+                                        String username,
                                         Pageable pageable) {
 
         IdeaPageDTO ideaList = ideaRepositoryCustom.findIdeasByParameters(
-                title, text, statuses, categories, users, selectedDateFrom, selectedDateTo, sortDirection, pageable);
+                title, text, statuses, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, pageable);
 
         List<IdeaResponseDTO> result = ideaList.getPagedIdeas().stream()
                 .map(idea -> {

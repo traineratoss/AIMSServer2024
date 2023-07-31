@@ -89,7 +89,7 @@ public class IdeaController {
 
     @Transactional
     @GetMapping("/allByUser")
-    public ResponseEntity<IdeaPageDTO> getAllIdeasByUserId(@RequestParam(required = true) Long id,
+    public ResponseEntity<IdeaPageDTO> getAllIdeasByUserUsername(@RequestParam(required = true) String username,
                                                                      @RequestParam(required = true) int pageSize,
                                                                      @RequestParam(required = true) int pageNumber,
                                                                      @RequestParam(required = true) String sortCategory,
@@ -97,11 +97,11 @@ public class IdeaController {
         switch (sortDirection) {
             case ASC -> {
                 Pageable pageableAsc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
-                return new ResponseEntity<>(ideaService.getAllIdeasByUserId(id, pageableAsc), HttpStatus.OK);
+                return new ResponseEntity<>(ideaService.getAllIdeasByUserUsername(username, pageableAsc), HttpStatus.OK);
             }
             case DESC -> {
                 Pageable pageableDesc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
-                return new ResponseEntity<>(ideaService.getAllIdeasByUserId(id, pageableDesc), HttpStatus.OK);
+                return new ResponseEntity<>(ideaService.getAllIdeasByUserUsername(username, pageableDesc), HttpStatus.OK);
             }
             default -> {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -121,6 +121,7 @@ public class IdeaController {
             @RequestParam(required = false) String selectedDateTo,
             @RequestParam(required = true) int pageNumber,
             @RequestParam(required = true) int pageSize,
+            @RequestParam(required = false) String username,
             @RequestParam(required = true) String sortDirection) {
 
         List<String> categories = new ArrayList<>();
@@ -129,7 +130,7 @@ public class IdeaController {
         }
 
         List<String> users = new ArrayList<>();
-        if (user != null && !user.isEmpty()) {
+        if (user != null && !user.isEmpty() && username == null) {
             users = Arrays.asList(user.split(","));
         }
 
@@ -143,6 +144,6 @@ public class IdeaController {
         Pageable pageableAsc = PageRequest.of(pageNumber, pageSize);
 
         return new ResponseEntity<>(ideaService.filterIdeasByAll(title,
-                text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, pageableAsc), HttpStatus.OK);
+                text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, pageableAsc), HttpStatus.OK);
     }
 }

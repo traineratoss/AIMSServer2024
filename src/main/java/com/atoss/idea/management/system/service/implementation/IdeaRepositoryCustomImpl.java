@@ -34,6 +34,7 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
                                              String selectedDateFrom,
                                              String selectedDateTo,
                                              String sortDirection,
+                                             String username,
                                              Pageable pageable) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -41,6 +42,10 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
         Root<Idea> root = criteriaQuery.from(Idea.class);
 
         List<Predicate> predicates = new ArrayList<>();
+
+        if (username != null) {
+            predicates.add(cb.equal(root.join("user").get("username"), username));
+        }
 
         if (title != null) {
             predicates.add(cb.like(root.get("title"), "%" + title + "%"));
@@ -54,7 +59,7 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
             predicates.add(root.get("status").in(statuses));
         }
 
-        if (users != null && !users.isEmpty()) {
+        if (users != null && !users.isEmpty() && username == null) {
             predicates.add(root.join("user").get("username").in(users));
         }
 

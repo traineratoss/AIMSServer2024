@@ -20,7 +20,7 @@ public interface IdeaService {
 
     IdeaPageDTO getAllIdeas(Pageable pageable);
 
-    IdeaPageDTO getAllIdeasByUserId(Long id, Pageable pageable);
+    IdeaPageDTO getAllIdeasByUserUsername(String username, Pageable pageable);
 
     IdeaPageDTO filterIdeasByAll(String title,
                                  String text,
@@ -30,6 +30,7 @@ public interface IdeaService {
                                  String selectedDateFrom,
                                  String selectedDateTo,
                                  String sortDirection,
+                                 String username,
                                  Pageable pageable);
 
 }
