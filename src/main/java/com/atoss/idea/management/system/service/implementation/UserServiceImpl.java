@@ -10,6 +10,7 @@ import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.service.UserService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +36,8 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${aims.app.bcrypt.salt}")
+    private String bcryptSalt;
 
     public UserServiceImpl(UserRepository userRepository,
                            ModelMapper modelMapper,
@@ -158,8 +161,7 @@ public class UserServiceImpl implements UserService {
         String username = changePasswordDTO.getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserAlreadyExistException("User already exist!"));
         String databasePassword = user.getPassword();
-        String hashFrontendOldPassword = passwordEncoder.encode(changePasswordDTO.getOldPassword());
-        String hashFrontendNewPassword = passwordEncoder.encode(changePasswordDTO.getNewPassword());
+        String hashFrontendNewPassword = BCrypt.hashpw(changePasswordDTO.getNewPassword(), bcryptSalt);
         if (!BCrypt.checkpw(changePasswordDTO.getOldPassword(), user.getPassword())) {
             return false;
         }

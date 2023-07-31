@@ -10,7 +10,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -19,31 +19,124 @@ import java.util.Date;
 @Service
 public class SendEmailServiceImpl implements SendEmailService {
 
+    SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private final UserRepository userRepository;
-
     private final JavaMailSender emailSender;
-
-    private final PasswordEncoder passwordEncoder;
 
     @Value("${spring.mail.username}")
     private String adminEmail;
 
-    public SendEmailServiceImpl(UserRepository userRepository, JavaMailSender emailSender, PasswordEncoder passwordEncoder) {
+    @Value("${aims.app.bcrypt.salt}")
+    private String bcryptSalt;
+    private final String companyName = "Company Name ";
+
+    public SendEmailServiceImpl(UserRepository userRepository, JavaMailSender emailSender) {
         this.userRepository = userRepository;
         this.emailSender = emailSender;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void sendApproveEmailToUser(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User dose not exist!"));
-        String companyName = "Company Name";
+        User user = getUserByUsername(username);
         String password = PasswordGenerator.generatePassayPassword(15);
-        String hashPassword = passwordEncoder.encode(password);
         String emailTo = user.getEmail();
         String subject = "Account Activation for [Company Name] App";
-        String text = "Dear "
+        String text = getEmailTextForActivation(username, password, emailTo);
+        sendEmail(emailTo, subject, text);
+        // Set the password, status, and isActive for the user
+        user.setPassword(BCrypt.hashpw(password, bcryptSalt));
+        user.setIsActive(true);
+        user.setHasPassword(true);
+        user.setRole(Role.STANDARD);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void sendDeclineEmailToUser(String username) {
+        User user = getUserByUsername(username);
+        String emailTo = user.getEmail();
+        String subject = "Registration Request - Rejected";
+        String text = getEmailTextForRegistrationRejected(username);
+        sendEmail(emailTo, subject, text);
+    }
+
+    @Override
+    public boolean sendDeactivateEmailToUser(String username) {
+        User user = getUserByUsername(username);
+        String emailTo = user.getEmail();
+        String subject = "Account Deactivation Notice";
+        String text = getEmailTextForAccountDeactivation(username);
+        sendEmail(emailTo, subject, text);
+        // Set the isActive to false
+        user.setIsActive(false);
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public boolean sendActivateEmailToUser(String username) {
+        User user = getUserByUsername(username);
+        String password = PasswordGenerator.generatePassayPassword(15);
+        String emailTo = user.getEmail();
+        String subject = "Account Reactivation Notice - Welcome Back!";
+        String text = getEmailTextForAccountReactivation(username, password, emailTo);
+        sendEmail(emailTo, subject, text);
+        // Set the isActive to true and change password
+        user.setIsActive(true);
+        user.setPassword(BCrypt.hashpw(password, bcryptSalt));
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public void sendEmailToAdmin(String username) {
+        User user = getUserByUsername(username);
+        String emailTo = user.getEmail();
+        String subject = "Alert: Login Request Received";
+        String text = getEmailTextForLoginRequest(username, emailTo);
+        String textAdmin = getEmailTextForLoginRequestForUser(username, emailTo);
+        sendEmail(adminEmail, subject, text);
+        sendEmail(emailTo, subject, textAdmin);
+    }
+
+    @Override
+    public void sendEmailForgotPassword(String username) {
+        User user = getUserByUsername(username);
+        String emailTo = user.getEmail();
+        String subject = "Password Reset Request";
+        String password = PasswordGenerator.generatePassayPassword(15);
+        String text = getEmailTextForPasswordReset(username, password);
+        sendEmail(emailTo, subject, text);
+        //Change password
+        user.setPassword(BCrypt.hashpw(password, bcryptSalt));
+        userRepository.save(user);
+    }
+
+    private User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User does not exist!"));
+    }
+
+    private void sendEmail(String emailTo, String subject, String text) {
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(
+                    message,
+                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name());
+            helper.setFrom(adminEmail);
+            helper.setTo(emailTo);
+            helper.setSubject(subject);
+            helper.setText(text);
+            emailSender.send(message);
+            System.out.println("Email sent successfully to: " + emailTo);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String getEmailTextForActivation(String username, String password, String emailTo) {
+        return "Dear "
                 + username
                 + "\nWelcome to "
                 + companyName
@@ -56,37 +149,10 @@ public class SendEmailServiceImpl implements SendEmailService {
                 + "\nBest regards,\nThe "
                 + companyName
                 + "Team";
-        try {
-            MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    message,
-                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                    StandardCharsets.UTF_8.name());
-            helper.setFrom(adminEmail);
-            helper.setTo(emailTo);
-            helper.setSubject(subject);
-            helper.setText(text);
-            emailSender.send(message);
-            //Set the password, status and isActive for user
-            user.setPassword(hashPassword);
-            user.setIsActive(true);
-            user.setHasPassword(true);
-            user.setRole(Role.STANDARD);
-            userRepository.save(user);
-            System.out.println("Email sent successfully to: " + emailTo);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
-    @Override
-    public void sendDeclineEmailToUser(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User dose not exist!"));
-        String companyName = "Company Name";
-        String emailTo = user.getEmail();
-        String subject = "Registration Request - Rejected";
-        String text = "Dear "
+    private String getEmailTextForRegistrationRejected(String username) {
+        return "Dear "
                 + username
                 + "\nThank you for your interest and for submitting your registration request to  "
                 + companyName
@@ -97,37 +163,16 @@ public class SendEmailServiceImpl implements SendEmailService {
                 + "\nBest regards,\nThe "
                 + companyName
                 + "Team";
-        try {
-            MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    message,
-                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                    StandardCharsets.UTF_8.name());
-            helper.setFrom(adminEmail);
-            helper.setTo(emailTo);
-            helper.setSubject(subject);
-            helper.setText(text);
-            emailSender.send(message);
-            System.out.println("Email sent successfully to: " + emailTo);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
-    @Override
-    public boolean sendDeactivateEmailToUser(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User dose not exist!"));
-        String companyName = "Company Name";
+    private String getEmailTextForAccountDeactivation(String username) {
         Date date = new Date();
-        String emailTo = user.getEmail();
-        String subject = "Account Deactivation Notice";
-        String text = "Dear "
+        return "Dear "
                 + username
                 + "\nWe hope this message finds you well. We are writing to inform you that your account with "
                 + companyName
                 + " has been deactivated, effective as of. "
-                + date
+                + formatter.format(date)
                 + "\nThe deactivation of your account is a result of your departure from "
                 + companyName
                 + ".As per our internal policies, user accounts are deactivated when an employee leaves the "
@@ -138,44 +183,16 @@ public class SendEmailServiceImpl implements SendEmailService {
                 + "period in accordance with our data retention policies."
                 + "\nBest regards,"
                 + companyName;
-        try {
-            MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    message,
-                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                    StandardCharsets.UTF_8.name());
-            helper.setFrom(adminEmail);
-            helper.setTo(emailTo);
-            helper.setSubject(subject);
-            helper.setText(text);
-            emailSender.send(message);
-            //Set the  isActive to false
-            user.setIsActive(false);
-            userRepository.save(user);
-            System.out.println("Email sent successfully to: " + emailTo);
-            return true;
-        } catch (MessagingException e) {
-            System.out.println("Email not sent to: " + emailTo);
-            return false;
-        }
     }
 
-    @Override
-    public boolean sendActivateEmailToUser(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User dose not exist!"));
-        String companyName = "Company Name";
-        String password = PasswordGenerator.generatePassayPassword(15);
-        String hashPassword = passwordEncoder.encode(password);
+    private String getEmailTextForAccountReactivation(String username, String password, String emailTo) {
         Date date = new Date();
-        String emailTo = user.getEmail();
-        String subject = "Account Reactivation Notice - Welcome Back!";
-        String text = "Dear "
+        return "Dear "
                 + username
                 + "\nWe hope this message finds you well. We are delighted to inform you that your account with "
                 + companyName
                 + " has been reactivated, effective immediately. "
-                + date
+                + formatter.format(date)
                 + "\nYour account was previously deactivated due to your departure from "
                 + companyName
                 + ".However, we are thrilled to welcome you back as you have returned to our company. "
@@ -193,76 +210,40 @@ public class SendEmailServiceImpl implements SendEmailService {
                 + "\nWelcome back!"
                 + "\nBest regards,"
                 + companyName;
-        try {
-            MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    message,
-                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                    StandardCharsets.UTF_8.name());
-            helper.setFrom(adminEmail);
-            helper.setTo(emailTo);
-            helper.setSubject(subject);
-            helper.setText(text);
-            emailSender.send(message);
-            //Set the  isActive to true and change password
-            user.setIsActive(true);
-            user.setPassword(hashPassword);
-            userRepository.save(user);
-            System.out.println("Email sent successfully to: " + emailTo);
-            return true;
-        } catch (MessagingException e) {
-            System.out.println("Email not sent to: " + emailTo);
-            return false;
-        }
     }
 
-    @Override
-    public void sendEmailToAdmin(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User dose not exist!"));
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    private String getEmailTextForLoginRequest(String username, String emailTo) {
         Date date = new Date();
-        String emailTo = user.getEmail();
-        String subject = "Alert: Login Request Received";
-        String text = "Dear "
+        return  "Dear "
+                + "Admin"
+                + "\nI hope this message finds you well. I am writing to inform you that we have recorded a login request in our account system."
+                + "\nRequest details:"
+                + "\nUser: "
+                + username
+                + "\nEmail: "
+                + emailTo
+                + "\nData and time: "
+                + formatter.format(date)
+                + "\nIf you confirm the request, please provide us with your approval to proceed with sending the password.";
+    }
+
+    private String getEmailTextForLoginRequestForUser(String username, String emailTo) {
+        Date date = new Date();
+        return  "Dear "
                 + username
                 + "\nI hope this message finds you well. I am writing to inform you that we have recorded a login request in our account system."
                 + "\nRequest details:"
                 + "\nUser: "
-                + user.getUsername()
+                + username
                 + "\nEmail: "
-                + user.getEmail()
+                + emailTo
                 + "\nData and time: "
-                + formatter.format(date)
-                + "\nIf you confirm the request, please provide us with your approval to proceed with sending the password.";
-        try {
-            MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    message,
-                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                    StandardCharsets.UTF_8.name());
-            helper.setFrom(adminEmail);
-            helper.setTo(adminEmail);
-            helper.setSubject(subject);
-            helper.setText(text);
-            emailSender.send(message);
-            System.out.println("Email sent successfully to: " + emailTo);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
+                + formatter.format(date);
     }
 
-    @Override
-    public void sendEmailForgotPassword(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User dose not exist!"));
+    private String getEmailTextForPasswordReset(String username, String password) {
         String link = "http://127.0.0.1:5173/login";
-        String companyName = "Company Name";
-        String password = PasswordGenerator.generatePassayPassword(15);
-        String hashPassword = passwordEncoder.encode(password);
-        String emailTo = user.getEmail();
-        String subject = "Password Reset Request";
-        String text = "Dear "
+        return "Dear "
                 + username
                 + "\nWelcome to "
                 + companyName
@@ -280,23 +261,5 @@ public class SendEmailServiceImpl implements SendEmailService {
                 + "\n\nBest regards,\nThe "
                 + companyName
                 + "Team";
-        try {
-            MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    message,
-                    MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                    StandardCharsets.UTF_8.name());
-            helper.setFrom(adminEmail);
-            helper.setTo(emailTo);
-            helper.setSubject(subject);
-            helper.setText(text);
-            emailSender.send(message);
-            //Set the password
-            user.setPassword(hashPassword);
-            userRepository.save(user);
-            System.out.println("Email sent successfully to: " + emailTo);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
