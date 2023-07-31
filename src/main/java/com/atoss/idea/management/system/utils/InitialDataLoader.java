@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 @Component
 public class InitialDataLoader implements CommandLineRunner {
@@ -84,24 +83,14 @@ public class InitialDataLoader implements CommandLineRunner {
             String namePrefix = "User Standard";
             String password = passwordEncoder.encode("StandardUser");
 
-            for (int i = 1; i <= avatarFileNames.length; i++) {
-                String avatarFileName = avatarFileNames[i - 1];
-                Avatar avatar = null;
-                try {
-                    String filePath = Objects.requireNonNull(getClass().getClassLoader().getResource(avatarFilePath + avatarFileName)).getPath();
-                    avatar = createAvatar(avatarFileName, filePath);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
 
-                for (int j = 1; j <= 5; j++) {
-                    String email = emailPrefix + String.format("%02d", j) + emailDomain;
-                    String username = usernamePrefix + String.format("%02d", j);
-                    String name = namePrefix + " " + j;
+            for (int j = 1; j <= 50; j++) {
+                String email = emailPrefix + String.format("%02d", j) + emailDomain;
+                String username = usernamePrefix + String.format("%02d", j);
+                String name = namePrefix + " " + j;
 
-                    User user = createUser(true, Role.STANDARD, avatar, email, username, name, password);
-                    userRepository.save(user);
-                }
+                User user = createUser(true, Role.STANDARD, avatar1, email, username, name, password);
+                userRepository.save(user);
             }
 
 
