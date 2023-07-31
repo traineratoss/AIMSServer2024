@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/ideas")
+@RequestMapping("/aims/api/v1/ideas")
 public class CommentController {
 
     private final CommentServiceImpl commentService;

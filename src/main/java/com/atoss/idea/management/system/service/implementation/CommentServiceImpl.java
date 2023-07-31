@@ -44,10 +44,15 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public String getTimeForComment(Long id) {
-        Optional<Comment> comment = commentRepository.findById(id);
-        Date creationDate =  comment.get().getCreationDate();
+        Optional<Comment> commentOptional = commentRepository.findById(id);
 
-        return getElapsedTime(creationDate);
+        if (commentOptional.isPresent()) {
+            Comment comment = commentOptional.get();
+            Date creationDate = comment.getCreationDate();
+            return getElapsedTime(creationDate);
+        } else {
+            throw new CommentNotFoundException();
+        }
     }
 
     @Override
