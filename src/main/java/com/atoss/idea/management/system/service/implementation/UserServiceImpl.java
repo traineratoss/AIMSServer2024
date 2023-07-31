@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO addUser(String username, String email) {
         if (userRepository.findByUsernameOrEmail(username, email).isPresent()) {
-            throw new UserAlreadyExistException("User already exist!");
+            throw new UserAlreadyExistException("User already exist! ");
         }
         User user = new User();
         user.setUsername(username);
