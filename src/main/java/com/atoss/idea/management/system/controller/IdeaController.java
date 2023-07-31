@@ -120,6 +120,7 @@ public class IdeaController {
             @RequestParam(required = false) String selectedDateFrom,
             @RequestParam(required = false) String selectedDateTo,
             @RequestParam(required = true) int pageNumber,
+            @RequestParam(required = true) int pageSize,
             @RequestParam(required = true) String sortDirection) {
 
         List<String> categories = new ArrayList<>();
@@ -139,7 +140,7 @@ public class IdeaController {
         List<Status> statusEnums = statusStrings.stream().map(s -> Status.valueOf(s)).toList();
         // pentru a converti corect, din String in Status nu stie in QueryCreator
 
-        Pageable pageableAsc = PageRequest.of(pageNumber, 2);
+        Pageable pageableAsc = PageRequest.of(pageNumber, pageSize);
 
         return new ResponseEntity<>(ideaService.filterIdeasByAll(title,
                 text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, pageableAsc), HttpStatus.OK);
