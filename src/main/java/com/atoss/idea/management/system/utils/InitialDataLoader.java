@@ -70,6 +70,7 @@ public class InitialDataLoader implements CommandLineRunner {
             int count = 0;
             String avatarFilePath = "image/avatar/";
             for (String fileName : avatarFileNames) {
+                System.out.println(avatarFilePath + fileName);
                 String filePath = classLoader.getResource(avatarFilePath + fileName).getPath();
                 Avatar avatar = avatarRepository.save(createAvatar(filePath, fileName));
                 avatarList.add(avatar);
