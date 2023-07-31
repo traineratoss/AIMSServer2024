@@ -10,7 +10,7 @@ import com.atoss.idea.management.system.repository.entity.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
@@ -30,24 +30,25 @@ public class InitialDataLoader implements CommandLineRunner {
     private final IdeaRepository ideaRepository;
     private final CommentRepository commentRepository;
 
-    private final PasswordEncoder passwordEncoder;
 
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlValue;
+
+    @Value("${aims.app.bcrypt.salt}")
+    private String bcryptSalt;
 
     public InitialDataLoader(AvatarRepository avatarRepository,
                              UserRepository userRepository,
                              CategoryRepository categoryRepository,
                              ImageRepository imageRepository,
                              CommentRepository commentRepository,
-                             IdeaRepository ideaRepository, PasswordEncoder passwordEncoder) {
+                             IdeaRepository ideaRepository) {
         this.avatarRepository = avatarRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.imageRepository = imageRepository;
         this.commentRepository = commentRepository;
         this.ideaRepository = ideaRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -82,7 +83,7 @@ public class InitialDataLoader implements CommandLineRunner {
             String emailDomain = "@gmail.com";
             String usernamePrefix = "Standard";
             String namePrefix = "User Standard";
-            String password = passwordEncoder.encode("StandardUser");
+            String password = BCrypt.hashpw("StandardUser", bcryptSalt);
 
 
             for (int j = 1; j <= 50; j++) {
@@ -96,24 +97,24 @@ public class InitialDataLoader implements CommandLineRunner {
 
 
             User user1 = createUser(true, Role.ADMIN, avatar1, "ap6548088@gmail.com", "Adrian22",
-                    "Adrian Popescu", passwordEncoder.encode("AtossAdmin123"));
+                    "Adrian Popescu", BCrypt.hashpw("AtossAdmin123", bcryptSalt));
             userRepository.save(user1);
 
             User user2 = createUser(true, Role.STANDARD, avatar1, "anaburlacu020626@gmail.com", "AnaS26",
-                    "Ana Burlacu", passwordEncoder.encode("StandardUser")
+                    "Ana Burlacu", BCrypt.hashpw("StandardUser", bcryptSalt)
             );
             userRepository.save(user2);
 
             User user3 = createUser(true, Role.ADMIN, avatar1, "aA12332111114@gmail.com", "Ale009",
-                    "Alexandra Moise", passwordEncoder.encode("AleAdmin2676"));
+                    "Alexandra Moise", BCrypt.hashpw("AleAdmin2676", bcryptSalt));
             userRepository.save(user3);
 
             User user4 = createUser(true, Role.STANDARD, avatar1, "andreiuser973@gmail.com", "Andrei09888",
-                    "Andrei Rusu", passwordEncoder.encode("AndreiUser4555454"));
+                    "Andrei Rusu", BCrypt.hashpw("AndreiUser4555454", bcryptSalt));
             userRepository.save(user4);
 
             User user5 = createUser(true, Role.STANDARD, avatar1, "usercristian91@gmail.com", "Cosmin4455",
-                    "Cosmin Cojocaru", passwordEncoder.encode("CosminUser4555454"));
+                    "Cosmin Cojocaru", BCrypt.hashpw("CosminUser4555454", bcryptSalt));
             userRepository.save(user4);
 
             Category category1 = createCategory("Innovation");
