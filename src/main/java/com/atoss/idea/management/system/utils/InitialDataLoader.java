@@ -86,12 +86,14 @@ public class InitialDataLoader implements CommandLineRunner {
             String password = BCrypt.hashpw("StandardUser", bcryptSalt);
 
 
-            for (int j = 1; j <= 50; j++) {
+            ArrayList<User> userList = new ArrayList<>();
+            for (int j = 1; j < 10; j++) {
                 String email = emailPrefix + String.format("%02d", j) + emailDomain;
                 String username = usernamePrefix + String.format("%02d", j);
                 String name = namePrefix + " " + j;
 
                 User user = createUser(true, Role.STANDARD, avatar1, email, username, name, password);
+                userList.add(user);
                 userRepository.save(user);
             }
 
@@ -138,6 +140,8 @@ public class InitialDataLoader implements CommandLineRunner {
             categories.add(category1);
             categories.add(category2);
             categories.add(category3);
+            List<Category> categories1 = new ArrayList<>();
+            categories1.add(category2);
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String staticDateString = "2023-07-26 12:00:00";
@@ -153,33 +157,80 @@ public class InitialDataLoader implements CommandLineRunner {
                 return;
             }
 
-            Idea idea1 = createIdea(user1, Status.OPEN, "First idea", "Test1",
-                    image1, staticDate, categories);
+            Idea idea1 = createIdea(user1, Status.OPEN, "Having a clear set of values for your "
+                            + "company is another effective way to improve morale and provide guidance to staff. "
+                            + "Creating and publishing your company values and morals provides a clear guideline "
+                            + "for what the company stands for and is working towards. This can provide guidance "
+                            + "for staff on the preferred course of action when faced with a decision during work, "
+                            + "and also may provide a positive outlook on what the work they contribute to the company "
+                            + "builds toward.", "Create clear company values", image1, staticDate, categories1);
 
-            Idea idea2 = createIdea(user1, Status.OPEN, "Second idea", "Test2",
-                    image2, staticDate2, categories);
+            Idea idea2 = createIdea(user1, Status.OPEN, "Communication within an organization is often one of the most"
+                            + " important elements of successful work. Providing staff with both the physical methods "
+                            + "of communicating and a company culture that encourages communication can help staff do "
+                            + "more efficiently find answers to any questions they have. This can help to increase employees'"
+                            + " productive hours.", "Establish lines of communication", image2, staticDate2, categories);
 
-            Idea idea3 = createIdea(user1, Status.IMPLEMENTED, "Third idea", "Test3",
+            Idea idea3 = createIdea(user1, Status.IMPLEMENTED, "Creating fair standards for employee performance assessment "
+                            + "within your organization can create a more fair and inclusive corporate culture. This can have two "
+                            + "important benefits for improving your company. First, by applying standards in a fair and clearly "
+                            + "described manner, you minimize the opportunity for employees to feel like a co-worker received benefits "
+                            + "they did not. Setting fair standards also helps you to identify your higher-performing employees, who may "
+                            + "receive enhanced responsibilities within the organization.", "Apply standards equally",
                     null, new Date(), categories);
 
-            Idea idea4 = createIdea(user2, Status.IMPLEMENTED, "Idea from standard user",
-                    "Test4", null, new Date(), categories);
+            Idea idea4 = createIdea(user2, Status.IMPLEMENTED, "Changing your company's payment structure allows you to make more "
+                            + "appealing offers to current and potential staff. Apart from allowing you to maintain your most essential "
+                            + "employees by showing that you value their work, this can help you make higher-quality hires as well. "
+                            + "Hiring more productive staff can compensate for the increased salary cost in the form of increased profit generation.",
+                    "Raise compensation to raise employee quality", null, new Date(), categories);
 
             ideaRepository.save(idea1);
             ideaRepository.save(idea2);
             ideaRepository.save(idea3);
             ideaRepository.save(idea4);
 
+
+            List<Idea> ideaList = new ArrayList<>();
+
+            Status status = Status.OPEN;
+            String text = "Test";
+            Date date = new Date();
+
+            for (User user : userList) {
+                String title = "Idea for " + "' " + idea1.getTitle() + " '";
+                Idea idea = createIdea(user, status, text, title, null, date, categories);
+                ideaList.add(idea);
+                ideaRepository.save(idea);
+            }
+
             Comment comment1 = createComment(new Date(), idea1, null,
-                    user1, "First comment");
+                    user1, "It's unnecessary");
             commentRepository.save(comment1);
 
             Comment comment2 = createComment(new Date(), idea2, null,
-                    user2, "Second comment");
+                    user2, "It's a great idea");
             commentRepository.save(comment2);
 
-            Comment reply1 = createReply(new Date(), comment2, user1, "salala");
+            Comment reply1 = createReply(new Date(), comment2, user1, "I don't think so");
             commentRepository.save(reply1);
+            List<Category> categoryList = new ArrayList<>();
+
+            int numberOfCommentsPerIdea = 4;
+
+            for (User user : userList) {
+                for (Idea idea : ideaList) {
+                    for (int i = 0; i < numberOfCommentsPerIdea; i++) {
+                        String commentText = "Comment for: " + idea.getTitle() + " - Comment ";
+                        Comment comment = createComment(date, idea, null, user, commentText);
+                        commentRepository.save(comment);
+                    }
+                }
+            }
+            for (Idea idea: ideaList) {
+                Comment reply = createComment(date, idea, comment1, user2, "reply text for comment : " + comment1.getCommentText());
+                commentRepository.save(reply);
+            }
         }
     }
 
