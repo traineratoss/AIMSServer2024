@@ -93,9 +93,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDTO updateUserRole(String username, Role role) {
+    public UserResponseDTO updateUserRole(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
-        user.setRole(role);
+
+        if (user.getRole() == Role.ADMIN) {
+            user.setRole(Role.STANDARD);
+        } else {
+            user.setRole(Role.ADMIN);
+        }
         userRepository.save(user);
 
         return modelMapper.map(user, UserResponseDTO.class);

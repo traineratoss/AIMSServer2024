@@ -1,7 +1,6 @@
 package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.repository.dto.*;
-import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -37,8 +36,8 @@ public class UserController {
 
     @Transactional
     @PatchMapping("/update-role")
-    public UserResponseDTO updateUserRole(@RequestParam(value = "username") String username, @RequestParam(value = "role") Role role) {
-        return userService.updateUserRole(username, role);
+    public UserResponseDTO updateUserRole(@RequestParam(value = "username") String username) {
+        return userService.updateUserRole(username);
     }
 
     @Transactional

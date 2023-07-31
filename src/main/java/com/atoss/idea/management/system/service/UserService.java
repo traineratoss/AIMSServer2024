@@ -1,7 +1,6 @@
 package com.atoss.idea.management.system.service;
 
 import com.atoss.idea.management.system.repository.dto.*;
-import com.atoss.idea.management.system.repository.entity.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,7 @@ public interface UserService {
 
     UserResponseDTO updateUserByUsername(String username, UserUpdateDTO userUpdateDTO);
 
-    UserResponseDTO updateUserRole(String username, Role role);
+    UserResponseDTO updateUserRole(String username);
 
     UserResponseDTO getUserByUsername(String username);
 
