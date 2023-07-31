@@ -19,11 +19,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Optional;
-
-import java.util.Comparator;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -120,10 +117,8 @@ public class UserServiceImpl implements UserService {
         userPageDTO.setTotal(userRepository.findAll().size());
         List<UserAdminDashboardResponseDTO> result = userRepository.findAll(pageable)
                                     .stream()
-                                    .sorted(Comparator.comparing(user -> user.getHasPassword() == true))
                                     .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
                                     .toList();
-
         return new UserPageDTO(userPageDTO.getTotal(), new PageImpl(result, pageable, result.size()));
     }
 

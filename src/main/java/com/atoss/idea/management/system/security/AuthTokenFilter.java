@@ -22,7 +22,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String username = authentication.getName();
             String role = authentication.getAuthorities().iterator().next().getAuthority();
             Cookie userCookie = new Cookie("user_info", username + ":" + role);
-            userCookie.setMaxAge(3600); // Set cookie expiry time (in seconds). Adjust as needed.
+            userCookie.setMaxAge(3600);
             response.addCookie(userCookie);
         }
         filterChain.doFilter(request, response);

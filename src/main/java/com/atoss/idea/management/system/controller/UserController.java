@@ -72,6 +72,7 @@ public class UserController {
                 userService.getAllUsers(
                         PageRequest.of(
                                 pageNumber,
+                                //10
                                 pageSize,
                                 Sort.by(Sort.Direction.ASC, sortCategory)
                         )
