@@ -43,7 +43,10 @@ public class AuthController {
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
             String role = authentication.getAuthorities().iterator().next().getAuthority();
-            Cookie userCookie = new Cookie("user_info", username + ":" + role);
+            String email = authentication.getAuthorities().iterator().next().getAuthority();
+            String fullName = authentication.getAuthorities().iterator().next().getAuthority();
+            String avatarId = authentication.getAuthorities().iterator().next().getAuthority();
+            Cookie userCookie = new Cookie("user_info", username + ":" + role + ":" + email + ":" + fullName + ":" + avatarId);
             userCookie.setMaxAge(3600);
             response.addCookie(userCookie);
         }

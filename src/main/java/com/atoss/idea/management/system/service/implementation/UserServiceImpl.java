@@ -199,7 +199,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalUser = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            if (password.equals(user.getPassword())) {
+            if (user.getIsActive() && password.equals(user.getPassword())) {
                 UserSecurityDTO userSecurityDTO = modelMapper.map(
                         user,
                         UserSecurityDTO.class

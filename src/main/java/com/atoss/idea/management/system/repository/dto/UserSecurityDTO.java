@@ -7,4 +7,7 @@ import lombok.Data;
 public class UserSecurityDTO {
     private String username;
     private Role role;
+    private String email;
+    private String fullName;
+    private String avatarId;
 }
