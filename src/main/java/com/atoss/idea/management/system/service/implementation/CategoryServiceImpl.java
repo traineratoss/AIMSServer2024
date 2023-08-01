@@ -40,7 +40,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDTO getCategory(Long id) {
-
         if (categoryRepository.findById(id).isPresent()) {
             return modelMapper.map(categoryRepository.findById(id).get(), CategoryDTO.class);
         } else {

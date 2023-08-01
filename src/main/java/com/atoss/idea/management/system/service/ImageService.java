@@ -9,8 +9,6 @@ public interface ImageService {
 
     ImageDTO addImage(MultipartFile imageFile) throws IOException;
 
-    ImageDTO getImage(Long id) throws Exception;
-
     List<ImageDTO> getAllImage();
 
 }
