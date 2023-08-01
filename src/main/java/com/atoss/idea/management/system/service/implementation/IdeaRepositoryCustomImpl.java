@@ -73,7 +73,7 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
             try {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date fromDate = simpleDateFormat.parse(selectedDateFrom);
-                predicates.add(cb.greaterThanOrEqualTo(root.get("date"), fromDate));
+                predicates.add(cb.greaterThanOrEqualTo(root.get("creationDate"), fromDate));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -83,7 +83,7 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
             try {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date toDate = simpleDateFormat.parse(selectedDateTo);
-                predicates.add(cb.lessThanOrEqualTo(root.get("date"), toDate));
+                predicates.add(cb.lessThanOrEqualTo(root.get("creationDate"), toDate));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -94,7 +94,7 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date fromDate = simpleDateFormat.parse(selectedDateFrom);
                 Date toDate = simpleDateFormat.parse(selectedDateTo);
-                predicates.add(cb.between(root.get("date"), fromDate, toDate));
+                predicates.add(cb.between(root.get("creationDate"), fromDate, toDate));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -105,9 +105,9 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
         List<Order> orders = new ArrayList<>();
 
         if (Objects.equals(sortDirection, "ASC")) {
-            orders.add(cb.asc(root.get("date")));
+            orders.add(cb.asc(root.get("creationDate")));
         } else {
-            orders.add(cb.desc(root.get("date")));
+            orders.add(cb.desc(root.get("creationDate")));
         }
 
         criteriaQuery.orderBy(orders);

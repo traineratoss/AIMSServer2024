@@ -114,12 +114,12 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public IdeaResponseDTO getIdeaById(Long id) throws FieldValidationException {
 
-        if (ideaRepository.existsById(id)) {
-            IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.findIdeaById(id), IdeaResponseDTO.class);
-            responseDTO.setUsername(ideaRepository.findIdeaById(id).getUser().getUsername());
         if (ideaRepository.findById(id).isPresent()) {
-            IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.findById(id).get(), IdeaResponseDTO.class);
+            Idea idea = ideaRepository.findById(id).get();
+            IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
             responseDTO.setUsername(ideaRepository.findById(id).get().getUser().getUsername());
+            responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
+            responseDTO.setCommentsNumber(idea.getCommentList().size());
             return responseDTO;
         } else {
             throw new IdeaNotFoundException("Idea doesn't exist.");
@@ -131,8 +131,7 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (ideaRepository.findById(id).isPresent()) {
 
-            Idea idea = ideaRepository.findById(id).orElseThrow(
-                    () -> new IdeaNotFoundException("Idea doesn't exist."));
+            Idea idea = ideaRepository.findById(id).get();
 
             if (ideaUpdateDTO.getText() != null) {
                 idea.setText(ideaUpdateDTO.getText());
@@ -159,6 +158,8 @@ public class IdeaServiceImpl implements IdeaService {
 
             IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);
             responseDTO.setUsername(ideaRepository.findById(id).get().getUser().getUsername());
+            responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
+            responseDTO.setCommentsNumber(idea.getCommentList().size());
             return responseDTO;
         } else {
             throw new IdeaNotFoundException("Idea doesn't exist.");
@@ -192,6 +193,8 @@ public class IdeaServiceImpl implements IdeaService {
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
                     responseDTO.setUsername(idea.getUser().getUsername());
+                    responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
+                    responseDTO.setCommentsNumber(idea.getCommentList().size());
                     return responseDTO;
                 })
                 .toList();
@@ -220,6 +223,8 @@ public class IdeaServiceImpl implements IdeaService {
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
                     responseDTO.setUsername(user.getUsername());
+                    responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
+                    responseDTO.setCommentsNumber(idea.getCommentList().size());
                     return responseDTO;
                 })
                 .toList();
@@ -247,6 +252,8 @@ public class IdeaServiceImpl implements IdeaService {
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
                     responseDTO.setUsername(idea.getUser().getUsername());
+                    responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
+                    responseDTO.setCommentsNumber(idea.getCommentList().size());
                     return responseDTO;
                 })
                 .toList();
