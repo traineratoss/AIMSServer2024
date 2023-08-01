@@ -83,7 +83,14 @@ public class UserServiceImpl implements UserService {
             }
         }
         if (userUpdateDTO.getAvatarId() != null) {
-            user.setAvatar(modelMapper.map(avatarRepository.findAvatarById(userUpdateDTO.getAvatarId()), Avatar.class));
+            Avatar avatar = avatarRepository
+                    .findById(
+                        userUpdateDTO.getAvatarId()
+                    )
+                    .orElseThrow(
+                            () -> new AvatarNotFoundException("Avatar not found!")
+                    );
+            user.setAvatar(modelMapper.map(avatar, Avatar.class));
         }
         if (userUpdateDTO.getFullName() != null) {
             user.setFullName(userUpdateDTO.getFullName());
