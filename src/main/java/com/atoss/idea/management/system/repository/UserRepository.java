@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.repository;
 
+import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,6 +19,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findUserById(Long userId);
 
     User findUserByUsername(String username);
+
+    List<User> findUserByRole(Role role);
 
     Optional<User> findByEmail(String email);
 

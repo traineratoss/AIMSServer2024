@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class SendEmailServiceImpl implements SendEmailService {
@@ -95,7 +96,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         String subject = "Alert: Login Request Received";
         String text = getEmailTextForLoginRequest(username, emailTo);
         String textAdmin = getEmailTextForLoginRequestForUser(username, emailTo);
-        sendEmail(adminEmail, subject, text);
+        sendToAllAdmin(subject, text);
         sendEmail(emailTo, subject, textAdmin);
     }
 
@@ -115,6 +116,11 @@ public class SendEmailServiceImpl implements SendEmailService {
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User does not exist!"));
+    }
+
+    private void sendToAllAdmin(String subject, String text) {
+        List<User> adminList = userRepository.findUserByRole(Role.ADMIN);
+        adminList.forEach(admin -> sendEmail(admin.getEmail(), subject, text));
     }
 
     private void sendEmail(String emailTo, String subject, String text) {
