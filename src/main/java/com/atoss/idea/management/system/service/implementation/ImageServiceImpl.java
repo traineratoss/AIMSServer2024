@@ -33,13 +33,12 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Transactional
-    public ImageDTO getImage(Long id) throws Exception {
-        if (id < 0) {
-            throw new ImageNotFoundException();
+    public ImageDTO getImage(Long id) throws ImageNotFoundException {
+        if (imageRepository.findById(id).isPresent()) {
+            return modelMapper.map(imageRepository.findById(id).get(), ImageDTO.class);
         } else {
-            return modelMapper.map(imageRepository.findImageById(id), ImageDTO.class);
+            throw new ImageNotFoundException();
         }
-
     }
 
     public List<ImageDTO> getAllImage() {

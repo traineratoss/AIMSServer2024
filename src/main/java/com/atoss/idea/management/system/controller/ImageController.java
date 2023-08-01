@@ -1,7 +1,8 @@
 package com.atoss.idea.management.system.controller;
 
+import com.atoss.idea.management.system.exception.ImageNotFoundException;
 import com.atoss.idea.management.system.repository.dto.ImageDTO;
-import com.atoss.idea.management.system.service.ImageService;
+import com.atoss.idea.management.system.service.implementation.ImageServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,10 +23,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/images")
 public class ImageController {
-    private final ImageService imageService;
+    private final ImageServiceImpl imageService;
 
     @Autowired
-     public ImageController(ImageService imageService) {
+     public ImageController(ImageServiceImpl imageService) {
         this.imageService = imageService;
     }
 
@@ -35,15 +36,13 @@ public class ImageController {
 
     }
 
-
     @GetMapping
     public List<ImageDTO> getAllImages() {
         return imageService.getAllImage();
     }
 
-
     @GetMapping("/{id}")
-    public ImageDTO getImage(@PathVariable("id") Long id) throws Exception {
+    public ImageDTO getImage(@PathVariable("id") Long id) throws ImageNotFoundException {
         return imageService.getImage(id);
     }
 
