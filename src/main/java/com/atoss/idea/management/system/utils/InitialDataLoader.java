@@ -14,6 +14,9 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -68,14 +71,20 @@ public class InitialDataLoader implements CommandLineRunner {
             };
             ArrayList<Avatar> avatarList = new ArrayList<>();
 
-            int count = 0;
             String avatarFilePath = "image/avatar/";
             for (String fileName : avatarFileNames) {
-                System.out.println(avatarFilePath + fileName);
-                String filePath = classLoader.getResource(avatarFilePath + fileName).getPath();
-                Avatar avatar = avatarRepository.save(createAvatar(filePath, fileName));
-                avatarList.add(avatar);
+                URL resourceUrl = classLoader.getResource(avatarFilePath + fileName);
+                if (resourceUrl != null) {
+                    try {
+                        String filePath = URLDecoder.decode(resourceUrl.getFile(), "UTF-8");
+                        Avatar avatar = avatarRepository.save(createAvatar(filePath, fileName));
+                        avatarList.add(avatar);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
+
 
             Avatar avatar1 = avatarList.get(0);
 
@@ -127,13 +136,26 @@ public class InitialDataLoader implements CommandLineRunner {
             Category category3 = createCategory("Nature");
             categoryRepository.save(category3);
 
-            Image image1 = imageRepository.save(
-                    createImage("img", ".png", classLoader.getResource("image/idea/img.png").getPath()));
-            imageRepository.save(image1);
+            String[] imageFileNames = {
+                "img.png",
+                "img3.png"
+            };
 
-            Image image2 = imageRepository.save(
-                    createImage("img3", ".png", classLoader.getResource("image/idea/img3.png").getPath()));
-            imageRepository.save(image2);
+            ArrayList<Image> imageList = new ArrayList<>();
+            String imageFilePath = "image/idea/";
+            for (String fileName : imageFileNames) {
+                URL resourceUrl = classLoader.getResource(imageFilePath + fileName);
+                if (resourceUrl != null) {
+                    try {
+                        String filePath = URLDecoder.decode(resourceUrl.getFile(), "UTF-8");
+                        Image image = imageRepository.save(createImage(filePath, fileName, filePath));
+                        imageList.add(image);
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
 
             List<Category> categories = new ArrayList<>();
             categories.add(category1);
@@ -156,19 +178,22 @@ public class InitialDataLoader implements CommandLineRunner {
                 return;
             }
 
+            final Image image1 = imageList.get(0);
+            final Image image2 = imageList.get(1);
+
             Idea idea1 = createIdea(user1, Status.OPEN, "Having a clear set of values for your "
-                            + "company is another effective way to improve morale and provide guidance to staff. "
-                            + "Creating and publishing your company values and morals provides a clear guideline "
-                            + "for what the company stands for and is working towards. This can provide guidance "
-                            + "for staff on the preferred course of action when faced with a decision during work, "
-                            + "and also may provide a positive outlook on what the work they contribute to the company "
-                            + "builds toward.", "Create clear company values", image1, staticDate, categories1);
+                    + "company is another effective way to improve morale and provide guidance to staff. "
+                    + "Creating and publishing your company values and morals provides a clear guideline "
+                    + "for what the company stands for and is working towards. This can provide guidance "
+                    + "for staff on the preferred course of action when faced with a decision during work, "
+                    + "and also may provide a positive outlook on what the work they contribute to the company "
+                    + "builds toward.", "Create clear company values", image1, staticDate, categories1);
 
             Idea idea2 = createIdea(user1, Status.OPEN, "Communication within an organization is often one of the most"
-                            + " important elements of successful work. Providing staff with both the physical methods "
-                            + "of communicating and a company culture that encourages communication can help staff do "
-                            + "more efficiently find answers to any questions they have. This can help to increase employees'"
-                            + " productive hours.", "Establish lines of communication", image2, staticDate2, categories);
+                    + " important elements of successful work. Providing staff with both the physical methods "
+                    + "of communicating and a company culture that encourages communication can help staff do "
+                    + "more efficiently find answers to any questions they have. This can help to increase employees'"
+                    + " productive hours.", "Establish lines of communication", image2, staticDate2, categories);
 
             Idea idea3 = createIdea(user1, Status.IMPLEMENTED, "Creating fair standards for employee performance assessment "
                             + "within your organization can create a more fair and inclusive corporate culture. This can have two "
