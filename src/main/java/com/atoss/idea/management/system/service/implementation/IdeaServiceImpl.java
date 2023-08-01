@@ -108,9 +108,9 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public IdeaResponseDTO getIdeaById(Long id) throws FieldValidationException {
 
-        if (ideaRepository.existsById(id)) {
-            IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.findIdeaById(id), IdeaResponseDTO.class);
-            responseDTO.setUsername(ideaRepository.findIdeaById(id).getUser().getUsername());
+        if (ideaRepository.findById(id).isPresent()) {
+            IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.findById(id).get(), IdeaResponseDTO.class);
+            responseDTO.setUsername(ideaRepository.findById(id).get().getUser().getUsername());
             return responseDTO;
         } else {
             throw new IdeaNotFoundException("Idea doesn't exist.");
@@ -120,7 +120,7 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public IdeaResponseDTO updateIdeaById(Long id, IdeaUpdateDTO ideaUpdateDTO) {
 
-        if (ideaRepository.existsById(id)) {
+        if (ideaRepository.findById(id).isPresent()) {
 
             Idea idea = ideaRepository.findById(id).orElseThrow(
                     () -> new IdeaNotFoundException("Idea doesn't exist."));
@@ -149,7 +149,7 @@ public class IdeaServiceImpl implements IdeaService {
             }
 
             IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);
-            responseDTO.setUsername(ideaRepository.findIdeaById(id).getUser().getUsername());
+            responseDTO.setUsername(ideaRepository.findById(id).get().getUser().getUsername());
             return responseDTO;
         } else {
             throw new IdeaNotFoundException("Idea doesn't exist.");

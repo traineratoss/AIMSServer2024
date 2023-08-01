@@ -10,8 +10,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface IdeaRepository extends JpaRepository<Idea, Long> {
-    Idea findIdeaById(Long id);
-
     @Query("SELECT i FROM Idea i JOIN i.user u WHERE u.username = :username")
     Page<Idea> findAllByUserUsername(@Param("username") String username, Pageable pageable);
 

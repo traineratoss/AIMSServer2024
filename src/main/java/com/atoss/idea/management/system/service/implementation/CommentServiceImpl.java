@@ -125,7 +125,7 @@ public class CommentServiceImpl implements CommentService {
 
         User user = userRepository.findByUsername(requestCommentDTO.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found!"));
 
-        Idea idea = ideaRepository.findIdeaById(requestCommentDTO.getIdeaId());
+        Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).get();
 
         java.util.Date creationDate = new java.util.Date();
 
