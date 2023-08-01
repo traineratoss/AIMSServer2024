@@ -6,7 +6,6 @@ import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.repository.entity.Status;
 import org.springframework.data.domain.Pageable;
-
 import java.util.List;
 
 public interface IdeaService {
@@ -33,4 +32,5 @@ public interface IdeaService {
                                  String username,
                                  Pageable pageable);
 
+    String getTimeForIdea(Long id);
 }

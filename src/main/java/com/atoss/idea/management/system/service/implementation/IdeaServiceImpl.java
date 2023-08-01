@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Log4j2
@@ -37,17 +38,22 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final ModelMapper modelMapper;
 
+    private final CommentServiceImpl commentServiceImpl;
+
     public IdeaServiceImpl(IdeaRepository ideaRepository,
                            IdeaRepositoryCustom ideaRepositoryCustom,
                            UserRepository userRepository,
                            CategoryRepository categoryRepository,
-                           CategoryServiceImpl categoryService, ModelMapper modelMapper) {
+                           CategoryServiceImpl categoryService,
+                           ModelMapper modelMapper,
+                           CommentServiceImpl commentServiceImpl) {
         this.ideaRepository = ideaRepository;
         this.ideaRepositoryCustom = ideaRepositoryCustom;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.categoryService = categoryService;
         this.modelMapper = modelMapper;
+        this.commentServiceImpl = commentServiceImpl;
     }
 
     @Override
@@ -77,7 +83,7 @@ public class IdeaServiceImpl implements IdeaService {
         savedIdea.setText(idea.getText());
         savedIdea.setTitle(idea.getTitle());
         savedIdea.setCategoryList(new ArrayList<>());
-        savedIdea.setDate(new Date());
+        savedIdea.setCreationDate(new Date());
 
         if (idea.getImage() != null) {
             Image image = modelMapper.map(idea.getImage(), Image.class);
@@ -108,6 +114,9 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public IdeaResponseDTO getIdeaById(Long id) throws FieldValidationException {
 
+        if (ideaRepository.existsById(id)) {
+            IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.findIdeaById(id), IdeaResponseDTO.class);
+            responseDTO.setUsername(ideaRepository.findIdeaById(id).getUser().getUsername());
         if (ideaRepository.findById(id).isPresent()) {
             IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.findById(id).get(), IdeaResponseDTO.class);
             responseDTO.setUsername(ideaRepository.findById(id).get().getUser().getUsername());
@@ -243,6 +252,19 @@ public class IdeaServiceImpl implements IdeaService {
                 .toList();
 
         return new IdeaPageDTO(ideaList.getTotal(), new PageImpl(result, pageable, result.size()));
+    }
+
+    @Override
+    public String getTimeForIdea(Long id) {
+        Optional<Idea> ideaOptional = ideaRepository.findById(id);
+
+        if (ideaOptional.isPresent()) {
+            Idea idea = ideaOptional.get();
+            Date creationDate = idea.getCreationDate();
+            return commentServiceImpl.getElapsedTime(creationDate);
+        } else {
+            throw new IdeaNotFoundException();
+        }
     }
 }
 

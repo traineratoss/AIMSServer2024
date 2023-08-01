@@ -6,7 +6,6 @@ import com.atoss.idea.management.system.exception.CommentNotFoundException;
 import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.CommentDTO;
 import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
 import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
@@ -244,18 +243,12 @@ public class CommentServiceImpl implements CommentService {
                             String time = getTimeForComment(comment.getId());
                             ResponseCommentDTO responseCommentDTO = modelMapper.map(comment, ResponseCommentDTO.class);
                             responseCommentDTO.setUsername(username);
-                            responseCommentDTO.setReplies(null);
                             responseCommentDTO.setElapsedTime(time);
                             responseCommentDTO.setHasReplies(hasReplies);
                             return responseCommentDTO;
                         })
                         .toList()
         );
-    }
-
-    @Override
-    public CommentDTO updateComment(Comment comment) {
-        return null;
     }
 
     @Override

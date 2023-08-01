@@ -32,7 +32,7 @@ public class Idea {
     private String text;
 
     @Column(name = "date")
-    private Date date;
+    private Date creationDate;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id", referencedColumnName = "image_id")

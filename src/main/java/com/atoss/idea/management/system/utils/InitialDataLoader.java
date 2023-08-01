@@ -306,7 +306,7 @@ public class InitialDataLoader implements CommandLineRunner {
         idea.setText(text);
         idea.setTitle(title);
         idea.setImage(image);
-        idea.setDate(date);
+        idea.setCreationDate(date);
         idea.setCategoryList(categories);
         return idea;
     }
