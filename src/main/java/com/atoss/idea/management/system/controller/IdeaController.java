@@ -4,6 +4,7 @@ import com.atoss.idea.management.system.repository.dto.IdeaPageDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.StatisticsDTO;
 import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import jakarta.transaction.Transactional;
@@ -145,5 +146,12 @@ public class IdeaController {
 
         return new ResponseEntity<>(ideaService.filterIdeasByAll(title,
                 text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, pageableAsc), HttpStatus.OK);
+    }
+
+    @GetMapping("stats")
+    public ResponseEntity<StatisticsDTO> getStats() {
+
+         return new ResponseEntity<>(ideaService.getStatistics(),HttpStatus.OK);
+
     }
 }

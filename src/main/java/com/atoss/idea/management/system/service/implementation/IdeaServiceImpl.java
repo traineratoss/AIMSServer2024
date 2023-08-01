@@ -262,16 +262,19 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public String getTimeForIdea(Long id) {
-        Optional<Idea> ideaOptional = ideaRepository.findById(id);
+    public StatisticsDTO getStatistics(){
 
-        if (ideaOptional.isPresent()) {
-            Idea idea = ideaOptional.get();
-            Date creationDate = idea.getCreationDate();
-            return commentServiceImpl.getElapsedTime(creationDate);
-        } else {
-            throw new IdeaNotFoundException();
-        }
+        StatisticsDTO statisticsDTO = new StatisticsDTO();
+        statisticsDTO.setNrOfUsers(userRepository.count());
+        statisticsDTO.setNrOfIdeas(ideaRepository.count());
+        statisticsDTO.setIdeasPerUser(Math.round((double)ideaRepository.count()/ (double)userRepository.count()*100)/100.00);
+        statisticsDTO.setImplementedIdeas(ideaRepository.countByStatus(Status.IMPLEMENTED));
+        statisticsDTO.setDraftIdeas(ideaRepository.countByStatus(Status.DRAFT));
+        statisticsDTO.setOpenIdeas(ideaRepository.countByStatus(Status.OPEN));
+        statisticsDTO.setTotalNrOfComments(ideaRepository.countComments());
+        statisticsDTO.setTotalNrOfReplies(ideaRepository.countAllReplies());
+
+        return statisticsDTO;
     }
 }
 
