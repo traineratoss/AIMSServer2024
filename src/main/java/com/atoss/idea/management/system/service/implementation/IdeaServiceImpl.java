@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Log4j2
@@ -262,12 +261,12 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public StatisticsDTO getStatistics(){
+    public StatisticsDTO getStatistics() {
 
         StatisticsDTO statisticsDTO = new StatisticsDTO();
         statisticsDTO.setNrOfUsers(userRepository.count());
         statisticsDTO.setNrOfIdeas(ideaRepository.count());
-        statisticsDTO.setIdeasPerUser(Math.round((double)ideaRepository.count()/ (double)userRepository.count()*100)/100.00);
+        statisticsDTO.setIdeasPerUser(Math.round((double) ideaRepository.count() / (double) userRepository.count() * 100) / 100.00);
         statisticsDTO.setImplementedIdeas(ideaRepository.countByStatus(Status.IMPLEMENTED));
         statisticsDTO.setDraftIdeas(ideaRepository.countByStatus(Status.DRAFT));
         statisticsDTO.setOpenIdeas(ideaRepository.countByStatus(Status.OPEN));

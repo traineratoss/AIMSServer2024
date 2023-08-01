@@ -19,6 +19,6 @@ public interface IdeaRepository extends JpaRepository<Idea, Long> {
     @Query(value = "SELECT COUNT(parent_id) FROM comment c", nativeQuery = true)
     Long countComments();
 
-    @Query(value ="SELECT COUNT(*) FROM comment WHERE parent_id IS NULL", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM comment WHERE parent_id IS NULL", nativeQuery = true)
     Long countAllReplies();
 }

@@ -151,7 +151,7 @@ public class IdeaController {
     @GetMapping("stats")
     public ResponseEntity<StatisticsDTO> getStats() {
 
-         return new ResponseEntity<>(ideaService.getStatistics(),HttpStatus.OK);
+        return new ResponseEntity<>(ideaService.getStatistics(), HttpStatus.OK);
 
     }
 }

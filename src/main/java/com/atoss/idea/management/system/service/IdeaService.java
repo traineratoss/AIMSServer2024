@@ -32,5 +32,6 @@ public interface IdeaService {
                                  String sortDirection,
                                  String username,
                                  Pageable pageable);
+
     StatisticsDTO getStatistics();
 }
