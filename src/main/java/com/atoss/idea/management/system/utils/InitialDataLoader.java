@@ -18,14 +18,17 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
+import java.security.SecureRandom;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 @Component
 public class InitialDataLoader implements CommandLineRunner {
+    private static final SecureRandom random = new SecureRandom();
     private final AvatarRepository avatarRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
@@ -96,7 +99,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
 
             ArrayList<User> userList = new ArrayList<>();
-            for (int j = 1; j < 10; j++) {
+            for (int j = 1; j < 20; j++) {
                 String email = emailPrefix + String.format("%02d", j) + emailDomain;
                 String username = usernamePrefix + String.format("%02d", j);
                 String name = namePrefix + " " + j;
@@ -166,13 +169,16 @@ public class InitialDataLoader implements CommandLineRunner {
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String staticDateString = "2023-07-26 12:00:00";
-            String staticDateString2 = "2023-06-26 12:00:00";
             Date staticDate;
-            Date staticDate2;
+            Date calendarC;
+            Date today = new Date();
+            Calendar c = Calendar.getInstance();
+            c.setTime(today);
+            int numberOfDaysToAdd = 1;
+            int numberOfCalls = 5;
 
             try {
                 staticDate = sdf.parse(staticDateString);
-                staticDate2 = sdf.parse(staticDateString2);
             } catch (ParseException e) {
                 e.printStackTrace();
                 return;
@@ -193,7 +199,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     + " important elements of successful work. Providing staff with both the physical methods "
                     + "of communicating and a company culture that encourages communication can help staff do "
                     + "more efficiently find answers to any questions they have. This can help to increase employees'"
-                    + " productive hours.", "Establish lines of communication", image2, staticDate2, categories);
+                    + " productive hours.", "Establish lines of communication", image2, staticDate, categories);
 
             Idea idea3 = createIdea(user1, Status.IMPLEMENTED, "Creating fair standards for employee performance assessment "
                             + "within your organization can create a more fair and inclusive corporate culture. This can have two "
@@ -216,18 +222,20 @@ public class InitialDataLoader implements CommandLineRunner {
 
 
             List<Idea> ideaList = new ArrayList<>();
-
-            Status status = Status.OPEN;
-            String text = "Test";
             Date date = new Date();
+
 
             int k = 1;
             for (User user : userList) {
-                String title = "New Idea " + k;
-                Idea idea = createIdea(user, status, text, title, null, date, categories);
-                ideaList.add(idea);
-                ideaRepository.save(idea);
-                k++;
+                for (int i = 0; i < numberOfCalls; i++) {
+                    c.add(Calendar.DATE, numberOfDaysToAdd);
+                    String title = "New Idea " + k;
+                    String text = "New Idea Text " + k;
+                    Idea idea = createIdea(user, randomEnum(Status.class), text, title, null, c.getTime(), categories);
+                    ideaList.add(idea);
+                    ideaRepository.save(idea);
+                    k++;
+                }
             }
 
 
@@ -235,7 +243,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     user1, "It's unnecessary");
             commentRepository.save(comment1);
 
-            Comment comment2 = createComment(staticDate2, idea2, null,
+            Comment comment2 = createComment(staticDate, idea2, null,
                     user2, "It's a great idea");
             commentRepository.save(comment2);
             ArrayList<Comment> commentList = new ArrayList<>();
@@ -295,6 +303,12 @@ public class InitialDataLoader implements CommandLineRunner {
         return category;
     }
 
+
+
+    public static <T extends Enum<?>> T randomEnum(Class<T> clazz) {
+        int x = random.nextInt(clazz.getEnumConstants().length);
+        return clazz.getEnumConstants()[x];
+    }
 
 
     private static Avatar createAvatar(String filePath, String fileName
