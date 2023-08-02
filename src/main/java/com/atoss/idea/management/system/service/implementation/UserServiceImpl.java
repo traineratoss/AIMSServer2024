@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO updateUserRole(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found "));
 
         if (user.getRole() == Role.ADMIN) {
             user.setRole(Role.STANDARD);
