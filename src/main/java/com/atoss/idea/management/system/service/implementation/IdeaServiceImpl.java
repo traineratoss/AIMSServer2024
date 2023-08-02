@@ -16,7 +16,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +26,7 @@ import java.util.List;
 @Service
 @Log4j2
 public class IdeaServiceImpl implements IdeaService {
+    private List<String> badWords = new ArrayList<>();
 
     private final IdeaRepository ideaRepository;
 
@@ -55,6 +58,31 @@ public class IdeaServiceImpl implements IdeaService {
         this.commentServiceImpl = commentServiceImpl;
     }
 
+    private String filterBadWords(String text) {
+        for (String word : badWords) {
+            text = text.replaceAll("(?i)" + word, "*".repeat(word.length()));
+        }
+        return text;
+    }
+
+    private void readBadWordsFromFile(String path) {
+        try {
+            FileReader fileReader = new FileReader(path);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null) {
+                String word = line.trim();
+
+                badWords.add(word);
+            }
+
+            bufferedReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) {
 
@@ -75,12 +103,15 @@ public class IdeaServiceImpl implements IdeaService {
         }
 
         Idea savedIdea = new Idea();
+        readBadWordsFromFile("src/main/resources/textTerms/badWords.txt");
 
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("No user found by this username."));
         savedIdea.setUser(user);
         savedIdea.setStatus(idea.getStatus());
-        savedIdea.setText(idea.getText());
-        savedIdea.setTitle(idea.getTitle());
+        String filteredIdeaText = filterBadWords(idea.getText());
+        savedIdea.setText(filteredIdeaText);
+        String filteredIdeaTitle = filterBadWords(idea.getTitle());
+        savedIdea.setTitle(filteredIdeaTitle);
         savedIdea.setCategoryList(new ArrayList<>());
         savedIdea.setCreationDate(new Date());
 
@@ -127,6 +158,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO updateIdeaById(Long id, IdeaUpdateDTO ideaUpdateDTO) {
+        readBadWordsFromFile("src/main/resources/textTerms/badWords.txt");
 
         if (ideaRepository.findById(id).isPresent()) {
 
@@ -134,6 +166,8 @@ public class IdeaServiceImpl implements IdeaService {
 
             if (ideaUpdateDTO.getText() != null) {
                 idea.setText(ideaUpdateDTO.getText());
+                String filteredCommentText = filterBadWords(idea.getText());
+                idea.setText(filteredCommentText);
             }
 
             if (ideaUpdateDTO.getStatus() != null) {
@@ -261,19 +295,17 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public FilteredStatisticsDTO getStatisticsByDate(String selectedDateFrom, String selectedDateTo) {
-
-        FilteredStatisticsDTO filteredStatisticsDTO = new FilteredStatisticsDTO();
-
-        List<Idea> returnedIdeas = ideaRepositoryCustom.findIdeasByDate(selectedDateFrom, selectedDateTo);
-
-        filteredStatisticsDTO.setTotalIdeas(returnedIdeas.size());
-
-        return filteredStatisticsDTO;
+    public StatisticsDTO getGeneralStatistics() {
+        return null;
     }
 
     @Override
-    public StatisticsDTO getGeneralStatistics() {
+    public FilteredStatisticsDTO getStatisticsByDate(String selectedDateFrom, String selectedDateTo) {
+        return null;
+    }
+
+    @Override
+    public StatisticsDTO getStatistics() {
 
         StatisticsDTO statisticsDTO = new StatisticsDTO();
         statisticsDTO.setNrOfUsers(userRepository.count());
