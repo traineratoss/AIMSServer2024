@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.controller;
 
+import com.atoss.idea.management.system.repository.dto.FilteredStatisticsDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaPageDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
@@ -148,10 +149,20 @@ public class IdeaController {
                 text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, pageableAsc), HttpStatus.OK);
     }
 
-    @GetMapping("stats")
+    @GetMapping("/stats")
     public ResponseEntity<StatisticsDTO> getStats() {
 
-        return new ResponseEntity<>(ideaService.getStatistics(), HttpStatus.OK);
+        return new ResponseEntity<>(ideaService.getGeneralStatistics(), HttpStatus.OK);
 
     }
+
+
+    @GetMapping("/filtered-stats")
+    public ResponseEntity<FilteredStatisticsDTO> getFilteredStats(
+            @RequestParam(required = false) String selectedDateFrom,
+            @RequestParam(required = false) String selectedDateTo) {
+
+        return new ResponseEntity<>(ideaService.getStatisticsByDate(selectedDateFrom, selectedDateTo), HttpStatus.OK);
+    }
+
 }

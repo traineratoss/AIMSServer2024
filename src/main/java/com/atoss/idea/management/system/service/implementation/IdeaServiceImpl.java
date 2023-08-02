@@ -261,7 +261,19 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public StatisticsDTO getStatistics() {
+    public FilteredStatisticsDTO getStatisticsByDate(String selectedDateFrom, String selectedDateTo) {
+
+        FilteredStatisticsDTO filteredStatisticsDTO = new FilteredStatisticsDTO();
+
+        List<Idea> returnedIdeas = ideaRepositoryCustom.findIdeasByDate(selectedDateFrom, selectedDateTo);
+
+        filteredStatisticsDTO.setTotalIdeas(returnedIdeas.size());
+
+        return filteredStatisticsDTO;
+    }
+
+    @Override
+    public StatisticsDTO getGeneralStatistics() {
 
         StatisticsDTO statisticsDTO = new StatisticsDTO();
         statisticsDTO.setNrOfUsers(userRepository.count());

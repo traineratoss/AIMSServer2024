@@ -140,4 +140,58 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
 
         return null;
     }
+
+
+    @Override
+    public List<Idea> findIdeasByDate(String selectedDateFrom, String selectedDateTo) {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
+        Root<Idea> root = criteriaQuery.from(Idea.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (selectedDateFrom != null && selectedDateTo == null) {
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
+                predicates.add(cb.greaterThanOrEqualTo(root.get("creationDate"), fromDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (selectedDateFrom == null && selectedDateTo != null) {
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                predicates.add(cb.lessThanOrEqualTo(root.get("creationDate"), toDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (selectedDateFrom != null && selectedDateTo != null) {
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
+                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                predicates.add(cb.between(root.get("creationDate"), fromDate, toDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        List<Order> orders = new ArrayList<>();
+        orders.add(cb.asc(root.get("creationDate")));
+
+        criteriaQuery.orderBy(orders);
+        criteriaQuery.where(predicates.toArray(new Predicate[0]));
+        TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
+
+        List<Idea> allIdeas = query.getResultList();
+
+        return allIdeas;
+    }
+
 }

@@ -2,6 +2,9 @@ package com.atoss.idea.management.system.repository.dto;
 
 import lombok.Data;
 
+/**
+ * This DTO is used to return statistics about all ideas.
+ */
 @Data
 public class StatisticsDTO {
 

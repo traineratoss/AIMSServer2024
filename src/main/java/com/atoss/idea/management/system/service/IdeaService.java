@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.service;
 
+import com.atoss.idea.management.system.repository.dto.FilteredStatisticsDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaPageDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
@@ -33,5 +34,7 @@ public interface IdeaService {
                                  String username,
                                  Pageable pageable);
 
-    StatisticsDTO getStatistics();
+    StatisticsDTO getGeneralStatistics();
+
+    FilteredStatisticsDTO getStatisticsByDate(String selectedDateFrom, String selectedDateTo);
 }
