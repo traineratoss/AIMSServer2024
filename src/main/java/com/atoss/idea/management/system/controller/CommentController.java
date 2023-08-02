@@ -9,6 +9,7 @@ import com.atoss.idea.management.system.service.implementation.CommentServiceImp
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,20 +53,22 @@ public class CommentController {
                                                                  @RequestParam(required = true) int pageSize,
                                                                  @RequestParam(required = true) int pageNumber,
                                                                  @RequestParam(required = true) String sortCategory) {
-        return new ResponseEntity<>(commentService.getAllCommentsByIdeaIdWithPaging(ideaId,
-                PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory))), HttpStatus.OK);
-    }
 
-    @Transactional
-    @GetMapping("/comments/test")
-    public List<ResponseCommentDTO> getAllCommentsByIdeaId(@RequestParam(name = "ideaId") Long ideaId) {
-        return commentService.getAllCommentsByIdeaId(ideaId);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
+
+        return new ResponseEntity<>(commentService.getAllPagedCommentsByIdeaId(ideaId, pageable), HttpStatus.OK);
     }
 
     @Transactional
     @GetMapping("/comments/replies")
-    public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(@RequestParam(name = "commentId") Long commentId) {
-        return commentService.getAllRepliesByCommentId(commentId);
+    public ResponseEntity<Page<ResponseCommentReplyDTO>> getAllRepliesByCommentId(@RequestParam(name = "commentId") Long commentId,
+                                                                  @RequestParam(required = true) int pageSize,
+                                                                  @RequestParam(required = true) int pageNumber,
+                                                                  @RequestParam(required = true) String sortCategory) {
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
+
+        return new ResponseEntity<>(commentService.getAllRepliesByCommentId(commentId, pageable), HttpStatus.OK);
     }
 
     @Transactional

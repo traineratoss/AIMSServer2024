@@ -209,82 +209,57 @@ public class CommentServiceImpl implements CommentService {
         return responseCommentReplyDTO;
     }
 
-    @Override
-    public List<ResponseCommentDTO> getAllCommentsByIdeaId(Long ideaId) {
-        if (!ideaRepository.existsById(ideaId)) {
-            throw new IdeaNotFoundException();
-        }
-
-        List<ResponseCommentDTO> filteredList = commentRepository.findAllByIdeaId(ideaId).stream()
-                .map(comment -> {
-                    boolean hasReplies = comment.getReplies().size() > 0;
-                    ResponseCommentDTO responseCommentDTO = new ResponseCommentDTO();
-                    responseCommentDTO = modelMapper.map(comment, ResponseCommentDTO.class);
-                    responseCommentDTO.setHasReplies(hasReplies);
-                    return responseCommentDTO;
-                })
-                .collect(Collectors.toList());
-
-        return filteredList;
-    }
-
     @Transactional
     @Override
-    public List<ResponseCommentReplyDTO> getAllRepliesByCommentId(Long commentId) {
+    public Page<ResponseCommentReplyDTO> getAllRepliesByCommentId(Long commentId, Pageable pageable) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
 
-        List<ResponseCommentReplyDTO> filteredList = commentRepository.findById(commentId).get().getReplies().stream()
-                .map(reply -> {
-                    String username = reply.getUser().getUsername();
-                    ResponseCommentReplyDTO responseCommentReplyDTO = modelMapper.map(reply, ResponseCommentReplyDTO.class);
-                    responseCommentReplyDTO.setUsername(username);
-                    String time = getTimeForComment(reply.getId());
-                    responseCommentReplyDTO.setElapsedTime(time);
-                    return responseCommentReplyDTO;
-                })
-                .collect(Collectors.collectingAndThen(Collectors.toList(),
-                        list -> {
-                            Collections.reverse(list);
-                            return list; // Return the reversed list
-                        }));
+        List<ResponseCommentReplyDTO> replyList = commentRepository.findAllByParentId(commentId, pageable)
+                .getContent()
+                .stream()
+                .map(pagedReply -> {
+                    String username = pagedReply.getUser().getUsername();
+                    String time = getTimeForComment(pagedReply.getId());
 
-        return filteredList;
+                    ResponseCommentReplyDTO responseCommentReplyDTO = new ResponseCommentReplyDTO();
+                    responseCommentReplyDTO.setId(pagedReply.getId());
+                    responseCommentReplyDTO.setUsername(username);
+                    responseCommentReplyDTO.setCommentText(pagedReply.getCommentText());
+                    responseCommentReplyDTO.setElapsedTime(time);
+                    responseCommentReplyDTO.setParentId(commentId);
+                    return responseCommentReplyDTO;
+                }).toList();
+
+        return new PageImpl<>(replyList, pageable, replyList.size());
+
     }
 
     @Override
-    public Page<ResponseCommentDTO> getAllCommentsByIdeaIdWithPaging(Long ideaId, Pageable pageable) {
+    public Page<ResponseCommentDTO> getAllPagedCommentsByIdeaId(Long ideaId, Pageable pageable) {
+
         if (!ideaRepository.existsById(ideaId)) {
             throw new IdeaNotFoundException();
         }
-        // Dragos B.
-        // The original Comment entity stores a User object
-        // ResponseCommentDTO stores the username
-        // of their respective user (String)
-        // A direct conversion between the two is impossible
-        // My Workaround:
-        // - find and store the username in a local variable
-        // - map the comment to its corespondent response class
-        // - update the username for the new object
 
-        return new PageImpl<ResponseCommentDTO>(
-                commentRepository.findAll(pageable)
-                        .stream()
-                        .filter(comment -> comment.getIdea() != null)
-                        .filter(comment -> comment.getIdea().getId() == ideaId)
-                        .map(comment -> {
-                            String username = comment.getUser().getUsername();
-                            boolean hasReplies = comment.getReplies().size() > 0;
-                            String time = getTimeForComment(comment.getId());
-                            ResponseCommentDTO responseCommentDTO = modelMapper.map(comment, ResponseCommentDTO.class);
-                            responseCommentDTO.setUsername(username);
-                            responseCommentDTO.setElapsedTime(time);
-                            responseCommentDTO.setHasReplies(hasReplies);
-                            return responseCommentDTO;
-                        })
-                        .toList()
-        );
+        List<ResponseCommentDTO> commentList = commentRepository.findAllByIdeaId(ideaId, pageable)
+                .getContent()
+                .stream()
+                .map(pagedComment -> {
+                    String username = pagedComment.getUser().getUsername();
+                    boolean hasReplies = pagedComment.getReplies().size() > 0;
+                    String time = getTimeForComment(pagedComment.getId());
+
+                    ResponseCommentDTO responseCommentDTO = modelMapper.map(pagedComment, ResponseCommentDTO.class);
+
+                    responseCommentDTO.setUsername(username);
+                    responseCommentDTO.setElapsedTime(time);
+                    responseCommentDTO.setHasReplies(hasReplies);
+                    return responseCommentDTO;
+                }).toList();
+
+        return new PageImpl<>(commentList, pageable, commentList.size());
     }
 
     @Override

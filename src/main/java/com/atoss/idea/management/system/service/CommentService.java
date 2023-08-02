@@ -20,11 +20,9 @@ public interface CommentService {
 
     ResponseCommentReplyDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO);
 
-    List<ResponseCommentDTO> getAllCommentsByIdeaId(Long ideaId);
+    Page<ResponseCommentDTO> getAllPagedCommentsByIdeaId(Long ideaId, Pageable pageable);
 
-    Page<ResponseCommentDTO> getAllCommentsByIdeaIdWithPaging(Long ideaId, Pageable pageable);
-
-    List<ResponseCommentReplyDTO> getAllRepliesByCommentId(Long commentId);
+    Page<ResponseCommentReplyDTO> getAllRepliesByCommentId(Long commentId, Pageable pageable);
 
     void deleteComment(Long commentId);
 
