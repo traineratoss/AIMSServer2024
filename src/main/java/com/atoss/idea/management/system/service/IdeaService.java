@@ -34,9 +34,14 @@ public interface IdeaService {
                                  String username,
                                  Pageable pageable);
 
+    FilteredStatisticsDTO getStatisticsByDate(List<Status> statuses,
+                                              List<String> categories,
+                                              List<String> users,
+                                              String selectedDateFrom,
+                                              String selectedDateTo);
+
     StatisticsDTO getGeneralStatistics();
 
-    FilteredStatisticsDTO getStatisticsByDate(String selectedDateFrom, String selectedDateTo);
+    FilteredStatisticsDTO getFilteredStatistics(IdeaPageDTO ideaPageDTO);
 
-    StatisticsDTO getStatistics();
 }

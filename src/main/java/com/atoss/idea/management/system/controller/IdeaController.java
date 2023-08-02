@@ -159,10 +159,33 @@ public class IdeaController {
 
     @GetMapping("/filtered-stats")
     public ResponseEntity<FilteredStatisticsDTO> getFilteredStats(
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String user,
             @RequestParam(required = false) String selectedDateFrom,
             @RequestParam(required = false) String selectedDateTo) {
 
-        return new ResponseEntity<>(ideaService.getStatisticsByDate(selectedDateFrom, selectedDateTo), HttpStatus.OK);
+        List<String> categories = new ArrayList<>();
+        if (category != null && !category.isEmpty()) {
+            categories = Arrays.asList(category.split(","));
+        }
+
+        List<String> users = new ArrayList<>();
+        if (user != null && !user.isEmpty()) {
+            users = Arrays.asList(user.split(","));
+        }
+
+        List<String> statusStrings = new ArrayList<>();
+        if (status != null && !status.isEmpty()) {
+            statusStrings = Arrays.asList(status.split(","));
+        }
+        List<Status> statuses = statusStrings.stream().map(Status::valueOf).toList();
+
+        return new ResponseEntity<>(ideaService.getStatisticsByDate(statuses,
+                                                                    categories,
+                                                                    users,
+                                                                    selectedDateFrom,
+                                                                    selectedDateTo), HttpStatus.OK);
     }
 
 }

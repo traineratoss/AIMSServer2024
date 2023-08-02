@@ -295,17 +295,21 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
+    public FilteredStatisticsDTO getStatisticsByDate(List<Status> statuses,
+                                                     List<String> categories,
+                                                     List<String> users,
+                                                     String selectedDateFrom,
+                                                     String selectedDateTo) {
+
+        FilteredStatisticsDTO filteredStatisticsDTO = new FilteredStatisticsDTO();
+
+        return getFilteredStatistics(ideaRepositoryCustom.findIdeasByParameters(
+                null, null, statuses, categories, users, selectedDateFrom, selectedDateTo, null, null, null));
+
+    }
+
+    @Override
     public StatisticsDTO getGeneralStatistics() {
-        return null;
-    }
-
-    @Override
-    public FilteredStatisticsDTO getStatisticsByDate(String selectedDateFrom, String selectedDateTo) {
-        return null;
-    }
-
-    @Override
-    public StatisticsDTO getStatistics() {
 
         StatisticsDTO statisticsDTO = new StatisticsDTO();
         statisticsDTO.setNrOfUsers(userRepository.count());
@@ -318,6 +322,22 @@ public class IdeaServiceImpl implements IdeaService {
         statisticsDTO.setTotalNrOfReplies(ideaRepository.countAllReplies());
 
         return statisticsDTO;
+    }
+
+    @Override
+    public FilteredStatisticsDTO getFilteredStatistics(IdeaPageDTO ideaPageDTO) {
+
+        int count = 0;
+
+        for (Idea idea:ideaPageDTO.getPagedIdeas()) {
+            count++;
+        }
+
+        FilteredStatisticsDTO filteredStatisticsDTO = new FilteredStatisticsDTO();
+
+        filteredStatisticsDTO.setTotalIdeas(count);
+
+        return filteredStatisticsDTO;
     }
 }
 

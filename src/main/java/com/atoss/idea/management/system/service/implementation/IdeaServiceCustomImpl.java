@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
-public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
+public class IdeaServiceCustomImpl implements IdeaRepositoryCustom {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -41,66 +41,33 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
         Root<Idea> root = criteriaQuery.from(Idea.class);
 
-        List<Predicate> predicates = new ArrayList<>();
+        List<Predicate> predicatesList = new ArrayList<>();
 
         if (username != null) {
-            predicates.add(cb.equal(root.join("user").get("username"), username));
+            predicatesList.add(cb.equal(root.join("user").get("username"), username));
         }
 
         if (title != null) {
-            predicates.add(cb.like(root.get("title"), "%" + title + "%"));
+            predicatesList.add(cb.like(root.get("title"), "%" + title + "%"));
         }
 
         if (text != null) {
-            predicates.add(cb.like(root.get("text"), "%" + text + "%"));
+            predicatesList.add(cb.like(root.get("text"), "%" + text + "%"));
         }
 
         if (statuses != null && !statuses.isEmpty()) {
-            predicates.add(root.get("status").in(statuses));
+            predicatesList.add(root.get("status").in(statuses));
         }
 
         if (users != null && !users.isEmpty() && username == null) {
-            predicates.add(root.join("user").get("username").in(users));
+            predicatesList.add(root.join("user").get("username").in(users));
         }
 
         if (categories != null && !categories.isEmpty()) {
-            predicates.add(root.join("categoryList").get("text").in(categories));
+            predicatesList.add(root.join("categoryList").get("text").in(categories));
         }
 
-        // filtering by the from and to date
-
-        if (selectedDateFrom != null && selectedDateTo == null) {
-            try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
-                predicates.add(cb.greaterThanOrEqualTo(root.get("creationDate"), fromDate));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (selectedDateFrom == null && selectedDateTo != null) {
-            try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date toDate = simpleDateFormat.parse(selectedDateTo);
-                predicates.add(cb.lessThanOrEqualTo(root.get("creationDate"), toDate));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (selectedDateFrom != null && selectedDateTo != null) {
-            try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
-                Date toDate = simpleDateFormat.parse(selectedDateTo);
-                predicates.add(cb.between(root.get("creationDate"), fromDate, toDate));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        }
-
-        //sorting by date
+        predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb));
 
         List<Order> orders = new ArrayList<>();
 
@@ -111,25 +78,22 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
         }
 
         criteriaQuery.orderBy(orders);
-        criteriaQuery.where(predicates.toArray(new Predicate[0]));
+        criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
         TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
-
-        //getting total and paginating
 
         int total = query.getResultList().size();
 
         List<Idea> allIdeas = query.getResultList();
 
         if (pageable != null) {
-            int pageNumber = pageable.getPageNumber();
-            int pageSize = pageable.getPageSize();
-            int firstIndex = pageNumber * pageSize;
+
+            int firstIndex = pageable.getPageNumber() * pageable.getPageSize();
 
             List<Idea> pagedIdeas = new ArrayList<>();
-            for (int i = 0; i < pageSize; i++) {
+            for (int i = 0; i < pageable.getPageSize(); i++) {
                 if (firstIndex < allIdeas.size()) {
                     pagedIdeas.add(allIdeas.get(firstIndex));
-                    firstIndex = firstIndex + 1;
+                    firstIndex++;
                 }
             }
             IdeaPageDTO ideaPageDTO = new IdeaPageDTO();
@@ -138,24 +102,19 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
             return ideaPageDTO;
         }
 
-        return null;
+        return new IdeaPageDTO(total, new PageImpl<>(allIdeas, Pageable.unpaged(), total));
     }
 
-
     @Override
-    public List<Idea> findIdeasByDate(String selectedDateFrom, String selectedDateTo) {
+    public List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<Idea> root, CriteriaBuilder cb) {
 
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
-        Root<Idea> root = criteriaQuery.from(Idea.class);
-
-        List<Predicate> predicates = new ArrayList<>();
+        List<Predicate> predicatesList = new ArrayList<>();
 
         if (selectedDateFrom != null && selectedDateTo == null) {
             try {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date fromDate = simpleDateFormat.parse(selectedDateFrom);
-                predicates.add(cb.greaterThanOrEqualTo(root.get("creationDate"), fromDate));
+                predicatesList.add(cb.greaterThanOrEqualTo(root.get("creationDate"), fromDate));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -165,7 +124,7 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
             try {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date toDate = simpleDateFormat.parse(selectedDateTo);
-                predicates.add(cb.lessThanOrEqualTo(root.get("creationDate"), toDate));
+                predicatesList.add(cb.lessThanOrEqualTo(root.get("creationDate"), toDate));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -176,22 +135,14 @@ public class IdeaRepositoryCustomImpl implements IdeaRepositoryCustom {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Date fromDate = simpleDateFormat.parse(selectedDateFrom);
                 Date toDate = simpleDateFormat.parse(selectedDateTo);
-                predicates.add(cb.between(root.get("creationDate"), fromDate, toDate));
+                predicatesList.add(cb.between(root.get("creationDate"), fromDate, toDate));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
 
-        List<Order> orders = new ArrayList<>();
-        orders.add(cb.asc(root.get("creationDate")));
-
-        criteriaQuery.orderBy(orders);
-        criteriaQuery.where(predicates.toArray(new Predicate[0]));
-        TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
-
-        List<Idea> allIdeas = query.getResultList();
-
-        return allIdeas;
+        return predicatesList;
     }
+
 
 }
