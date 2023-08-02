@@ -82,8 +82,21 @@ public class UserController {
 
     @Transactional
     @GetMapping("/allByUsername")
-    public Page<UserResponseDTO> getAllUserByUsername(@RequestParam(name = "username") String username) {
-        return userService.getAllUsersByUsername(username);
+    public ResponseEntity<UserPageDTO> getAllUserByUsername(@RequestParam(required = true) int pageSize,
+                                                            @RequestParam(required = true) int pageNumber,
+                                                            @RequestParam(required = true) String sortCategory,
+                                                            @RequestParam(name = "username") String username) {
+        return new ResponseEntity<>(
+                userService.getAllUsersByUsernamePageable(
+                    PageRequest.of(
+                            pageNumber,
+                            pageSize,
+                            Sort.by(Sort.Direction.ASC, sortCategory)
+                    ),
+                    username
+                ),
+                HttpStatus.OK
+        );
     }
 
     @Transactional
