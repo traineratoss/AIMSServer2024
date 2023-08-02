@@ -13,5 +13,5 @@ import org.springframework.data.domain.Page;
 @NoArgsConstructor
 public class IdeaPageDTO {
     private int total;
-    private Page<Idea> pagedIdeas;
+    private Page<IdeaResponseDTO> pagedIdeas;
 }

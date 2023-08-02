@@ -5,11 +5,18 @@ import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.FieldValidationException;
 import com.atoss.idea.management.system.repository.CategoryRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
-import com.atoss.idea.management.system.repository.IdeaRepositoryCustom;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.*;
 import com.atoss.idea.management.system.service.IdeaService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Order;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -19,41 +26,40 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Log4j2
 public class IdeaServiceImpl implements IdeaService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private List<String> badWords = new ArrayList<>();
 
     private final IdeaRepository ideaRepository;
 
-    private final IdeaRepositoryCustom ideaRepositoryCustom;
-
     private final UserRepository userRepository;
 
     private final CategoryRepository categoryRepository;
-
-    private final CategoryServiceImpl categoryService;
 
     private final ModelMapper modelMapper;
 
     private final CommentServiceImpl commentServiceImpl;
 
     public IdeaServiceImpl(IdeaRepository ideaRepository,
-                           IdeaRepositoryCustom ideaRepositoryCustom,
                            UserRepository userRepository,
                            CategoryRepository categoryRepository,
-                           CategoryServiceImpl categoryService,
                            ModelMapper modelMapper,
                            CommentServiceImpl commentServiceImpl) {
         this.ideaRepository = ideaRepository;
-        this.ideaRepositoryCustom = ideaRepositoryCustom;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
-        this.categoryService = categoryService;
         this.modelMapper = modelMapper;
         this.commentServiceImpl = commentServiceImpl;
     }
@@ -278,20 +284,82 @@ public class IdeaServiceImpl implements IdeaService {
                                         String username,
                                         Pageable pageable) {
 
-        IdeaPageDTO ideaList = ideaRepositoryCustom.findIdeasByParameters(
-                title, text, statuses, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, pageable);
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
+        Root<Idea> root = criteriaQuery.from(Idea.class);
 
-        List<IdeaResponseDTO> result = ideaList.getPagedIdeas().stream()
-                .map(idea -> {
-                    IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
-                    responseDTO.setUsername(idea.getUser().getUsername());
-                    responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
-                    responseDTO.setCommentsNumber(idea.getCommentList().size());
-                    return responseDTO;
-                })
-                .toList();
+        List<Predicate> predicatesList = new ArrayList<>();
 
-        return new IdeaPageDTO(ideaList.getTotal(), new PageImpl(result, pageable, result.size()));
+        if (username != null) {
+            predicatesList.add(cb.equal(root.join("user").get("username"), username));
+        }
+
+        if (title != null) {
+            predicatesList.add(cb.like(root.get("title"), "%" + title + "%"));
+        }
+
+        if (text != null) {
+            predicatesList.add(cb.like(root.get("text"), "%" + text + "%"));
+        }
+
+        if (statuses != null && !statuses.isEmpty()) {
+            predicatesList.add(root.get("status").in(statuses));
+        }
+
+        if (users != null && !users.isEmpty() && username == null) {
+            predicatesList.add(root.join("user").get("username").in(users));
+        }
+
+        if (categories != null && !categories.isEmpty()) {
+            predicatesList.add(root.join("categoryList").get("text").in(categories));
+        }
+
+        predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb));
+
+        List<Order> orders = new ArrayList<>();
+
+        if (Objects.equals(sortDirection, "ASC")) {
+            orders.add(cb.asc(root.get("creationDate")));
+        } else {
+            orders.add(cb.desc(root.get("creationDate")));
+        }
+
+        criteriaQuery.orderBy(orders);
+        criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
+        TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
+
+        int total = query.getResultList().size();
+
+        List<Idea> allIdeas = query.getResultList();
+
+        List<IdeaResponseDTO> allIdeasDTO = new ArrayList<>();
+
+        allIdeasDTO = allIdeas.stream().map(idea -> {
+            IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
+            ideaResponseDTO.setUsername(idea.getUser().getUsername());
+            ideaResponseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
+            ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
+            return ideaResponseDTO;
+        }).toList();
+
+        if (pageable != null) {
+
+            int firstIndex = pageable.getPageNumber() * pageable.getPageSize();
+
+            List<IdeaResponseDTO> pagedIdeas = new ArrayList<>();
+            for (int i = 0; i < pageable.getPageSize(); i++) {
+                if (firstIndex < allIdeas.size()) {
+                    pagedIdeas.add(allIdeasDTO.get(firstIndex));
+                    firstIndex++;
+                }
+            }
+            IdeaPageDTO ideaPageDTO = new IdeaPageDTO();
+            ideaPageDTO.setPagedIdeas(new PageImpl<>(pagedIdeas, pageable, total));
+            ideaPageDTO.setTotal(total);
+            return ideaPageDTO;
+        }
+
+        return new IdeaPageDTO(total, new PageImpl<>(allIdeasDTO, Pageable.unpaged(), total));
     }
 
     @Override
@@ -303,7 +371,7 @@ public class IdeaServiceImpl implements IdeaService {
 
         FilteredStatisticsDTO filteredStatisticsDTO = new FilteredStatisticsDTO();
 
-        return getFilteredStatistics(ideaRepositoryCustom.findIdeasByParameters(
+        return getFilteredStatistics(filterIdeasByAll(
                 null, null, statuses, categories, users, selectedDateFrom, selectedDateTo, null, null, null));
 
     }
@@ -312,14 +380,25 @@ public class IdeaServiceImpl implements IdeaService {
     public StatisticsDTO getGeneralStatistics() {
 
         StatisticsDTO statisticsDTO = new StatisticsDTO();
-        statisticsDTO.setNrOfUsers(userRepository.count());
-        statisticsDTO.setNrOfIdeas(ideaRepository.count());
-        statisticsDTO.setIdeasPerUser(Math.round((double) ideaRepository.count() / (double) userRepository.count() * 100) / 100.00);
-        statisticsDTO.setImplementedIdeas(ideaRepository.countByStatus(Status.IMPLEMENTED));
-        statisticsDTO.setDraftIdeas(ideaRepository.countByStatus(Status.DRAFT));
-        statisticsDTO.setOpenIdeas(ideaRepository.countByStatus(Status.OPEN));
-        statisticsDTO.setTotalNrOfComments(ideaRepository.countComments());
-        statisticsDTO.setTotalNrOfReplies(ideaRepository.countAllReplies());
+
+        Long nrOfUsers = userRepository.count();
+        Long nrOfIdeas = ideaRepository.count();
+        Double ideasPerUser = Math.round((double) nrOfIdeas / (double) nrOfUsers * 100) / 100.00;
+        Long implIdeas = ideaRepository.countByStatus(Status.IMPLEMENTED);
+        Long draftedIdeas = ideaRepository.countByStatus(Status.DRAFT);
+        Long openIdeas = nrOfIdeas - draftedIdeas - implIdeas;
+        Long nrOfComments = ideaRepository.countComments();
+        Long nrOfReplies = ideaRepository.countAllReplies();
+
+
+        statisticsDTO.setNrOfUsers(nrOfUsers);
+        statisticsDTO.setNrOfIdeas(nrOfIdeas);
+        statisticsDTO.setIdeasPerUser(ideasPerUser);
+        statisticsDTO.setImplementedIdeas(implIdeas);
+        statisticsDTO.setDraftIdeas(draftedIdeas);
+        statisticsDTO.setOpenIdeas(openIdeas);
+        statisticsDTO.setTotalNrOfComments(nrOfComments);
+        statisticsDTO.setTotalNrOfReplies(nrOfReplies);
 
         return statisticsDTO;
     }
@@ -327,17 +406,53 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public FilteredStatisticsDTO getFilteredStatistics(IdeaPageDTO ideaPageDTO) {
 
-        int count = 0;
-
-        for (Idea idea:ideaPageDTO.getPagedIdeas()) {
-            count++;
-        }
+        List<Idea> ideaList = new ArrayList<>();
 
         FilteredStatisticsDTO filteredStatisticsDTO = new FilteredStatisticsDTO();
 
-        filteredStatisticsDTO.setTotalIdeas(count);
 
         return filteredStatisticsDTO;
     }
+
+    @Override
+    public List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<Idea> root, CriteriaBuilder cb) {
+
+        List<Predicate> predicatesList = new ArrayList<>();
+
+        if (selectedDateFrom != null && selectedDateTo == null) {
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
+                predicatesList.add(cb.greaterThanOrEqualTo(root.get("creationDate"), fromDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (selectedDateFrom == null && selectedDateTo != null) {
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                predicatesList.add(cb.lessThanOrEqualTo(root.get("creationDate"), toDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (selectedDateFrom != null && selectedDateTo != null) {
+            try {
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
+                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                predicatesList.add(cb.between(root.get("creationDate"), fromDate, toDate));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return predicatesList;
+    }
+
+
 }
 
