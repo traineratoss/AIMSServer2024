@@ -21,7 +21,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -33,6 +36,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @Service
 public class CommentServiceImpl implements CommentService {
+    private List<String> badWords = new ArrayList<>();
     private final CommentRepository commentRepository;
     private final IdeaRepository ideaRepository;
     private final UserRepository userRepository;
@@ -58,6 +62,8 @@ public class CommentServiceImpl implements CommentService {
             throw new CommentNotFoundException();
         }
     }
+
+
 
     @Override
     public String getElapsedTime(Date creationDate) {
@@ -118,6 +124,32 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    private String filterBadWords(String text) {
+        for (String word : badWords) {
+            text = text.replaceAll("(?i)" + word, "*".repeat(word.length()));
+        }
+        return text;
+    }
+
+    private void readBadWordsFromFile(String path) {
+        try {
+            FileReader fileReader = new FileReader(path);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line;
+
+            while ((line = bufferedReader.readLine()) != null) {
+                String word = line.trim();
+
+                badWords.add(word);
+            }
+
+            bufferedReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     @Transactional
     @Override
     public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) {
@@ -126,15 +158,17 @@ public class CommentServiceImpl implements CommentService {
 
         Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).get();
 
-        java.util.Date creationDate = new java.util.Date();
-
         Comment newComment =  new Comment();
+        readBadWordsFromFile("src/main/resources/textTerms/badWords.txt");
+        java.util.Date creationDate = new java.util.Date();
 
         newComment.setUser(user);
         newComment.setIdea(idea);
         newComment.setParent(null);
         newComment.setCommentText(requestCommentDTO.getCommentText());
         newComment.setCreationDate(creationDate);
+        String filteredCommentText = filterBadWords(newComment.getCommentText());
+        newComment.setCommentText(filteredCommentText);
 
         commentRepository.save(newComment);
 
@@ -164,6 +198,8 @@ public class CommentServiceImpl implements CommentService {
         newReply.setParent(commentRepository.findById(requestCommentReplyDTO.getParentId()).get());
         newReply.setCommentText(requestCommentReplyDTO.getCommentText());
         newReply.setCreationDate(creationDate);
+        String filteredCommentText = filterBadWords(newReply.getCommentText());
+        newReply.setCommentText(filteredCommentText);
 
         commentRepository.save(newReply);
 

@@ -37,4 +37,6 @@ public interface IdeaService {
     StatisticsDTO getGeneralStatistics();
 
     FilteredStatisticsDTO getStatisticsByDate(String selectedDateFrom, String selectedDateTo);
+
+    StatisticsDTO getStatistics();
 }
