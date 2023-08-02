@@ -189,10 +189,29 @@ public class IdeaServiceImpl implements IdeaService {
             }
 
             if (ideaUpdateDTO.getCategoryList() != null) {
-                idea.setCategoryList(new ArrayList<>());
-                for (CategoryDTO category:ideaUpdateDTO.getCategoryList()) {
-                    idea.getCategoryList().add(modelMapper.map(category, Category.class));
+
+                if (ideaUpdateDTO.getCategoryList().isEmpty()) {
+                    throw new RuntimeException("Please select at least one category");
                 }
+
+                idea.setCategoryList(new ArrayList<>());
+                List<Category> newList = new ArrayList<>();
+
+                for (CategoryDTO category: ideaUpdateDTO.getCategoryList()) {
+
+                    Category newCategory = categoryRepository.findByText(category.getText());
+                    if (newCategory == null) {
+                        Category addedCategory = new Category();
+                        addedCategory.setText(category.getText());
+                        categoryRepository.save(addedCategory);
+                        newList.add(addedCategory);
+                    } else {
+                        newList.add(newCategory);
+                    }
+
+                }
+
+                idea.setCategoryList(newList);
             }
 
             IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);

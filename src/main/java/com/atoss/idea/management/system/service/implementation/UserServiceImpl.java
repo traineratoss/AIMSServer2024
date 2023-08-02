@@ -143,14 +143,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserResponseDTO> getAllUsersByUsername(String username) {
-        return new PageImpl<>(
-                userRepository.findByUsernameStartsWith(username)
-                        .stream()
-                        .map(user -> modelMapper.map(user, UserResponseDTO.class))
-                        .toList()
-        );
+    public UserPageDTO getAllUsersByUsernamePageable(Pageable pageable, String username) {
+        UserPageDTO userPageDTO = new UserPageDTO();
+        userPageDTO.setTotal(userRepository.findByUsernameStartsWith(username, Pageable.unpaged()).getContent().size());
+        List<UserAdminDashboardResponseDTO> result = userRepository
+                .findByUsernameStartsWith(username, pageable)
+                .stream()
+                .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
+                .toList();
+        return new UserPageDTO(userPageDTO.getTotal(), new PageImpl(result, pageable, result.size()));
     }
+
+    //    @Override
+    //    public Page<UserAdminDashboardResponseDTO> getAllUsersByUsername(String username) {
+    //        List<UserAdminDashboardResponseDTO> list = userRepository
+    //                .findByUsernameStartsWith(username)
+    //                .stream()
+    //                .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
+    //                .toList();
+    //        System.out.println(list);
+    //        return new PageImpl<>(
+    //                userRepository.findByUsernameStartsWith(username)
+    //                        .stream()
+    //                        .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
+    //                        .toList()
+    //        );
+    //    }
 
     @Override
     public Page<UserResponseDTO> getAllPendingUsers(boolean isActive, Pageable pageable) {

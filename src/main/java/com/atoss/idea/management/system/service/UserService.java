@@ -20,7 +20,9 @@ public interface UserService {
 
     Page<UserResponseDTO> getAllUsers(Pageable pageable);
 
-    Page<UserResponseDTO> getAllUsersByUsername(String username);
+    UserPageDTO getAllUsersByUsernamePageable(Pageable pageable, String username);
+
+    //    Page<UserAdminDashboardResponseDTO> getAllUsersByUsername(String username);
 
     Page<UserResponseDTO> getAllPendingUsers(boolean isActive, Pageable pageable);
 
