@@ -1,6 +1,5 @@
 package com.atoss.idea.management.system.repository.dto;
 
-import com.atoss.idea.management.system.repository.entity.Category;
 import com.atoss.idea.management.system.repository.entity.Image;
 import com.atoss.idea.management.system.repository.entity.Status;
 
@@ -9,7 +8,7 @@ import java.util.List;
 public class IdeaUpdateDTO {
     private String title;
     private Status status;
-    private List<Category> categoryList;
+    private List<CategoryDTO> categoryList;
     private Image image;
     private String text;
 
@@ -29,11 +28,11 @@ public class IdeaUpdateDTO {
         this.status = status;
     }
 
-    public List<Category> getCategoryList() {
+    public List<CategoryDTO> getCategoryList() {
         return categoryList;
     }
 
-    public void setCategoryList(List<Category> categoryList) {
+    public void setCategoryList(List<CategoryDTO> categoryList) {
         this.categoryList = categoryList;
     }
 

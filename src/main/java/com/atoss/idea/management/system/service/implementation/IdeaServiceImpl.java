@@ -150,8 +150,8 @@ public class IdeaServiceImpl implements IdeaService {
 
             if (ideaUpdateDTO.getCategoryList() != null) {
                 idea.setCategoryList(new ArrayList<>());
-                for (Category category:ideaUpdateDTO.getCategoryList()) {
-                    idea.getCategoryList().add(category);
+                for (CategoryDTO category:ideaUpdateDTO.getCategoryList()) {
+                    idea.getCategoryList().add(modelMapper.map(category, Category.class));
                 }
             }
 

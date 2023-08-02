@@ -13,7 +13,7 @@ public class IdeaRequestDTO {
 
     private Status status;
 
-    private List<CategoryDTO> categoryList; //BIG PROBLEM HERE!!!!!!!!!!!!!!!! DON'T EDIT
+    private List<CategoryDTO> categoryList;
 
     private ImageDTO image;
 
