@@ -206,11 +206,13 @@ public class UserServiceImpl implements UserService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             if (user.getIsActive() && password.equals(user.getPassword())) {
-                UserSecurityDTO userSecurityDTO = modelMapper.map(
+                return modelMapper.map(
                         user,
                         UserSecurityDTO.class
                 );
-                return userSecurityDTO;
+            }
+            if (!user.getIsActive() && password.equals(user.getPassword())) {
+                throw new UserAlreadyDeactivatedException("User was deactivated");
             }
         }
         throw new BadCredentialsException("Bad credentials");

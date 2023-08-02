@@ -130,8 +130,8 @@ public class UserController {
 
     @PostMapping("/login")
     public UserSecurityDTO login(@RequestParam(name = "username") String username,
-                                                         @RequestBody String password) {
-        return userService.login(username, password);
+                                                         @RequestBody String hashPassword) {
+        return userService.login(username, hashPassword);
     }
 
     @Transactional
