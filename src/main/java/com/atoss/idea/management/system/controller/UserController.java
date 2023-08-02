@@ -118,8 +118,8 @@ public class UserController {
 
     @Transactional
     @PostMapping("/send-approve-email")
-    public void sendApproveEmail(@RequestBody String username) {
-        userService.sendApproveEmail(username);
+    public ResponseEntity<Object> sendApproveEmail(@RequestBody String username) {
+        return userService.sendApproveEmail(username);
     }
 
     @Transactional

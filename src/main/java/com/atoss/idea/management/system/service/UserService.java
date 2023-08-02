@@ -26,7 +26,7 @@ public interface UserService {
 
     boolean changePassword(ChangePasswordDTO changePasswordDTO);
 
-    void sendApproveEmail(String username);
+    ResponseEntity<Object> sendApproveEmail(String username);
 
     ResponseEntity<Object> sendDeclineEmail(String user);
 

@@ -178,20 +178,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void sendApproveEmail(String username) {
-        sendEmailService.sendApproveEmailToUser(username);
+    public ResponseEntity<Object> sendApproveEmail(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found exception"));
+        if (!user.getHasPassword()) {
+            sendEmailService.sendApproveEmailToUser(username);
+            return new ResponseEntity<>("User approve successfully", HttpStatus.OK);
+        }
+        throw new ApproveAlreadyGrantedException("Approve already granted exception");
     }
 
     @Override
     public ResponseEntity<Object> sendDeclineEmail(String username) {
-        if (userRepository.findByUsername(username).isPresent()) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found exception"));
+        if (!user.getHasPassword()) {
             sendEmailService.sendDeclineEmailToUser(username);
             if (deleteUser(username)) {
                 return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
             }
             throw new UserStatusIsActiveException("User status is active");
         }
-        throw new UserNotFoundException("User not found!");
+        throw new ApproveAlreadyGrantedException("Approve already granted exception");
     }
 
     @Override
@@ -231,17 +237,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<Object> sendDeactivateEmail(String username) {
-        if (sendEmailService.sendDeactivateEmailToUser(username)) {
-            return new ResponseEntity<>("Email send", HttpStatus.OK);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!"));
+        if (user.getIsActive()) {
+            if (sendEmailService.sendDeactivateEmailToUser(username)) {
+                return new ResponseEntity<>("Email send", HttpStatus.OK);
+            }
+            throw new EmailFailedException("Sending email failed");
         }
-        throw new EmailFailedException("Sending email failed");
+        throw new UserAlreadyDeactivatedException("User already deactivate exception");
     }
 
     @Override
     public ResponseEntity<Object> sendActivateEmail(String username) {
-        if (sendEmailService.sendActivateEmailToUser(username)) {
-            return new ResponseEntity<>("Email send", HttpStatus.OK);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!"));
+        if (!user.getIsActive()) {
+            if (sendEmailService.sendActivateEmailToUser(username)) {
+                return new ResponseEntity<>("Email send", HttpStatus.OK);
+            }
+            throw new EmailFailedException("Sending email failed");
         }
-        throw new EmailFailedException("Sending email failed");
+        throw new UserAlreadyActivatedException("User already activate exception");
     }
 }

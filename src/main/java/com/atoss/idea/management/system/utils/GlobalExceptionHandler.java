@@ -87,4 +87,22 @@ public class GlobalExceptionHandler {
     public ResponseEntity<UserStatusIsActiveException> userStatusIsActiveException(UserStatusIsActiveException userStatusIsActiveException) {
         return new ResponseEntity<>(userStatusIsActiveException, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = ApproveAlreadyGrantedException.class)
+    public ResponseEntity<ApproveAlreadyGrantedException> approveAlreadyGrantedException(
+            ApproveAlreadyGrantedException approveAlreadyGrantedException) {
+        return new ResponseEntity<>(approveAlreadyGrantedException, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = UserAlreadyDeactivatedException.class)
+    public ResponseEntity<UserAlreadyDeactivatedException> userAlreadyDeactivateException(
+            UserAlreadyDeactivatedException userAlreadyDeactivatedException) {
+        return new ResponseEntity<>(userAlreadyDeactivatedException, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = UserAlreadyActivatedException.class)
+    public ResponseEntity<UserAlreadyActivatedException> userAlreadyActivatedException(
+            UserAlreadyActivatedException userAlreadyActivatedException) {
+        return new ResponseEntity<>(userAlreadyActivatedException, HttpStatus.BAD_REQUEST);
+    }
 }
