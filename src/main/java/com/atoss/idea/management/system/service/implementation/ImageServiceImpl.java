@@ -6,7 +6,6 @@ import com.atoss.idea.management.system.repository.dto.ImageDTO;
 import com.atoss.idea.management.system.repository.entity.Image;
 import com.atoss.idea.management.system.service.ImageService;
 import jakarta.transaction.Transactional;
-import jakarta.websocket.OnError;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -21,6 +20,12 @@ public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
     private final ModelMapper modelMapper;
 
+    /**
+     * Constructor
+     *
+     * @param imageRepository accessing CRUD Repository for Image Entity
+     * @param modelMapper mapping Entity-DTO relationship
+     */
     public  ImageServiceImpl(ImageRepository imageRepository, ModelMapper modelMapper) {
         this.imageRepository = imageRepository;
         this.modelMapper = modelMapper;
@@ -43,6 +48,7 @@ public class ImageServiceImpl implements ImageService {
             throw new ImageNotFoundException();
         }
     }
+
     @Override
     public List<ImageDTO> getAllImage() {
         return Arrays.asList(modelMapper.map(imageRepository.findAll(), ImageDTO[].class));
