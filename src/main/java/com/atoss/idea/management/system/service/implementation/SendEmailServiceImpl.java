@@ -36,6 +36,17 @@ public class SendEmailServiceImpl implements SendEmailService {
     private String bcryptSalt;
     private final String companyName = "Company Name ";
 
+    /**
+     * Constructs a new instance of the SendEmailServiceImpl.
+     *
+     * This constructor initializes the SendEmailServiceImpl with the required dependencies, including
+     * the UserRepository for accessing user data, the AvatarRepository for accessing avatar data, and
+     * the JavaMailSender for sending emails.
+     *
+     * @param userRepository  The UserRepository instance for accessing user data.
+     * @param avatarRepository The AvatarRepository instance for accessing avatar data.
+     * @param emailSender      The JavaMailSender instance for sending emails.
+     */
     public SendEmailServiceImpl(UserRepository userRepository, AvatarRepository avatarRepository, JavaMailSender emailSender) {
         this.userRepository = userRepository;
         this.avatarRepository = avatarRepository;
@@ -122,16 +133,49 @@ public class SendEmailServiceImpl implements SendEmailService {
         userRepository.save(user);
     }
 
+    /**
+     * Retrieves a user from the repository based on the provided username.
+     *
+     * This method fetches a user from the user repository using the given username. If the user does not exist,
+     * a RuntimeException is thrown.
+     *
+     * @param username The username of the user to retrieve.
+     * @return The User object corresponding to the given username.
+     * @throws RuntimeException If the user does not exist in the repository.
+     */
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User does not exist!"));
     }
 
+    /**
+     * Sends an email to all administrators with the provided subject and text.
+     *
+     * This method fetches a list of users with the role "ADMIN" from the user repository. It then iterates through
+     * the list and sends an email to each administrator with the given subject and text content using the `sendEmail()`
+     * method.
+     *
+     * @param subject The subject of the email to be sent to all administrators.
+     * @param text    The text content of the email to be sent to all administrators.
+     * @throws RuntimeException If there are any issues during the email sending process.
+     */
     private void sendToAllAdmin(String subject, String text) {
         List<User> adminList = userRepository.findUserByRole(Role.ADMIN);
         adminList.forEach(admin -> sendEmail(admin.getEmail(), subject, text));
     }
 
+    /**
+     * Sends an email to the provided recipient email address with the given subject and text content.
+     *
+     * This method uses the JavaMail API to send an email to the specified email address with the given subject and
+     * text content. The email is sent using the emailSender object, and if any errors occur during the email sending
+     * process, a RuntimeException is thrown.
+     *
+     * @param emailTo The recipient email address to send the email to.
+     * @param subject The subject of the email.
+     * @param text    The text content of the email.
+     * @throws RuntimeException If there are any issues during the email sending process.
+     */
     private void sendEmail(String emailTo, String subject, String text) {
         try {
             MimeMessage message = emailSender.createMimeMessage();
@@ -150,6 +194,17 @@ public class SendEmailServiceImpl implements SendEmailService {
         }
     }
 
+    /**
+     * Generates the email content for account activation.
+     *
+     * This method creates an email text welcoming the user to the application and providing the necessary information
+     * for account activation. It includes the username, the generated password, and the company name in the email.
+     *
+     * @param username The username of the user to be addressed in the email.
+     * @param password The generated password for the user's account activation.
+     * @param emailTo  The email address of the user to whom the email will be sent.
+     * @return The email content for account activation.
+     */
     private String getEmailTextForActivation(String username, String password, String emailTo) {
         return "Dear "
                 + username
@@ -166,6 +221,15 @@ public class SendEmailServiceImpl implements SendEmailService {
                 + "Team";
     }
 
+    /**
+     * Generates the email content for a registration rejection.
+     *
+     * This method creates an email text notifying the user that their registration request has been rejected. It includes
+     * the username and the company name in the email.
+     *
+     * @param username The username of the user to be addressed in the email.
+     * @return The email content for registration rejection.
+     */
     private String getEmailTextForRegistrationRejected(String username) {
         return "Dear "
                 + username
@@ -180,6 +244,15 @@ public class SendEmailServiceImpl implements SendEmailService {
                 + "Team";
     }
 
+    /**
+     * Generates the email content for account deactivation.
+     *
+     * This method creates an email text informing the user that their account has been deactivated. It includes the username,
+     * the company name, and the deactivation date in the email.
+     *
+     * @param username The username of the user to be addressed in the email.
+     * @return The email content for account deactivation.
+     */
     private String getEmailTextForAccountDeactivation(String username) {
         Date date = new Date();
         return "Dear "
@@ -200,6 +273,17 @@ public class SendEmailServiceImpl implements SendEmailService {
                 + companyName;
     }
 
+    /**
+     * Generates the email content for account reactivation.
+     *
+     * This method creates an email text informing the user that their account has been reactivated. It includes the username,
+     * the company name, the reactivation date, and the newly generated password (if applicable) in the email.
+     *
+     * @param username The username of the user to be addressed in the email.
+     * @param password The newly generated password for the user's account reactivation.
+     * @param emailTo  The email address of the user to whom the email will be sent.
+     * @return The email content for account reactivation.
+     */
     private String getEmailTextForAccountReactivation(String username, String password, String emailTo) {
         Date date = new Date();
         return "Dear "
@@ -227,6 +311,16 @@ public class SendEmailServiceImpl implements SendEmailService {
                 + companyName;
     }
 
+    /**
+     * Generates the email content for login request notification to administrators.
+     *
+     * This method creates an email text notifying the administrators about a login request from a user. It includes the
+     * username, the user's email address, and the date and time of the login request in the email.
+     *
+     * @param username The username of the user who initiated the login request.
+     * @param emailTo  The email address of the user who initiated the login request.
+     * @return The email content for login request notification to administrators.
+     */
     private String getEmailTextForLoginRequest(String username, String emailTo) {
         Date date = new Date();
         return  "Dear "
@@ -242,6 +336,16 @@ public class SendEmailServiceImpl implements SendEmailService {
                 + "\nIf you confirm the request, please provide us with your approval to proceed with sending the password.";
     }
 
+    /**
+     * Generates the email content for login request notification to the user.
+     *
+     * This method creates an email text notifying the user about their login request recorded in the system. It includes
+     * the username, the user's email address, and the date and time of the login request in the email.
+     *
+     * @param username The username of the user who initiated the login request.
+     * @param emailTo  The email address of the user who initiated the login request.
+     * @return The email content for login request notification to the user.
+     */
     private String getEmailTextForLoginRequestForUser(String username, String emailTo) {
         Date date = new Date();
         return  "Dear "
@@ -256,6 +360,17 @@ public class SendEmailServiceImpl implements SendEmailService {
                 + formatter.format(date);
     }
 
+    /**
+     * Generates the email content for a password reset request.
+     *
+     * This method creates an email text providing instructions to the user for resetting their account password. It includes
+     * the username, the company name, a link to the login page, the temporary password, and some guidelines for setting
+     * a new password.
+     *
+     * @param username The username of the user who requested the password reset.
+     * @param password The temporary password provided for the password reset.
+     * @return The email content for the password reset request.
+     */
     private String getEmailTextForPasswordReset(String username, String password) {
         String link = "http://127.0.0.1:5173/login";
         return "Dear "
