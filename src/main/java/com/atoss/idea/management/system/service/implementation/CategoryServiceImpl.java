@@ -23,7 +23,7 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
     }
-
+    
     @Override
     public CategoryDTO addCategory(CategoryDTO categoryDTO) {
 
@@ -55,6 +55,5 @@ public class CategoryServiceImpl implements CategoryService {
         } else {
             throw new CategoryNotFoundException("No categories found.");
         }
-
     }
 }
