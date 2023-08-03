@@ -10,6 +10,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class AtossIdeaManagementSystemApplication {
+
+	/**
+	 * The main method to start the AtossIdeaManagementSystemApplication.
+	 *
+	 * @param args The command-line arguments passed to the application.
+	 *
+	 * @see SpringApplication
+	 * @see AtossIdeaManagementSystemApplication
+	 */
 	public static void main(String[] args) {
 		SpringApplication.run(AtossIdeaManagementSystemApplication.class, args);
 	}
