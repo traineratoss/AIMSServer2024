@@ -67,6 +67,14 @@ public class User {
     @JsonManagedReference(value = "user-comments")
     private List<Comment> comments;
 
+    /**
+     * Constructor for creating a User object with the provided username and email.
+     *
+     * @param username The username of the user to be created.
+     * @param email    The email address of the user to be created.
+     *
+     * @see User
+     */
     public User(String username, String email) {
         this.username = username;
         this.email = email;
