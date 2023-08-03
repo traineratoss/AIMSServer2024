@@ -6,6 +6,7 @@ import com.atoss.idea.management.system.repository.dto.ImageDTO;
 import com.atoss.idea.management.system.repository.entity.Image;
 import com.atoss.idea.management.system.service.ImageService;
 import jakarta.transaction.Transactional;
+import jakarta.websocket.OnError;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -25,6 +26,7 @@ public class ImageServiceImpl implements ImageService {
         this.modelMapper = modelMapper;
     }
 
+    @Override
     public ImageDTO addImage(MultipartFile file) throws IOException {
 
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
@@ -33,6 +35,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Transactional
+    @Override
     public ImageDTO getImage(Long id) throws ImageNotFoundException {
         if (imageRepository.findById(id).isPresent()) {
             return modelMapper.map(imageRepository.findById(id).get(), ImageDTO.class);
@@ -40,7 +43,7 @@ public class ImageServiceImpl implements ImageService {
             throw new ImageNotFoundException();
         }
     }
-
+    @Override
     public List<ImageDTO> getAllImage() {
         return Arrays.asList(modelMapper.map(imageRepository.findAll(), ImageDTO[].class));
     }

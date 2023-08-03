@@ -5,15 +5,8 @@ import com.atoss.idea.management.system.repository.dto.ImageDTO;
 import com.atoss.idea.management.system.service.implementation.ImageServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
-
 
 
 import java.io.IOException;
@@ -21,7 +14,8 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/images")
+@RequestMapping("/aims/api/v1/images")
+
 public class ImageController {
     private final ImageServiceImpl imageService;
 
@@ -31,7 +25,7 @@ public class ImageController {
     }
 
     @PostMapping("/addImage")
-    public ImageDTO addImage(@RequestParam("file") MultipartFile file) throws IOException {
+    public ImageDTO addImage(@RequestBody MultipartFile file) throws IOException {
         return imageService.addImage(file);
 
     }
