@@ -19,11 +19,16 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper  modelMapper;
 
+    /**
+     * Constructor
+     * @param categoryRepository accessing CRUD Repository for Category Entity
+     * @param modelMapper mapping Entity-DTO relationship
+     */
     public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper) {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
     }
-    
+
     @Override
     public CategoryDTO addCategory(CategoryDTO categoryDTO) {
 
