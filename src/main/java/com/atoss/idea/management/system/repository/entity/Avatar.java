@@ -36,6 +36,14 @@ public class Avatar {
     @Column(name = "file_name")
     private String fileName;
 
+    /**
+     * Constructs a new Avatar instance with the specified file name and data.
+     *
+     * This constructor initializes an Avatar object with the provided file name and binary data.
+     *
+     * @param fileName The name of the avatar file.
+     * @param data     The binary data representing the avatar image.
+     */
     public Avatar(String fileName, byte[] data) {
         this.fileName = fileName;
         this.data = data;

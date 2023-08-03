@@ -19,6 +19,14 @@ public class AvatarController {
         this.avatarService = avatarService;
     }
 
+    /**
+     * Retrieves a list of all avatars and returns them as a ResponseEntity with HTTP status 200 (OK).
+     *
+     * This controller method calls the `getAllAvatars()` method of the AvatarService to fetch a list of all avatars.
+     * It then wraps the list in a ResponseEntity and sets the HTTP status code to 200 (OK).
+     *
+     * @return A ResponseEntity containing a list of AvatarDTO objects representing all avatars in the system.
+     */
     @GetMapping("/all")
     public ResponseEntity<List<AvatarDTO>> getAllAvatars() {
         return new ResponseEntity<>(avatarService.getAllAvatars(), HttpStatus.OK);
