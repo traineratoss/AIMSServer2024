@@ -38,6 +38,13 @@ public class Image {
     private String fileName;
     private String fileType;
 
+    /**
+     * Constructor
+     *
+     * @param fileName the name of the file.
+     * @param fileType the file format of the file.
+     * @param image the byte array of the image data.
+     */
     public Image(String fileName, String fileType, byte[] image) {
         this.fileName = fileName;
         this.fileType = fileType;

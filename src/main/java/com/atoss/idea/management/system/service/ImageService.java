@@ -25,13 +25,13 @@ public interface ImageService {
      * @throws ImageNotFoundException if the image we want to get doesn't exist into the database
      *                                it will throw an exception.
      */
-     ImageDTO getImage(Long id) throws ImageNotFoundException;
+    ImageDTO getImage(Long id) throws ImageNotFoundException;
 
     /**
      * Gets all the images from the database.
      *
      * @return it returns a list of images.
-     */
+     * */
     List<ImageDTO> getAllImage();
 
 }
