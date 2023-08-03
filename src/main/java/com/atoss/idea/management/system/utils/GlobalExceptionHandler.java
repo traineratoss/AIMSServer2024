@@ -196,15 +196,15 @@ public class GlobalExceptionHandler {
     /**
      * user has an activated account
      *
-     * @see UserStatusIsActiveException
-     * @param userStatusIsActiveException - necessary if we need to deactivate
+     * @see UserAlreadyActivatedException
+     * @param userAlreadyActivatedException - necessary if we need to deactivate
      *                                    user that is already active
      * @return ResponseEntity - error
      */
 
-    @ExceptionHandler(value = UserStatusIsActiveException.class)
-    public ResponseEntity<UserStatusIsActiveException> userStatusIsActiveException(UserStatusIsActiveException userStatusIsActiveException) {
-        return new ResponseEntity<>(userStatusIsActiveException, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(value = UserAlreadyActivatedException.class)
+    public ResponseEntity<UserAlreadyActivatedException> userStatusIsActiveException(UserAlreadyActivatedException userAlreadyActivatedException) {
+        return new ResponseEntity<>(userAlreadyActivatedException, HttpStatus.BAD_REQUEST);
     }
 
     /**
