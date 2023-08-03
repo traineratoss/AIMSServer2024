@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.UnsupportedEncodingException;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/aims/api/v1/ideas")
@@ -43,7 +45,7 @@ public class CommentController {
     @Transactional
     @PostMapping("/comments")
     @ResponseBody
-    public ResponseEntity<ResponseCommentDTO> addComment(@RequestBody RequestCommentDTO newComment) {
+    public ResponseEntity<ResponseCommentDTO> addComment(@RequestBody RequestCommentDTO newComment) throws UnsupportedEncodingException {
 
         ResponseCommentDTO responseCommentDTO = commentService.addComment(newComment);
 

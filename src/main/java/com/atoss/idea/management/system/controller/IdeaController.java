@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +55,7 @@ public class IdeaController {
     @PostMapping("/create")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> addIdea(@RequestBody IdeaRequestDTO idea,
-                                                   @RequestParam String username) {
+                                                   @RequestParam String username) throws UnsupportedEncodingException {
         return new ResponseEntity<>(ideaService.addIdea(idea, username), HttpStatus.OK);
     }
 
@@ -80,7 +81,7 @@ public class IdeaController {
     @PatchMapping("/update")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> updateIdeaById(@RequestParam(required = true) Long id,
-                                                          @RequestBody IdeaUpdateDTO ideaUpdateDTO) {
+                                                          @RequestBody IdeaUpdateDTO ideaUpdateDTO) throws UnsupportedEncodingException {
         return new ResponseEntity<>(ideaService.updateIdeaById(id, ideaUpdateDTO), HttpStatus.OK);
     }
 
