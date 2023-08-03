@@ -235,7 +235,6 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public void deleteIdeaById(Long id) {
-
         if (ideaRepository.existsById(id)) {
             ideaRepository.deleteById(id);
         } else {
@@ -376,7 +375,7 @@ public class IdeaServiceImpl implements IdeaService {
 
             List<IdeaResponseDTO> pagedIdeas = new ArrayList<>();
             for (int i = 0; i < pageable.getPageSize(); i++) {
-                if (firstIndex < allIdeas.size()) {
+                if (firstIndex < pageable.getPageSize()) {
                     pagedIdeas.add(allIdeasDTO.get(firstIndex));
                     firstIndex++;
                 }
@@ -449,8 +448,8 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (selectedDateFrom != null && selectedDateTo == null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom + " 00:00:00");
                 predicatesList.add(cb.greaterThanOrEqualTo(root.get("creationDate"), fromDate));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -459,8 +458,8 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (selectedDateFrom == null && selectedDateTo != null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date toDate = simpleDateFormat.parse(selectedDateTo+" 23:59:59");
                 predicatesList.add(cb.lessThanOrEqualTo(root.get("creationDate"), toDate));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -469,9 +468,9 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (selectedDateFrom != null && selectedDateTo != null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
-                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom+ " 00:00:00");
+                Date toDate = simpleDateFormat.parse(selectedDateTo+ " 23:59:59");
                 predicatesList.add(cb.between(root.get("creationDate"), fromDate, toDate));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -480,6 +479,7 @@ public class IdeaServiceImpl implements IdeaService {
 
         return predicatesList;
     }
+
 
 
 }
