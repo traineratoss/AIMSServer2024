@@ -21,17 +21,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -42,6 +41,14 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
+    /**
+     * CONSTRUCTOR
+     *
+     * @param commentRepository needed
+     * @param ideaRepository  needed
+     * @param userRepository needed
+     * @param modelMapper needed
+     */
     public CommentServiceImpl(CommentRepository commentRepository, IdeaRepository ideaRepository,
                               UserRepository userRepository, ModelMapper modelMapper) {
         this.commentRepository = commentRepository;
@@ -62,8 +69,6 @@ public class CommentServiceImpl implements CommentService {
             throw new CommentNotFoundException();
         }
     }
-
-
 
     @Override
     public String getElapsedTime(Date creationDate) {
@@ -124,6 +129,12 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    /**
+     * Replaces bad word from a String. A bad word is any word found in a certain file stored in the project.
+     *
+     * @param text the string we want to format
+     * @return filteredText the updated text
+     */
     private String filterBadWords(String text) {
         for (String word : badWords) {
             text = text.replaceAll("(?i)" + word, "*".repeat(word.length()));
@@ -131,6 +142,12 @@ public class CommentServiceImpl implements CommentService {
         return text;
     }
 
+    /**
+     * Opens and reads String values containing bad words from a certain file path
+     *
+     * @param path the path to the file
+     * @throws IOException when the path for the input file is not found
+     */
     private void readBadWordsFromFile(String path) {
         try {
             FileReader fileReader = new FileReader(path);
@@ -149,14 +166,13 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-
     @Transactional
     @Override
     public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) {
 
         User user = userRepository.findByUsername(requestCommentDTO.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found!"));
 
-        Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).get();
+        Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
 
         Comment newComment =  new Comment();
         readBadWordsFromFile("src/main/resources/textTerms/badWords.txt");
