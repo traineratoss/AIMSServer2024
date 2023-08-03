@@ -43,7 +43,6 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * CONSTRUCTOR
-     *
      * @param commentRepository needed
      * @param ideaRepository  needed
      * @param userRepository needed
