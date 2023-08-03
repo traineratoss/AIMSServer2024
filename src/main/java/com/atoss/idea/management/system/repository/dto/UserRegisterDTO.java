@@ -25,6 +25,17 @@ public class UserRegisterDTO implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
+    /**
+     * Constructor for the UserRegisterDTO class.
+     *
+     * @param id          The unique identifier of the user.
+     * @param username    The username of the user.
+     * @param email       The email address of the user.
+     * @param password    The password of the user.
+     * @param authorities The collection of authorities (roles) assigned to the user.
+     *
+     * @see GrantedAuthority
+     */
     public UserRegisterDTO(Long id, String username, String email, String password,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
@@ -34,6 +45,18 @@ public class UserRegisterDTO implements UserDetails {
         this.authorities = authorities;
     }
 
+    /**
+     * Static method to build a UserRegisterDTO object from a User entity.
+     *
+     * @param user The User entity containing user-specific data.
+     *
+     * @return A UserRegisterDTO object representing user details extracted from the User entity.
+     *
+     * @see User
+     * @see Role
+     * @see SimpleGrantedAuthority
+     * @see GrantedAuthority
+     */
     public static UserRegisterDTO build(User user) {
         List<GrantedAuthority> authorities = Arrays.asList(Role.STANDARD, Role.ADMIN)
                 .stream()

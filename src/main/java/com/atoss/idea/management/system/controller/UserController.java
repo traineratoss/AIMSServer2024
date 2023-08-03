@@ -316,7 +316,7 @@ public class UserController {
     /**
      * Deletes the user
      * @param username the username of the user which will be deleted
-     * @return ResponseEntity<Boolean> with delete result and OK HTTP status
+     * @return ResponseEntity with delete result and OK HTTP status
      * @throws UserNotFoundException if the user specified by username is not found
      */
     @Transactional
