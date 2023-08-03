@@ -10,6 +10,21 @@ import jakarta.servlet.http.Cookie;
 
 public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
+    /**
+     * Called when a user successfully authenticates during the login process.
+     *
+     * @param request        The HttpServletRequest object representing the incoming request.
+     * @param response       The HttpServletResponse object representing the response to be sent to the client.
+     * @param authentication The Authentication object representing the user's authentication details.
+     *
+     * @throws IOException   If an input or output exception occurs during the processing of the request or response.
+     * @throws ServletException If a general servlet exception occurs during the processing of the request or response.
+     *
+     * @see HttpServletRequest
+     * @see HttpServletResponse
+     * @see Authentication
+     * @see Cookie
+     */
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,

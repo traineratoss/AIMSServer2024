@@ -14,6 +14,23 @@ import java.io.IOException;
 @Log4j2
 public class AuthTokenFilter extends OncePerRequestFilter {
 
+    /**
+     * Performs filtering on the incoming HTTP request and response to set user information as a cookie.
+     *
+     * @param request      The HttpServletRequest object representing the incoming request.
+     * @param response     The HttpServletResponse object representing the response to be sent to the client.
+     * @param filterChain  The FilterChain to continue the filter chain with the next filter or servlet in the chain.
+     *
+     * @throws ServletException If a general servlet exception occurs during the processing of the request or response.
+     * @throws IOException      If an input or output exception occurs during the processing of the request or response.
+     *
+     * @see HttpServletRequest
+     * @see HttpServletResponse
+     * @see FilterChain
+     * @see SecurityContextHolder
+     * @see Authentication
+     * @see Cookie
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {

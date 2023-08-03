@@ -23,21 +23,53 @@ public class WebSecurityConfig {
 
     private final AuthEntryPointJwt unauthorizedHandler;
 
+    /**
+     * Constructor for the WebSecurityConfig class.
+     *
+     * @param userDetailsService The UserDetailsServiceImpl used for loading user-specific data during authentication.
+     * @param unauthorizedHandler The AuthEntryPointJwt used for handling unauthorized access and authentication errors.
+     *
+     * @see UserDetailsServiceImpl
+     * @see AuthEntryPointJwt
+     */
     public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler) {
         this.userDetailsService = userDetailsService;
         this.unauthorizedHandler = unauthorizedHandler;
     }
 
+    /**
+     * Creates a BCryptPasswordEncoder bean for encoding passwords.
+     *
+     * @return A BCryptPasswordEncoder object for password encoding.
+     *
+     * @see PasswordEncoder
+     * @see BCryptPasswordEncoder
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Creates an AuthTokenFilter bean for filtering and validating JWT authentication tokens.
+     *
+     * @return An AuthTokenFilter object for filtering and validating JWT authentication tokens.
+     *
+     * @see AuthTokenFilter
+     */
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
     }
 
+    /**
+     * Creates a DaoAuthenticationProvider bean for custom authentication using UserDetailsServiceImpl.
+     *
+     * @return A DaoAuthenticationProvider object for custom authentication using UserDetailsServiceImpl.
+     *
+     * @see DaoAuthenticationProvider
+     * @see UserDetailsServiceImpl
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -46,11 +78,35 @@ public class WebSecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Creates a custom AuthenticationManager bean to manage user authentication.
+     *
+     * @param authConfig The AuthenticationConfiguration to configure the authentication manager.
+     *
+     * @return An AuthenticationManager object to manage user authentication.
+     * @throws Exception If an exception occurs while configuring the authentication manager.
+     *
+     * @see AuthenticationManager
+     * @see AuthenticationConfiguration
+     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
+    /**
+     * Configures the security filter chain for HTTP requests.
+     *
+     * @param http The HttpSecurity object used for configuring the security filter chain.
+     *
+     * @return A SecurityFilterChain object representing the configured security filter chain.
+     * @throws Exception If an exception occurs during the configuration of the security filter chain.
+     *
+     * @see HttpSecurity
+     * @see HttpMethod
+     * @see UsernamePasswordAuthenticationFilter
+     * @see AuthTokenFilter
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -70,6 +126,14 @@ public class WebSecurityConfig {
         return http.build();
     }
 
+    /**
+     * Creates a custom AuthenticationSuccessHandler bean for handling successful authentication events.
+     *
+     * @return An AuthenticationSuccessHandler object for handling successful authentication events.
+     *
+     * @see AuthenticationSuccessHandler
+     * @see CustomAuthenticationSuccessHandler
+     */
     @Bean
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
         return new CustomAuthenticationSuccessHandler();
