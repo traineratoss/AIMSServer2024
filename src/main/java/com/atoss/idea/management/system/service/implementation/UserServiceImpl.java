@@ -39,6 +39,14 @@ public class UserServiceImpl implements UserService {
     @Value("${aims.app.bcrypt.salt}")
     private String bcryptSalt;
 
+    /**
+     * CONSTRUCTOR
+     * @param userRepository for accessing CRUD repository methods for User Entity
+     * @param modelMapper for mapping entity-dto relationships
+     * @param sendEmailService service used for sending emails
+     * @param avatarRepository for accessing CRUD repository methods for Avatar Entity
+     * @param passwordEncoder for password hashing and verification
+     */
     public UserServiceImpl(UserRepository userRepository,
                            ModelMapper modelMapper,
                            SendEmailService sendEmailService,
@@ -112,8 +120,6 @@ public class UserServiceImpl implements UserService {
 
         return modelMapper.map(user, UserResponseDTO.class);
     }
-
-
 
     @Override
     public UserResponseDTO getUserByUsername(String username) {
@@ -189,8 +195,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean changePassword(ChangePasswordDTO changePasswordDTO) {
         String username = changePasswordDTO.getUsername();
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserAlreadyExistException("User already exist!"));
-        String databasePassword = user.getPassword();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!"));
         String hashFrontendNewPassword = BCrypt.hashpw(changePasswordDTO.getNewPassword(), bcryptSalt);
         if (!BCrypt.checkpw(changePasswordDTO.getOldPassword(), user.getPassword())) {
             return false;
