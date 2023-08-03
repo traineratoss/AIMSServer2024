@@ -18,13 +18,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
-import java.security.SecureRandom;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 @Component
 public class InitialDataLoader implements CommandLineRunner {
     private final AvatarRepository avatarRepository;
@@ -40,6 +39,17 @@ public class InitialDataLoader implements CommandLineRunner {
 
     @Value("${aims.app.bcrypt.salt}")
     private String bcryptSalt;
+
+    /**
+     * CONSTRUCTOR - save entity in repository
+     *
+     * @param avatarRepository for saving a new entity of Avatar
+     * @param userRepository for saving a new entity of User
+     * @param categoryRepository for saving a new entity of Category
+     * @param imageRepository for saving a new entity of Image
+     * @param commentRepository for saving a new entity of Comment
+     * @param ideaRepository for saving a new entity of Idea
+     */
 
     public InitialDataLoader(AvatarRepository avatarRepository,
                              UserRepository userRepository,
@@ -62,13 +72,13 @@ public class InitialDataLoader implements CommandLineRunner {
         ClassLoader classLoader = getClass().getClassLoader();
         if (ddlValue.equals("create")) {
             String[] avatarFileNames = {
-                    "avatar1.svg",
-                    "avatar2.svg",
-                    "avatar3.svg",
-                    "avatar4.svg",
-                    "avatar5.svg",
-                    "avatar6.svg",
-                    "avatar7.svg"
+                "avatar1.svg",
+                "avatar2.svg",
+                "avatar3.svg",
+                "avatar4.svg",
+                "avatar5.svg",
+                "avatar6.svg",
+                "avatar7.svg"
             };
             ArrayList<Avatar> avatarList = new ArrayList<>();
 
@@ -138,8 +148,8 @@ public class InitialDataLoader implements CommandLineRunner {
             categoryRepository.save(category3);
 
             String[] imageFileNames = {
-                    "img.png",
-                    "img3.png"
+                "img.png",
+                "img3.png"
             };
 
             ArrayList<Image> imageList = new ArrayList<>();
@@ -272,6 +282,20 @@ public class InitialDataLoader implements CommandLineRunner {
         }
     }
 
+    /**
+     * CONSTRUCTOR - create new User
+     *
+     * @param isActive - describe if user have or not an active account
+     * @param role - admin or standard
+     * @param avatar - profile photo
+     * @param email - unique entity
+     * @param username - unique entity
+     * @param fullName - name of user
+     * @param hashPassword - encrypted password
+     * @param hasPassword - describes the difference between accepted/declined request for create an account
+     *                    (if user was declined, he doesn't have a password)
+     * @return user
+     */
     private static User createUser(Boolean isActive, Role role, Avatar avatar,
                                    String email, String username, String fullName,
                                    String hashPassword, Boolean hasPassword) {
@@ -288,6 +312,13 @@ public class InitialDataLoader implements CommandLineRunner {
         return user;
     }
 
+    /**
+     * CONSTRUCTOR - create new Category
+     *
+     * @param text - name of category
+     * @return category
+     */
+
     private static Category createCategory(
             String text
     ) {
@@ -297,6 +328,14 @@ public class InitialDataLoader implements CommandLineRunner {
     }
 
 
+    /**
+     * CONSTRUCTOR - create new Avatar
+     *
+     * @param filePath - path for finding image for avatar
+     * @param fileName - name of file (for image-avatar)
+     * @return avatar
+     * @throws IOException - can't read input file
+     */
 
     private static Avatar createAvatar(String filePath, String fileName
     ) throws IOException {
@@ -310,6 +349,15 @@ public class InitialDataLoader implements CommandLineRunner {
     }
 
 
+    /**
+     * CONSTRUCTOR - create new Image
+     *
+     * @param fileName - name of file (for image)
+     * @param fileType - type of file-image
+     * @param filePath - path for finding image
+     * @return image
+     * @throws IOException - can't read input file
+     */
     private static Image createImage(String fileName,
                                      String fileType, String filePath
     ) throws IOException {
@@ -321,6 +369,19 @@ public class InitialDataLoader implements CommandLineRunner {
         image.setFileType(fileType);
         return image;
     }
+
+    /**
+     * CONSTRUCTOR - create new Idea
+     *
+     * @param user -author of idea
+     * @param status - DRAFT/OPEN/IMPLEMENTED
+     * @param text - text of idea
+     * @param title - title of idea
+     * @param image - image name
+     * @param date - create date
+     * @param categories - list of categories
+     * @return idea
+     */
 
     private static Idea createIdea(User user, Status status, String text,
                                    String title, Image image, Date date,
@@ -337,17 +398,39 @@ public class InitialDataLoader implements CommandLineRunner {
         return idea;
     }
 
+    /**
+     * CONSTRUCTOR - create new Reply
+     *
+     * @param date - create date
+     * @param commentId - id the unique identifier of the comment (parent of reply)
+     * @param ideaId  - id the unique identifier of the reply
+     * @param user - author of comment
+     * @param text - reply text
+     * @return reply
+     */
+
 
     private static Comment createReply(Date date, Comment commentId, Idea ideaId,
                                        User user, String text) {
         Comment comment = new Comment();
         comment.setCreationDate(date);
-        comment.setIdea(ideaId);
+        comment.setIdea(null);
         comment.setParent(commentId);
         comment.setUser(user);
         comment.setCommentText(text);
         return comment;
     }
+
+    /**
+     * CONSTRUCTOR - create new Comment
+     *
+     * @param date - create date
+     * @param ideaId  - id the unique identifier of the idea
+     * @param parentId - just reply can have this parameter not null
+     * @param user - author of reply
+     * @param text - reply text
+     * @return comment
+     */
 
     private static Comment createComment(Date date, Idea ideaId,
                                          Comment parentId, User user, String text
