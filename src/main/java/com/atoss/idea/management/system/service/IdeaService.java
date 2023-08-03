@@ -1,13 +1,10 @@
 package com.atoss.idea.management.system.service;
 
-import com.atoss.idea.management.system.exception.FieldValidationException;
-import com.atoss.idea.management.system.repository.dto.FilteredStatisticsDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaPageDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.repository.dto.StatisticsDTO;
-import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.Status;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -32,7 +29,7 @@ public interface IdeaService {
      *
      * @param id the id of the idea we want to receive
      * @return the idea DTO with that specific id
-     * @throws FieldValidationException if the idea with the given id isn't found
+     * @throws  //FieldValidationException if the idea with the given id isn't found
      *                                  in the database
      */
     IdeaResponseDTO getIdeaById(Long id);
@@ -103,21 +100,6 @@ public interface IdeaService {
                                  String username,
                                  Pageable pageable);
 
-    /**
-     * Filters statistics based on specified criteria
-     *
-     * @param statuses the ideas matching the specified statuses
-     * @param categories the ideas matching the specified categories
-     * @param users the ideas matching the specified users
-     * @param selectedDateFrom the ideas matching the specified selected date from
-     * @param selectedDateTo the ideas matching the specified selected date to
-     * @return a statistics DTO
-     */
-    FilteredStatisticsDTO getStatisticsByDate(List<Status> statuses,
-                                              List<String> categories,
-                                              List<String> users,
-                                              String selectedDateFrom,
-                                              String selectedDateTo);
 
     /**
      * Gets the general statistics of the application
@@ -133,7 +115,7 @@ public interface IdeaService {
      * @param ideaPageDTO the idea page dto - working on this
      * @return a dto of Filtered Statistics
      */
-    FilteredStatisticsDTO getFilteredStatistics(IdeaPageDTO ideaPageDTO);
+    StatisticsDTO getFilteredStatistics(IdeaPageDTO ideaPageDTO);
 
     /**
      * Filters ideas based on date criteria
@@ -145,6 +127,11 @@ public interface IdeaService {
      *           queries and to prevent writing raw SQL code)
      * @return a list of predicates to filter Ideas based on the specified date range
      */
-    List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<Idea> root, CriteriaBuilder cb);
+    List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<?> root, CriteriaBuilder cb, String columnName);
 
+    StatisticsDTO getStatisticsByFilter(String title, String text, List<Status> statuses, List<String> categories, List<String> users, String selectedDateFrom, String selectedDateTo, String username);
+
+    Long getSelectionRepliesNumber(String selectedDateFrom, String selectedDateTo);
+
+    Long getSelectionCommentNumber(String selectedDateFrom, String selectedDateTo);
 }

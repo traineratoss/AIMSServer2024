@@ -89,7 +89,6 @@ public class CommentServiceImpl implements CommentService {
             return minutes + " minute";
         }
 
-
         long hours = TimeUnit.MILLISECONDS.toHours(milliSeconds);
         if (hours < 24 && hours != 1) {
             return hours + " hours";

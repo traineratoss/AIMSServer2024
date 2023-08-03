@@ -4,6 +4,7 @@ import com.atoss.idea.management.system.repository.entity.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -29,4 +30,22 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @return Page of type Comment with the replies of the comment
      */
     Page<Comment> findAllByParentId(Long parentId, Pageable pageable);
+
+    /**
+     * Counts in the Database the number of comments
+     *
+     * @return the number of comments
+     */
+    @Query(value = "SELECT COUNT(parent_id) FROM comment c", nativeQuery = true)
+    Long countComments();
+
+    /**
+     * Counts in the Database the number of replies
+     *
+     * @return the number of replies
+     */
+    @Query(value = "SELECT COUNT(*) FROM comment WHERE parent_id I S NULL", nativeQuery = true)
+    Long countAllReplies();
+
+
 }
