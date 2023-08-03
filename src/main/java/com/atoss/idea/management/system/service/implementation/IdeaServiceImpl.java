@@ -52,6 +52,15 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final CommentServiceImpl commentServiceImpl;
 
+    /**
+     * Constructor for the Idea Service Implementation
+     *
+     * @param ideaRepository repository for the Idea Entity
+     * @param userRepository repository for the User Entity
+     * @param categoryRepository repository for the Category Entity
+     * @param modelMapper responsible for mapping our entities
+     * @param commentServiceImpl the service that holds all the comments logic
+     */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
                            UserRepository userRepository,
                            CategoryRepository categoryRepository,
@@ -402,20 +411,20 @@ public class IdeaServiceImpl implements IdeaService {
 
         Long nrOfUsers = userRepository.count();
         Long nrOfIdeas = ideaRepository.count();
-        Double ideasPerUser = Math.round((double) nrOfIdeas / (double) nrOfUsers * 100) / 100.00;
         Long implIdeas = ideaRepository.countByStatus(Status.IMPLEMENTED);
         Long draftedIdeas = ideaRepository.countByStatus(Status.DRAFT);
         Long openIdeas = nrOfIdeas - draftedIdeas - implIdeas;
         Long nrOfComments = ideaRepository.countComments();
+        System.out.println("comments:" + nrOfComments);
         Long nrOfReplies = ideaRepository.countAllReplies();
+        Double ideasPerUser = Math.round((double) nrOfIdeas / (double) nrOfUsers * 100) / 100.00;
 
-
+        statisticsDTO.setOpenIdeas(openIdeas);
         statisticsDTO.setNrOfUsers(nrOfUsers);
         statisticsDTO.setNrOfIdeas(nrOfIdeas);
         statisticsDTO.setIdeasPerUser(ideasPerUser);
         statisticsDTO.setImplementedIdeas(implIdeas);
         statisticsDTO.setDraftIdeas(draftedIdeas);
-        statisticsDTO.setOpenIdeas(openIdeas);
         statisticsDTO.setTotalNrOfComments(nrOfComments);
         statisticsDTO.setTotalNrOfReplies(nrOfReplies);
 
