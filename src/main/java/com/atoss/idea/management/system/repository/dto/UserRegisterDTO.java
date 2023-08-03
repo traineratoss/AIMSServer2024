@@ -75,10 +75,24 @@ public class UserRegisterDTO implements UserDetails {
         return authorities;
     }
 
+    /**
+     * Get the unique identifier of the user.
+     *
+     * @return The unique identifier (ID) of the user.
+     *
+     * @see User
+     */
     public Long getId() {
         return id;
     }
 
+    /**
+     * Get the email address of the user.
+     *
+     * @return The email address of the user.
+     *
+     * @see User
+     */
     public String getEmail() {
         return email;
     }
