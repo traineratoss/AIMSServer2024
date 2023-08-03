@@ -7,7 +7,7 @@ import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.repository.dto.StatisticsDTO;
 import com.atoss.idea.management.system.repository.entity.Status;
-import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
+import com.atoss.idea.management.system.service.IdeaService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,13 +34,24 @@ import java.util.List;
 @RequestMapping("/aims/api/v1/ideas")
 public class IdeaController {
 
-    private final IdeaServiceImpl ideaService;
+    private final IdeaService ideaService;
 
-    public IdeaController(IdeaServiceImpl ideaService) {
+    /**
+     * Constructor for the Idea Controller
+     *
+     * @param ideaService the Idea Service interface
+     */
+    public IdeaController(IdeaService ideaService) {
         this.ideaService = ideaService;
     }
 
-
+    /**
+     * Adds a new idea to a user that has a given username
+     *
+     * @param idea the idea to be added
+     * @param username the username associated with the idea
+     * @return a Response Entity containing the response DTO of the added idea
+     */
     @PostMapping("/create")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> addIdea(@RequestBody IdeaRequestDTO idea,
@@ -48,12 +59,25 @@ public class IdeaController {
         return new ResponseEntity<>(ideaService.addIdea(idea, username), HttpStatus.OK);
     }
 
+    /**
+     * Gets an idea by a given id
+     *
+     * @param id the id of the idea
+     * @return a Response Entity containing the response DTO of the idea received
+     */
     @GetMapping("/get")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> getIdeaById(@RequestParam(required = true) Long id) {
         return new ResponseEntity<>(ideaService.getIdeaById(id), HttpStatus.OK);
     }
 
+    /**
+     * Updates an idea by a given id
+     *
+     * @param id the id of the idea we want to update
+     * @param ideaUpdateDTO the DTO containing the updated idea information
+     * @return a Response Entity containing the response DTO of the updated idea
+     */
     @PatchMapping("/update")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> updateIdeaById(@RequestParam(required = true) Long id,
@@ -61,6 +85,13 @@ public class IdeaController {
         return new ResponseEntity<>(ideaService.updateIdeaById(id, ideaUpdateDTO), HttpStatus.OK);
     }
 
+    /**
+     * Deletes an idea by a given id
+     *
+     * @param id the id of the idea we want to delete
+     * @return a Response Entity containing a text that suggests the fact that we successfully
+     *         deleted the idea
+     */
     @DeleteMapping("/delete")
     @Transactional
     public ResponseEntity<String> deleteIdeaById(@RequestParam(required = true) Long id)  {
@@ -68,6 +99,16 @@ public class IdeaController {
         return new ResponseEntity<>("Idea successfully deleted", HttpStatus.OK);
     }
 
+    /**
+     * Returns all the ideas paged
+     *
+     * @param pageSize the size of the page
+     * @param pageNumber the number of the page
+     * @param sortCategory the category we sort the ideas by
+     * @param sortDirection the direction we want the ideas to be sorted by
+     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
+     *         the page containing the list of ideas )
+     */
     @Transactional
     @GetMapping("/all")
     public ResponseEntity<IdeaPageDTO> getAllIdeas(@RequestParam(required = true) int pageSize,
@@ -89,13 +130,24 @@ public class IdeaController {
         }
     }
 
+    /**
+     * Returns all the ideas that belong to a User, paged
+     *
+     * @param username the username of the User whose ideas belong to
+     * @param pageSize the size of the page
+     * @param pageNumber the number of the page
+     * @param sortCategory the category we sort the ideas by
+     * @param sortDirection the direction we want the ideas to be sorted by
+     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
+     *         the page containing the list of ideas )
+     */
     @Transactional
     @GetMapping("/allByUser")
     public ResponseEntity<IdeaPageDTO> getAllIdeasByUserUsername(@RequestParam(required = true) String username,
-                                                                     @RequestParam(required = true) int pageSize,
-                                                                     @RequestParam(required = true) int pageNumber,
-                                                                     @RequestParam(required = true) String sortCategory,
-                                                                     @RequestParam(required = true) Sort.Direction sortDirection) {
+                                                                 @RequestParam(required = true) int pageSize,
+                                                                 @RequestParam(required = true) int pageNumber,
+                                                                 @RequestParam(required = true) String sortCategory,
+                                                                 @RequestParam(required = true) Sort.Direction sortDirection) {
         switch (sortDirection) {
             case ASC -> {
                 Pageable pageableAsc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
@@ -111,6 +163,26 @@ public class IdeaController {
         }
     }
 
+    /**
+     * Filters ideas based on specified criteria
+     *
+     * @param title the ideas matching the specified title criteria
+     * @param text the ideas matching the specified text criteria
+     * @param status a string that will be converted into an array
+     *               of Statuses and filter the ideas matching these
+     * @param category a string that will be converted into an array
+     *                 of Categories and filter the ideas matching these
+     * @param user a string that will be converted into an array
+     *             of Users and filter the ideas matching these
+     * @param selectedDateFrom the ideas matching the specified selected date from
+     * @param selectedDateTo the ideas matching the specified selected date to
+     * @param pageSize the size of the page
+     * @param pageNumber the number of the page
+     * @param username if not null, returns filtered ideas belonging to the specified username
+     * @param sortDirection the direction we want the ideas to be sorted by
+     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
+     *         the page containing the list of ideas )
+     */
     @Transactional
     @GetMapping("/filter")
     public ResponseEntity<IdeaPageDTO> filterAllIdeasByParameters(
@@ -149,6 +221,11 @@ public class IdeaController {
                 text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, pageableAsc), HttpStatus.OK);
     }
 
+    /**
+     * Working on this
+     *
+     * @return stats for the ideas
+     */
     @GetMapping("/stats")
     public ResponseEntity<StatisticsDTO> getStats() {
 
@@ -156,7 +233,19 @@ public class IdeaController {
 
     }
 
-
+    /**
+     * Filters ideas based on specified criteria
+     *
+     * @param status a string that will be converted into an array
+     *               of Statuses and filter the ideas matching these
+     * @param category a string that will be converted into an array
+     *                 of Categories and filter the ideas matching these
+     * @param user a string that will be converted into an array
+     *             of Users and filter the ideas matching these
+     * @param selectedDateFrom the ideas matching the specified selected date from
+     * @param selectedDateTo the ideas matching the specified selected date to
+     * @return a Response Entity containing a Statistics DTO
+     */
     @GetMapping("/filtered-stats")
     public ResponseEntity<FilteredStatisticsDTO> getFilteredStats(
             @RequestParam(required = false) String status,
