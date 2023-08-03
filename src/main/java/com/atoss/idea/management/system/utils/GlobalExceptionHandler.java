@@ -235,16 +235,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(userAlreadyDeactivatedException, HttpStatus.BAD_REQUEST);
     }
 
-    /**
-     * user is already activated
-     *
-     * @see UserAlreadyActivatedException
-     * @param userAlreadyActivatedException - impossible to activate user that is already activated
-     * @return ResponseEntity - error
-     */
-    @ExceptionHandler(value = UserAlreadyActivatedException.class)
-    public ResponseEntity<UserAlreadyActivatedException> userAlreadyActivatedException(
-            UserAlreadyActivatedException userAlreadyActivatedException) {
-        return new ResponseEntity<>(userAlreadyActivatedException, HttpStatus.BAD_REQUEST);
-    }
+    //    /**
+    //     * user is already activated
+    //     *
+    //     * @see UserAlreadyActivatedException
+    //     * @param userAlreadyActivatedException - impossible to activate user that is already activated
+    //     * @return ResponseEntity - error
+    //     */
+    //    @ExceptionHandler(value = UserAlreadyActivatedException.class)
+    //    public ResponseEntity<UserAlreadyActivatedException> userAlreadyActivatedException(
+    //            UserAlreadyActivatedException userAlreadyActivatedException) {
+    //        return new ResponseEntity<>(userAlreadyActivatedException, HttpStatus.BAD_REQUEST);
+    //    }
 }

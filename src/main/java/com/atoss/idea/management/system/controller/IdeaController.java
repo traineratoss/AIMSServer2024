@@ -8,6 +8,7 @@ import com.atoss.idea.management.system.repository.dto.StatisticsDTO;
 import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.service.IdeaService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -110,7 +111,7 @@ public class IdeaController {
      */
     @Transactional
     @GetMapping("/all")
-    public ResponseEntity<IdeaPageDTO> getAllIdeas(@RequestParam(required = true) int pageSize,
+    public ResponseEntity<Page<IdeaResponseDTO>> getAllIdeas(@RequestParam(required = true) int pageSize,
                                                              @RequestParam(required = true) int pageNumber,
                                                              @RequestParam(required = true) String sortCategory,
                                                              @RequestParam(required = true) Sort.Direction sortDirection) {
@@ -142,7 +143,7 @@ public class IdeaController {
      */
     @Transactional
     @GetMapping("/allByUser")
-    public ResponseEntity<IdeaPageDTO> getAllIdeasByUserUsername(@RequestParam(required = true) String username,
+    public ResponseEntity<Page<IdeaResponseDTO>> getAllIdeasByUserUsername(@RequestParam(required = true) String username,
                                                                  @RequestParam(required = true) int pageSize,
                                                                  @RequestParam(required = true) int pageNumber,
                                                                  @RequestParam(required = true) String sortCategory,
@@ -184,7 +185,7 @@ public class IdeaController {
      */
     @Transactional
     @GetMapping("/filter")
-    public ResponseEntity<IdeaPageDTO> filterAllIdeasByParameters(
+    public ResponseEntity<Page<IdeaResponseDTO>> filterAllIdeasByParameters(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String text,
             @RequestParam(required = false) String status,

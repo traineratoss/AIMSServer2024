@@ -9,6 +9,7 @@ import com.atoss.idea.management.system.repository.entity.Status;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public interface IdeaService {
      * @return an IdeaPageDTO that contains a page of listed ideas and
      *         the total number of elements in all the pages
      */
-    IdeaPageDTO getAllIdeas(Pageable pageable);
+    Page<IdeaResponseDTO> getAllIdeas(Pageable pageable);
 
     /**
      * Gets all the ideas that belong to a user paged
@@ -70,7 +71,7 @@ public interface IdeaService {
      * @return an IdeaPageDTO that contains a page of listed ideas that belong
      *         to a user and the total number of elements in all the pages
      */
-    IdeaPageDTO getAllIdeasByUserUsername(String username, Pageable pageable);
+    Page<IdeaResponseDTO> getAllIdeasByUserUsername(String username, Pageable pageable);
 
     /**
      * Filters ideas based on specified criteria
@@ -89,16 +90,16 @@ public interface IdeaService {
      *                  sort category and sort direction
      * @return an IdeaPageDTO containing filtered ideas based on the given criteria
      */
-    IdeaPageDTO filterIdeasByAll(String title,
-                                 String text,
-                                 List<Status> status,
-                                 List<String> categories,
-                                 List<String> user,
-                                 String selectedDateFrom,
-                                 String selectedDateTo,
-                                 String sortDirection,
-                                 String username,
-                                 Pageable pageable);
+    Page<IdeaResponseDTO> filterIdeasByAll(String title,
+                                           String text,
+                                           List<Status> status,
+                                           List<String> categories,
+                                           List<String> user,
+                                           String selectedDateFrom,
+                                           String selectedDateTo,
+                                           String sortDirection,
+                                           String username,
+                                           Pageable pageable);
 
 
     /**
@@ -115,7 +116,7 @@ public interface IdeaService {
      * @param ideaPageDTO the idea page dto - working on this
      * @return a dto of Filtered Statistics
      */
-    StatisticsDTO getFilteredStatistics(IdeaPageDTO ideaPageDTO);
+    StatisticsDTO getFilteredStatistics(Page<IdeaResponseDTO> ideaPageDTO);
 
     /**
      * Filters ideas based on date criteria

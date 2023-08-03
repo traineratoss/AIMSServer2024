@@ -248,13 +248,9 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public IdeaPageDTO getAllIdeas(Pageable pageable) {
+    public Page<IdeaResponseDTO> getAllIdeas(Pageable pageable) {
 
-        IdeaPageDTO ideaPageDTO = new IdeaPageDTO();
-
-        if (ideaRepository.findAll().size() > 0) {
-            ideaPageDTO.setTotal(ideaRepository.findAll().size());
-        } else {
+        if (ideaRepository.findAll().size() <= 0) {
             throw new FieldValidationException("No ideas found.");
         }
 
@@ -270,13 +266,11 @@ public class IdeaServiceImpl implements IdeaService {
                 })
                 .toList();
 
-        ideaPageDTO.setPagedIdeas(new PageImpl(ideaResponseDTOs, pageable, ideas.getTotalElements()));
-
-        return ideaPageDTO;
+        return new PageImpl<>(ideaResponseDTOs, pageable, ideas.getTotalElements());
     }
 
     @Override
-    public IdeaPageDTO getAllIdeasByUserUsername(String username, Pageable pageable) {
+    public Page<IdeaResponseDTO> getAllIdeasByUserUsername(String username, Pageable pageable) {
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
@@ -284,10 +278,6 @@ public class IdeaServiceImpl implements IdeaService {
         if (user.getIdeas() == null || user.getIdeas().isEmpty()) {
             throw new FieldValidationException("No ideas found.");
         }
-
-        IdeaPageDTO ideaPageDTO = new IdeaPageDTO();
-
-        ideaPageDTO.setTotal(userRepository.findByUsername(username).get().getIdeas().size());
 
         List<IdeaResponseDTO> ideaResponseDTOs = ideaRepository.findAllByUserUsername(username, pageable)
                 .stream()
@@ -299,13 +289,12 @@ public class IdeaServiceImpl implements IdeaService {
                     return responseDTO;
                 })
                 .toList();
-        ideaPageDTO.setPagedIdeas(new PageImpl(ideaResponseDTOs, pageable, ideaResponseDTOs.size()));
 
-        return ideaPageDTO;
+        return new PageImpl<>(ideaResponseDTOs, pageable, ideaResponseDTOs.size());
     }
 
     @Override
-    public IdeaPageDTO filterIdeasByAll(String title,
+    public Page<IdeaResponseDTO> filterIdeasByAll(String title,
                                         String text,
                                         List<Status> statuses,
                                         List<String> categories,
@@ -360,13 +349,28 @@ public class IdeaServiceImpl implements IdeaService {
         criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
         TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
 
-        int total = query.getResultList().size();
-
         List<Idea> allIdeas = query.getResultList();
 
-        List<IdeaResponseDTO> allIdeasDTO;
+        if (pageable != null) {
+            query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
+            query.setMaxResults(pageable.getPageSize());
 
-        allIdeasDTO = allIdeas.stream().map(idea -> {
+            List<Idea> pagedIdeas = query.getResultList();
+
+            List<IdeaResponseDTO> allIdeasDTO = new ArrayList<>();
+
+            allIdeasDTO = pagedIdeas.stream().map(idea -> {
+                IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
+                ideaResponseDTO.setUsername(idea.getUser().getUsername());
+                ideaResponseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
+                ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
+                return ideaResponseDTO;
+            }).toList();
+            return new PageImpl<>(allIdeasDTO, pageable, allIdeas.size());
+
+        };
+
+        List<IdeaResponseDTO> allIdeasUnpaged = allIdeas.stream().map(idea -> {
             IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
             ideaResponseDTO.setUsername(idea.getUser().getUsername());
             ideaResponseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
@@ -374,35 +378,18 @@ public class IdeaServiceImpl implements IdeaService {
             return ideaResponseDTO;
         }).toList();
 
-        if (pageable != null) {
-
-            int firstIndex = pageable.getPageNumber() * pageable.getPageSize();
-
-            List<IdeaResponseDTO> pagedIdeas = new ArrayList<>();
-            for (int i = 0; i < pageable.getPageSize(); i++) {
-                if (firstIndex < allIdeas.size()) {
-                    pagedIdeas.add(allIdeasDTO.get(firstIndex));
-                    firstIndex++;
-                }
-            }
-            IdeaPageDTO ideaPageDTO = new IdeaPageDTO();
-            ideaPageDTO.setPagedIdeas(new PageImpl<>(pagedIdeas, pageable, total));
-            ideaPageDTO.setTotal(total);
-            return ideaPageDTO;
-        }
-
-        return new IdeaPageDTO(total, new PageImpl<>(allIdeasDTO, Pageable.unpaged(), total));
+        return new PageImpl<>(allIdeasUnpaged, Pageable.unpaged(), allIdeas.size());
     }
 
     @Override
-    public StatisticsDTO getFilteredStatistics(IdeaPageDTO ideaPageDTO) {
+    public StatisticsDTO getFilteredStatistics(Page<IdeaResponseDTO> ideaPageDTO) {
 
         StatisticsDTO filteredStatisticsDTO = new StatisticsDTO();
         Long implementedIdeas = 0L;
         Long draftIdeas = 0L;
         Long openIdeas = 0L;
 
-        for (IdeaResponseDTO idea : ideaPageDTO.getPagedIdeas().getContent()) {
+        for (IdeaResponseDTO idea : ideaPageDTO.getContent()) {
             if (idea.getStatus().equals(Status.OPEN)){
                 openIdeas++;
             } else if (idea.getStatus().equals(Status.IMPLEMENTED)) {
@@ -430,7 +417,7 @@ public class IdeaServiceImpl implements IdeaService {
                                                      String selectedDateTo,
                                                      String username) {
 
-        IdeaPageDTO ideaPageDTO = filterIdeasByAll(title,
+        Page<IdeaResponseDTO> ideaPageDTO = filterIdeasByAll(title,
                                                     text,
                                                 statuses,
                                               categories,
@@ -438,7 +425,7 @@ public class IdeaServiceImpl implements IdeaService {
 
         Long nrOfComments = getSelectionCommentNumber(selectedDateFrom, selectedDateTo);
         Long nrOfReplies = getSelectionRepliesNumber(selectedDateFrom, selectedDateTo);
-        Long nrOfIdeas = (long) ideaPageDTO.getTotal();
+        Long nrOfIdeas = (long) ideaPageDTO.getTotalElements();
 
         StatisticsDTO filteredStatisticsDTO = getFilteredStatistics(ideaPageDTO);
 

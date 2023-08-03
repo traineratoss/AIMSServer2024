@@ -44,7 +44,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      *
      * @return the number of replies
      */
-    @Query(value = "SELECT COUNT(*) FROM comment WHERE parent_id I S NULL", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) FROM comment WHERE parent_id IS NULL", nativeQuery = true)
     Long countAllReplies();
 
 
