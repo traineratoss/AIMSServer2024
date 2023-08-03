@@ -15,6 +15,7 @@ public class GlobalExceptionHandler {
     /**
      * category already exists
      *
+     * @see CategoryAlreadyExistsException
      * @param exception CategoryAlreadyExistsException
      * @return ResponseEntity - error BAD REQUEST
      */
@@ -27,6 +28,7 @@ public class GlobalExceptionHandler {
     /**
      * category not found
      *
+     * @see CategoryNotFoundException
      * @param exception CategoryNotFoundException
      * @return ResponseEntity - error NOT FOUND
      */
@@ -39,6 +41,7 @@ public class GlobalExceptionHandler {
     /**
      * valid fields for new idea (title, text)
      *
+     * @see FieldValidationException
      * @param exception FieldValidationException
      * @return ResponseEntity - error BAD REQUEST
      */
@@ -51,6 +54,7 @@ public class GlobalExceptionHandler {
     /**
      * user already exists
      *
+     * @see UserAlreadyExistException
      * @param userAlreadyExistException - registration error
      * @return ResponseEntity - error BAD REQUEST
      */
@@ -63,6 +67,7 @@ public class GlobalExceptionHandler {
     /**
      * user not found
      *
+     * @see UserNotFoundException
      * @param userNotFoundException - log in error
      * @return ResponseEntity - error NOT FOUND
      */
@@ -87,6 +92,7 @@ public class GlobalExceptionHandler {
     /**
      * avatar not found
      *
+     * @see AvatarNotFoundException
      * @param avatarNotFoundException - login error
      * @return ResponseEntity - error NOT FOUND
      */
@@ -99,6 +105,7 @@ public class GlobalExceptionHandler {
     /**
      * idea not found
      *
+     * @see IdeaNotFoundException
      * @param ideaNotFoundException - can't access idea content
      * @return ResponseEntity - error NOT FOUND
      */
@@ -111,6 +118,7 @@ public class GlobalExceptionHandler {
     /**
      * comment not found
      *
+     * @see CommentNotFoundException
      * @param commentNotFoundException - can't access comment content
      * @return ResponseEntity - error message Comment not Found
      */
@@ -123,6 +131,7 @@ public class GlobalExceptionHandler {
     /**
      * too long comment (500 max)
      *
+     * @see CommentTooLongException
      * @param commentTooLongException - don't allow to write more than 500 characters
      * @return ResponseEntity - error message Comment Too Long
      */
@@ -135,6 +144,7 @@ public class GlobalExceptionHandler {
     /**
      * username already exists
      *
+     * @see UsernameAlreadyExistException
      * @param usernameAlreadyExistException - don't allow to log in with that username
      * @return ResponseEntity - error
      */
@@ -147,6 +157,7 @@ public class GlobalExceptionHandler {
     /**
      * email already exists
      *
+     * @see EmailAlreadyExistException
      * @param emailAlreadyExistException - don't allow to log in with that email
      * @return ResponseEntity - error
      */
@@ -159,7 +170,8 @@ public class GlobalExceptionHandler {
     /**
      * password doesn't contain the mandatory fields
      *
-     * @param incorrectPasswordException - don't allow to log in, need to change password
+     * @see IncorrectPasswordException
+     * @param incorrectPasswordException - don't allow to log in, need to change password that contains the mandatory fields
      * @return ResponseEntity - error
      */
 
@@ -171,7 +183,8 @@ public class GlobalExceptionHandler {
     /**
      * email doesn't contain the mandatory fields
      *
-     * @param emailFailedException - don't allow to log in, need to change email
+     * @see EmailFailedException
+     * @param emailFailedException - don't allow to log in, need to change with an email that contains the mandatory fields
      * @return ResponseEntity - error
      */
 
@@ -183,6 +196,7 @@ public class GlobalExceptionHandler {
     /**
      * user has an activated account
      *
+     * @see UserStatusIsActiveException
      * @param userStatusIsActiveException - necessary if we need to deactivate
      *                                    user that is already active
      * @return ResponseEntity - error
@@ -196,7 +210,8 @@ public class GlobalExceptionHandler {
     /**
      * user is already approved
      *
-     * @param approveAlreadyGrantedException - unnecessary to approve user that is already approved
+     * @see ApproveAlreadyGrantedException
+     * @param approveAlreadyGrantedException - impossible to approve user that is already approved
      * @return ResponseEntity - error
      */
 
@@ -209,7 +224,8 @@ public class GlobalExceptionHandler {
     /**
      * user is already deactivated
      *
-     * @param userAlreadyDeactivatedException - unnecessary to deactivate user that is already deactivated
+     * @see UserAlreadyDeactivatedException
+     * @param userAlreadyDeactivatedException - impossible to deactivate user that is already deactivated
      * @return ResponseEntity - error
      */
 
@@ -222,7 +238,8 @@ public class GlobalExceptionHandler {
     /**
      * user is already activated
      *
-     * @param userAlreadyActivatedException - unnecessary to activate user that is already activated
+     * @see UserAlreadyActivatedException
+     * @param userAlreadyActivatedException - impossible to activate user that is already activated
      * @return ResponseEntity - error
      */
     @ExceptionHandler(value = UserAlreadyActivatedException.class)
