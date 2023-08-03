@@ -29,8 +29,6 @@ public interface IdeaService {
      *
      * @param id the id of the idea we want to receive
      * @return the idea DTO with that specific id
-     * @throws  //FieldValidationException if the idea with the given id isn't found
-     *                                  in the database
      */
     IdeaResponseDTO getIdeaById(Long id);
 
@@ -125,13 +123,52 @@ public interface IdeaService {
      * @param root the root (Idea) for constructing criteria queries
      * @param cb the CriteriaBuilder for building criteria queries (used for more complex
      *           queries and to prevent writing raw SQL code)
+     * @param columnName specifies the name of the desired database column to be accesed
      * @return a list of predicates to filter Ideas based on the specified date range
      */
-    List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<?> root, CriteriaBuilder cb, String columnName);
+    List<Predicate> filterByDate(String selectedDateFrom,
+                                 String selectedDateTo,
+                                 Root<?> root,
+                                 CriteriaBuilder cb,
+                                 String columnName);
 
-    StatisticsDTO getStatisticsByFilter(String title, String text, List<Status> statuses, List<String> categories, List<String> users, String selectedDateFrom, String selectedDateTo, String username);
+    /**
+     * Gets filtered statistics
+     *
+     * @param title the ideas matching the specified title criteria
+     * @param text the ideas matching the specified text criteria
+     * @param statuses  the ideas matching the specified statuses
+     * @param categories the ideas matching the specified categories
+     * @param users the ideas matching the specified users
+     * @param selectedDateFrom the ideas matching the specified selected date from
+     * @param selectedDateTo the ideas matching the specified selected date to
+     * @param username if not null, returns filtered ideas belonging to the specified username
+     * @return a statistics DTO containing filtered data based on the given criteria
+     */
+    StatisticsDTO getStatisticsByFilter(String title,
+                                        String text,
+                                        List<Status> statuses,
+                                        List<String> categories,
+                                        List<String> users,
+                                        String selectedDateFrom,
+                                        String selectedDateTo,
+                                        String username);
 
+    /**
+     * Returns the number of all replies between selected dates
+     *
+     * @param selectedDateFrom the date from
+     * @param selectedDateTo the date to
+     * @return the number of all replies between selected dates
+     */
     Long getSelectionRepliesNumber(String selectedDateFrom, String selectedDateTo);
 
+    /**
+     * Returns the number of all comments between selected dates
+     *
+     * @param selectedDateFrom the date from
+     * @param selectedDateTo the date to
+     * @return the number of all comments between selected dates
+     */
     Long getSelectionCommentNumber(String selectedDateFrom, String selectedDateTo);
 }

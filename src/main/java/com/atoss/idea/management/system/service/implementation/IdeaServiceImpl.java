@@ -63,12 +63,14 @@ public class IdeaServiceImpl implements IdeaService {
      * @param categoryRepository repository for the Category Entity
      * @param modelMapper responsible for mapping our entities
      * @param commentServiceImpl the service that holds all the comments logic
+     * @param commentRepository the repository of the comments
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
                            UserRepository userRepository,
                            CategoryRepository categoryRepository,
                            ModelMapper modelMapper,
-                           CommentServiceImpl commentServiceImpl, CommentRepository commentRepository) {
+                           CommentServiceImpl commentServiceImpl,
+                           CommentRepository commentRepository) {
         this.ideaRepository = ideaRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
@@ -349,7 +351,7 @@ public class IdeaServiceImpl implements IdeaService {
         criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
         TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
 
-        List<Idea> allIdeas = query.getResultList();
+        int totalSize = query.getMaxResults();
 
         if (pageable != null) {
             query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
@@ -357,18 +359,18 @@ public class IdeaServiceImpl implements IdeaService {
 
             List<Idea> pagedIdeas = query.getResultList();
 
-            List<IdeaResponseDTO> allIdeasDTO = new ArrayList<>();
-
-            allIdeasDTO = pagedIdeas.stream().map(idea -> {
+            List<IdeaResponseDTO> allIdeasDTO = pagedIdeas.stream().map(idea -> {
                 IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
                 ideaResponseDTO.setUsername(idea.getUser().getUsername());
                 ideaResponseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
                 ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
                 return ideaResponseDTO;
             }).toList();
-            return new PageImpl<>(allIdeasDTO, pageable, allIdeas.size());
 
-        };
+            return new PageImpl<>(allIdeasDTO, pageable, totalSize);
+        }
+
+        List<Idea> allIdeas = query.getResultList();
 
         List<IdeaResponseDTO> allIdeasUnpaged = allIdeas.stream().map(idea -> {
             IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
@@ -378,7 +380,7 @@ public class IdeaServiceImpl implements IdeaService {
             return ideaResponseDTO;
         }).toList();
 
-        return new PageImpl<>(allIdeasUnpaged, Pageable.unpaged(), allIdeas.size());
+        return new PageImpl<>(allIdeasUnpaged, Pageable.unpaged(), totalSize);
     }
 
     @Override
@@ -390,12 +392,11 @@ public class IdeaServiceImpl implements IdeaService {
         Long openIdeas = 0L;
 
         for (IdeaResponseDTO idea : ideaPageDTO.getContent()) {
-            if (idea.getStatus().equals(Status.OPEN)){
+            if (idea.getStatus().equals(Status.OPEN)) {
                 openIdeas++;
             } else if (idea.getStatus().equals(Status.IMPLEMENTED)) {
                 implementedIdeas++;
-            }
-            else {
+            } else {
                 draftIdeas++;
             }
         }
