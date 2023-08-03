@@ -1,6 +1,5 @@
 package com.atoss.idea.management.system.controller;
 
-import com.atoss.idea.management.system.repository.dto.FilteredStatisticsDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaPageDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
@@ -236,6 +235,8 @@ public class IdeaController {
     /**
      * Filters ideas based on specified criteria
      *
+     * @param title  idea's title
+     * @param text idea's text
      * @param status a string that will be converted into an array
      *               of Statuses and filter the ideas matching these
      * @param category a string that will be converted into an array
@@ -244,15 +245,19 @@ public class IdeaController {
      *             of Users and filter the ideas matching these
      * @param selectedDateFrom the ideas matching the specified selected date from
      * @param selectedDateTo the ideas matching the specified selected date to
+     * @param username in case you want your own ideas
      * @return a Response Entity containing a Statistics DTO
      */
     @GetMapping("/filtered-stats")
-    public ResponseEntity<FilteredStatisticsDTO> getFilteredStats(
+    public ResponseEntity<StatisticsDTO> getFilteredStats(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String text,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String user,
             @RequestParam(required = false) String selectedDateFrom,
-            @RequestParam(required = false) String selectedDateTo) {
+            @RequestParam(required = false) String selectedDateTo,
+            @RequestParam(required = false) String username) {
 
         List<String> categories = new ArrayList<>();
         if (category != null && !category.isEmpty()) {
@@ -270,11 +275,14 @@ public class IdeaController {
         }
         List<Status> statuses = statusStrings.stream().map(Status::valueOf).toList();
 
-        return new ResponseEntity<>(ideaService.getStatisticsByDate(statuses,
+        return new ResponseEntity<>(ideaService.getStatisticsByFilter(title,
+                                                                    text,
+                                                                    statuses,
                                                                     categories,
                                                                     users,
                                                                     selectedDateFrom,
-                                                                    selectedDateTo), HttpStatus.OK);
+                                                                    selectedDateTo,
+                                                                    username), HttpStatus.OK);
     }
 
 }

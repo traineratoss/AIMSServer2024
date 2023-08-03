@@ -4,6 +4,7 @@ import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.FieldValidationException;
 import com.atoss.idea.management.system.repository.CategoryRepository;
+import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.*;
@@ -52,6 +53,8 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final CommentServiceImpl commentServiceImpl;
 
+    private final CommentRepository commentRepository;
+
     /**
      * Constructor for the Idea Service Implementation
      *
@@ -65,12 +68,13 @@ public class IdeaServiceImpl implements IdeaService {
                            UserRepository userRepository,
                            CategoryRepository categoryRepository,
                            ModelMapper modelMapper,
-                           CommentServiceImpl commentServiceImpl) {
+                           CommentServiceImpl commentServiceImpl, CommentRepository commentRepository) {
         this.ideaRepository = ideaRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
         this.commentServiceImpl = commentServiceImpl;
+        this.commentRepository = commentRepository;
     }
 
     private String filterBadWords(String text) {
@@ -235,6 +239,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public void deleteIdeaById(Long id) {
+
         if (ideaRepository.existsById(id)) {
             ideaRepository.deleteById(id);
         } else {
@@ -341,7 +346,7 @@ public class IdeaServiceImpl implements IdeaService {
             predicatesList.add(root.join("categoryList").get("text").in(categories));
         }
 
-        predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb));
+        predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
 
         List<Order> orders = new ArrayList<>();
 
@@ -359,7 +364,7 @@ public class IdeaServiceImpl implements IdeaService {
 
         List<Idea> allIdeas = query.getResultList();
 
-        List<IdeaResponseDTO> allIdeasDTO = new ArrayList<>();
+        List<IdeaResponseDTO> allIdeasDTO;
 
         allIdeasDTO = allIdeas.stream().map(idea -> {
             IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
@@ -375,7 +380,7 @@ public class IdeaServiceImpl implements IdeaService {
 
             List<IdeaResponseDTO> pagedIdeas = new ArrayList<>();
             for (int i = 0; i < pageable.getPageSize(); i++) {
-                if (firstIndex < pageable.getPageSize()) {
+                if (firstIndex < allIdeas.size()) {
                     pagedIdeas.add(allIdeasDTO.get(firstIndex));
                     firstIndex++;
                 }
@@ -390,18 +395,101 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public FilteredStatisticsDTO getStatisticsByDate(List<Status> statuses,
+    public StatisticsDTO getFilteredStatistics(IdeaPageDTO ideaPageDTO) {
+
+        StatisticsDTO filteredStatisticsDTO = new StatisticsDTO();
+        Long implementedIdeas = 0L;
+        Long draftIdeas = 0L;
+        Long openIdeas = 0L;
+
+        for (IdeaResponseDTO idea : ideaPageDTO.getPagedIdeas().getContent()) {
+            if (idea.getStatus().equals(Status.OPEN)){
+                openIdeas++;
+            } else if (idea.getStatus().equals(Status.IMPLEMENTED)) {
+                implementedIdeas++;
+            }
+            else {
+                draftIdeas++;
+            }
+        }
+
+        filteredStatisticsDTO.setOpenIdeas(openIdeas);
+        filteredStatisticsDTO.setDraftIdeas(draftIdeas);
+        filteredStatisticsDTO.setImplementedIdeas(implementedIdeas);
+
+        return filteredStatisticsDTO;
+    }
+
+    @Override
+    public StatisticsDTO getStatisticsByFilter(String title,
+                                                     String text,
+                                                     List<Status> statuses,
                                                      List<String> categories,
                                                      List<String> users,
                                                      String selectedDateFrom,
-                                                     String selectedDateTo) {
+                                                     String selectedDateTo,
+                                                     String username) {
 
-        FilteredStatisticsDTO filteredStatisticsDTO = new FilteredStatisticsDTO();
+        IdeaPageDTO ideaPageDTO = filterIdeasByAll(title,
+                                                    text,
+                                                statuses,
+                                              categories,
+                   users, selectedDateFrom, selectedDateTo, null, username, null);
 
-        return getFilteredStatistics(filterIdeasByAll(
-                null, null, statuses, categories, users, selectedDateFrom, selectedDateTo, null, null, null));
+        Long nrOfComments = getSelectionCommentNumber(selectedDateFrom, selectedDateTo);
+        Long nrOfReplies = getSelectionRepliesNumber(selectedDateFrom, selectedDateTo);
+        Long nrOfIdeas = (long) ideaPageDTO.getTotal();
 
+        StatisticsDTO filteredStatisticsDTO = getFilteredStatistics(ideaPageDTO);
+
+        filteredStatisticsDTO.setTotalNrOfComments(nrOfComments);
+        filteredStatisticsDTO.setTotalNrOfReplies(nrOfReplies);
+        filteredStatisticsDTO.setNrOfIdeas(nrOfIdeas);
+
+        return filteredStatisticsDTO;
     }
+
+
+    @Override
+    public Long getSelectionRepliesNumber(String selectedDateFrom, String selectedDateTo) {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Comment> criteriaQuery = cb.createQuery(Comment.class);
+        Root<Comment> root = criteriaQuery.from(Comment.class);
+
+        List<Predicate> predicatesList = new ArrayList<>();
+
+        predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
+        predicatesList.add(cb.isNotNull(root.get("parent")));
+
+        criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
+        TypedQuery<Comment> repliesQuery = entityManager.createQuery(criteriaQuery);
+
+        Long allReplies = (long) repliesQuery.getResultList().size();
+
+        return  allReplies;
+    }
+
+    @Override
+    public Long getSelectionCommentNumber(String selectedDateFrom, String selectedDateTo) {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Comment> criteriaQuery = cb.createQuery(Comment.class);
+        Root<Comment> root = criteriaQuery.from(Comment.class);
+
+        List<Predicate> predicatesList = new ArrayList<>();
+
+        predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
+        predicatesList.add(cb.isNull(root.get("parent")));
+
+        criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
+        TypedQuery<Comment> commentsQuery = entityManager.createQuery(criteriaQuery);
+
+        Long allComments = (long) commentsQuery.getResultList().size();
+
+        return allComments;
+    }
+
 
     @Override
     public StatisticsDTO getGeneralStatistics() {
@@ -410,13 +498,12 @@ public class IdeaServiceImpl implements IdeaService {
 
         Long nrOfUsers = userRepository.count();
         Long nrOfIdeas = ideaRepository.count();
+        Double ideasPerUser = Math.round((double) nrOfIdeas / (double) nrOfUsers * 100) / 100.00;
         Long implIdeas = ideaRepository.countByStatus(Status.IMPLEMENTED);
         Long draftedIdeas = ideaRepository.countByStatus(Status.DRAFT);
         Long openIdeas = nrOfIdeas - draftedIdeas - implIdeas;
-        Long nrOfComments = ideaRepository.countComments();
-        System.out.println("comments:" + nrOfComments);
-        Long nrOfReplies = ideaRepository.countAllReplies();
-        Double ideasPerUser = Math.round((double) nrOfIdeas / (double) nrOfUsers * 100) / 100.00;
+        Long nrOfComments = commentRepository.countComments();
+        Long nrOfReplies = commentRepository.countAllReplies();
 
         statisticsDTO.setOpenIdeas(openIdeas);
         statisticsDTO.setNrOfUsers(nrOfUsers);
@@ -431,26 +518,15 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public FilteredStatisticsDTO getFilteredStatistics(IdeaPageDTO ideaPageDTO) {
-
-        List<Idea> ideaList = new ArrayList<>();
-
-        FilteredStatisticsDTO filteredStatisticsDTO = new FilteredStatisticsDTO();
-
-
-        return filteredStatisticsDTO;
-    }
-
-    @Override
-    public List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<Idea> root, CriteriaBuilder cb) {
+    public List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<?> root, CriteriaBuilder cb, String columnName) {
 
         List<Predicate> predicatesList = new ArrayList<>();
 
         if (selectedDateFrom != null && selectedDateTo == null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date fromDate = simpleDateFormat.parse(selectedDateFrom + " 00:00:00");
-                predicatesList.add(cb.greaterThanOrEqualTo(root.get("creationDate"), fromDate));
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
+                predicatesList.add(cb.greaterThanOrEqualTo(root.get(columnName), fromDate));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -458,9 +534,9 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (selectedDateFrom == null && selectedDateTo != null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date toDate = simpleDateFormat.parse(selectedDateTo+" 23:59:59");
-                predicatesList.add(cb.lessThanOrEqualTo(root.get("creationDate"), toDate));
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                predicatesList.add(cb.lessThanOrEqualTo(root.get(columnName), toDate));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -468,10 +544,10 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (selectedDateFrom != null && selectedDateTo != null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date fromDate = simpleDateFormat.parse(selectedDateFrom+ " 00:00:00");
-                Date toDate = simpleDateFormat.parse(selectedDateTo+ " 23:59:59");
-                predicatesList.add(cb.between(root.get("creationDate"), fromDate, toDate));
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
+                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                predicatesList.add(cb.between(root.get(columnName), fromDate, toDate));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -479,7 +555,6 @@ public class IdeaServiceImpl implements IdeaService {
 
         return predicatesList;
     }
-
 
 
 }
