@@ -1,5 +1,7 @@
 package com.atoss.idea.management.system.service;
 
+import com.atoss.idea.management.system.exception.AvatarNotFoundException;
+
 public interface SendEmailService {
     /**
      * Sends an account activation email to the user associated with the given username.

@@ -279,7 +279,7 @@ public class UserController {
      * @return ResponseEntity with the message "User deleted successfully" and OK HTTP status
      * @throws UserNotFoundException when the user was not found in the database
      * @throws ApproveAlreadyGrantedException when the user's request was already approved
-     * @throws UserStatusIsActiveException when the user has already been activated
+     * @throws UserAlreadyActivatedException when the user has already been activated
      */
     @Transactional
     @PostMapping("/send-decline-email")

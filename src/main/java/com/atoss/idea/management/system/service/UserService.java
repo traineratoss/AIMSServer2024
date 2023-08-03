@@ -25,7 +25,8 @@ public interface UserService {
     /**
      * Updates the information of a user identified by the given username
      *
-     * This method retrieves the user from the repository based on the provided username and updates the user's information according to the fields specified in the UserUpdateDTO object.
+     * This method retrieves the user from the repository based on the provided username and updates the user's information
+     * according to the fields specified in the UserUpdateDTO object.
      *
      * @param username the username of the user whose information is to be updated
      * @param userUpdateDTO the new information about user
@@ -130,12 +131,12 @@ public interface UserService {
      *
      * @throws UserNotFoundException        If the user specified in the user information is not found in the system's database.
      * @throws ApproveAlreadyGrantedException If the user's request has already been approved, and the decline email cannot be sent.
-     * @throws UserStatusIsActiveException   If the user has already been activated, and the decline email cannot be sent.
+     * @throws UserAlreadyActivatedException   If the user has already been activated, and the decline email cannot be sent.
      *
      * @see ResponseEntity
      * @see UserNotFoundException
      * @see ApproveAlreadyGrantedException
-     * @see UserStatusIsActiveException
+     * @see UserAlreadyActivatedException
      */
     ResponseEntity<Object> sendDeclineEmail(String user);
 

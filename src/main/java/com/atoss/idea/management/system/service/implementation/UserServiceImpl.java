@@ -223,7 +223,7 @@ public class UserServiceImpl implements UserService {
             if (deleteUser(username)) {
                 return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
             }
-            throw new UserStatusIsActiveException("User status is active");
+            throw new UserAlreadyActivatedException("User status is active");
         }
         throw new ApproveAlreadyGrantedException("Approve already granted exception");
     }
