@@ -15,6 +15,14 @@ public class AvatarController {
 
     private final AvatarService avatarService;
 
+    /**
+     * Constructor for creating an instance of the AvatarController.
+     *
+     * @param avatarService The AvatarService used by the controller to handle avatar-related operations.
+     *
+     * @see AvatarController
+     * @see AvatarService
+     */
     public AvatarController(AvatarService avatarService) {
         this.avatarService = avatarService;
     }
