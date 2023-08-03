@@ -43,10 +43,10 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * CONSTRUCTOR
-     * @param commentRepository needed
-     * @param ideaRepository  needed
-     * @param userRepository needed
-     * @param modelMapper needed
+     * @param commentRepository for accessing CRUD repository methods for Comment Entity
+     * @param ideaRepository for accessing CRUD repository methods for Idea Entity
+     * @param userRepository for accessing CRUD repository methods for User Entity
+     * @param modelMapper for mapping entity-dto relationships
      */
     public CommentServiceImpl(CommentRepository commentRepository, IdeaRepository ideaRepository,
                               UserRepository userRepository, ModelMapper modelMapper) {
