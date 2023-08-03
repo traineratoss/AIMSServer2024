@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.security.authentication.BadCredentialsException;
 
 @Service
 public interface UserService {
@@ -106,18 +107,108 @@ public interface UserService {
      */
     boolean changePassword(ChangePasswordDTO changePasswordDTO);
 
+    /**
+     * Sends an approval email to the user with the specified username.
+     *
+     * @param username The username of the user to whom the approval email will be sent.
+     *
+     * @return A ResponseEntity representing the result of sending the approval email.
+     *
+     * @throws UserNotFoundException when the user was not found in the database
+     * @throws ApproveAlreadyGrantedException when the user's request was already approved
+     *
+     * @see ResponseEntity
+     */
     ResponseEntity<Object> sendApproveEmail(String username);
 
+    /**
+     * Sends a decline email to the user with the specified information.
+     *
+     * @param user The information of the user for whom the decline email will be sent.
+     *
+     * @return A ResponseEntity representing the result of sending the decline email.
+     *
+     * @throws UserNotFoundException        If the user specified in the user information is not found in the system's database.
+     * @throws ApproveAlreadyGrantedException If the user's request has already been approved, and the decline email cannot be sent.
+     * @throws UserStatusIsActiveException   If the user has already been activated, and the decline email cannot be sent.
+     *
+     * @see ResponseEntity
+     * @see UserNotFoundException
+     * @see ApproveAlreadyGrantedException
+     * @see UserStatusIsActiveException
+     */
     ResponseEntity<Object> sendDeclineEmail(String user);
 
+    /**
+     * Authenticates a user's login credentials and returns security-related information.
+     *
+     * @param usernameOrEmail The username or email of the user trying to log in.
+     * @param password        The password provided by the user for authentication.
+     *
+     * @return A UserSecurityDTO object containing security-related information after successful authentication.
+     *         If the login credentials are valid, the UserSecurityDTO object will hold security-related data,
+     *         such as access tokens, refresh tokens, or other security-related information.
+     *         If the login credentials are invalid, the method may return null or throw an exception, depending on the implementation.
+     *
+     * @throws UserAlreadyDeactivatedException if the user account is deactivated
+     * @throws BadCredentialsException if the credentials entered are not valid
+     *
+     * @see ResponseEntity
+     */
     UserSecurityDTO login(String usernameOrEmail, String password);
 
+    /**
+     * Sends a forgot password email to the user with the specified username or email.
+     *
+     * @param usernameOrEmail The username or email of the user for whom the forgot password email will be sent.
+     *
+     * @return A ResponseEntity representing the result of sending the forgot password email.
+     *
+     * @throws UserNotFoundException if the user specified was not found in the database
+     *
+     * @see ResponseEntity
+     */
     ResponseEntity<UserResponseDTO> sendForgotPassword(String usernameOrEmail);
 
+    /**
+     * Deletes a user from the system based on the provided username.
+     *
+     * @param username The username of the user to be deleted.
+     *
+     * @return true if the user is successfully deleted, false otherwise.
+     *
+     * @throws UserNotFoundException If the user specified in the username is not found in the system's database.
+     */
     Boolean deleteUser(String username);
 
+    /**
+     * Sends a deactivate email to the user with the specified information.
+     *
+     * @param user The information of the user for whom the deactivate email will be sent.
+     *
+     * @return A ResponseEntity representing the result of sending the deactivate email.
+     *
+     * @throws UserNotFoundException if the user is not found in the database
+     * @throws UserAlreadyDeactivatedException if the user has already been deactivated
+     * @throws EmailFailedException if the email was not sent
+     *
+     * @see ResponseEntity
+     */
     ResponseEntity<Object> sendDeactivateEmail(String user);
 
+    /**
+     * Sends an activate email to the user with the specified information.
+     *
+     * @param user The information of the user for whom the activate email will be sent.
+     *
+     * @return A ResponseEntity representing the result of sending the activate email.
+     *
+     * @throws UserNotFoundException if the user is not found in the database
+     * @throws UserAlreadyDeactivatedException if the user has already been deactivated
+     * @throws EmailFailedException if the email was not sent
+     *
+     * @see ResponseEntity
+     */
     ResponseEntity<Object> sendActivateEmail(String user);
 
 
