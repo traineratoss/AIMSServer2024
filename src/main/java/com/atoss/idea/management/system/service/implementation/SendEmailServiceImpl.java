@@ -1,6 +1,9 @@
 package com.atoss.idea.management.system.service.implementation;
 
+import com.atoss.idea.management.system.exception.AvatarNotFoundException;
+import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
+import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
@@ -22,6 +25,8 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private final UserRepository userRepository;
+
+    private final AvatarRepository avatarRepository;
     private final JavaMailSender emailSender;
 
     @Value("${spring.mail.username}")
@@ -31,8 +36,9 @@ public class SendEmailServiceImpl implements SendEmailService {
     private String bcryptSalt;
     private final String companyName = "Company Name ";
 
-    public SendEmailServiceImpl(UserRepository userRepository, JavaMailSender emailSender) {
+    public SendEmailServiceImpl(UserRepository userRepository, AvatarRepository avatarRepository, JavaMailSender emailSender) {
         this.userRepository = userRepository;
+        this.avatarRepository = avatarRepository;
         this.emailSender = emailSender;
     }
 
@@ -49,6 +55,9 @@ public class SendEmailServiceImpl implements SendEmailService {
         user.setIsActive(true);
         user.setHasPassword(true);
         user.setRole(Role.STANDARD);
+        user.setFullName("");
+        Avatar avatar = avatarRepository.findById(1L).orElseThrow(() -> new AvatarNotFoundException("Avatar not found!"));
+        user.setAvatar(avatar);
         userRepository.save(user);
     }
 

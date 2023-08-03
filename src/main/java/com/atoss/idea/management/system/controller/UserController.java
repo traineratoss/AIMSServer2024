@@ -85,7 +85,8 @@ public class UserController {
     public ResponseEntity<UserPageDTO> getAllUserByUsername(@RequestParam(required = true) int pageSize,
                                                             @RequestParam(required = true) int pageNumber,
                                                             @RequestParam(required = true) String sortCategory,
-                                                            @RequestParam(name = "username") String username) {
+                                                            @RequestParam(name = "username") String username,
+                                                            @RequestParam(name = "currentUsername") String currentUsername) {
         return new ResponseEntity<>(
                 userService.getAllUsersByUsernamePageable(
                     PageRequest.of(
@@ -93,7 +94,8 @@ public class UserController {
                             pageSize,
                             Sort.by(Sort.Direction.ASC, sortCategory)
                     ),
-                    username
+                    username,
+                    currentUsername
                 ),
                 HttpStatus.OK
         );

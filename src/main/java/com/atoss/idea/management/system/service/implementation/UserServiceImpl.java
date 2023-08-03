@@ -143,12 +143,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserPageDTO getAllUsersByUsernamePageable(Pageable pageable, String username) {
+    public UserPageDTO getAllUsersByUsernamePageable(
+            Pageable pageable,
+            String username,
+            String currentUsername
+    ) {
         UserPageDTO userPageDTO = new UserPageDTO();
         userPageDTO.setTotal(userRepository.findByUsernameStartsWith(username, Pageable.unpaged()).getContent().size());
         List<UserAdminDashboardResponseDTO> result = userRepository
                 .findByUsernameStartsWith(username, pageable)
                 .stream()
+                .filter(user -> user.getUsername().equals(currentUsername) == false)
                 .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
                 .toList();
         return new UserPageDTO(userPageDTO.getTotal(), new PageImpl(result, pageable, result.size()));
