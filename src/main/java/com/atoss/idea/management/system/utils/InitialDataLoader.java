@@ -101,7 +101,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
             String emailPrefix = "standarduser";
             String emailDomain = "@gmail.com";
-            String usernamePrefix = "Standard";
+            String usernamePrefix = "standard";
             String namePrefix = "User Standard";
             String password = BCrypt.hashpw("StandardUser", bcryptSalt);
 
@@ -118,23 +118,23 @@ public class InitialDataLoader implements CommandLineRunner {
             }
 
 
-            User user1 = createUser(true, Role.ADMIN, avatar1, "ap6548088@gmail.com", "Adrian22",
+            User user1 = createUser(true, Role.ADMIN, avatar1, "ap6548088@gmail.com", "adrian22",
                     "Adrian Popescu", BCrypt.hashpw("AtossAdmin123", bcryptSalt), true);
             userRepository.save(user1);
 
-            User user2 = createUser(true, Role.STANDARD, avatar1, "anaburlacu020626@gmail.com", "AnaS26",
+            User user2 = createUser(true, Role.STANDARD, avatar1, "anaburlacu020626@gmail.com", "anaS26",
                     "Ana Burlacu", BCrypt.hashpw("StandardUser", bcryptSalt), true);
             userRepository.save(user2);
 
-            User user3 = createUser(true, Role.ADMIN, avatar1, "aA12332111114@gmail.com", "Ale009",
+            User user3 = createUser(true, Role.ADMIN, avatar1, "aA12332111114@gmail.com", "ale009",
                     "Alexandra Moise", BCrypt.hashpw("AleAdmin2676", bcryptSalt), true);
             userRepository.save(user3);
 
-            User user4 = createUser(false, null, null, "andreiuser973@gmail.com", "Andrei09888",
+            User user4 = createUser(false, null, null, "andreiuser973@gmail.com", "andrei09888",
                     null, null, false);
             userRepository.save(user4);
 
-            User user5 = createUser(false, null, null, "usercristian91@gmail.com", "Cosmin4455",
+            User user5 = createUser(false, null, null, "usercristian91@gmail.com", "cosmin4455",
                     null, null, false);
             userRepository.save(user5);
 

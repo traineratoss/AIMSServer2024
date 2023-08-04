@@ -247,12 +247,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<UserResponseDTO> sendForgotPassword(String usernameOrEmail) {
+    public ResponseEntity<Object> sendForgotPassword(String usernameOrEmail) {
         User user = userRepository
                 .findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new UserNotFoundException("User or email not found"));
-        sendEmailService.sendEmailForgotPassword(user.getUsername());
-        return new ResponseEntity<>(modelMapper.map(user, UserResponseDTO.class), HttpStatus.OK);
+        if (user.getIsActive()) {
+            sendEmailService.sendEmailForgotPassword(user.getUsername());
+            return new ResponseEntity<>("Email send", HttpStatus.OK);
+        } else {
+            if (user.getHasPassword()) {
+                throw new UserAlreadyDeactivatedException("User was deactivated");
+            }
+            throw new BadCredentialsException("User not activated");
+        }
     }
 
     @Override
