@@ -136,7 +136,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     "Adrian Popescu", BCrypt.hashpw("AtossAdmin123", bcryptSalt), true);
             userRepository.save(user1);
 
-            User user2 = createUser(true, Role.STANDARD, avatar1, "anaburlacu020626@gmail.com", "anaS26",
+            User user2 = createUser(true, Role.STANDARD, avatar1, "anaburlacu020626@gmail.com", "anas26",
                     "Ana Burlacu", BCrypt.hashpw("StandardUser", bcryptSalt), true);
             userRepository.save(user2);
 
