@@ -25,6 +25,9 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -35,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 @Service
 public class CommentServiceImpl implements CommentService {
+    ClassLoader classLoader = getClass().getClassLoader();
     private List<String> badWords = new ArrayList<>();
     private final CommentRepository commentRepository;
     private final IdeaRepository ideaRepository;
@@ -166,14 +170,19 @@ public class CommentServiceImpl implements CommentService {
 
     @Transactional
     @Override
-    public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) {
+    public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) throws UnsupportedEncodingException {
 
         User user = userRepository.findByUsername(requestCommentDTO.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found!"));
 
         Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
 
         Comment newComment =  new Comment();
-        readBadWordsFromFile("src/main/resources/textTerms/badWords.txt");
+        String wordsFilePath = "textTerms/badWords.txt";
+        URL resourceUrl = classLoader.getResource(wordsFilePath);
+        if (resourceUrl != null) {
+            String filePath = URLDecoder.decode(resourceUrl.getFile(), "UTF-8");
+            readBadWordsFromFile(filePath);
+        }
         java.util.Date creationDate = new java.util.Date();
 
         newComment.setUser(user);

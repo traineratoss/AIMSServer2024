@@ -27,6 +27,9 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,6 +40,7 @@ import java.util.Objects;
 @Service
 @Log4j2
 public class IdeaServiceImpl implements IdeaService {
+    ClassLoader classLoader = getClass().getClassLoader();
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -105,7 +109,7 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) {
+    public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws UnsupportedEncodingException {
 
         if (idea.getTitle() == null || idea.getTitle().isEmpty()) {
             throw new FieldValidationException("Please enter a valid title for the idea.");
@@ -124,7 +128,12 @@ public class IdeaServiceImpl implements IdeaService {
         }
 
         Idea savedIdea = new Idea();
-        readBadWordsFromFile("src/main/resources/textTerms/badWords.txt");
+        String wordsFilePath = "textTerms/badWords.txt";
+        URL resourceUrl = classLoader.getResource(wordsFilePath);
+        if (resourceUrl != null) {
+            String filePath = URLDecoder.decode(resourceUrl.getFile(), "UTF-8");
+            readBadWordsFromFile(filePath);
+        }
 
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("No user found by this username."));
         savedIdea.setUser(user);
@@ -178,8 +187,14 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public IdeaResponseDTO updateIdeaById(Long id, IdeaUpdateDTO ideaUpdateDTO) {
-        readBadWordsFromFile("src/main/resources/textTerms/badWords.txt");
+    public IdeaResponseDTO updateIdeaById(Long id, IdeaUpdateDTO ideaUpdateDTO) throws UnsupportedEncodingException {
+        String wordsFilePath = "textTerms/badWords.txt";
+        URL resourceUrl = classLoader.getResource(wordsFilePath);
+        if (resourceUrl != null) {
+            String filePath = URLDecoder.decode(resourceUrl.getFile(), "UTF-8");
+            readBadWordsFromFile(filePath);
+        }
+
 
         if (ideaRepository.findById(id).isPresent()) {
 

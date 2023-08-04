@@ -10,6 +10,7 @@ import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 public interface CommentService {
@@ -41,7 +42,7 @@ public interface CommentService {
      * @throws UserNotFoundException when the username is not found in the database
      * @throws IdeaNotFoundException when the id for an idea is not found in the database
      */
-    ResponseCommentDTO addComment(RequestCommentDTO newComment);
+    ResponseCommentDTO addComment(RequestCommentDTO newComment) throws UnsupportedEncodingException;
 
     /**
      * Takes a RequestCommentReplyDTO and formats it to fit a Comment's entity structure
