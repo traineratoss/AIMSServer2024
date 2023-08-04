@@ -368,9 +368,6 @@ public class IdeaServiceImpl implements IdeaService {
         criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
         TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
 
-        //int totalSize = query.getMaxResults();
-        //Daca folosim getMaxResults(), TotalElements va fi egal cu 2147483647
-
         int totalSize = query.getResultList().size();
 
         if (pageable != null) {
@@ -446,7 +443,7 @@ public class IdeaServiceImpl implements IdeaService {
 
         Long nrOfComments = getSelectionCommentNumber(selectedDateFrom, selectedDateTo);
         Long nrOfReplies = getSelectionRepliesNumber(selectedDateFrom, selectedDateTo);
-        Long nrOfIdeas = (long) ideaPageDTO.getTotalElements();
+        Long nrOfIdeas = (long) ideaPageDTO.getContent().size();
 
         StatisticsDTO filteredStatisticsDTO = getFilteredStatistics(ideaPageDTO);
 
