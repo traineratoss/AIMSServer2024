@@ -169,7 +169,7 @@ public interface UserService {
      *
      * @see ResponseEntity
      */
-    ResponseEntity<UserResponseDTO> sendForgotPassword(String usernameOrEmail);
+    ResponseEntity<Object> sendForgotPassword(String usernameOrEmail);
 
     /**
      * Deletes a user from the system based on the provided username.

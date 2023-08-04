@@ -333,11 +333,13 @@ public class IdeaServiceImpl implements IdeaService {
         }
 
         if (title != null) {
-            predicatesList.add(cb.like(root.get("title"), "%" + title + "%"));
+            String nonCaseSensitiveTitle = title.toLowerCase();
+            predicatesList.add(cb.like(cb.lower(root.get("title")), "%" + nonCaseSensitiveTitle + "%"));
         }
 
         if (text != null) {
-            predicatesList.add(cb.like(root.get("text"), "%" + text + "%"));
+            String nonCaseSensitiveText = text.toLowerCase();
+            predicatesList.add(cb.like(cb.lower(root.get("text")), "%" + nonCaseSensitiveText + "%"));
         }
 
         if (statuses != null && !statuses.isEmpty()) {
@@ -366,7 +368,10 @@ public class IdeaServiceImpl implements IdeaService {
         criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
         TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
 
-        int totalSize = query.getMaxResults();
+        //int totalSize = query.getMaxResults();
+        //Daca folosim getMaxResults(), TotalElements va fi egal cu 2147483647
+
+        int totalSize = query.getResultList().size();
 
         if (pageable != null) {
             query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
@@ -527,8 +532,8 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (selectedDateFrom != null && selectedDateTo == null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom + " 00:00:00");
                 predicatesList.add(cb.greaterThanOrEqualTo(root.get(columnName), fromDate));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -537,8 +542,8 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (selectedDateFrom == null && selectedDateTo != null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date toDate = simpleDateFormat.parse(selectedDateTo + " 23:59:59");
                 predicatesList.add(cb.lessThanOrEqualTo(root.get(columnName), toDate));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -547,9 +552,9 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (selectedDateFrom != null && selectedDateTo != null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
-                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom + " 00:00:00");
+                Date toDate = simpleDateFormat.parse(selectedDateTo + " 23:59:59");
                 predicatesList.add(cb.between(root.get(columnName), fromDate, toDate));
             } catch (ParseException e) {
                 e.printStackTrace();

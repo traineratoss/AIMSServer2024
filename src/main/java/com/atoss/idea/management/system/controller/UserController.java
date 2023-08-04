@@ -309,7 +309,7 @@ public class UserController {
      */
     @Transactional
     @PostMapping("/send-forgot-password")
-    public ResponseEntity<UserResponseDTO> sendForgotPassword(@RequestBody String usernameOrEmail) {
+    public ResponseEntity<Object> sendForgotPassword(@RequestBody String usernameOrEmail) {
         return userService.sendForgotPassword(usernameOrEmail);
     }
 
