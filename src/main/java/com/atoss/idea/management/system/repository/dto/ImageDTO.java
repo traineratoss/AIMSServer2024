@@ -8,9 +8,11 @@ import java.util.Base64;
 @Data
 public class ImageDTO {
 
+    private Long id;
     private byte[] image;
     private String fileName;
     private String fileType;
+
 
     /**
      * Method is used to convert the byte array image data to a Base64 encoded string.
