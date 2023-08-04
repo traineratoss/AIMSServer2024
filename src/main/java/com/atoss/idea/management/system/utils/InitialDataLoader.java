@@ -8,11 +8,13 @@ import com.atoss.idea.management.system.repository.ImageRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.entity.*;
 import jakarta.transaction.Transactional;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import java.io.File;
+import java.security.SecureRandom;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -20,12 +22,20 @@ import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
+@Log4j2
 @Component
 public class InitialDataLoader implements CommandLineRunner {
+    private static final SecureRandom random = new SecureRandom();
+
     private final AvatarRepository avatarRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
@@ -70,6 +80,8 @@ public class InitialDataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         ClassLoader classLoader = getClass().getClassLoader();
+
+        // Avatar CONSTRUCTOR
         if (ddlValue.equals("create")) {
             String[] avatarFileNames = {
                 "avatar1.svg",
@@ -95,9 +107,11 @@ public class InitialDataLoader implements CommandLineRunner {
                     }
                 }
             }
-
-
             Avatar avatar1 = avatarList.get(0);
+
+
+            //User CONSTRUCTOR
+            ArrayList<User> userList = new ArrayList<>();
 
             String emailPrefix = "standarduser";
             String emailDomain = "@gmail.com";
@@ -105,14 +119,14 @@ public class InitialDataLoader implements CommandLineRunner {
             String namePrefix = "User Standard";
             String password = BCrypt.hashpw("StandardUser", bcryptSalt);
 
-
-            ArrayList<User> userList = new ArrayList<>();
-            for (int j = 1; j < 10; j++) {
+            //dummy user
+            int numberOfUsers = 10;
+            for (int j = 1; j < numberOfUsers; j++) {
                 String email = emailPrefix + String.format("%02d", j) + emailDomain;
                 String username = usernamePrefix + String.format("%02d", j);
                 String name = namePrefix + " " + j;
 
-                User user = createUser(true, Role.STANDARD, avatar1, email, username, name, password, true);
+                User user = createUser(true, randomEnum(Role.class), randomElementFromList(avatarList), email, username, name, password, true);
                 userList.add(user);
                 userRepository.save(user);
             }
@@ -134,10 +148,12 @@ public class InitialDataLoader implements CommandLineRunner {
                     null, null, false);
             userRepository.save(user4);
 
-            User user5 = createUser(false, null, null, "usercristian91@gmail.com", "cosmin4455",
+            User user5 = createUser(false, null, null, "usercristian91@gmail.com", "aosmin4455",
                     null, null, false);
             userRepository.save(user5);
 
+
+            //Category CONSTRUCTOR
             Category category1 = createCategory("Innovation");
             categoryRepository.save(category1);
 
@@ -147,10 +163,29 @@ public class InitialDataLoader implements CommandLineRunner {
             Category category3 = createCategory("Nature");
             categoryRepository.save(category3);
 
+            List<Category> categories = new ArrayList<>();
+            categories.add(category1);
+            categories.add(category2);
+            categories.add(category3);
+            List<Category> categories1 = new ArrayList<>();
+            categories1.add(category2);
+
+            ArrayList<ArrayList<Category>> categoryMatrix = new ArrayList<>();
+            categoryMatrix.add(new ArrayList<>());
+            categoryMatrix.add(new ArrayList<>());
+            categoryMatrix.add(new ArrayList<>());
+
+            categoryMatrix.get(0).add(category1);
+            categoryMatrix.get(1).add(category3);
+            categoryMatrix.get(2).add(category2);
+
+
+            //Image CONSTRUCTOR
             String[] imageFileNames = {
                 "img.png",
                 "img3.png"
             };
+
 
             ArrayList<Image> imageList = new ArrayList<>();
             String imageFilePath = "image/idea/";
@@ -167,14 +202,10 @@ public class InitialDataLoader implements CommandLineRunner {
                 }
             }
 
+            final Image image1 = imageList.get(0);
+            final Image image2 = imageList.get(1);
 
-            List<Category> categories = new ArrayList<>();
-            categories.add(category1);
-            categories.add(category2);
-            categories.add(category3);
-            List<Category> categories1 = new ArrayList<>();
-            categories1.add(category2);
-
+            //Date
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String staticDateString = "2023-07-26 12:00:00";
             String staticDateString2 = "2023-06-26 12:00:00";
@@ -189,35 +220,35 @@ public class InitialDataLoader implements CommandLineRunner {
                 return;
             }
 
-            final Image image1 = imageList.get(0);
-            final Image image2 = imageList.get(1);
+            LocalDate start = LocalDate.of(2023, 7, 25);
+            LocalDate end = LocalDate.now();
+            Date date = new Date();
 
+
+            //Idea CONSTRUCTOR
             Idea idea1 = createIdea(user1, Status.OPEN, "Having a clear set of values for your "
                     + "company is another effective way to improve morale and provide guidance to staff. "
                     + "Creating and publishing your company values and morals provides a clear guideline "
-                    + "for what the company stands for and is working towards. This can provide guidance "
-                    + "for staff on the preferred course of action when faced with a decision during work, "
-                    + "and also may provide a positive outlook on what the work they contribute to the company "
-                    + "builds toward.", "Create clear company values", image1, staticDate, categories1);
+                    + "for what the company stands for and is working towards.",
+                    "Create clear company values", image1, staticDate, categories1);
 
             Idea idea2 = createIdea(user1, Status.OPEN, "Communication within an organization is often one of the most"
                     + " important elements of successful work. Providing staff with both the physical methods "
                     + "of communicating and a company culture that encourages communication can help staff do "
-                    + "more efficiently find answers to any questions they have. This can help to increase employees'"
-                    + " productive hours.", "Establish lines of communication", image2, staticDate2, categories);
+                    + "more efficiently find answers to any questions they have. ",
+                    "Establish lines of communication", image2, staticDate2, categories);
 
             Idea idea3 = createIdea(user1, Status.IMPLEMENTED, "Creating fair standards for employee performance assessment "
-                            + "within your organization can create a more fair and inclusive corporate culture. This can have two "
-                            + "important benefits for improving your company. First, by applying standards in a fair and clearly "
-                            + "described manner, you minimize the opportunity for employees to feel like a co-worker received benefits "
-                            + "they did not. Setting fair standards also helps you to identify your higher-performing employees, who may "
-                            + "receive enhanced responsibilities within the organization.", "Apply standards equally",
-                    null, new Date(), categories);
+                    + "within your organization can create a more fair and inclusive corporate culture. This can have two "
+                    + "important benefits for improving your company. First, by applying standards in a fair and clearly "
+                    + "described manner, you minimize the opportunity for employees to feel like a co-worker received benefits "
+                    + "they did not.",
+                    "Apply standards equally", null, new Date(), categories);
 
             Idea idea4 = createIdea(user2, Status.IMPLEMENTED, "Changing your company's payment structure allows you to make more "
-                            + "appealing offers to current and potential staff. Apart from allowing you to maintain your most essential "
-                            + "employees by showing that you value their work, this can help you make higher-quality hires as well. "
-                            + "Hiring more productive staff can compensate for the increased salary cost in the form of increased profit generation.",
+                    + "appealing offers to current and potential staff. Apart from allowing you to maintain your most essential "
+                    + "employees by showing that you value their work, this can help you make higher-quality hires as well. "
+                    + "Hiring more productive staff can compensate for the increased salary cost in the form of increased profit generation.",
                     "Raise compensation to raise employee quality", null, new Date(), categories);
 
             ideaRepository.save(idea1);
@@ -225,23 +256,32 @@ public class InitialDataLoader implements CommandLineRunner {
             ideaRepository.save(idea3);
             ideaRepository.save(idea4);
 
-
             List<Idea> ideaList = new ArrayList<>();
 
-            Status status = Status.OPEN;
-            String text = "Test";
-            Date date = new Date();
+            //dummy idea
+            int numberOfIdeasToCreate = 20;
 
+            // if we want more ideas in the same day, we need a small number
+            int numberOfDateI = 5;
             int k = 1;
-            for (User user : userList) {
+            for (int j = 1; j < numberOfIdeasToCreate; j++) {
+                ArrayList<Date> randomDate = null;
+                for (int i = 1; i < numberOfDateI; i++) {
+                    randomDate = new ArrayList<>();
+                    long randomEpochDay = ThreadLocalRandom.current().nextLong(start.toEpochDay(), end.toEpochDay());
+                    Date dateR = Date.from(LocalDate.ofEpochDay(randomEpochDay).atStartOfDay(ZoneId.systemDefault()).toInstant());
+                    randomDate.add(dateR);
+                }
                 String title = "New Idea " + k;
-                Idea idea = createIdea(user, status, text, title, null, date, categories);
+                String text = "New text" + k;
+                Idea idea = createIdea(randomElementFromList(userList), randomEnum(Status.class), text, title,
+                        null, randomDateFromList(randomDate),  randomElementFromList(categoryMatrix));
                 ideaList.add(idea);
                 ideaRepository.save(idea);
                 k++;
             }
 
-
+            //Comment CONSTRUCTOR
             Comment comment1 = createComment(staticDate, idea1, null,
                     user1, "It's unnecessary");
             commentRepository.save(comment1);
@@ -257,30 +297,107 @@ public class InitialDataLoader implements CommandLineRunner {
             commentRepository.save(reply1);
             List<Category> categoryList = new ArrayList<>();
 
+            //dummy comment
             int n = 0;
-            int numberOfCommentsPerIdea = 4;
-            for (Idea idea : ideaList) {
+
+            // if we want more ideas in the same day, we need a small number
+            int numberOfDateC = 5;
+            int numberOfComment = 20;
+
+            //random number of comment per idea
+            int numberOfCommentsPerIdea = givenList_shouldReturnARandomElement();
+            for (int a = 1; a < numberOfComment; a++) {
                 for (int i = 0; i < numberOfCommentsPerIdea; i++) {
-                    String commentText = "Comment " + n + " for: " + idea.getTitle();
-                    Comment comment = createComment(date, idea, null, user1, commentText);
+                    ArrayList<Date> randomDate = null;
+                    for (int j = 1; j < numberOfDateC; j++) {
+                        randomDate = new ArrayList<>();
+                        long randomEpochDay = ThreadLocalRandom.current().nextLong(start.toEpochDay(), end.toEpochDay());
+                        Date dateR = Date.from(LocalDate.ofEpochDay(randomEpochDay).atStartOfDay(ZoneId.systemDefault()).toInstant());
+                        randomDate.add(dateR);
+                    }
+                    String commentText = "Comment " + n;
+                    Comment comment = createComment(randomDateFromList(randomDate), randomElementFromList(ideaList), null,
+                            randomElementFromList(userList), commentText);
                     commentRepository.save(comment);
                     commentList.add(comment);
                     n++;
                 }
             }
 
+            //dummy reply
             int m = 0;
-            int numberOfRepliesPerComment = 2;
-            for (Comment comment : commentList) {
+            int numberOfRepliesPerComment = givenList_shouldReturnARandomElement();
+            for (int a = 1; a < numberOfComment; a++) {
                 for (int i = 0; i < numberOfRepliesPerComment; i++) {
-                    String replyText = "Reply " + m + " for: " + comment.getCommentText();
-                    Comment reply = createReply(date, comment1, idea2, user2, replyText);
+                    ArrayList<Date> randomDate = null;
+                    for (int j = 1; j < numberOfDateC; j++) {
+                        randomDate = new ArrayList<>();
+                        long randomEpochDay = ThreadLocalRandom.current().nextLong(start.toEpochDay(), end.toEpochDay());
+                        Date dateR = Date.from(LocalDate.ofEpochDay(randomEpochDay).atStartOfDay(ZoneId.systemDefault()).toInstant());
+                        randomDate.add(dateR);
+                    }
+                    String replyText = "Reply " + m;
+                    Comment reply = createReply(randomDateFromList(randomDate), randomElementFromList(commentList),
+                            randomElementFromList(ideaList), randomElementFromList(userList), replyText);
                     commentRepository.save(reply);
                     m++;
                 }
             }
         }
     }
+
+    /**
+     * return random number - for date
+     *
+     * @return random number
+     */
+
+    public int givenList_shouldReturnARandomElement() {
+        List<Integer> givenList = Arrays.asList(1, 2, 3);
+        Random rand = new Random();
+        int randomElement = givenList.get(rand.nextInt(givenList.size()));
+        return randomElement;
+    }
+
+    /**
+     * random generator from choosing one date
+     *
+     * @param randomList - dateList
+     * @return one random date
+     */
+
+    public Date randomDateFromList(List<Date> randomList) {
+        Random rand = new Random();
+        List<Date> givenList = randomList;
+
+        int numberOfElements = givenList_shouldReturnARandomElement();
+
+        Date randomElement = null;
+        for (int i = 0; i < numberOfElements; i++) {
+            int randomIndex = rand.nextInt(givenList.size());
+            randomElement = givenList.get(randomIndex);
+        }
+        return randomElement;
+    }
+
+    /**
+     * random generic
+     *
+     * @param randomList - generic list
+     * @param <T> generic type
+     * @return random generic entity
+     */
+
+    public static <T> T randomElementFromList(List<T> randomList) {
+        if (randomList == null || randomList.isEmpty()) {
+            throw new IllegalArgumentException("List must not be null or empty");
+        }
+
+        Random rand = new Random();
+        T randomElement = randomList.get(rand.nextInt(randomList.size()));
+        return randomElement;
+    }
+
 
     /**
      * CONSTRUCTOR - create new User
@@ -313,11 +430,25 @@ public class InitialDataLoader implements CommandLineRunner {
     }
 
     /**
+     * random function for status (create idea)
+     *
+     * @param clazz enum class
+     * @param <T> one entity of enum
+     * @return one entity from that enum
+     */
+
+    public static <T extends Enum<?>> T randomEnum(Class<T> clazz) {
+        int x = random.nextInt(clazz.getEnumConstants().length);
+        return clazz.getEnumConstants()[x];
+    }
+
+    /**
      * CONSTRUCTOR - create new Category
      *
      * @param text - name of category
      * @return category
      */
+
 
     private static Category createCategory(
             String text
