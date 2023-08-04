@@ -532,8 +532,8 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (selectedDateFrom != null && selectedDateTo == null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom + " 00:00:00");
                 predicatesList.add(cb.greaterThanOrEqualTo(root.get(columnName), fromDate));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -542,8 +542,8 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (selectedDateFrom == null && selectedDateTo != null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date toDate = simpleDateFormat.parse(selectedDateTo + " 23:59:59");
                 predicatesList.add(cb.lessThanOrEqualTo(root.get(columnName), toDate));
             } catch (ParseException e) {
                 e.printStackTrace();
@@ -552,9 +552,9 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (selectedDateFrom != null && selectedDateTo != null) {
             try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date fromDate = simpleDateFormat.parse(selectedDateFrom);
-                Date toDate = simpleDateFormat.parse(selectedDateTo);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date fromDate = simpleDateFormat.parse(selectedDateFrom + " 00:00:00");
+                Date toDate = simpleDateFormat.parse(selectedDateTo + " 23:59:59");
                 predicatesList.add(cb.between(root.get(columnName), fromDate, toDate));
             } catch (ParseException e) {
                 e.printStackTrace();
