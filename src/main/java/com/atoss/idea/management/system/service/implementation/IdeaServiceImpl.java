@@ -333,11 +333,13 @@ public class IdeaServiceImpl implements IdeaService {
         }
 
         if (title != null) {
-            predicatesList.add(cb.like(root.get("title"), "%" + title + "%"));
+            String nonCaseSensitiveTitle = title.toLowerCase();
+            predicatesList.add(cb.like(cb.lower(root.get("title")), "%" + nonCaseSensitiveTitle + "%"));
         }
 
         if (text != null) {
-            predicatesList.add(cb.like(root.get("text"), "%" + text + "%"));
+            String nonCaseSensitiveText = text.toLowerCase();
+            predicatesList.add(cb.like(cb.lower(root.get("text")), "%" + nonCaseSensitiveText + "%"));
         }
 
         if (statuses != null && !statuses.isEmpty()) {
@@ -366,7 +368,10 @@ public class IdeaServiceImpl implements IdeaService {
         criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
         TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
 
-        int totalSize = query.getMaxResults();
+        //int totalSize = query.getMaxResults();
+        //Daca folosim getMaxResults(), TotalElements va fi egal cu 2147483647
+
+        int totalSize = query.getResultList().size();
 
         if (pageable != null) {
             query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
