@@ -148,7 +148,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     null, null, false);
             userRepository.save(user4);
 
-            User user5 = createUser(false, null, null, "usercristian91@gmail.com", "aosmin4455",
+            User user5 = createUser(false, null, null, "usercristian91@gmail.com", "cosmin4455",
                     null, null, false);
             userRepository.save(user5);
 
