@@ -3,10 +3,7 @@ package com.atoss.idea.management.system.service.implementation;
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.FieldValidationException;
-import com.atoss.idea.management.system.repository.CategoryRepository;
-import com.atoss.idea.management.system.repository.CommentRepository;
-import com.atoss.idea.management.system.repository.IdeaRepository;
-import com.atoss.idea.management.system.repository.UserRepository;
+import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.*;
 import com.atoss.idea.management.system.service.IdeaService;
@@ -49,6 +46,8 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final IdeaRepository ideaRepository;
 
+    private final ImageRepository imageRepository;
+
     private final UserRepository userRepository;
 
     private final CategoryRepository categoryRepository;
@@ -62,20 +61,22 @@ public class IdeaServiceImpl implements IdeaService {
     /**
      * Constructor for the Idea Service Implementation
      *
-     * @param ideaRepository repository for the Idea Entity
-     * @param userRepository repository for the User Entity
+     * @param ideaRepository     repository for the Idea Entity
+     * @param imageRepository    repository for the Image Entity
+     * @param userRepository     repository for the User Entity
      * @param categoryRepository repository for the Category Entity
-     * @param modelMapper responsible for mapping our entities
+     * @param modelMapper        responsible for mapping our entities
      * @param commentServiceImpl the service that holds all the comments logic
-     * @param commentRepository the repository of the comments
+     * @param commentRepository  the repository of the comments
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
-                           UserRepository userRepository,
+                           ImageRepository imageRepository, UserRepository userRepository,
                            CategoryRepository categoryRepository,
                            ModelMapper modelMapper,
                            CommentServiceImpl commentServiceImpl,
                            CommentRepository commentRepository) {
         this.ideaRepository = ideaRepository;
+        this.imageRepository = imageRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
@@ -146,8 +147,17 @@ public class IdeaServiceImpl implements IdeaService {
         savedIdea.setCreationDate(new Date());
 
         if (idea.getImage() != null) {
-            Image image = modelMapper.map(idea.getImage(), Image.class);
-            savedIdea.setImage(image);
+            // Check if the image already exists in the repository
+            Image existingImage = imageRepository.findImageByFileName(idea.getImage().getFileName());
+
+            if (existingImage == null) {
+                // Image does not exist, so create a new one and associate it with the idea
+                Image newImage = modelMapper.map(idea.getImage(), Image.class);
+                savedIdea.setImage(newImage);
+            } else {
+                // Image already exists, so associate the existing image with the idea
+                savedIdea.setImage(imageRepository.findImageByFileName(idea.getImage().getFileName()));
+            }
         }
 
         for (CategoryDTO categoryDTO : idea.getCategoryList()) {

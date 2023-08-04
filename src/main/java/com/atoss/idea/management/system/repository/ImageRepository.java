@@ -14,4 +14,12 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
      * @return  the Image object that matches the provided image id.
      */
     Image findImageById(Long id);
+
+    /**
+     * Finds an image by its file name
+     *
+     * @param fileName the file name of the image
+     * @return the image
+     */
+    Image findImageByFileName(String fileName);
 }

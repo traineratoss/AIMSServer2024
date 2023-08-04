@@ -59,8 +59,8 @@ public class ImageController {
      * @throws ImageNotFoundException if the image we want to get doesn't exist into the database
      *                                it will throw an exception
      */
-    @GetMapping("/{id}")
-    public ImageDTO getImage(@PathVariable("id") Long id) throws ImageNotFoundException {
+    @GetMapping("/get")
+    public ImageDTO getImage(@RequestParam Long id) throws ImageNotFoundException {
         return imageService.getImage(id);
     }
 
