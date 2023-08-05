@@ -23,4 +23,10 @@ public class StatisticsDTO {
     private Long draftIdeas;
 
     private Long openIdeas;
+
+    private Long draftP;
+
+    private Long openP;
+
+    private Long implP;
 }
