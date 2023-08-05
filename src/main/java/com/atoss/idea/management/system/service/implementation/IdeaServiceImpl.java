@@ -522,9 +522,9 @@ public class IdeaServiceImpl implements IdeaService {
         Long openIdeas = nrOfIdeas - draftedIdeas - implIdeas;
         Long nrOfComments = commentRepository.countComments();
         Long nrOfReplies = commentRepository.countAllReplies();
-        Long draftP = Math.round((double) draftedIdeas / (double) nrOfIdeas * 100) ;
-        Long openP =  Math.round((double) openIdeas / (double) nrOfIdeas * 100) ;
-        Long implP = Math.round((double) implIdeas / (double) nrOfIdeas * 100) ;
+        Long draftP = Math.round((double) draftedIdeas / (double) nrOfIdeas * 100);
+        Long openP =  Math.round((double) openIdeas / (double) nrOfIdeas * 100);
+        Long implP = Math.round((double) implIdeas / (double) nrOfIdeas * 100);
 
 
         statisticsDTO.setOpenIdeas(openIdeas);
