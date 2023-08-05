@@ -34,7 +34,7 @@ public class Idea {
     @Column(name = "date")
     private Date creationDate;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id", referencedColumnName = "image_id")
     @JsonManagedReference(value = "idea-image")
     private Image image;

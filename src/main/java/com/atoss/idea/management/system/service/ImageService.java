@@ -34,4 +34,12 @@ public interface ImageService {
      * */
     List<ImageDTO> getAllImage();
 
+    /**
+     *  Gets an image by an idea id
+     *
+     * @param id the id of the idea
+     * @return it returns the image.
+     */
+    ImageDTO getImageByIdeaId(Long id);
+
 }

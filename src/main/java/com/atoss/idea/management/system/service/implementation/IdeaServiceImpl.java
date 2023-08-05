@@ -147,16 +147,13 @@ public class IdeaServiceImpl implements IdeaService {
         savedIdea.setCreationDate(new Date());
 
         if (idea.getImage() != null) {
-            // Check if the image already exists in the repository
             Image existingImage = imageRepository.findImageByFileName(idea.getImage().getFileName());
 
             if (existingImage == null) {
-                // Image does not exist, so create a new one and associate it with the idea
                 Image newImage = modelMapper.map(idea.getImage(), Image.class);
                 savedIdea.setImage(newImage);
             } else {
-                // Image already exists, so associate the existing image with the idea
-                savedIdea.setImage(imageRepository.findImageByFileName(idea.getImage().getFileName()));
+                savedIdea.setImage(existingImage);
             }
         }
 
@@ -221,7 +218,13 @@ public class IdeaServiceImpl implements IdeaService {
             }
 
             if (ideaUpdateDTO.getImage() != null) {
-                idea.setImage(ideaUpdateDTO.getImage());
+                Image existingImage = imageRepository.findImageByFileName(ideaUpdateDTO.getImage().getFileName());
+                if (existingImage == null) {
+                    Image newImage = modelMapper.map(ideaUpdateDTO.getImage(), Image.class);
+                    idea.setImage(newImage);
+                } else {
+                    idea.setImage(existingImage);
+                }
             }
 
             if (ideaUpdateDTO.getTitle() != null) {

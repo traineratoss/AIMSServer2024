@@ -183,7 +183,12 @@ public class InitialDataLoader implements CommandLineRunner {
             //Image CONSTRUCTOR
             String[] imageFileNames = {
                 "img.png",
-                "img3.png"
+                "img2.png",
+                "img3.png",
+                "img4.png",
+                "img5.png",
+                "img6.png",
+                "img7.png"
             };
 
 
@@ -204,6 +209,11 @@ public class InitialDataLoader implements CommandLineRunner {
 
             final Image image1 = imageList.get(0);
             final Image image2 = imageList.get(1);
+            final Image image3 = imageList.get(2);
+            final Image image4 = imageList.get(3);
+            final Image image5 = imageList.get(4);
+            final Image image6 = imageList.get(5);
+            final Image image7 = imageList.get(6);
 
             //Date
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -243,13 +253,13 @@ public class InitialDataLoader implements CommandLineRunner {
                     + "important benefits for improving your company. First, by applying standards in a fair and clearly "
                     + "described manner, you minimize the opportunity for employees to feel like a co-worker received benefits "
                     + "they did not.",
-                    "Apply standards equally", null, new Date(), categories);
+                    "Apply standards equally", image3, new Date(), categories);
 
             Idea idea4 = createIdea(user2, Status.IMPLEMENTED, "Changing your company's payment structure allows you to make more "
                     + "appealing offers to current and potential staff. Apart from allowing you to maintain your most essential "
                     + "employees by showing that you value their work, this can help you make higher-quality hires as well. "
                     + "Hiring more productive staff can compensate for the increased salary cost in the form of increased profit generation.",
-                    "Raise compensation to raise employee quality", null, new Date(), categories);
+                    "Raise compensation to raise employee quality", image4, new Date(), categories);
 
             ideaRepository.save(idea1);
             ideaRepository.save(idea2);
@@ -275,7 +285,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 String title = "New Idea " + k;
                 String text = "New text" + k;
                 Idea idea = createIdea(randomElementFromList(userList), randomEnum(Status.class), text, title,
-                        null, randomDateFromList(randomDate),  randomElementFromList(categoryMatrix));
+                        image5, randomDateFromList(randomDate),  randomElementFromList(categoryMatrix));
                 ideaList.add(idea);
                 ideaRepository.save(idea);
                 k++;

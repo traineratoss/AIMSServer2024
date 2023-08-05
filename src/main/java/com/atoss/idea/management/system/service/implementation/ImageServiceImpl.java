@@ -54,4 +54,9 @@ public class ImageServiceImpl implements ImageService {
         return Arrays.asList(modelMapper.map(imageRepository.findAll(), ImageDTO[].class));
     }
 
+    @Override
+    public ImageDTO getImageByIdeaId(Long id) {
+        return modelMapper.map(imageRepository.findByIdeaId(id), ImageDTO.class);
+    }
+
 }

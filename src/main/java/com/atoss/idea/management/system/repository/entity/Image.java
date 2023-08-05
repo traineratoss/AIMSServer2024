@@ -1,18 +1,14 @@
 package com.atoss.idea.management.system.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 
 @Data
@@ -32,9 +28,9 @@ public class Image {
     @Column(name = "photo", length = 1000)
     private byte[] image;
 
-    @OneToOne(mappedBy = "image")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "image")
     @JsonBackReference(value = "idea-image")
-    private Idea idea;
+    private List<Idea> idea;
     private String fileName;
     private String fileType;
 

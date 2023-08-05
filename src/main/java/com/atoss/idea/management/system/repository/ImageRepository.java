@@ -22,4 +22,12 @@ public interface ImageRepository extends JpaRepository<Image, Long> {
      * @return the image
      */
     Image findImageByFileName(String fileName);
+
+    /**
+     * Finds an image by an idea id
+     *
+     * @param id the id of the idea
+     * @return the image associated to the idea
+     */
+    Image findByIdeaId(Long id);
 }
