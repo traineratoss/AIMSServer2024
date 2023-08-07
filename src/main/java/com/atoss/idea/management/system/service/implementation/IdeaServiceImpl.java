@@ -30,6 +30,7 @@ import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -509,10 +510,55 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
 
+    /**
+     * we use this function to retrieve the most commented ideas in order to
+     * do statistics based an them and to send them to be displayed
+     *
+     * @param mostCommentedIdeas list of idea id
+     * @return list of most commented ideas
+     */
+    public List<IdeaResponseDTO> getMostCommentedIdeas(List<Long> mostCommentedIdeas) {
+
+        return mostCommentedIdeas.stream().map(idea_id -> {
+
+            Idea idea = ideaRepository.findById(idea_id).get();
+            IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
+            ideaResponseDTO.setUsername(idea.getUser().getUsername());
+            ideaResponseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
+            ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
+
+            return ideaResponseDTO;
+        }).toList();
+    }
+
+    /**
+     * we use this function to retrieve the most replied ideas in order to
+     *  do statistics based on then and to send them to be displayed
+     *
+     * @param mostRepliedIdeas list of integers representing idea id
+     * @return list of ideas
+     */
+    public List<IdeaResponseDTO> getMostRepliedIdeas(List<Long> mostRepliedIdeas) {
+
+        Collections.reverse(mostRepliedIdeas);
+
+        return mostRepliedIdeas.stream().map(idea_id -> {
+
+            Idea idea = ideaRepository.findById(idea_id).get();
+            IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
+            ideaResponseDTO.setUsername(idea.getUser().getUsername());
+            ideaResponseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
+            ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
+
+            return ideaResponseDTO;
+        }).toList();
+    }
+
     @Override
     public StatisticsDTO getGeneralStatistics() {
 
         StatisticsDTO statisticsDTO = new StatisticsDTO();
+
 
         Long nrOfUsers = userRepository.count();
         Long nrOfIdeas = ideaRepository.count();
@@ -525,8 +571,11 @@ public class IdeaServiceImpl implements IdeaService {
         Long draftP = Math.round((double) draftedIdeas / (double) nrOfIdeas * 100);
         Long openP =  Math.round((double) openIdeas / (double) nrOfIdeas * 100);
         Long implP = Math.round((double) implIdeas / (double) nrOfIdeas * 100);
+        List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(commentRepository.mostCommentedIdeas());
+        // List<IdeaResponseDTO> mostRepliedIdeas = getMostRepliedIdeas(commentRepository.mostRepliedIdeas());
 
 
+        statisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
         statisticsDTO.setOpenIdeas(openIdeas);
         statisticsDTO.setNrOfUsers(nrOfUsers);
         statisticsDTO.setNrOfIdeas(nrOfIdeas);

@@ -2,6 +2,8 @@ package com.atoss.idea.management.system.repository.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * This DTO is used to return statistics about all ideas.
  */
@@ -29,4 +31,9 @@ public class StatisticsDTO {
     private Long openP;
 
     private Long implP;
+
+    private List<IdeaResponseDTO> mostCommentedIdeas;
+
+    //private List<IdeaResponseDTO> mostRepliedIdeas;
+
 }

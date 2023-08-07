@@ -269,7 +269,7 @@ public class InitialDataLoader implements CommandLineRunner {
             List<Idea> ideaList = new ArrayList<>();
 
             //dummy idea
-            int numberOfIdeasToCreate = 20;
+            int numberOfIdeasToCreate = 10;
 
             // if we want more ideas in the same day, we need a small number
             int numberOfDateI = 5;
@@ -312,7 +312,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
             // if we want more ideas in the same day, we need a small number
             int numberOfDateC = 5;
-            int numberOfComment = 20;
+            int numberOfComment = 10;
 
             //random number of comment per idea
             int numberOfCommentsPerIdea = givenList_shouldReturnARandomElement();

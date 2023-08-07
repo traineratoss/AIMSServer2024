@@ -33,21 +33,4 @@ public interface IdeaRepository extends JpaRepository<Idea, Long> {
      * @return the number of ideas who have this status
      */
     Long countByStatus(Status status);
-
-    /**
-     * Counts in the Database the number of comments
-     *
-     * @return the number of comments
-     */
-    @Query(value = "SELECT COUNT(parent_id) FROM comment c", nativeQuery = true)
-    Long countComments();
-
-    /**
-     * Counts in the Database the number of replies
-     *
-     * @return the number of replies
-     */
-    @Query(value = "SELECT COUNT(*) FROM comment WHERE parent_id I S NULL", nativeQuery = true)
-    Long countAllReplies();
-
 }
