@@ -28,7 +28,7 @@ public class Image {
     @Column(name = "photo", length = 1000)
     private byte[] image;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "image")
+    @OneToMany(mappedBy = "image")
     @JsonBackReference(value = "idea-image")
     private List<Idea> idea;
     private String fileName;
