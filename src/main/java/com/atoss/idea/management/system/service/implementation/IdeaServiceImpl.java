@@ -281,9 +281,9 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public Page<IdeaResponseDTO> getAllIdeas(Pageable pageable) {
 
-        if (ideaRepository.findAll().size() <= 0) {
-            throw new FieldValidationException("No ideas found.");
-        }
+        //        if (ideaRepository.findAll().size() <= 0) {
+        //            throw new FieldValidationException("No ideas found.");
+        //        }
 
         Page<Idea> ideas = ideaRepository.findAll(pageable);
 
@@ -306,9 +306,9 @@ public class IdeaServiceImpl implements IdeaService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
 
-        if (user.getIdeas() == null || user.getIdeas().isEmpty()) {
-            throw new FieldValidationException("No ideas found.");
-        }
+        //        if (user.getIdeas() == null || user.getIdeas().isEmpty()) {
+        //            throw new FieldValidationException("No ideas found.");
+        //        }
 
         List<IdeaResponseDTO> ideaResponseDTOs = ideaRepository.findAllByUserUsername(username, pageable)
                 .stream()
