@@ -286,4 +286,22 @@ public class IdeaController {
                                                                     username), HttpStatus.OK);
     }
 
+
+    /**
+     * this method is used to return stats for selected time interval
+     *
+     * @param selectedDateFrom date from which we select
+     * @param selectedDateTo data up to selection
+     * @return statisticsDTO
+     */
+    @GetMapping("/new-stats")
+    public ResponseEntity<StatisticsDTO> getFilteredStats(
+            @RequestParam(required = false) String selectedDateFrom,
+            @RequestParam(required = false) String selectedDateTo) {
+
+        return new  ResponseEntity<>(ideaService.getStatisticsByDate(
+                selectedDateFrom,
+                selectedDateTo), HttpStatus.OK);
+
+    }
 }

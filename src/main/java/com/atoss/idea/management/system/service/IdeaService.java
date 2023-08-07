@@ -173,4 +173,14 @@ public interface IdeaService {
      * @return the number of all comments between selected dates
      */
     Long getSelectionCommentNumber(String selectedDateFrom, String selectedDateTo);
+
+    /**
+     * used to retrieve stats based on given date interval
+     *
+     * @param selectedDateFrom the date from within we want to get stats
+     * @param selectedDateTo the date until  we want to get stats
+     * @return used to retrieve stats based on given date interval
+     */
+    public StatisticsDTO getStatisticsByDate(String selectedDateFrom,
+                                             String selectedDateTo);
 }

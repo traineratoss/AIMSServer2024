@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -67,6 +68,30 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             +
             " LIMIT 5", nativeQuery = true)
     List<Long> mostCommentedIdeas();
+
+
+    /**
+     * gets the most commented ideas id's
+     *
+     * @param selectedDateFrom date from which we select
+     * @param selectedDateTo data up to selection
+     * @return a list containing idea-id's of the most commented ideas between given dates
+     */
+    @Query(value = " SELECT idea_id , COUNT(*) AS frequency "
+            +
+            " FROM comment c"
+            +
+            " WHERE (c.creation_date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp) )"
+            +
+            " and (idea_id IS NOT NULL) "
+            +
+            " GROUP BY idea_id "
+            +
+            " ORDER BY frequency DESC "
+            +
+            " LIMIT 5 ", nativeQuery = true)
+    List<Long> mostCommentedIdeasByDate(@Param("selectedDateFrom") String selectedDateFrom,
+                                        @Param("selectedDateTo") String selectedDateTo);
 
 
     /**

@@ -418,6 +418,9 @@ public class IdeaServiceImpl implements IdeaService {
     public StatisticsDTO getFilteredStatistics(Page<IdeaResponseDTO> ideaPageDTO) {
 
         StatisticsDTO filteredStatisticsDTO = new StatisticsDTO();
+
+        Long nrOfIdeas = (long) ideaPageDTO.getContent().size();
+
         Long implementedIdeas = 0L;
         Long draftIdeas = 0L;
         Long openIdeas = 0L;
@@ -432,9 +435,18 @@ public class IdeaServiceImpl implements IdeaService {
             }
         }
 
+        Long draftP = Math.round((double) draftIdeas / (double) nrOfIdeas * 100);
+        Long openP =  Math.round((double) openIdeas / (double) nrOfIdeas * 100);
+        Long implP = Math.round((double) implementedIdeas / (double) nrOfIdeas * 100);
+
         filteredStatisticsDTO.setOpenIdeas(openIdeas);
         filteredStatisticsDTO.setDraftIdeas(draftIdeas);
         filteredStatisticsDTO.setImplementedIdeas(implementedIdeas);
+        filteredStatisticsDTO.setNrOfIdeas(nrOfIdeas);
+        filteredStatisticsDTO.setImplP(implP);
+        filteredStatisticsDTO.setDraftP(draftP);
+        filteredStatisticsDTO.setOpenP(openP);
+
 
         return filteredStatisticsDTO;
     }
@@ -628,6 +640,41 @@ public class IdeaServiceImpl implements IdeaService {
         }
 
         return predicatesList;
+    }
+
+
+    @Override
+    public StatisticsDTO getStatisticsByDate(String selectedDateFrom,
+                                               String selectedDateTo) {
+
+        Page<IdeaResponseDTO> ideaPageDTO = filterIdeasByAll(null,
+                                                            null,
+                                                            null,
+                                                            null,
+                                                            null,
+                                                            selectedDateFrom,
+                                                            selectedDateTo,
+                                                            null,
+                                                            null,
+                                                            null);
+
+
+
+
+        Long nrOfComments = getSelectionCommentNumber(selectedDateFrom, selectedDateTo);
+        Long nrOfReplies = getSelectionRepliesNumber(selectedDateFrom, selectedDateTo);
+        List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(
+                commentRepository.mostCommentedIdeasByDate(selectedDateFrom, selectedDateTo));
+
+
+
+        StatisticsDTO filteredStatisticsDTO = getFilteredStatistics(ideaPageDTO);
+
+        filteredStatisticsDTO.setTotalNrOfComments(nrOfComments);
+        filteredStatisticsDTO.setTotalNrOfReplies(nrOfReplies);
+        filteredStatisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
+
+        return filteredStatisticsDTO;
     }
 
 
