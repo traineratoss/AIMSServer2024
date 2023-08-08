@@ -180,7 +180,7 @@ public class UserController {
      * @see UserPageDTO
      * @see PageRequest
      * @see Sort
-     * @see UserService#getAllUsersByUsernamePageable(Pageable, String, String)
+     * @see UserService#getAllUsersByUsernamePageable(Pageable, String)
      */
     @Transactional
     @GetMapping("/allByUsername")
@@ -196,8 +196,7 @@ public class UserController {
                             pageSize,
                             Sort.by(Sort.Direction.ASC, sortCategory)
                     ),
-                    username,
-                    currentUsername
+                    username
                 ),
                 HttpStatus.OK
         );

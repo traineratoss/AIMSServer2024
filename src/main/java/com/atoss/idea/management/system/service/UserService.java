@@ -83,10 +83,9 @@ public interface UserService {
      *
      * @param pageable for defining the pagination parameters such as pageSize, pageNumber and sortCategory
      * @param username the value that the usernames of all the users should start with
-     * @param currentUsername the value which should be excluded from the list
      * @return a UserPageDTO containing the total pages of users and a paginated list of UserAdminDashboardResponseDTO filtered by their username
      */
-    UserPageDTO getAllUsersByUsernamePageable(Pageable pageable, String username, String currentUsername);
+    UserPageDTO getAllUsersByUsernamePageable(Pageable pageable, String username);
 
     //    Page<UserAdminDashboardResponseDTO> getAllUsersByUsername(String username);
 
