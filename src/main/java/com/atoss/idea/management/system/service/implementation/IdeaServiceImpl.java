@@ -578,7 +578,7 @@ public class IdeaServiceImpl implements IdeaService {
         Double ideasPerUser = Math.round((double) nrOfIdeas / (double) nrOfUsers * 100) / 100.00;
         Long implIdeas = ideaRepository.countByStatus(Status.IMPLEMENTED);
         Long draftedIdeas = ideaRepository.countByStatus(Status.DRAFT);
-        Long openIdeas = nrOfIdeas - draftedIdeas - implIdeas;
+        Long openIdeas = ideaRepository.countByStatus(Status.OPEN);
         Long nrOfComments = commentRepository.countComments();
         Long nrOfReplies = commentRepository.countAllReplies();
         Long draftP = Math.round((double) draftedIdeas / (double) nrOfIdeas * 100);
