@@ -283,7 +283,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     randomDate.add(dateR);
                 }
                 String title = "New Idea " + k;
-                String text = "New text" + k;
+                String text = "World changing idea number." + k + " Waiting on opinions!";
                 Idea idea = createIdea(randomElementFromList(userList), randomEnum(Status.class), text, title,
                         image5, randomDateFromList(randomDate),  randomElementFromList(categoryMatrix));
                 ideaList.add(idea);
