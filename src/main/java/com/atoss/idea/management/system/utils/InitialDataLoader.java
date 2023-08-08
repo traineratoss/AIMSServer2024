@@ -230,7 +230,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 return;
             }
 
-            LocalDate start = LocalDate.of(2023, 7, 25);
+            LocalDate start = LocalDate.of(2023, 7, 3);
             LocalDate end = LocalDate.now();
             Date date = new Date();
 
@@ -269,10 +269,10 @@ public class InitialDataLoader implements CommandLineRunner {
             List<Idea> ideaList = new ArrayList<>();
 
             //dummy idea
-            int numberOfIdeasToCreate = 10;
+            int numberOfIdeasToCreate = 60;
 
             // if we want more ideas in the same day, we need a small number
-            int numberOfDateI = 5;
+            int numberOfDateI = 30;
             int k = 1;
             for (int j = 1; j < numberOfIdeasToCreate; j++) {
                 ArrayList<Date> randomDate = null;
