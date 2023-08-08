@@ -87,7 +87,8 @@ public class IdeaServiceImpl implements IdeaService {
 
     private String filterBadWords(String text) {
         for (String word : badWords) {
-            text = text.replaceAll("(?i)" + word, "*".repeat(word.length()));
+            String pattern = "\\b" + word + "\\b";
+            text = text.replaceAll("(?i)" + pattern, "*".repeat(word.length()));
         }
         return text;
     }
