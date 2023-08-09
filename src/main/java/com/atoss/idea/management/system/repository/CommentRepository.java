@@ -72,28 +72,42 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     //            +
     //            " LIMIT 5 ", nativeQuery = true)
 
-    @Query(value =
-            "SELECT idea_id FROM idea i "
+    //    @Query(value =
+    //            "SELECT idea_id FROM idea i "
+    //            +
+    //            "WHERE i.idea_id IN ("
+    //            +
+    //            "    SELECT c.idea_id"
+    //            +
+    //            "    FROM comment c "
+    //            +
+    //            " WHERE (c.creation_date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp) )"
+    //           +
+    //            " and (idea_id IS NOT NULL) "
+    //            +
+    //            "    GROUP BY c.idea_id "
+    //            +
+    //            "    ORDER BY COUNT(*) DESC "
+    //            +
+    //            "    LIMIT 5 "
+    //            +
+    //            ")", nativeQuery = true)
+
+    @Query(value = " select c.idea_id, COUNT(*) AS total_comments "
             +
-            "WHERE i.idea_id IN ("
+            " from comment c "
             +
-            "    SELECT c.idea_id"
+            " WHERE (c.creation_date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp) ) "
             +
-            "    FROM comment c "
-            +
-            " WHERE (c.creation_date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp) )"
-           +
             " and (idea_id IS NOT NULL) "
             +
-            "    GROUP BY c.idea_id "
+            " GROUP BY c.idea_id "
             +
-            "    ORDER BY COUNT(*) DESC "
+            " order by total_comments DESC "
             +
-            "    LIMIT 5 "
-            +
-            ")", nativeQuery = true)
+            " limit 5 ", nativeQuery = true)
     List<Long> mostCommentedIdeasByDate(@Param("selectedDateFrom") String selectedDateFrom,
-                                        @Param("selectedDateTo") String selectedDateTo);
+                                                 @Param("selectedDateTo") String selectedDateTo);
 
     /**
      * gets the most commented ideas id's

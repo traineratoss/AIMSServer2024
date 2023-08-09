@@ -26,11 +26,11 @@ public class StatisticsDTO {
 
     private Long openIdeas;
 
-    private Long draftP;
+    private Double draftP;
 
-    private Long openP;
+    private Double openP;
 
-    private Long implP;
+    private Double implP;
 
     private List<IdeaResponseDTO> mostCommentedIdeas;
 

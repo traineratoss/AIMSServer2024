@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
-
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/aims/api/v1/statistics")
@@ -70,18 +67,34 @@ public class StatisticsController {
     }
 
 
-    /**
-     * ======
-     *
-     * @param selectedDateFrom ======
-     * @param selectedDateTo ======
-     * @return ======
-     */
-    @GetMapping("/test")
-    public List<Long> test(
-        @RequestParam(required = false) String selectedDateFrom,
-        @RequestParam(required = false) String selectedDateTo) {
-        return commentRepository.mostCommentedIdeasByDate(selectedDateFrom, selectedDateTo);
-    }
+    //    /**
+    //     * ======
+    //     *
+    //     * @param selectedDateFrom ======
+    //     * @param selectedDateTo ======
+    //     * @return ======
+    //     */
+    //    @GetMapping("/test")
+    //    public ArrayList<ArrayList<Long>> test(
+    //        @RequestParam(required = false) String selectedDateFrom,
+    //        @RequestParam(required = false) String selectedDateTo) {
+    //
+    //        List<Object[]> rObj = commentRepository.mostCommentedIdeasByDate(selectedDateFrom, selectedDateTo);
+    //
+    //        ArrayList<ArrayList<Long>>  result = new ArrayList<>();
+    //
+    //        for (Object[] obj : rObj) {
+    //
+    //            ArrayList<Long> intermediate = new ArrayList<>(2);
+    //
+    //            intermediate.add((Long) obj[0]);
+    //            intermediate.add((Long) obj[1]);
+    //
+    //            result.add(intermediate);
+    //        }
+    //
+    //
+    //        return result;
+    //    }
 
 }

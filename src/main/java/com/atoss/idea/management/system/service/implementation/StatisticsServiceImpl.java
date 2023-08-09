@@ -142,9 +142,9 @@ public class StatisticsServiceImpl implements StatisticsService {
         Long openIdeas = ideaRepository.countByStatus(Status.OPEN);
         Long nrOfComments = commentRepository.countComments();
         Long nrOfReplies = commentRepository.countAllReplies();
-        Long draftP = Math.round((double) draftedIdeas / (double) nrOfIdeas * 100);
-        Long openP =  Math.round((double) openIdeas / (double) nrOfIdeas * 100);
-        Long implP = Math.round((double) implIdeas / (double) nrOfIdeas * 100);
+        Double draftP = ((double) draftedIdeas / (double) nrOfIdeas * 100);
+        Double openP =  ((double) openIdeas / (double) nrOfIdeas * 100);
+        Double implP = ((double) implIdeas / (double) nrOfIdeas * 100);
         List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(commentRepository.mostCommentedIdeas());
 
         statisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
@@ -178,14 +178,17 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         Long totalIdeasCount = openIdeasCount + draftIdeasCount + implIdeasCount;
 
-        Long draftP = Math.round((double) draftIdeasCount / (double) totalIdeasCount * 100);
-        Long openP =  Math.round((double) openIdeasCount / (double) totalIdeasCount * 100);
-        Long implP = Math.round((double) implIdeasCount / (double) totalIdeasCount * 100);
+        Double draftP = ((double) draftIdeasCount / (double) totalIdeasCount * 100);
+        Double openP =  ((double) openIdeasCount / (double) totalIdeasCount * 100);
+        Double implP = ((double) implIdeasCount / (double) totalIdeasCount * 100);
 
         List<Long> listOfRepliesAndComments = commentRepository.getRepliesAndCommentsCount(selectedDateFrom, selectedDateTo);
 
         Long noOfReplies = listOfRepliesAndComments.get(0);
         Long noOfComments = listOfRepliesAndComments.get(1);
+
+        List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(
+                commentRepository.mostCommentedIdeasByDate(selectedDateFrom, selectedDateTo));
 
 
         filteredStatisticsDTO.setImplP(implP);
@@ -197,6 +200,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         filteredStatisticsDTO.setImplementedIdeas(implIdeasCount);
         filteredStatisticsDTO.setTotalNrOfComments(noOfComments);
         filteredStatisticsDTO.setTotalNrOfReplies(noOfReplies);
+        filteredStatisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
 
         return filteredStatisticsDTO;
     }
