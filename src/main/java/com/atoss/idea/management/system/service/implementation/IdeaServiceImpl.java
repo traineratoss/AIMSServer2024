@@ -30,7 +30,6 @@ import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -57,8 +56,6 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final CommentServiceImpl commentServiceImpl;
 
-    private final CommentRepository commentRepository;
-
     /**
      * Constructor for the Idea Service Implementation
      *
@@ -67,22 +64,19 @@ public class IdeaServiceImpl implements IdeaService {
      * @param userRepository     repository for the User Entity
      * @param categoryRepository repository for the Category Entity
      * @param modelMapper        responsible for mapping our entities
-     * @param commentServiceImpl the service that holds all the comments logic
-     * @param commentRepository  the repository of the comments
+     * @param commentServiceImpl ======
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
                            ImageRepository imageRepository, UserRepository userRepository,
                            CategoryRepository categoryRepository,
                            ModelMapper modelMapper,
-                           CommentServiceImpl commentServiceImpl,
-                           CommentRepository commentRepository) {
+                           CommentServiceImpl commentServiceImpl) {
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
         this.commentServiceImpl = commentServiceImpl;
-        this.commentRepository = commentRepository;
     }
 
     private String filterBadWords(String text) {
@@ -419,194 +413,6 @@ public class IdeaServiceImpl implements IdeaService {
         return new PageImpl<>(allIdeasUnpaged, Pageable.unpaged(), totalSize);
     }
 
-    @Override
-    public StatisticsDTO getFilteredStatistics(Page<IdeaResponseDTO> ideaPageDTO) {
-
-        StatisticsDTO filteredStatisticsDTO = new StatisticsDTO();
-
-        Long nrOfIdeas = (long) ideaPageDTO.getContent().size();
-
-        Long implementedIdeas = 0L;
-        Long draftIdeas = 0L;
-        Long openIdeas = 0L;
-
-        for (IdeaResponseDTO idea : ideaPageDTO.getContent()) {
-            if (idea.getStatus().equals(Status.OPEN)) {
-                openIdeas++;
-            } else if (idea.getStatus().equals(Status.IMPLEMENTED)) {
-                implementedIdeas++;
-            } else {
-                draftIdeas++;
-            }
-        }
-
-        Long draftP = Math.round((double) draftIdeas / (double) nrOfIdeas * 100);
-        Long openP =  Math.round((double) openIdeas / (double) nrOfIdeas * 100);
-        Long implP = Math.round((double) implementedIdeas / (double) nrOfIdeas * 100);
-
-        filteredStatisticsDTO.setOpenIdeas(openIdeas);
-        filteredStatisticsDTO.setDraftIdeas(draftIdeas);
-        filteredStatisticsDTO.setImplementedIdeas(implementedIdeas);
-        filteredStatisticsDTO.setNrOfIdeas(nrOfIdeas);
-        filteredStatisticsDTO.setImplP(implP);
-        filteredStatisticsDTO.setDraftP(draftP);
-        filteredStatisticsDTO.setOpenP(openP);
-
-
-        return filteredStatisticsDTO;
-    }
-
-    @Override
-    public StatisticsDTO getStatisticsByFilter(String title,
-                                                     String text,
-                                                     List<Status> statuses,
-                                                     List<String> categories,
-                                                     List<String> users,
-                                                     String selectedDateFrom,
-                                                     String selectedDateTo,
-                                                     String username) {
-
-        Page<IdeaResponseDTO> ideaPageDTO = filterIdeasByAll(title,
-                                                    text,
-                                                statuses,
-                                              categories,
-                   users, selectedDateFrom, selectedDateTo, null, username, null);
-
-        Long nrOfComments = getSelectionCommentNumber(selectedDateFrom, selectedDateTo);
-        Long nrOfReplies = getSelectionRepliesNumber(selectedDateFrom, selectedDateTo);
-        Long nrOfIdeas = (long) ideaPageDTO.getContent().size();
-
-        StatisticsDTO filteredStatisticsDTO = getFilteredStatistics(ideaPageDTO);
-
-        filteredStatisticsDTO.setTotalNrOfComments(nrOfComments);
-        filteredStatisticsDTO.setTotalNrOfReplies(nrOfReplies);
-        filteredStatisticsDTO.setNrOfIdeas(nrOfIdeas);
-
-        return filteredStatisticsDTO;
-    }
-
-
-    @Override
-    public Long getSelectionRepliesNumber(String selectedDateFrom, String selectedDateTo) {
-
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Comment> criteriaQuery = cb.createQuery(Comment.class);
-        Root<Comment> root = criteriaQuery.from(Comment.class);
-
-        List<Predicate> predicatesList = new ArrayList<>();
-
-        predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
-        predicatesList.add(cb.isNotNull(root.get("parent")));
-
-        criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
-        TypedQuery<Comment> repliesQuery = entityManager.createQuery(criteriaQuery);
-
-        Long allReplies = (long) repliesQuery.getResultList().size();
-
-        return  allReplies;
-    }
-
-    @Override
-    public Long getSelectionCommentNumber(String selectedDateFrom, String selectedDateTo) {
-
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Comment> criteriaQuery = cb.createQuery(Comment.class);
-        Root<Comment> root = criteriaQuery.from(Comment.class);
-
-        List<Predicate> predicatesList = new ArrayList<>();
-
-        predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
-        predicatesList.add(cb.isNull(root.get("parent")));
-
-        criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
-        TypedQuery<Comment> commentsQuery = entityManager.createQuery(criteriaQuery);
-
-        Long allComments = (long) commentsQuery.getResultList().size();
-
-        return allComments;
-    }
-
-
-    /**
-     * we use this function to retrieve the most commented ideas in order to
-     * do statistics based an them and to send them to be displayed
-     *
-     * @param mostCommentedIdeas list of idea id
-     * @return list of most commented ideas
-     */
-    public List<IdeaResponseDTO> getMostCommentedIdeas(List<Long> mostCommentedIdeas) {
-
-        return mostCommentedIdeas.stream().map(idea_id -> {
-
-            Idea idea = ideaRepository.findById(idea_id).get();
-            IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
-            ideaResponseDTO.setUsername(idea.getUser().getUsername());
-            ideaResponseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
-            ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
-
-            return ideaResponseDTO;
-        }).toList();
-    }
-
-    /**
-     * we use this function to retrieve the most replied ideas in order to
-     *  do statistics based on then and to send them to be displayed
-     *
-     * @param mostRepliedIdeas list of integers representing idea id
-     * @return list of ideas
-     */
-    public List<IdeaResponseDTO> getMostRepliedIdeas(List<Long> mostRepliedIdeas) {
-
-        Collections.reverse(mostRepliedIdeas);
-
-        return mostRepliedIdeas.stream().map(idea_id -> {
-
-            Idea idea = ideaRepository.findById(idea_id).get();
-            IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
-            ideaResponseDTO.setUsername(idea.getUser().getUsername());
-            ideaResponseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
-            ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
-
-            return ideaResponseDTO;
-        }).toList();
-    }
-
-    @Override
-    public StatisticsDTO getGeneralStatistics() {
-
-        StatisticsDTO statisticsDTO = new StatisticsDTO();
-
-
-        Long nrOfUsers = userRepository.count();
-        Long nrOfIdeas = ideaRepository.count();
-        Double ideasPerUser = Math.round((double) nrOfIdeas / (double) nrOfUsers * 100) / 100.00;
-        Long implIdeas = ideaRepository.countByStatus(Status.IMPLEMENTED);
-        Long draftedIdeas = ideaRepository.countByStatus(Status.DRAFT);
-        Long openIdeas = ideaRepository.countByStatus(Status.OPEN);
-        Long nrOfComments = commentRepository.countComments();
-        Long nrOfReplies = commentRepository.countAllReplies();
-        Long draftP = Math.round((double) draftedIdeas / (double) nrOfIdeas * 100);
-        Long openP =  Math.round((double) openIdeas / (double) nrOfIdeas * 100);
-        Long implP = Math.round((double) implIdeas / (double) nrOfIdeas * 100);
-        List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(commentRepository.mostCommentedIdeas());
-        // List<IdeaResponseDTO> mostRepliedIdeas = getMostRepliedIdeas(commentRepository.mostRepliedIdeas());
-
-
-        statisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
-        statisticsDTO.setOpenIdeas(openIdeas);
-        statisticsDTO.setNrOfUsers(nrOfUsers);
-        statisticsDTO.setNrOfIdeas(nrOfIdeas);
-        statisticsDTO.setIdeasPerUser(ideasPerUser);
-        statisticsDTO.setImplementedIdeas(implIdeas);
-        statisticsDTO.setDraftIdeas(draftedIdeas);
-        statisticsDTO.setTotalNrOfComments(nrOfComments);
-        statisticsDTO.setTotalNrOfReplies(nrOfReplies);
-        statisticsDTO.setImplP(implP);
-        statisticsDTO.setDraftP(draftP);
-        statisticsDTO.setOpenP(openP);
-
-        return statisticsDTO;
-    }
 
     @Override
     public List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<?> root, CriteriaBuilder cb, String columnName) {
@@ -645,41 +451,6 @@ public class IdeaServiceImpl implements IdeaService {
         }
 
         return predicatesList;
-    }
-
-
-    @Override
-    public StatisticsDTO getStatisticsByDate(String selectedDateFrom,
-                                               String selectedDateTo) {
-
-        Page<IdeaResponseDTO> ideaPageDTO = filterIdeasByAll(null,
-                                                            null,
-                                                            null,
-                                                            null,
-                                                            null,
-                                                            selectedDateFrom,
-                                                            selectedDateTo,
-                                                            null,
-                                                            null,
-                                                            null);
-
-
-
-
-        Long nrOfComments = getSelectionCommentNumber(selectedDateFrom, selectedDateTo);
-        Long nrOfReplies = getSelectionRepliesNumber(selectedDateFrom, selectedDateTo);
-        List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(
-                commentRepository.mostCommentedIdeasByDate(selectedDateFrom, selectedDateTo));
-
-
-
-        StatisticsDTO filteredStatisticsDTO = getFilteredStatistics(ideaPageDTO);
-
-        filteredStatisticsDTO.setTotalNrOfComments(nrOfComments);
-        filteredStatisticsDTO.setTotalNrOfReplies(nrOfReplies);
-        filteredStatisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
-
-        return filteredStatisticsDTO;
     }
 
 

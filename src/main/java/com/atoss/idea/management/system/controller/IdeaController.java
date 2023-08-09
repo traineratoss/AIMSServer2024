@@ -3,7 +3,6 @@ package com.atoss.idea.management.system.controller;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
-import com.atoss.idea.management.system.repository.dto.StatisticsDTO;
 import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.service.IdeaService;
 import jakarta.transaction.Transactional;
@@ -221,87 +220,4 @@ public class IdeaController {
                 text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, pageableAsc), HttpStatus.OK);
     }
 
-    /**
-     * Working on this
-     *
-     * @return stats for the ideas
-     */
-    @GetMapping("/stats")
-    public ResponseEntity<StatisticsDTO> getStats() {
-
-        return new ResponseEntity<>(ideaService.getGeneralStatistics(), HttpStatus.OK);
-
-    }
-
-    /**
-     * Filters ideas based on specified criteria
-     *
-     * @param title  idea's title
-     * @param text idea's text
-     * @param status a string that will be converted into an array
-     *               of Statuses and filter the ideas matching these
-     * @param category a string that will be converted into an array
-     *                 of Categories and filter the ideas matching these
-     * @param user a string that will be converted into an array
-     *             of Users and filter the ideas matching these
-     * @param selectedDateFrom the ideas matching the specified selected date from
-     * @param selectedDateTo the ideas matching the specified selected date to
-     * @param username in case you want your own ideas
-     * @return a Response Entity containing a Statistics DTO
-     */
-    @GetMapping("/filtered-stats")
-    public ResponseEntity<StatisticsDTO> getFilteredStats(
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) String text,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String user,
-            @RequestParam(required = false) String selectedDateFrom,
-            @RequestParam(required = false) String selectedDateTo,
-            @RequestParam(required = false) String username) {
-
-        List<String> categories = new ArrayList<>();
-        if (category != null && !category.isEmpty()) {
-            categories = Arrays.asList(category.split(","));
-        }
-
-        List<String> users = new ArrayList<>();
-        if (user != null && !user.isEmpty()) {
-            users = Arrays.asList(user.split(","));
-        }
-
-        List<String> statusStrings = new ArrayList<>();
-        if (status != null && !status.isEmpty()) {
-            statusStrings = Arrays.asList(status.split(","));
-        }
-        List<Status> statuses = statusStrings.stream().map(Status::valueOf).toList();
-
-        return new ResponseEntity<>(ideaService.getStatisticsByFilter(title,
-                                                                    text,
-                                                                    statuses,
-                                                                    categories,
-                                                                    users,
-                                                                    selectedDateFrom,
-                                                                    selectedDateTo,
-                                                                    username), HttpStatus.OK);
-    }
-
-
-    /**
-     * this method is used to return stats for selected time interval
-     *
-     * @param selectedDateFrom date from which we select
-     * @param selectedDateTo data up to selection
-     * @return statisticsDTO
-     */
-    @GetMapping("/new-stats")
-    public ResponseEntity<StatisticsDTO> getFilteredStats(
-            @RequestParam(required = false) String selectedDateFrom,
-            @RequestParam(required = false) String selectedDateTo) {
-
-        return new  ResponseEntity<>(ideaService.getStatisticsByDate(
-                selectedDateFrom,
-                selectedDateTo), HttpStatus.OK);
-
-    }
 }

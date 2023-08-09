@@ -3,7 +3,6 @@ package com.atoss.idea.management.system.service;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
-import com.atoss.idea.management.system.repository.dto.StatisticsDTO;
 import com.atoss.idea.management.system.repository.entity.Status;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -102,22 +101,6 @@ public interface IdeaService {
 
 
     /**
-     * Gets the general statistics of the application
-     *
-     * @return a statistic DTO that contains all the field necessary for
-     *         the statistics
-     */
-    StatisticsDTO getGeneralStatistics();
-
-    /**
-     * Gets filtered stats - WORKING ON THIS
-     *
-     * @param ideaPageDTO the idea page dto - working on this
-     * @return a dto of Filtered Statistics
-     */
-    StatisticsDTO getFilteredStatistics(Page<IdeaResponseDTO> ideaPageDTO);
-
-    /**
      * Filters ideas based on date criteria
      *
      * @param selectedDateFrom the starting date for filtering
@@ -134,53 +117,4 @@ public interface IdeaService {
                                  CriteriaBuilder cb,
                                  String columnName);
 
-    /**
-     * Gets filtered statistics
-     *
-     * @param title the ideas matching the specified title criteria
-     * @param text the ideas matching the specified text criteria
-     * @param statuses  the ideas matching the specified statuses
-     * @param categories the ideas matching the specified categories
-     * @param users the ideas matching the specified users
-     * @param selectedDateFrom the ideas matching the specified selected date from
-     * @param selectedDateTo the ideas matching the specified selected date to
-     * @param username if not null, returns filtered ideas belonging to the specified username
-     * @return a statistics DTO containing filtered data based on the given criteria
-     */
-    StatisticsDTO getStatisticsByFilter(String title,
-                                        String text,
-                                        List<Status> statuses,
-                                        List<String> categories,
-                                        List<String> users,
-                                        String selectedDateFrom,
-                                        String selectedDateTo,
-                                        String username);
-
-    /**
-     * Returns the number of all replies between selected dates
-     *
-     * @param selectedDateFrom the date from
-     * @param selectedDateTo the date to
-     * @return the number of all replies between selected dates
-     */
-    Long getSelectionRepliesNumber(String selectedDateFrom, String selectedDateTo);
-
-    /**
-     * Returns the number of all comments between selected dates
-     *
-     * @param selectedDateFrom the date from
-     * @param selectedDateTo the date to
-     * @return the number of all comments between selected dates
-     */
-    Long getSelectionCommentNumber(String selectedDateFrom, String selectedDateTo);
-
-    /**
-     * used to retrieve stats based on given date interval
-     *
-     * @param selectedDateFrom the date from within we want to get stats
-     * @param selectedDateTo the date until  we want to get stats
-     * @return used to retrieve stats based on given date interval
-     */
-    public StatisticsDTO getStatisticsByDate(String selectedDateFrom,
-                                             String selectedDateTo);
 }

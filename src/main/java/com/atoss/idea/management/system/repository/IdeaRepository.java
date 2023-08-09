@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface IdeaRepository extends JpaRepository<Idea, Long> {
 
@@ -33,4 +35,36 @@ public interface IdeaRepository extends JpaRepository<Idea, Long> {
      * @return the number of ideas who have this status
      */
     Long countByStatus(Status status);
+
+    /**
+     * counts grouped by status , very important , [0] means OPEN , [1] means DRAFT and [2] means IMPLEMENTED
+     *
+     * @param selectedDateFrom date from which we select
+     * @param selectedDateTo data up to selection
+     * @return a list of statuses
+     */
+    @Query(value = " SELECT COUNT(*) AS frequency FROM idea i "
+            +
+            " WHERE (i.date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp))"
+            +
+            " GROUP BY i.status ", nativeQuery = true)
+    List<Long> countStatusByDate(@Param("selectedDateFrom") String selectedDateFrom,
+                           @Param("selectedDateTo") String selectedDateTo);
+
+    /**
+     * returns all ideas in order to be further processed
+     *  Use-cases : if we want te get more detailed  info about statistics generated from a certain given time interval
+     *
+     * @param selectedDateFrom date from which we select
+     * @param selectedDateTo data up to selection
+     * @return all ideas within a certain given time interval
+     */
+    @Query(value = " SELECT * "
+            +
+            " FROM idea i"
+            +
+            " WHERE (i.date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp)) ", nativeQuery = true)
+    List<Idea> filterIdeasByDate(@Param("selectedDateFrom") String selectedDateFrom,
+                                 @Param("selectedDateTo") String selectedDateTo);
+
 }
