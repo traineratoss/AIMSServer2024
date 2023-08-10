@@ -284,7 +284,7 @@ public class InitialDataLoader implements CommandLineRunner {
             int k = 1;
             for (int j = 1; j < numberOfIdeasToCreate; j++) {
                 String title = "New Idea " + k;
-                String text = "World changing idea number." + k + " Waiting on opinions!";
+                String text = "World changing idea number " + k + ". Waiting on opinions!";
                 Idea idea = createIdea(randomElementFromList(userList), randomEnum(Status.class), text, title,
                         image5, randomDateFromList(randomDateList(30)),  randomElementFromList(categoryMatrix));
                 ideaList.add(idea);
