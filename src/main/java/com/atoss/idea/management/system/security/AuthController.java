@@ -6,7 +6,7 @@ import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.security.request.LoginRequest;
-import com.atoss.idea.management.system.security.request.SignupRequest;
+import com.atoss.idea.management.system.security.request.RegisterRequest;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -74,18 +74,28 @@ public class AuthController {
     @Transactional
     @PostMapping("/login")
     public String authenticateUser(@RequestBody LoginRequest authRequest, HttpServletResponse response) {
+        // Get the current authentication from the security context
         Authentication authentication = SecurityContextHolder
                 .getContext()
                 .getAuthentication();
+        // Check if the authentication is not null and the user is authenticated
         if (authentication != null && authentication.isAuthenticated()) {
+            // Retrieve user information from the authentication object
             String username = authentication.getName();
+            // Get the user's role (authority)
             String role = authentication.getAuthorities().iterator().next().getAuthority();
+            // Get the user's email (authority)
             String email = authentication.getAuthorities().iterator().next().getAuthority();
+            // Get the user's full name (authority)
             String fullName = authentication.getAuthorities().iterator().next().getAuthority();
+            // Get the user's avatar ID (authority)
             String avatarId = authentication.getAuthorities().iterator().next().getAuthority();
-            Cookie userCookie = new Cookie("user_info", username + ":" + role + ":" + email + ":" + fullName + ":" + avatarId);
-            userCookie.setMaxAge(3600);
-            response.addCookie(userCookie);
+            //
+            String isFirstLogin = authentication.getAuthorities().iterator().next().getAuthority();
+            // Create a user_info cookie containing user information
+            Cookie userCookie = new Cookie("user_info", username + ":" + role + ":" + email + ":" + fullName + ":" + avatarId + ":" + isFirstLogin);
+            userCookie.setMaxAge(3600);         // Set the maximum age of the cookie to 1 hour (3600 seconds)
+            response.addCookie(userCookie);     // Add the user_cookie to the response
         }
         return "Authentication successful!";
     }
@@ -101,7 +111,7 @@ public class AuthController {
      * @throws EmailAlreadyExistException    If the email provided in the signup request already exists in the system.
      *
      * @see ResponseEntity
-     * @see SignupRequest
+     * @see RegisterRequest
      * @see User
      * @see Role
      * @see UsernameAlreadyExistException
@@ -109,7 +119,7 @@ public class AuthController {
      */
     @Transactional
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest signUpRequest) {
         if (userRepository.findByUsername(signUpRequest.getUsername()).isPresent()) {
             throw new UsernameAlreadyExistException("Username already exist!");
         }

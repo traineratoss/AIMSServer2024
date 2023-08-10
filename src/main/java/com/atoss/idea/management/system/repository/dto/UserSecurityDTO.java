@@ -10,4 +10,5 @@ public class UserSecurityDTO {
     private String email;
     private String fullName;
     private String avatarId;
+    private Boolean isFirstLogin;
 }

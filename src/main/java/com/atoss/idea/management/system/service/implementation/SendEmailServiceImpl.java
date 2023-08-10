@@ -105,6 +105,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         // Set the isActive to true and change password
         user.setIsActive(true);
         user.setPassword(BCrypt.hashpw(password, bcryptSalt));
+        user.setIsFirstLogin(true);
         userRepository.save(user);
         return true;
     }
@@ -130,6 +131,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         sendEmail(emailTo, subject, text);
         //Change password
         user.setPassword(BCrypt.hashpw(password, bcryptSalt));
+        user.setIsFirstLogin(true);
         userRepository.save(user);
     }
 

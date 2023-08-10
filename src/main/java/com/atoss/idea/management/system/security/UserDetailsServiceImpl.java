@@ -1,7 +1,7 @@
 package com.atoss.idea.management.system.security;
 
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.UserRegisterDTO;
+import com.atoss.idea.management.system.security.response.UserDetailsImpl;
 import com.atoss.idea.management.system.repository.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      * @throws UsernameNotFoundException If a user with the given username is not found in the database.
      *
      * @see UserDetails
-     * @see UserRegisterDTO
+     * @see UserDetailsImpl
      * @see UserRepository
      */
     @Override
@@ -43,6 +43,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
 
-        return UserRegisterDTO.build(user);
+        return UserDetailsImpl.build(user);
     }
 }

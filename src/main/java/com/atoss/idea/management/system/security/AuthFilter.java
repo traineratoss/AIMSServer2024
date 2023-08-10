@@ -12,7 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Log4j2
-public class AuthTokenFilter extends OncePerRequestFilter {
+public class AuthFilter extends OncePerRequestFilter {
 
     /**
      * Performs filtering on the incoming HTTP request and response to set user information as a cookie.
@@ -35,16 +35,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            String role = authentication.getAuthorities().iterator().next().getAuthority();
-            String email = authentication.getAuthorities().iterator().next().getAuthority();
-            String fullName = authentication.getAuthorities().iterator().next().getAuthority();
-            String avatarId = authentication.getAuthorities().iterator().next().getAuthority();
-            Cookie userCookie = new Cookie("user_info", username + ":" + role + ":" + email + ":" + fullName + ":" + avatarId);
-            userCookie.setMaxAge(3600);
-            response.addCookie(userCookie);
-        }
+        //        if (authentication != null && authentication.isAuthenticated()) {
+        //            String username = authentication.getName();
+        //            String role = authentication.getAuthorities().iterator().next().getAuthority();
+        //            String email = authentication.getAuthorities().iterator().next().getAuthority();
+        //            String fullName = authentication.getAuthorities().iterator().next().getAuthority();
+        //            String avatarId = authentication.getAuthorities().iterator().next().getAuthority();
+        //            Cookie userCookie = new Cookie("user_info", username + ":" + role + ":" + email + ":" + fullName + ":" + avatarId);
+        //            userCookie.setMaxAge(3600);
+        //            response.addCookie(userCookie);
+        //        }
         filterChain.doFilter(request, response);
     }
 

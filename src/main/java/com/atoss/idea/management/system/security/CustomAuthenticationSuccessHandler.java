@@ -29,12 +29,12 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
-        String username = authentication.getName();
-        String role = authentication.getAuthorities().iterator().next().getAuthority();
-        String email = authentication.getAuthorities().iterator().next().getAuthority();
-        Cookie userCookie = new Cookie("user_info", username + ":" + role + ":" + email);
-        userCookie.setMaxAge(3600); // Set cookie expiry time (in seconds). Adjust as needed.
-        response.addCookie(userCookie);
+        //        String username = authentication.getName();
+        //        String role = authentication.getAuthorities().iterator().next().getAuthority();
+        //        String email = authentication.getAuthorities().iterator().next().getAuthority();
+        //        Cookie userCookie = new Cookie("user_info", username + ":" + role + ":" + email);
+        //        userCookie.setMaxAge(3600); // Set cookie expiry time (in seconds). Adjust as needed.
+        //        response.addCookie(userCookie);
         super.onAuthenticationSuccess(request, response, authentication);
     }
 }

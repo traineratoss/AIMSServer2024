@@ -117,23 +117,23 @@ public class InitialDataLoader implements CommandLineRunner {
             String password = BCrypt.hashpw("StandardUser", bcryptSalt);
 
             User user1 = createUser(true, Role.ADMIN, avatar1, "ap6548088@gmail.com", "adrian22",
-                    "Adrian Popescu", BCrypt.hashpw("AtossAdmin123", bcryptSalt), true);
+                    "Adrian Popescu", BCrypt.hashpw("AtossAdmin123", bcryptSalt), true, false);
             userRepository.save(user1);
 
-            User user2 = createUser(true, Role.STANDARD, avatar1, "anaburlacu020626@gmail.com", "anas26",
-                    "Ana Burlacu", BCrypt.hashpw("StandardUser", bcryptSalt), true);
+            User user2 = createUser(true, Role.STANDARD, avatar1, "userlorena7@gmail.com", "lorena16",
+                    "Ana Burlacu", BCrypt.hashpw("StandardUser", bcryptSalt), true, false);
             userRepository.save(user2);
 
             User user3 = createUser(true, Role.ADMIN, avatar1, "aA12332111114@gmail.com", "ale009",
-                    "Alexandra Moise", BCrypt.hashpw("AleAdmin2676", bcryptSalt), true);
+                    "Alexandra Moise", BCrypt.hashpw("AleAdmin2676", bcryptSalt), true, false);
             userRepository.save(user3);
 
             User user4 = createUser(false, null, null, "andreiuser973@gmail.com", "andrei09888",
-                    null, null, false);
+                    null, null, false, true);
             userRepository.save(user4);
 
             User user5 = createUser(false, null, null, "usercristian91@gmail.com", "cosmin4455",
-                    null, null, false);
+                    null, null, false, true);
             userRepository.save(user5);
 
 
@@ -274,7 +274,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 String username = usernamePrefix + String.format("%02d", j);
                 String name = namePrefix + " " + j;
 
-                User user = createUser(true, randomEnum(Role.class), randomElementFromList(avatarList), email, username, name, password, true);
+                User user = createUser(true, randomEnum(Role.class), randomElementFromList(avatarList), email, username, name, password, true, false);
                 userList.add(user);
                 userRepository.save(user);
             }
@@ -417,11 +417,12 @@ public class InitialDataLoader implements CommandLineRunner {
      * @param hashPassword - encrypted password
      * @param hasPassword - describes the difference between accepted/declined request for create an account
      *                    (if user was declined, he doesn't have a password)
+     * @param isFirstLogin - check if the user's login is for the first time
      * @return user
      */
     private static User createUser(Boolean isActive, Role role, Avatar avatar,
                                    String email, String username, String fullName,
-                                   String hashPassword, Boolean hasPassword) {
+                                   String hashPassword, Boolean hasPassword, Boolean isFirstLogin) {
         User user = new User();
         user.setUsername(username);
         user.setPassword(hashPassword);
@@ -432,6 +433,7 @@ public class InitialDataLoader implements CommandLineRunner {
         user.setHasPassword(hasPassword);
         user.setAvatar(avatar);
         user.setRole(role);
+        user.setIsFirstLogin(isFirstLogin);
         return user;
     }
 

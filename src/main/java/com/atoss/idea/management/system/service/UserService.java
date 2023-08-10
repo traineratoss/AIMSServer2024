@@ -211,5 +211,15 @@ public interface UserService {
      */
     ResponseEntity<Object> sendActivateEmail(String user);
 
+    /**
+     * Checks whether the user identified by the provided username or email has logged in for the first time.
+     *
+     * @param usernameOrEmail The username or email of the user to be checked.
+     *
+     * @return {@code true} if the user's first login status is detected, {@code false} otherwise.
+     *
+     * @throws UserNotFoundException If the user with the given username or email is not found.
+     */
+    Boolean isFirstLogin(String usernameOrEmail);
 
 }

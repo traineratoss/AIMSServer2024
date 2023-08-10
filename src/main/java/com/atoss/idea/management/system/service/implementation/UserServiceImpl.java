@@ -68,6 +68,7 @@ public class UserServiceImpl implements UserService {
         user.setEmail(email);
         user.setIsActive(false);
         user.setHasPassword(false);
+        user.setIsFirstLogin(true);
         userRepository.save(user);
         sendEmailService.sendEmailToAdmin(username);
         return modelMapper.map(user, UserResponseDTO.class);
@@ -199,6 +200,7 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         user.setPassword(hashFrontendNewPassword);
+        user.setIsFirstLogin(false);
         userRepository.save(user);
         return true;
     }
@@ -292,5 +294,12 @@ public class UserServiceImpl implements UserService {
             throw new EmailFailedException("Sending email failed");
         }
         throw new UserAlreadyActivatedException("User already activate exception");
+    }
+
+    @Override
+    public Boolean isFirstLogin(String usernameOrEmail) {
+        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
+        return user.getIsFirstLogin();
     }
 }

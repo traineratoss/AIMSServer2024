@@ -351,4 +351,20 @@ public class UserController {
     public ResponseEntity<Object> sendActivateMessage(@RequestBody String username) {
         return userService.sendActivateEmail(username);
     }
+
+    /**
+     * Checks whether the user identified by the provided username or email has logged in for the first time.
+     *
+     * @param usernameOrEmail The username or email of the user to be checked.
+     *
+     * @return ResponseEntity containing a Boolean value indicating whether it's the user's first login.
+     *         Returns HttpStatus.OK if the request is successful.
+     *
+     * @see UserService#isFirstLogin(String)
+     */
+    @Transactional
+    @GetMapping("/is-first-login")
+    public ResponseEntity<Boolean> isFirstLogin(@RequestParam(name = "usernameOrEmail") String usernameOrEmail) {
+        return new ResponseEntity<>(userService.isFirstLogin(usernameOrEmail), HttpStatus.OK);
+    }
 }

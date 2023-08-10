@@ -67,6 +67,9 @@ public class User {
     @JsonManagedReference(value = "user-comments")
     private List<Comment> comments;
 
+    @Column(name = "is_first_login")
+    private Boolean isFirstLogin;
+
     /**
      * Constructor for creating a User object with the provided username and email.
      *

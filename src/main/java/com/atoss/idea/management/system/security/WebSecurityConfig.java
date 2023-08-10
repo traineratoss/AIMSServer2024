@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
 
-    private final AuthEntryPointJwt unauthorizedHandler;
+    private final AuthEntryPoint unauthorizedHandler;
 
     /**
      * Constructor for the WebSecurityConfig class.
@@ -30,9 +30,9 @@ public class WebSecurityConfig {
      * @param unauthorizedHandler The AuthEntryPointJwt used for handling unauthorized access and authentication errors.
      *
      * @see UserDetailsServiceImpl
-     * @see AuthEntryPointJwt
+     * @see AuthEntryPoint
      */
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPointJwt unauthorizedHandler) {
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPoint unauthorizedHandler) {
         this.userDetailsService = userDetailsService;
         this.unauthorizedHandler = unauthorizedHandler;
     }
@@ -55,11 +55,11 @@ public class WebSecurityConfig {
      *
      * @return An AuthTokenFilter object for filtering and validating JWT authentication tokens.
      *
-     * @see AuthTokenFilter
+     * @see AuthFilter
      */
     @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
+    public AuthFilter authenticationJwtTokenFilter() {
+        return new AuthFilter();
     }
 
     /**
@@ -105,7 +105,7 @@ public class WebSecurityConfig {
      * @see HttpSecurity
      * @see HttpMethod
      * @see UsernamePasswordAuthenticationFilter
-     * @see AuthTokenFilter
+     * @see AuthFilter
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

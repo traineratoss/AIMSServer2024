@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Component
 @Log4j2
-public class AuthEntryPointJwt implements AuthenticationEntryPoint {
+public class AuthEntryPoint implements AuthenticationEntryPoint {
 
     /**
      * Called when authentication fails, and the user is not authenticated.
@@ -35,16 +35,18 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {
+        // Log an error message with the details of the unauthorized error
         log.error("Unauthorized error: {}", authException.getMessage());
-
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        final Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        body.put("error", "Unauthorized");
-        body.put("message", authException.getMessage());
-        body.put("path", request.getServletPath());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);  // Set the response content type to JSON
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);    // Set the response status to 401 Unauthorized
+        final Map<String, Object> body = new HashMap<>();           // Create a map to hold the response body data
+        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);    // Add status information to the response body
+        body.put("error", "Unauthorized");                          // Add error type information to the response body
+        body.put("message", authException.getMessage());            // Add the error message to the response body
+        body.put("path", request.getServletPath());                 // Add the request path to the response body
+        // Create an ObjectMapper instance to serialize the response body map to JSON
         final ObjectMapper mapper = new ObjectMapper();
+        // Write the serialized JSON response body to the output stream of the response
         mapper.writeValue(response.getOutputStream(), body);
     }
 }

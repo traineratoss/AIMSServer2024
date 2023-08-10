@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.repository.dto;
+package com.atoss.idea.management.system.security.response;
 
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
@@ -14,7 +14,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Data
-public class UserRegisterDTO implements UserDetails {
+public class UserDetailsImpl implements UserDetails {
     private Long id;
 
     private String username;
@@ -36,7 +36,7 @@ public class UserRegisterDTO implements UserDetails {
      *
      * @see GrantedAuthority
      */
-    public UserRegisterDTO(Long id, String username, String email, String password,
+    public UserDetailsImpl(Long id, String username, String email, String password,
                            Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
@@ -57,13 +57,13 @@ public class UserRegisterDTO implements UserDetails {
      * @see SimpleGrantedAuthority
      * @see GrantedAuthority
      */
-    public static UserRegisterDTO build(User user) {
+    public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = Arrays.asList(Role.STANDARD, Role.ADMIN)
                 .stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))
                 .collect(Collectors.toList());
 
-        return new UserRegisterDTO(user.getId(),
+        return new UserDetailsImpl(user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
@@ -135,7 +135,7 @@ public class UserRegisterDTO implements UserDetails {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        UserRegisterDTO user = (UserRegisterDTO) o;
+        UserDetailsImpl user = (UserDetailsImpl) o;
         return Objects.equals(id, user.id);
     }
 }
