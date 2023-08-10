@@ -337,6 +337,14 @@ public class IdeaServiceImpl implements IdeaService {
 
         List<Predicate> predicatesList = new ArrayList<>();
 
+        if (username == null) {
+            List<Integer> allIdeasStatuses = new ArrayList<>();
+            allIdeasStatuses.add(0);
+            allIdeasStatuses.add(2);
+
+            predicatesList.add(root.get("status").in(allIdeasStatuses));
+        }
+
         if (username != null) {
             predicatesList.add(cb.equal(root.join("user").get("username"), username));
         }
