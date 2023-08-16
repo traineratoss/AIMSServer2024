@@ -3,6 +3,7 @@ package com.atoss.idea.management.system.service;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
+import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.Status;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -99,6 +100,13 @@ public interface IdeaService {
                                            String username,
                                            Pageable pageable);
 
+    /**
+     * Function used to return a list of ideas by their id
+     *
+     * @param ideaIds list of ids
+     * @return list of Idea
+     */
+    List<Idea> findIdeasByIds(List<Long> ideaIds);
 
     /**
      * Filters ideas based on date criteria

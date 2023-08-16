@@ -59,9 +59,7 @@ public interface IdeaRepository extends JpaRepository<Idea, Long> {
      * @param selectedDateTo data up to selection
      * @return all ideas within a certain given time interval
      */
-    @Query(value = " SELECT * "
-            +
-            " FROM idea i"
+    @Query(value = " SELECT * FROM idea i"
             +
             " WHERE (i.date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp)) ", nativeQuery = true)
     List<Idea> filterIdeasByDate(@Param("selectedDateFrom") String selectedDateFrom,

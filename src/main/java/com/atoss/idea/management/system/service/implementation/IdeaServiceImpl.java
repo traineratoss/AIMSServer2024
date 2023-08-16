@@ -421,6 +421,22 @@ public class IdeaServiceImpl implements IdeaService {
         return new PageImpl<>(allIdeasUnpaged, Pageable.unpaged(), totalSize);
     }
 
+    @Override
+    public List<Idea> findIdeasByIds(List<Long> ideaIds) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
+        Root<Idea> root = criteriaQuery.from(Idea.class);
+
+        List<Predicate> predicatesList = new ArrayList<>();
+
+        for (Long id:ideaIds) {
+            criteriaQuery.where(cb.equal(root.get("id"), id));
+        }
+
+        return entityManager.createQuery(criteriaQuery).getResultList();
+
+    }
+
 
     @Override
     public List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<?> root, CriteriaBuilder cb, String columnName) {

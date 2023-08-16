@@ -7,6 +7,7 @@ public interface StatisticsService {
 
     /**
      * Gets the general statistics of the application
+     * Usage : in "/stats" controller , called when CustomStatistics is mounted
      *
      * @return a statistic DTO that contains all the field necessary for
      *         the statistics
@@ -34,6 +35,8 @@ public interface StatisticsService {
 
     /**
      * used to retrieve stats based on given date interval
+     * Function called by the "/filteredStats" controller when wanting
+     * to display stats for selected time interval in CustomStatistics
      *
      * @param selectedDateFrom the date from within we want to get stats
      * @param selectedDateTo the date until  we want to get stats

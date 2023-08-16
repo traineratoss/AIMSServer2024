@@ -111,12 +111,12 @@ public class StatisticsServiceImpl implements StatisticsService {
      * we use this function to retrieve the most commented ideas in order to
      * do statistics based an them and to send them to be displayed
      *
-     * @param mostCommentedIdeas list of idea id
+     * @param mostCommentedIdeasIds list of idea id
      * @return list of most commented ideas
      */
-    public List<IdeaResponseDTO> getMostCommentedIdeas(List<Long> mostCommentedIdeas) {
+    public List<IdeaResponseDTO> getMostCommentedIdeas(List<Long> mostCommentedIdeasIds) {
 
-        return mostCommentedIdeas.stream().map(idea_id -> {
+        return mostCommentedIdeasIds.stream().map(idea_id -> {
 
             Idea idea = ideaRepository.findById(idea_id).get();
             IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
@@ -139,9 +139,9 @@ public class StatisticsServiceImpl implements StatisticsService {
         Double ideasPerUser = Math.round((double) nrOfIdeas / (double) nrOfUsers * 100) / 100.00;
         Long implIdeas = ideaRepository.countByStatus(Status.IMPLEMENTED);
         Long draftedIdeas = ideaRepository.countByStatus(Status.DRAFT);
-        Long openIdeas = ideaRepository.countByStatus(Status.OPEN);
+        Long openIdeas = nrOfIdeas - implIdeas - draftedIdeas;
         Long nrOfComments = commentRepository.countComments();
-        Long nrOfReplies = commentRepository.countAllReplies();
+        Long nrOfReplies = commentRepository.countReplies();
         Double draftP = ((double) draftedIdeas / (double) nrOfIdeas * 100);
         Double openP =  ((double) openIdeas / (double) nrOfIdeas * 100);
         Double implP = ((double) implIdeas / (double) nrOfIdeas * 100);
@@ -188,7 +188,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         Long noOfComments = listOfRepliesAndComments.get(1);
 
         List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(
-                commentRepository.mostCommentedIdeasByDate(selectedDateFrom, selectedDateTo));
+                commentRepository.mostCommentedIdeasIdsByDate(selectedDateFrom, selectedDateTo));
 
 
         filteredStatisticsDTO.setImplP(implP);
