@@ -132,34 +132,34 @@ public class StatisticsServiceImpl implements StatisticsService {
     public StatisticsDTO getGeneralStatistics() {
 
         StatisticsDTO statisticsDTO = new StatisticsDTO();
-
-
         Long nrOfUsers = userRepository.count();
         Long nrOfIdeas = ideaRepository.count();
-        Double ideasPerUser = Math.round((double) nrOfIdeas / (double) nrOfUsers * 100) / 100.00;
+        double ideasPerUser = Math.round((double) nrOfIdeas / (double) nrOfUsers * 100.00) / 100.00;
+        statisticsDTO.setIdeasPerUser(ideasPerUser);
         Long implIdeas = ideaRepository.countByStatus(Status.IMPLEMENTED);
         Long draftedIdeas = ideaRepository.countByStatus(Status.DRAFT);
+        statisticsDTO.setDraftIdeas(draftedIdeas);
         Long openIdeas = nrOfIdeas - implIdeas - draftedIdeas;
+        statisticsDTO.setOpenIdeas(openIdeas);
         Long nrOfComments = commentRepository.countComments();
+        statisticsDTO.setTotalNrOfComments(nrOfComments);
         Long nrOfReplies = commentRepository.countReplies();
-        Double draftP = ((double) draftedIdeas / (double) nrOfIdeas * 100);
-        Double openP =  ((double) openIdeas / (double) nrOfIdeas * 100);
-        Double implP = ((double) implIdeas / (double) nrOfIdeas * 100);
+        statisticsDTO.setTotalNrOfReplies(nrOfReplies);
+        double draftP = ((double) draftedIdeas / (double) nrOfIdeas * 100);
+        double openP = ((double) openIdeas / (double) nrOfIdeas * 100);
+        double implP = ((double) implIdeas / (double) nrOfIdeas * 100);
+        double totalP = (int) draftP + (int) openP + (int)  implP;
+        double diff = 100.00 - totalP;
+        draftP = draftP + diff;
         List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(commentRepository.mostCommentedIdeas());
 
         statisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
-        statisticsDTO.setOpenIdeas(openIdeas);
         statisticsDTO.setNrOfUsers(nrOfUsers);
         statisticsDTO.setNrOfIdeas(nrOfIdeas);
-        statisticsDTO.setIdeasPerUser(ideasPerUser);
         statisticsDTO.setImplementedIdeas(implIdeas);
-        statisticsDTO.setDraftIdeas(draftedIdeas);
-        statisticsDTO.setTotalNrOfComments(nrOfComments);
-        statisticsDTO.setTotalNrOfReplies(nrOfReplies);
         statisticsDTO.setImplP(implP);
         statisticsDTO.setDraftP(draftP);
         statisticsDTO.setOpenP(openP);
-
         return statisticsDTO;
     }
 
