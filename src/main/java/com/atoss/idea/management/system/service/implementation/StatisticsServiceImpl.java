@@ -1,6 +1,5 @@
 package com.atoss.idea.management.system.service.implementation;
 
-
 import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
@@ -169,12 +168,48 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         StatisticsDTO filteredStatisticsDTO = new StatisticsDTO();
 
+        List<Long> listOfRepliesAndComments = commentRepository.getRepliesAndCommentsCount(selectedDateFrom, selectedDateTo);
+
+        Long noOfReplies;
+        try {
+            noOfReplies = listOfRepliesAndComments.get(0);
+        } catch (Exception e) {
+            noOfReplies = 0L;
+        }
+        filteredStatisticsDTO.setTotalNrOfReplies(noOfReplies);
+
+        Long noOfComments;
+        try {
+            noOfComments = listOfRepliesAndComments.get(1);
+        } catch (Exception e) {
+            noOfComments = 0L;
+        }
+        filteredStatisticsDTO.setTotalNrOfComments(noOfComments);
+
         List<Long> listOfStatusesCount = ideaRepository.countStatusByDate(selectedDateFrom,
                 selectedDateTo);
 
-        Long openIdeasCount = listOfStatusesCount.get(0);
-        Long draftIdeasCount = listOfStatusesCount.get(1);
-        Long implIdeasCount = listOfStatusesCount.get(2);
+        Long openIdeasCount;
+        Long draftIdeasCount;
+        Long implIdeasCount;
+
+        try {
+            openIdeasCount = listOfStatusesCount.get(0);
+        } catch (Exception e) {
+            openIdeasCount = 0L;
+        }
+
+        try {
+            draftIdeasCount = listOfStatusesCount.get(1);
+        } catch (Exception e) {
+            draftIdeasCount = 0L;
+        }
+
+        try {
+            implIdeasCount = listOfStatusesCount.get(2);
+        } catch (Exception e) {
+            implIdeasCount = 0L;
+        }
 
         Long totalIdeasCount = openIdeasCount + draftIdeasCount + implIdeasCount;
 
@@ -182,14 +217,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         Double openP =  ((double) openIdeasCount / (double) totalIdeasCount * 100);
         Double implP = ((double) implIdeasCount / (double) totalIdeasCount * 100);
 
-        List<Long> listOfRepliesAndComments = commentRepository.getRepliesAndCommentsCount(selectedDateFrom, selectedDateTo);
-
-        Long noOfReplies = listOfRepliesAndComments.get(0);
-        Long noOfComments = listOfRepliesAndComments.get(1);
-
         List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(
                 commentRepository.mostCommentedIdeasIdsByDate(selectedDateFrom, selectedDateTo));
-
 
         filteredStatisticsDTO.setImplP(implP);
         filteredStatisticsDTO.setOpenP(openP);
@@ -198,13 +227,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         filteredStatisticsDTO.setDraftIdeas(draftIdeasCount);
         filteredStatisticsDTO.setOpenIdeas(openIdeasCount);
         filteredStatisticsDTO.setImplementedIdeas(implIdeasCount);
-        filteredStatisticsDTO.setTotalNrOfComments(noOfComments);
-        filteredStatisticsDTO.setTotalNrOfReplies(noOfReplies);
         filteredStatisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
 
         return filteredStatisticsDTO;
     }
-
-
-
 }
