@@ -38,7 +38,6 @@ public class CategoryServiceImpl implements CategoryService {
         if (existCategory.isPresent()) {
             throw new CategoryAlreadyExistsException("Category already exists");
         } else {
-            savedCategory.setText(categoryDTO.getText());
             return modelMapper.map(categoryRepository.save(savedCategory), CategoryDTO.class);
         }
     }
