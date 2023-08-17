@@ -34,17 +34,27 @@ public interface SendEmailService {
     void sendDeclineEmailToUser(String username);
 
     /**
-     * Sends an email to the admin regarding a login request received from the user associated with the given username.
+     * Sends an email to the user associated with the given username.
      *
      * The method fetches the user details using the provided username and sends two emails:
-     *   1. An email to all administrators alerting them about the login request.
-     *   2. An email to the user's email address containing details of the login request.
+     *   An email to the user's email address containing details of the login request.
      *
      * @param username The username of the user for whom the login request is received.
      * @throws RuntimeException If the user does not exist in the repository.
      * @throws RuntimeException If there are any issues during the email sending process.
      */
-    void sendEmailToAdmin(String username);
+    void sendEmailToUser(String username);
+
+    /**
+     * Sends an email to the admin regarding a login request received from the user associated with the given username.
+     *
+     * The method fetches the user details using the provided username and sends two emails:
+     *   An email to all administrators alerting them about the login request.
+     *
+     * @param username The username of the user for whom the login request is received.
+     * @throws RuntimeException If there are any issues during the email sending process.
+     */
+    void sendEmailToAdmins(String username);
 
     /**
      * Sends an email to the user associated with the given username for the password reset request.

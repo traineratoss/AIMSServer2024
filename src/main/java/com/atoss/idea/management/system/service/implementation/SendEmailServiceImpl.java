@@ -111,14 +111,23 @@ public class SendEmailServiceImpl implements SendEmailService {
     }
 
     @Override
-    public void sendEmailToAdmin(String username) {
+    public void sendEmailToUser(String username) {
         User user = getUserByUsername(username);
         String emailTo = user.getEmail();
         String subject = "Alert: Login Request Received";
-        String text = getEmailTextForLoginRequest(username, emailTo);
-        String textAdmin = getEmailTextForLoginRequestForUser(username, emailTo);
-        sendToAllAdmin(subject, text);
-        sendEmail(emailTo, subject, textAdmin);
+        //        String textAdmin = getEmailTextForLoginRequest(username, emailTo);
+        String textUser = getEmailTextForLoginRequestForUser(username, emailTo);
+        //        sendToAllAdmin(subject, textAdmin);
+        sendEmail(emailTo, subject, textUser);
+    }
+
+    @Override
+    public void sendEmailToAdmins(String username) {
+        User user = getUserByUsername(username);
+        String emailTo = user.getEmail();
+        String subject = "Alert: Login Request Received";
+        String textAdmin = getEmailTextForLoginRequest(username, emailTo);
+        sendToAllAdmin(subject, textAdmin);
     }
 
     @Override

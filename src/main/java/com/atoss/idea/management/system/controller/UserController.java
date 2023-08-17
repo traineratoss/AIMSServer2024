@@ -2,6 +2,7 @@ package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.exception.*;
 import com.atoss.idea.management.system.repository.dto.*;
+import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -20,16 +21,18 @@ import com.atoss.idea.management.system.exception.UserNotFoundException;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final SendEmailService sendEmailService;
 
     /**
      * Constructs a new instance of the UserController with the provided UserService.
      *
-     * @param userService The UserService instance to be used by the UserController.
-     *
+     * @param userService      The UserService instance to be used by the UserController.
+     * @param sendEmailService  The SendEmailService instance to be used by the UserController.
      * @see UserService
      */
-    public UserController(UserService userService) {
+    public UserController(UserService userService, SendEmailService sendEmailService) {
         this.userService = userService;
+        this.sendEmailService = sendEmailService;
     }
 
     /**
@@ -49,6 +52,18 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> addUser(@RequestParam(name = "username") String username,
                                                    @RequestParam(name = "email") String email) {
         return new ResponseEntity<>(userService.addUser(username, email), HttpStatus.CREATED);
+    }
+
+    /**
+     * Send email to all admins.
+     * @param username The unique parameter representing the username of the new user.
+     * @return A ResponseEntity with a String that confirm the email was sent.
+     */
+    @Transactional
+    @PostMapping("/send-email-to-admin")
+    public ResponseEntity<String> sendEmailToAdmins(@RequestParam(name = "username") String username) {
+        sendEmailService.sendEmailToAdmins(username);
+        return new ResponseEntity<>("Email send to all admins!", HttpStatus.OK);
     }
 
     /**

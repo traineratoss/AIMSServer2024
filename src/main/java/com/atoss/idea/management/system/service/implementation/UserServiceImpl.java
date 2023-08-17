@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
         user.setHasPassword(false);
         user.setIsFirstLogin(true);
         userRepository.save(user);
-        sendEmailService.sendEmailToAdmin(username);
+        sendEmailService.sendEmailToUser(username);
         return modelMapper.map(user, UserResponseDTO.class);
     }
 
