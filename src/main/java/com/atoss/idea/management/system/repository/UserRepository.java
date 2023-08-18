@@ -66,5 +66,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @param pageable The Pageable object used for pagination and sorting.
      * @return A Page containing a subset of User entities with usernames that start with the specified string.
      */
-    Page<User> findByUsernameStartsWith(String username, Pageable pageable);
+    Page<User> findByUsernameStartsWithOrderByIsActiveAscIdAsc(String username, Pageable pageable);
 }

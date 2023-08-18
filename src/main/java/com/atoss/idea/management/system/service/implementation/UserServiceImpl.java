@@ -155,9 +155,9 @@ public class UserServiceImpl implements UserService {
             String username
     ) {
         UserPageDTO userPageDTO = new UserPageDTO();
-        userPageDTO.setTotal(userRepository.findByUsernameStartsWith(username, Pageable.unpaged()).getContent().size());
+        userPageDTO.setTotal(userRepository.findByUsernameStartsWithOrderByIsActiveAscIdAsc(username, Pageable.unpaged()).getContent().size());
         List<UserAdminDashboardResponseDTO> result = userRepository
-                .findByUsernameStartsWith(username, pageable)
+                .findByUsernameStartsWithOrderByIsActiveAscIdAsc(username, pageable)
                 .stream()
                 .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
                 .toList();
