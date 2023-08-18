@@ -234,16 +234,19 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         Long totalIdeasCount = openIdeasCount + draftIdeasCount + implIdeasCount;
 
-        Double draftP = ((double) draftIdeasCount / (double) totalIdeasCount * 100);
-        Double openP =  ((double) openIdeasCount / (double) totalIdeasCount * 100);
-        Double implP = ((double) implIdeasCount / (double) totalIdeasCount * 100);
+        double draftPercentage = ((double) draftIdeasCount / (double) totalIdeasCount * 100);
+        double openPercentage =  ((double) openIdeasCount / (double) totalIdeasCount * 100);
+        double implPercentage = ((double) implIdeasCount / (double) totalIdeasCount * 100);
+        double totalP = (int) draftPercentage + (int) openPercentage + (int)  implPercentage;
+        double diff = 100.00 - totalP;
+        draftPercentage = draftPercentage + diff;
 
         List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(
                 commentRepository.mostCommentedIdeasIdsByDate(selectedDateFrom, selectedDateTo));
 
-        filteredStatisticsDTO.setImplP(implP);
-        filteredStatisticsDTO.setOpenP(openP);
-        filteredStatisticsDTO.setDraftP(draftP);
+        filteredStatisticsDTO.setImplP(implPercentage);
+        filteredStatisticsDTO.setOpenP(openPercentage);
+        filteredStatisticsDTO.setDraftP(draftPercentage);
         filteredStatisticsDTO.setNrOfIdeas(totalIdeasCount);
         filteredStatisticsDTO.setDraftIdeas(draftIdeasCount);
         filteredStatisticsDTO.setOpenIdeas(openIdeasCount);
