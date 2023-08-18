@@ -193,7 +193,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         Long noOfReplies;
         try {
-            noOfReplies = listOfRepliesAndComments.get(0);
+            noOfReplies = listOfRepliesAndComments.get(1);
         } catch (Exception e) {
             noOfReplies = 0L;
         }
@@ -201,7 +201,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         Long noOfComments;
         try {
-            noOfComments = listOfRepliesAndComments.get(1);
+            noOfComments = listOfRepliesAndComments.get(0);
         } catch (Exception e) {
             noOfComments = 0L;
         }

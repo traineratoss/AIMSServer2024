@@ -74,7 +74,7 @@ public class StatisticsController {
             @RequestParam(required = false) String selectedDateFrom,
             @RequestParam(required = false) String selectedDateTo) {
 
-        return new  ResponseEntity<>(statisticsService.getStatisticsByDate(
+        return new ResponseEntity<>(statisticsService.getStatisticsByDate(
                 selectedDateFrom,
                 selectedDateTo), HttpStatus.OK);
 
