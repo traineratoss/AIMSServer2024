@@ -4,17 +4,12 @@ import com.atoss.idea.management.system.exception.AvatarNotFoundException;
 
 public interface SendEmailService {
     /**
-     * Sends an account activation email to the user associated with the given username.
+     * Sends an approval email to a user for account activation and performs necessary actions upon approval.
      *
-     * The method fetches the user details using the provided username and generates a random password
-     * for the activation process. An activation email containing the generated password is sent to
-     * the user's email address.
+     * This method generates a random password, sends an email to the user with activation details,
+     * and updates the user's information in the system upon successful approval.
      *
-     * After sending the email, the method updates the user's account information to set the hashed
-     * password, activate the account, set the user role to standard, set an empty full name, and
-     * associate the user with a default avatar.
-     *
-     * @param username The username of the user to whom the activation email will be sent.
+     * @param username The username of the user to send the approval email to.
      * @throws AvatarNotFoundException If the default avatar with ID 1 is not found in the avatar repository.
      * @throws RuntimeException If the user does not exist in the repository.
      * @throws RuntimeException If there are any issues during the email sending process.
@@ -22,45 +17,47 @@ public interface SendEmailService {
     void sendApproveEmailToUser(String username);
 
     /**
-     * Sends a registration rejection email to the user associated with the given username.
+     /**
+     * Sends a notification email to a user indicating that their registration request has been declined.
      *
-     * The method fetches the user details using the provided username and sends an email notifying the user
-     * that their registration request has been rejected.
+     * This method sends an email to the user, notifying them that their registration request
+     * has been rejected by the system administrators.
      *
-     * @param username The username of the user to whom the rejection email will be sent.
+     * @param username The username of the user to send the decline email to.
      * @throws RuntimeException If the user does not exist in the repository.
      * @throws RuntimeException If there are any issues during the email sending process.
      */
     void sendDeclineEmailToUser(String username);
 
     /**
-     * Sends an email to the user associated with the given username.
+     * Sends a notification email to a user regarding a received login request.
      *
-     * The method fetches the user details using the provided username and sends two emails:
-     *   An email to the user's email address containing details of the login request.
+     * This method sends an email to the user to inform them that a login request
+     * has been received for their account.
      *
-     * @param username The username of the user for whom the login request is received.
+     * @param username The username of the user to send the email notification to.
      * @throws RuntimeException If the user does not exist in the repository.
      * @throws RuntimeException If there are any issues during the email sending process.
      */
     void sendEmailToUser(String username);
 
     /**
-     * Sends an email to the admin regarding a login request received from the user associated with the given username.
+     * Sends a notification email to administrators regarding a received login request from a user.
      *
-     * The method fetches the user details using the provided username and sends two emails:
-     *   An email to all administrators alerting them about the login request.
+     * This method sends an email to each administrator in the system, informing them that a login request
+     * has been received from a specific user.
      *
-     * @param username The username of the user for whom the login request is received.
+     * @param username The username of the user who initiated the login request.
      * @throws RuntimeException If there are any issues during the email sending process.
      */
     void sendEmailToAdmins(String username);
 
     /**
-     * Sends an email to the user associated with the given username for the password reset request.
+     /**
+     * Sends a password reset email to a user and updates their password upon request.
      *
-     * The method fetches the user details using the provided username and sends an email containing
-     * a password reset link and the newly generated password.
+     * This method generates a new random password, sends a password reset email to the user,
+     * and updates their password in the system upon their request.
      *
      * @param username The username of the user for whom the password reset email will be sent.
      * @throws RuntimeException If the user does not exist in the repository.
@@ -69,29 +66,23 @@ public interface SendEmailService {
     void sendEmailForgotPassword(String username);
 
     /**
-     * Sends an account deactivation email to the user associated with the given username and deactivates the user's account.
+     * Sends an account deactivation email to a user and updates their account status.
      *
-     * The method fetches the user details using the provided username and sends an account deactivation email
-     * to the user's email address. After sending the email, it sets the user's account status to inactive (isActive = false)
-     * and saves the updated user information to the repository.
+     * This method sends an email to the user notifying them of their account deactivation
+     * and updates their account status in the system.
      *
-     * @param username The username of the user to whom the deactivation email will be sent.
-     * @return True if the deactivation email is sent and the user's account is successfully deactivated; otherwise, false.
+     * @param username The username of the user whose account is being deactivated.
+     * @return `true` if the deactivation email is sent and the account status is updated successfully; otherwise, `false`.
      * @throws RuntimeException If the user does not exist in the repository.
      * @throws RuntimeException If there are any issues during the email sending process.
      */
     boolean sendDeactivateEmailToUser(String username);
 
     /**
-     * Sends an account reactivation email to the user associated with the given username and activates the user's account.
+     * Sends an account reactivation email to a user and updates their account status.
      *
-     * The method fetches the user details using the provided username and generates a random password of length 15
-     * characters using the `PasswordGenerator.generatePassayPassword()` method (not shown here). It then sends an account
-     * reactivation email containing the reactivation link or the newly generated password to the user's email address.
-     *
-     * After sending the email, the method sets the user's account status to active (isActive = true) and changes the
-     * user's password to the newly generated password (hashed using BCrypt) before saving the updated user information
-     * to the repository.
+     * This method sends an email to the user notifying them of their account reactivation,
+     * generates and sets a new password for their account, and updates their account status in the system.
      *
      * @param username The username of the user to whom the reactivation email will be sent.
      * @return True if the reactivation email is sent and the user's account is successfully reactivated; otherwise, false.
