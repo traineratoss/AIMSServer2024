@@ -120,19 +120,23 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @return An array with 2 elements , on index 0 we have Replies and on index 1 Comments
      *
      */
-    @Query(value = " SELECT COUNT(*) AS frequency FROM  comment c "
+    @Query(value = " select count(*) from comment c "
             +
-            " WHERE (c.creation_date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp) ) "
+            " where (c.creation_date  between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp)) "
             +
-            " AND idea_id IS NULL "
+            " and c.idea_id is not null and c.idea_id in (select idea_id from idea "
             +
-            " UNION "
+            " where status != 1 and (idea.date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp)) ) union all "
             +
-            " SELECT COUNT(*) AS frequency FROM comment  c "
+            " select count(*) from comment c where (c.creation_date between cast(:selectedDateFrom AS timestamp) "
             +
-            "WHERE (c.creation_date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp) ) "
+            " and cast(:selectedDateTo AS timestamp)) "
             +
-            " AND idea_id IS NOT NULL ", nativeQuery = true)
+            " and c.idea_id is null and c.idea_id in (select idea_id from idea "
+            +
+            " where status != 1 and (idea.date  between cast(:selectedDateFrom AS timestamp) "
+            +
+            " and cast(:selectedDateTo AS timestamp)))", nativeQuery = true)
     List<Long> getRepliesAndCommentsCount(@Param("selectedDateFrom") String selectedDateFrom,
                                           @Param("selectedDateTo") String selectedDateTo);
 
