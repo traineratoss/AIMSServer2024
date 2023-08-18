@@ -43,11 +43,21 @@ public interface IdeaRepository extends JpaRepository<Idea, Long> {
      * @param selectedDateTo data up to selection
      * @return a list of statuses
      */
-    @Query(value = " SELECT COUNT(*) AS frequency FROM idea i "
-            +
-            " WHERE (i.date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp))"
-            +
-            " GROUP BY i.status ", nativeQuery = true)
+    @Query(value = "SELECT COUNT(*) AS frequency FROM idea i "
+        +
+        " WHERE (i.date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp)) and i.status = 0 "
+        +
+        " UNION ALL "
+        +
+        " SELECT COUNT(*) AS frequency FROM idea i "
+        +
+        " WHERE (i.date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp)) and i.status = 1 "
+        +
+        " UNION ALL "
+        +
+        " SELECT COUNT(*) AS frequency FROM idea i "
+        +
+        " WHERE (i.date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp)) and i.status = 2", nativeQuery = true)
     List<Long> countStatusByDate(@Param("selectedDateFrom") String selectedDateFrom,
                            @Param("selectedDateTo") String selectedDateTo);
 

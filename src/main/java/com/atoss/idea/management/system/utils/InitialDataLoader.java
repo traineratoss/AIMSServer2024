@@ -280,7 +280,7 @@ public class InitialDataLoader implements CommandLineRunner {
             }
 
             // Dummy ideas
-            int numberOfIdeasToCreate = 60;
+            int numberOfIdeasToCreate = 50;
             int k = 1;
             for (int j = 1; j <= numberOfIdeasToCreate; j++) {
                 Date ideaDate = randomDateFromList(randomDateList(30));
@@ -294,9 +294,9 @@ public class InitialDataLoader implements CommandLineRunner {
             }
 
             // Dummy comments and replies
+            int n = 0;
+            int m = 0;
             for (Idea idea : ideaList) {
-                int n = 0;
-
                 // Because we want a random number of comments per idea
                 int numberOfCommentsPerIdea = givenList_shouldReturnARandomElement();
                 for (int i = 0; i < numberOfCommentsPerIdea; i++) {
@@ -309,7 +309,6 @@ public class InitialDataLoader implements CommandLineRunner {
                     n++;
 
                     // Dummy replies
-                    int m = 0;
                     // Because we want a random number of replies per comment
                     int numberOfRepliesPerComment = givenList_shouldReturnARandomElement();
                     for (int b = 0; b < numberOfRepliesPerComment; b++) {
@@ -322,6 +321,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     }
                 }
             }
+
         }
     }
 

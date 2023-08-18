@@ -59,15 +59,19 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @param selectedDateTo data up to selection
      * @return a list containing idea-id's of the most commented ideas between given dates
      */
-    @Query(value = " select c.idea_id, COUNT(*) AS total_comments from comment c "
+    @Query(value = " select comment.idea_id, count(*) as noOfComments from comment "
             +
-            " WHERE (c.creation_date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp) ) "
+            " where comment.idea_id in "
             +
-            " and (idea_id IS NOT NULL) "
+            " (select idea.idea_id from idea "
             +
-            " GROUP BY c.idea_id "
+            " where (idea.date between cast(:selectedDateFrom AS timestamp) "
             +
-            " order by total_comments DESC limit 5 ", nativeQuery = true)
+            " and cast(:selectedDateTo AS timestamp)) "
+            +
+            " and idea.status != 1) "
+            +
+            " group by comment.idea_id order by noOfComments DESC limit 5", nativeQuery = true)
     List<Long> mostCommentedIdeasIdsByDate(@Param("selectedDateFrom") String selectedDateFrom,
                                            @Param("selectedDateTo") String selectedDateTo);
 
@@ -81,6 +85,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             " FROM comment "
             +
             " WHERE idea_id IS NOT NULL "
+            +
+            " AND idea_id IN "
+            +
+            " (SELECT idea_id FROM idea WHERE status != 1) "
             +
             " GROUP BY idea_id "
             +
@@ -112,19 +120,23 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @return An array with 2 elements , on index 0 we have Replies and on index 1 Comments
      *
      */
-    @Query(value = " SELECT COUNT(*) AS frequency FROM  comment c "
+    @Query(value = " select count(*) from comment c "
             +
-            " WHERE (c.creation_date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp) ) "
+            " where (c.creation_date  between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp)) "
             +
-            " AND idea_id IS NULL "
+            " and c.idea_id is not null and c.idea_id in (select idea_id from idea "
             +
-            " UNION "
+            " where status != 1 and (idea.date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp)) ) union all "
             +
-            " SELECT COUNT(*) AS frequency FROM comment  c "
+            " select count(*) from comment c where (c.creation_date between cast(:selectedDateFrom AS timestamp) "
             +
-            "WHERE (c.creation_date between cast(:selectedDateFrom AS timestamp) and cast(:selectedDateTo AS timestamp) ) "
+            " and cast(:selectedDateTo AS timestamp)) "
             +
-            " AND idea_id IS NOT NULL ", nativeQuery = true)
+            " and c.idea_id is null and c.idea_id in (select idea_id from idea "
+            +
+            " where status != 1 and (idea.date  between cast(:selectedDateFrom AS timestamp) "
+            +
+            " and cast(:selectedDateTo AS timestamp)))", nativeQuery = true)
     List<Long> getRepliesAndCommentsCount(@Param("selectedDateFrom") String selectedDateFrom,
                                           @Param("selectedDateTo") String selectedDateTo);
 
