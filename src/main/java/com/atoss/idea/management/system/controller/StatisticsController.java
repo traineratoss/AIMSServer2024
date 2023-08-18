@@ -33,10 +33,10 @@ public class StatisticsController {
     /**
      * Constructor for the Statistics Controller
      *
-     * @param statisticsService what it says
-     * @param commentRepository ===
-     * @param ideaRepository test
-     * @param ideaServiceImpl test
+     * @param statisticsService used for injecting the StatisticsService in order to access and use its methods
+     * @param commentRepository repository for the Comment Entity
+     * @param ideaRepository repository for the Idea Entity
+     * @param ideaServiceImpl Idea Service Implementation
      */
     public StatisticsController(StatisticsService statisticsService,
                                 CommentRepository commentRepository,
@@ -83,8 +83,8 @@ public class StatisticsController {
     /**
      * Testing endpoint
      *
-     * @param selectedDateFrom placeholder
-     * @param selectedDateTo placeholder
+     * @param selectedDateFrom date from which we select
+     * @param selectedDateTo data up to selection
      * @return testing endpoint
      */
     @GetMapping("/test")

@@ -61,6 +61,7 @@ public class CommentServiceImpl implements CommentService {
         this.modelMapper = modelMapper;
     }
 
+    // create a link between comment and elapsed time function
     @Override
     public String getTimeForComment(Long id) {
         Optional<Comment> commentOptional = commentRepository.findById(id);
@@ -74,6 +75,7 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    // converts milliseconds in the correct time unit
     @Override
     public String getElapsedTime(Date creationDate) {
         Date currentDate = new Date();
