@@ -279,10 +279,11 @@ public class InitialDataLoader implements CommandLineRunner {
                 userRepository.save(user);
             }
 
-            //dummy idea
+            // Dummy ideas
             int numberOfIdeasToCreate = 60;
             int k = 1;
-            for (int j = 1; j < numberOfIdeasToCreate; j++) {
+            for (int j = 1; j <= numberOfIdeasToCreate; j++) {
+                Date ideaDate = randomDateFromList(randomDateList(30));
                 String title = "New Idea " + k;
                 String text = "World changing idea number " + k + ". Waiting on opinions!";
                 Idea idea = createIdea(randomElementFromList(userList), randomEnum(Status.class), text, title,
@@ -292,38 +293,50 @@ public class InitialDataLoader implements CommandLineRunner {
                 k++;
             }
 
-            //dummy comment
-            int n = 0;
-            int numberOfComment = 10;
-            //because we want a random number of comments per idea
-            int numberOfCommentsPerIdea = givenList_shouldReturnARandomElement();
+            // Dummy comments and replies
+            for (Idea idea : ideaList) {
+                int n = 0;
 
-            for (int a = 1; a < numberOfComment; a++) {
+                // Because we want a random number of comments per idea
+                int numberOfCommentsPerIdea = givenList_shouldReturnARandomElement();
                 for (int i = 0; i < numberOfCommentsPerIdea; i++) {
+                    Date commentDate = randomDateAfter(idea.getCreationDate());
                     String commentText = "Comment " + n;
-                    Comment comment = createComment(randomDateFromList(randomDateList(30)), randomElementFromList(ideaList), null,
+                    Comment comment = createComment(commentDate, idea, null,
                             randomElementFromList(userList), commentText);
                     commentRepository.save(comment);
                     commentList.add(comment);
                     n++;
-                }
-            }
 
-            //dummy reply
-            int m = 0;
-            //because we want a random number of replies for each comment
-            int numberOfRepliesPerComment = givenList_shouldReturnARandomElement();
-
-            for (int a = 1; a < numberOfComment; a++) {
-                for (int i = 0; i < numberOfRepliesPerComment; i++) {
-                    String replyText = "Reply " + m;
-                    Comment reply = createReply(randomDateFromList(randomDateList(30)), randomElementFromList(commentList),
-                            randomElementFromList(ideaList), randomElementFromList(userList), replyText);
-                    commentRepository.save(reply);
-                    m++;
+                    // Dummy replies
+                    int m = 0;
+                    // Because we want a random number of replies per comment
+                    int numberOfRepliesPerComment = givenList_shouldReturnARandomElement();
+                    for (int b = 0; b < numberOfRepliesPerComment; b++) {
+                        String replyText = "Reply " + m;
+                        Date replyDate = randomDateAfter(commentDate); // Generate reply date after parent comment date
+                        Comment reply = createReply(replyDate, comment, idea,
+                                randomElementFromList(userList), replyText);
+                        commentRepository.save(reply);
+                        m++;
+                    }
                 }
             }
         }
+    }
+
+    /** generate child date after parent date
+     *
+      * @param minDate date of parent (need to be earlier that child date)
+     * @return randomDate after parent randomDate
+     */
+    private Date randomDateAfter(Date minDate) {
+        long minMillis = minDate.getTime();
+        long maxMillis = System.currentTimeMillis(); // Use current time as upper bound
+        long randomMillis = ThreadLocalRandom.current().nextLong(minMillis, maxMillis);
+
+        Date randomDate = new Date(randomMillis);
+        return randomDate;
     }
 
     /*
