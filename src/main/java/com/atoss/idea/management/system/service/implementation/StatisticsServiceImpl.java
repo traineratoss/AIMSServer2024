@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.service.implementation;
 
+
 import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
@@ -22,7 +23,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
@@ -47,12 +50,12 @@ public class StatisticsServiceImpl implements StatisticsService {
     /**
      * Constructor
      *
-     * @param modelMapper used for the conversion of entities object to DTO
-     * @param ideaService Idea Service (interface)
-     * @param ideaRepository repository for the Idea Entity
-     * @param commentService Comment Service (interface)
-     * @param userRepository repository for the User Entity
-     * @param commentRepository repository for the Comment Entity
+     * @param modelMapper ==
+     * @param ideaService ==
+     * @param ideaRepository ==
+     * @param commentService ==
+     * @param userRepository ==
+     * @param commentRepository ==
      */
     public StatisticsServiceImpl(ModelMapper modelMapper,
                                  IdeaService ideaService,
@@ -69,7 +72,6 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public Long getSelectionRepliesNumber(String selectedDateFrom, String selectedDateTo) {
 
-        // used to construct structured queries
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Comment> criteriaQuery = cb.createQuery(Comment.class);
         Root<Comment> root = criteriaQuery.from(Comment.class);
@@ -77,7 +79,6 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<Predicate> predicatesList = new ArrayList<>();
 
         predicatesList.addAll(ideaService.filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
-        // used to add a single condition related to the parent attribute (parent for reply is not null)
         predicatesList.add(cb.isNotNull(root.get("parent")));
 
         criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
@@ -120,25 +121,38 @@ public class StatisticsServiceImpl implements StatisticsService {
      * do statistics on them and to send them to be displayed
      *
      * @param mostCommentedIdeasIds list of idea id
+     * @param sortOrder sorting order of the ideas
      * @return list of most commented ideas
      */
-    public List<IdeaResponseDTO> getMostCommentedIdeas(List<Long> mostCommentedIdeasIds) {
+    public List<IdeaResponseDTO> getMostCommentedIdeas(List<Long> mostCommentedIdeasIds, String sortOrder) {
 
-        return mostCommentedIdeasIds.stream().map(idea_id -> {
+        List<IdeaResponseDTO> sortedIdeas = mostCommentedIdeasIds.stream()
+                .map(idea_id -> {
+                    Idea idea = ideaRepository.findById(idea_id).get();
+                    IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
+                    ideaResponseDTO.setUsername(idea.getUser().getUsername());
+                    ideaResponseDTO.setElapsedTime(commentService.getElapsedTime(idea.getCreationDate()));
+                    ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
+                    return ideaResponseDTO;
+                })
+                .collect(Collectors.toList());
 
-            Idea idea = ideaRepository.findById(idea_id).get();
-            // transforms data into a DTO format
-            IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
-            ideaResponseDTO.setUsername(idea.getUser().getUsername());
-            ideaResponseDTO.setElapsedTime(commentService.getElapsedTime(idea.getCreationDate()));
-            ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
+        if (sortOrder == null) {
+            sortedIdeas.sort(Comparator.comparing(ideaResponseDTO -> ideaResponseDTO.getCreationDate()));
+            return sortedIdeas;
+        }
 
-            return ideaResponseDTO;
-        }).toList();
+        if ("DESC".equals(sortOrder)) {
+            sortedIdeas.sort(Comparator.comparing(ideaResponseDTO -> ideaResponseDTO.getCreationDate(), Comparator.reverseOrder()));
+            return sortedIdeas;
+        }
+
+        sortedIdeas.sort(Comparator.comparing(ideaResponseDTO -> ideaResponseDTO.getCreationDate()));
+        return sortedIdeas;
     }
 
     @Override
-    public StatisticsDTO getGeneralStatistics() {
+    public StatisticsDTO getGeneralStatistics(String mostCommentedSIdeasSortOrder) {
 
         StatisticsDTO statisticsDTO = new StatisticsDTO();
 
@@ -170,7 +184,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         double diff = 100.00 - totalP;
         draftPercentage = draftPercentage + diff;
 
-        List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(commentRepository.mostCommentedIdeas());
+        List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(commentRepository.mostCommentedIdeas(), mostCommentedSIdeasSortOrder);
 
         statisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
         statisticsDTO.setNrOfUsers(nrOfUsers);
@@ -242,7 +256,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         draftPercentage = draftPercentage + diff;
 
         List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(
-                commentRepository.mostCommentedIdeasIdsByDate(selectedDateFrom, selectedDateTo));
+                commentRepository.mostCommentedIdeasIdsByDate(selectedDateFrom, selectedDateTo), "ASC");
 
         filteredStatisticsDTO.setImplP(implPercentage);
         filteredStatisticsDTO.setOpenP(openPercentage);
@@ -251,8 +265,13 @@ public class StatisticsServiceImpl implements StatisticsService {
         filteredStatisticsDTO.setDraftIdeas(draftIdeasCount);
         filteredStatisticsDTO.setOpenIdeas(openIdeasCount);
         filteredStatisticsDTO.setImplementedIdeas(implIdeasCount);
+        filteredStatisticsDTO.setTotalNrOfComments(noOfComments);
+        filteredStatisticsDTO.setTotalNrOfReplies(noOfReplies);
         filteredStatisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
 
         return filteredStatisticsDTO;
     }
+
+
+
 }
