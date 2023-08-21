@@ -11,7 +11,7 @@
         <tr>
             <td align="center" valign="center" bgcolor="#333333"
                 style="background-color: #333333; height: 100px; ">
-                <h1 style="color: #ffa941; ">Congratulations! </h1>
+                <h1 style="color: #ffa941; ">Congratulations, ${username}! </h1>
             </td>
         </tr>
         <tr style="background-color: #c8c8ca; box-shadow: 0px -10px 10px rgba(0, 0, 0, 0.1);">

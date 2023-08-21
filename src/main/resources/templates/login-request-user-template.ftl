@@ -28,7 +28,7 @@
                 <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 25%; margin-left:20px;">
                     <p style="font-size: 16px; line-height: 1.5; margin: 5px;">
                         <strong  style="font-size: 18px">Request details:</strong><br>
-                        <b>User:</b> ${username}<br>
+                        <b>Username:</b> ${username}<br>
                         <b>Email:</b> ${email}<br>
                         <b>Date and time:</b> ${date}
                     </p>

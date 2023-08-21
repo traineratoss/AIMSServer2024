@@ -274,7 +274,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 String username = usernamePrefix + String.format("%02d", j);
                 String name = namePrefix + " " + j;
 
-                User user = createUser(true, randomEnum(Role.class), randomElementFromList(avatarList), email, username, name, password, true, false);
+                User user = createUser(true, Role.STANDARD, randomElementFromList(avatarList), email, username, name, password, true, false);
                 userList.add(user);
                 userRepository.save(user);
             }

@@ -1,24 +1,42 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>Login Request Notification</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
-<body>
-<p>
-    Dear ${usernameAdmin},
-</p>
-<p>
-    I hope this message finds you well. I am writing to inform you that we have recorded a login request in our account system.
-</p>
-<p>
-    <strong>Request details:</strong><br>
-    User: <span>${usernameUser}</span><br>
-    Email: <span>${emailUser}</span><br>
-    Date and time: <span>${date}</span>
-</p>
-<p>
-    If you confirm the request, please provide us with your approval to proceed with sending the password.
-</p>
+
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f2f2f2; color: #333333">
+
+    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+            <td align="center" valign="center" bgcolor="#333333"
+                style="background-color: #333333; height: 100px; ">
+                <h1 style="color: #ffa941; ">New account request</h1>
+            </td>
+        </tr>
+        <tr style="background-color: #c8c8ca; box-shadow: 0px -10px 10px rgba(0, 0, 0, 0.1);">
+            <td align="left" valign="center" bgcolor="#c8c8ca"
+                style="background-color: #c8c8ca; padding:20px; box-shadow: 0px -10px 10px rgba(0, 0, 0, 0.1);">
+                <p style="font-size: 18px; line-height: 1.5; ">
+                    Dear <span style="font-weight: bold;">${usernameAdmin}</span>,
+                </p>
+                <p style="font-size: 16px; line-height: 1.5;">
+                    I hope this message finds you well. I am writing to inform you that we have recorded a login request in our account system.
+                </p>
+                <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 50%; margin-left:20px;">
+                    <p style="font-size: 16px; line-height: 1.5; margin: 5px;">
+                       <strong  style="font-size: 18px">Request details:</strong><br>
+                       <b>Username:</b> ${usernameUser}<br>
+                       <b>Email:</b> ${emailUser}<br>
+                       <b>Date and time:</b> ${date}
+                   </p>
+               </div>
+                <p style="font-size: 16px; line-height: 1.5;">
+                    If you confirm the request, please provide us with your approval to proceed with sending the password.
+                </p>
+            </td>
+        </tr>
+    </table>
 </body>
 </html>
+
