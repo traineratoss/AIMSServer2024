@@ -52,13 +52,12 @@ public class StatisticsController {
      * Return statistics generated for the entire app since the beginning.
      * Used when powering up the statistics view , default data to be shown
      *
-     * @param mostCommentedSIdeasSortOrder sorting order of the ideas
      * @return general stats for the ideas
      */
     @GetMapping("/stats")
-    public ResponseEntity<StatisticsDTO> getStats(@RequestParam(required = false) String mostCommentedSIdeasSortOrder) {
+    public ResponseEntity<StatisticsDTO> getStats() {
 
-        return new ResponseEntity<>(statisticsService.getGeneralStatistics(mostCommentedSIdeasSortOrder), HttpStatus.OK);
+        return new ResponseEntity<>(statisticsService.getGeneralStatistics(), HttpStatus.OK);
 
     }
 

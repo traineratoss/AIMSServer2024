@@ -23,9 +23,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
@@ -121,10 +119,9 @@ public class StatisticsServiceImpl implements StatisticsService {
      * do statistics on them and to send them to be displayed
      *
      * @param mostCommentedIdeasIds list of idea id
-     * @param sortOrder sorting order of the ideas
      * @return list of most commented ideas
      */
-    public List<IdeaResponseDTO> getMostCommentedIdeas(List<Long> mostCommentedIdeasIds, String sortOrder) {
+    public List<IdeaResponseDTO> getMostCommentedIdeas(List<Long> mostCommentedIdeasIds) {
 
         List<IdeaResponseDTO> sortedIdeas = mostCommentedIdeasIds.stream()
                 .map(idea_id -> {
@@ -135,24 +132,13 @@ public class StatisticsServiceImpl implements StatisticsService {
                     ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
                     return ideaResponseDTO;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
-        if (sortOrder == null) {
-            sortedIdeas.sort(Comparator.comparing(ideaResponseDTO -> ideaResponseDTO.getCreationDate()));
-            return sortedIdeas;
-        }
-
-        if ("DESC".equals(sortOrder)) {
-            sortedIdeas.sort(Comparator.comparing(ideaResponseDTO -> ideaResponseDTO.getCreationDate(), Comparator.reverseOrder()));
-            return sortedIdeas;
-        }
-
-        sortedIdeas.sort(Comparator.comparing(ideaResponseDTO -> ideaResponseDTO.getCreationDate()));
         return sortedIdeas;
     }
 
     @Override
-    public StatisticsDTO getGeneralStatistics(String mostCommentedSIdeasSortOrder) {
+    public StatisticsDTO getGeneralStatistics() {
 
         StatisticsDTO statisticsDTO = new StatisticsDTO();
 
@@ -184,7 +170,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         double diff = 100.00 - totalP;
         draftPercentage = draftPercentage + diff;
 
-        List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(commentRepository.mostCommentedIdeas(), mostCommentedSIdeasSortOrder);
+        List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(commentRepository.mostCommentedIdeas());
 
         statisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
         statisticsDTO.setNrOfUsers(nrOfUsers);
@@ -256,7 +242,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         draftPercentage = draftPercentage + diff;
 
         List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(
-                commentRepository.mostCommentedIdeasIdsByDate(selectedDateFrom, selectedDateTo), "ASC");
+                commentRepository.mostCommentedIdeasIdsByDate(selectedDateFrom, selectedDateTo));
 
         filteredStatisticsDTO.setImplP(implPercentage);
         filteredStatisticsDTO.setOpenP(openPercentage);

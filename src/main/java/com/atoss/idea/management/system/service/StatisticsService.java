@@ -9,11 +9,10 @@ public interface StatisticsService {
      * Gets the general statistics of the application
      * Usage : in "/stats" controller , called when CustomStatistics is mounted
      *
-     * @param mostCommentedSIdeasSortOrder sorting order of the ideas
      * @return a statistic DTO that contains all the field necessary for
      *         the statistics
      */
-    StatisticsDTO getGeneralStatistics(String mostCommentedSIdeasSortOrder);
+    StatisticsDTO getGeneralStatistics();
 
 
     /**
