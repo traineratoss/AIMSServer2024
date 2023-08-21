@@ -4,7 +4,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Login Request Notification</title>
+    <title>Login Request Received</title>
 </head>
 
 <body  style="font-family: Arial, sans-serif;">
