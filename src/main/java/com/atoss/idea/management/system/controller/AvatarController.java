@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("aims/api/v1/avatars")
-public class AvatarController {
+public class AvatarController {       
 
     private final AvatarService avatarService;
 
