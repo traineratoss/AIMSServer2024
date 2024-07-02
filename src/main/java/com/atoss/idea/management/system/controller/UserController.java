@@ -23,6 +23,7 @@ public class UserController {
     private final UserService userService;
     private final SendEmailService sendEmailService;
 
+    //add a new comment
     /**
      * Constructs a new instance of the UserController with the provided UserService.
      *
