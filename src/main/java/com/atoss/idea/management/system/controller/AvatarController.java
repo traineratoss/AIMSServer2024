@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequestMapping("aims/api/v1/avatars")
 public class AvatarController {        
 
-    private final AvatarService avatarService;
+    private final AvatarService avatarService;    
     /**
      * Constructor for creating an instance of the AvatarController.
      *
