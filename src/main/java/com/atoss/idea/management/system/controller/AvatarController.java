@@ -1,5 +1,5 @@
 package com.atoss.idea.management.system.controller;
-
+  
 import com.atoss.idea.management.system.repository.dto.AvatarDTO;
 import com.atoss.idea.management.system.service.AvatarService;
 import org.springframework.http.HttpStatus;
