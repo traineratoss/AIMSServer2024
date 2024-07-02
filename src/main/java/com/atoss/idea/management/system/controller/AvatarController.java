@@ -1,5 +1,5 @@
 package com.atoss.idea.management.system.controller;
-
+  
 import com.atoss.idea.management.system.repository.dto.AvatarDTO;
 import com.atoss.idea.management.system.service.AvatarService;
 import org.springframework.http.HttpStatus;
@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
-
-@RestController
+    
+@RestController  
 @RequestMapping("aims/api/v1/avatars")
-public class AvatarController {
+public class AvatarController {       
 
     private final AvatarService avatarService;
 
