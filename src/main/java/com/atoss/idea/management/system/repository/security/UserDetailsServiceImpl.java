@@ -1,7 +1,7 @@
-package com.atoss.idea.management.system.security;
+package com.atoss.idea.management.system.repository.security;
 
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.security.response.UserDetailsImpl;
+import com.atoss.idea.management.system.repository.security.response.UserDetailsImpl;
 import com.atoss.idea.management.system.repository.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

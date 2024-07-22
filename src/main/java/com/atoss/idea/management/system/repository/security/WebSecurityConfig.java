@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.security;
+package com.atoss.idea.management.system.repository.security;
 
 import com.atoss.idea.management.system.repository.entity.Role;
 import org.springframework.context.annotation.Bean;

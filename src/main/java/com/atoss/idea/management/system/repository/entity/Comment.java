@@ -49,4 +49,14 @@ public class Comment {
     @Column(name = "creation_date")
     private Date creationDate;
 
+    public void setCommentText(String comment)
+    {
+        this.commentText=comment;
+    }
+
+    public String getCommentText()
+    {
+        return this.commentText;
+    }
+
 }

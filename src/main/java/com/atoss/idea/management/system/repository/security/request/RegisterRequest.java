@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.security.request;
+package com.atoss.idea.management.system.repository.security.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,12 +1,12 @@
-package com.atoss.idea.management.system.security;
+package com.atoss.idea.management.system.repository.security;
 
 import com.atoss.idea.management.system.exception.EmailAlreadyExistException;
 import com.atoss.idea.management.system.exception.UsernameAlreadyExistException;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
-import com.atoss.idea.management.system.security.request.LoginRequest;
-import com.atoss.idea.management.system.security.request.RegisterRequest;
+import com.atoss.idea.management.system.repository.security.request.LoginRequest;
+import com.atoss.idea.management.system.repository.security.request.RegisterRequest;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
