@@ -64,11 +64,11 @@ public class User {
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name = "likes",
-            joinColumns = { @JoinColumn(name = "comment_id") },
-            inverseJoinColumns = { @JoinColumn(name = "user_id") }
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = { @JoinColumn(name = "comment_id") }
     )
     @JsonIgnoreProperties("userList")
-    private List<Comment> commentList;
+    private List<Comment> likedComments;
 
 
     /**

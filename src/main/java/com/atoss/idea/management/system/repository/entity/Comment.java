@@ -50,9 +50,9 @@ public class Comment {
     @Column(name = "creation_date")
     private Date creationDate;
 
-    @ManyToMany(mappedBy = "userList")
-    @JsonIgnoreProperties("userList")
-    private List<Comment> commentList;
+    @ManyToMany(mappedBy = "likedComments")
+    @JsonIgnoreProperties("likedComments")
+    private List<User> userList;
 
     public void setCommentText(String comment)
     {
