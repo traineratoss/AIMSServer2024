@@ -3,15 +3,13 @@ package com.atoss.idea.management.system.service;
 import com.atoss.idea.management.system.exception.CommentNotFoundException;
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
-import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
-import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
-import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
-import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.List;
 
 public interface CommentService {
 
@@ -92,5 +90,8 @@ public interface CommentService {
      * @throws CommentNotFoundException when the comment id is not found in the database
      */
     void deleteComment(Long commentId);
+
+
+    List<UserResponseDTO> getLikesForComment(Long commentId);
 
 }
