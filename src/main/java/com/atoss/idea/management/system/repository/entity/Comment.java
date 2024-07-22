@@ -2,6 +2,7 @@ package com.atoss.idea.management.system.repository.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,6 +49,10 @@ public class Comment {
 
     @Column(name = "creation_date")
     private Date creationDate;
+
+    @ManyToMany(mappedBy = "userList")
+    @JsonIgnoreProperties("userList")
+    private List<Comment> commentList;
 
     public void setCommentText(String comment)
     {

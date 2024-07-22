@@ -3,16 +3,7 @@ package com.atoss.idea.management.system.repository.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Column;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -69,6 +60,16 @@ public class User {
 
     @Column(name = "is_first_login")
     private Boolean isFirstLogin;
+
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "likes",
+            joinColumns = { @JoinColumn(name = "comment_id") },
+            inverseJoinColumns = { @JoinColumn(name = "user_id") }
+    )
+    @JsonIgnoreProperties("userList")
+    private List<Comment> commentList;
+
 
     /**
      * Constructor for creating a User object with the provided username and email.
