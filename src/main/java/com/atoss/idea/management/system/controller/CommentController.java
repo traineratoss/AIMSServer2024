@@ -1,9 +1,6 @@
 package com.atoss.idea.management.system.controller;
 
-import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
-import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
-import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
-import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -15,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -152,4 +150,10 @@ public class CommentController {
         commentService.deleteComment(commentId);
     }
 
+
+    @GetMapping("/comments/{commentId}/likes")
+    public ResponseEntity<List<UserResponseDTO>> getLikesForComment(@PathVariable Long commentId) {
+        List<UserResponseDTO> likes = commentService.getLikesForComment(commentId);
+        return ResponseEntity.ok(likes);
+    }
 }
