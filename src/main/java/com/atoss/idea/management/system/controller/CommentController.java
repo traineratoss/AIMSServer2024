@@ -1,9 +1,7 @@
 package com.atoss.idea.management.system.controller;
 
-import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
-import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
-import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
-import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
+import com.atoss.idea.management.system.repository.dto.*;
+import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -71,7 +69,13 @@ public class CommentController {
         return new ResponseEntity<ResponseCommentReplyDTO>(responseCommentReplyDTO, HttpStatus.OK);
     }
 
+    @Transactional
+    @PostMapping("/comments/like")
+    public ResponseEntity<String> addLike(@RequestParam Long comment_id, @RequestParam Long user_id) {
 
+            commentService.addLike(comment_id, user_id);
+            return new ResponseEntity<>("Like added successfully", HttpStatus.OK);
+    }
     /**
      * Performs a Get Request in order to get all comments of a certain idea in a paginated form
      *

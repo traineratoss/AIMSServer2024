@@ -61,14 +61,14 @@ public class User {
     @Column(name = "is_first_login")
     private Boolean isFirstLogin;
 
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "likes",
             joinColumns = { @JoinColumn(name = "comment_id") },
             inverseJoinColumns = { @JoinColumn(name = "user_id") }
     )
     @JsonIgnoreProperties("userList")
-    private List<Comment> commentList;
+    private List<Comment> likedComments;
 
 
     /**

@@ -5,6 +5,7 @@ import lombok.Data;
 import java.util.Base64;
 
 
+
 @Data
 public class ImageDTO {
 

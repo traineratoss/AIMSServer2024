@@ -3,10 +3,7 @@ package com.atoss.idea.management.system.service;
 import com.atoss.idea.management.system.exception.CommentNotFoundException;
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
-import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
-import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
-import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
-import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,6 +19,7 @@ public interface CommentService {
      * @return time the time difference in a human-readable format
      * @throws CommentNotFoundException when the id is not found in the database
      */
+    void addLike(Long commentId, Long userId);
     String getTimeForComment(Long id);
 
     /**

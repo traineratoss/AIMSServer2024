@@ -6,11 +6,8 @@ import com.atoss.idea.management.system.exception.CommentNotFoundException;
 import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
-import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
-import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Comment;
-import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.CommentService;
@@ -171,6 +168,36 @@ public class CommentServiceImpl implements CommentService {
             e.printStackTrace();
         }
     }
+
+    private boolean verifyCommentOwner(Long commentId, Long userId)
+    {
+        boolean val = true;
+        Optional<Comment> comment=commentRepository.findById(commentId);
+        Optional<User> user= userRepository.findById(userId);
+        if(comment.isPresent() && user.isPresent())
+        {
+            if(!comment.get().getUser().getId().equals(user.get().getId()))
+            {
+                val=false;
+            }
+        }
+        else
+        {
+            throw new RuntimeException("User or comment not found!");
+        }
+        return val;
+    }
+    @Transactional
+    public void addLike(Long commentId, Long userId) {
+       if (!verifyCommentOwner(commentId, userId)) {
+           commentRepository.saveLike(commentId,userId);
+       } else {
+           throw new RuntimeException("Un user nu poate sa dea like la propriul comentariu!");
+        }
+    }
+
+
+
 
     @Transactional
     @Override

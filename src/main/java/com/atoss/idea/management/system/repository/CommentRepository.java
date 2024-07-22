@@ -4,9 +4,11 @@ import com.atoss.idea.management.system.repository.entity.Comment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -40,6 +42,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      *
      * @return the number of comments
      */
+
+
+    @Modifying
+    @Transactional
+    @Query(value="INSERT INTO likes (comment_id, user_id) VALUES (:comment_id, :user_id)", nativeQuery=true)
+    void saveLike(@Param("comment_id") Long comment_id, @Param("user_id") Long user_id);
+
     @Query(value = "SELECT COUNT(parent_id) FROM comment c", nativeQuery = true)
     Long countReplies();
 
