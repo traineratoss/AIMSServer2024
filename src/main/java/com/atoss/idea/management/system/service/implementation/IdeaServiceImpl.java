@@ -132,6 +132,7 @@ public class IdeaServiceImpl implements IdeaService {
             readBadWordsFromFile(filePath);
         }
 
+
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("No user found by this username."));
         savedIdea.setUser(user);
         savedIdea.setStatus(idea.getStatus());

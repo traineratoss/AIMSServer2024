@@ -178,7 +178,7 @@ public class CommentServiceImpl implements CommentService {
 
         User user = userRepository.findByUsername(requestCommentDTO.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found!"));
 
-        Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
+        Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).orElseThrow(() -> new IdeaNotFoundException("Idea not found!"));
 
         Comment newComment =  new Comment();
         String wordsFilePath = "textTerms/badWords.txt";
