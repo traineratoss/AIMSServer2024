@@ -401,11 +401,7 @@ public class UserController {
     @Transactional
     @PostMapping("/verify-otp")
     public ResponseEntity<Object> verifyOTP(@RequestBody VerifyOTPDTO verifyOTPDTO) {
-        try {
-            userService.verifyOTP(verifyOTPDTO);
-        } catch (UserNotFoundException e) {
-
-        }
+        userService.verifyOTP(verifyOTPDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
