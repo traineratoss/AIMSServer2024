@@ -305,4 +305,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
 
+
+    @Override
+    public void deleteLikes(Long commentId, Long userId){
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        commentRepository.deleteLikes(commentId,userId);
+    }
 }

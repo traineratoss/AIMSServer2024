@@ -156,4 +156,12 @@ public class CommentController {
         List<UserResponseDTO> likes = commentService.getLikesForComment(commentId);
         return ResponseEntity.ok(likes);
     }
+
+    @Transactional
+    @DeleteMapping("/comments/like/delete/{commentId}/{userId}")
+    public void deleteLikes(@PathVariable Long commentId,
+                              @PathVariable Long userId) {
+        commentService.deleteLikes(commentId,userId);
+    }
+
 }

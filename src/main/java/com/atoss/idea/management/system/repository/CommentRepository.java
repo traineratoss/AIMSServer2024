@@ -1,9 +1,11 @@
 package com.atoss.idea.management.system.repository;
 
 import com.atoss.idea.management.system.repository.entity.Comment;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -139,6 +141,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             " and cast(:selectedDateTo AS timestamp)))", nativeQuery = true)
     List<Long> getRepliesAndCommentsCount(@Param("selectedDateFrom") String selectedDateFrom,
                                           @Param("selectedDateTo") String selectedDateTo);
+
+
+
+    @Transactional
+    @Modifying
+    @Query(value="DELETE FROM likes WHERE user_id=:userId AND comment_id=:commentId",nativeQuery = true)
+    void deleteLikes(@Param("commentId")Long commentId,@Param("userId")Long userId);
 
 
 }
