@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.controller;
 
+
 import com.atoss.idea.management.system.repository.dto.CategoryDTO;
 import com.atoss.idea.management.system.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
+        
     /**
      * Constructor
      *

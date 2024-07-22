@@ -32,6 +32,8 @@ public class AuthEntryPoint implements AuthenticationEntryPoint {
      * @see AuthenticationException
      * @see HttpServletResponse#SC_UNAUTHORIZED
      */
+
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {
