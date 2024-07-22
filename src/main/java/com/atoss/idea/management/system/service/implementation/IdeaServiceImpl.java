@@ -306,6 +306,7 @@ public class IdeaServiceImpl implements IdeaService {
                                                   String selectedDateTo,
                                                   String sortDirection,
                                                   String username,
+                                                  String rating,
                                                   Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
@@ -338,6 +339,9 @@ public class IdeaServiceImpl implements IdeaService {
         }
         if (categories != null && !categories.isEmpty()) {
             predicatesList.add(root.join("categoryList").get("text").in(categories));
+        }
+        if(rating != null && !rating.isEmpty()){
+            predicatesList.add(root.join("rating").get("rating").in(rating));
         }
         predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
         List<Order> orders = new ArrayList<>();

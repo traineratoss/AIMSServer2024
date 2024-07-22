@@ -76,6 +76,10 @@ public class User {
     private List<Comment> likedComments;
 
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Rating> rating;
+
+
     /**
      * Constructor for creating a User object with the provided username and email.
      *

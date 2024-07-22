@@ -3,6 +3,7 @@ package com.atoss.idea.management.system.controller;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
+import com.atoss.idea.management.system.repository.entity.Rating;
 import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.service.IdeaService;
 import jakarta.transaction.Transactional;
@@ -195,6 +196,7 @@ public class IdeaController {
             @RequestParam(required = true) int pageNumber,
             @RequestParam(required = true) int pageSize,
             @RequestParam(required = false) String username,
+            @RequestParam(required = false) String rating,
             @RequestParam(required = true) String sortDirection) {
 
         List<String> categories = new ArrayList<>();
@@ -214,10 +216,11 @@ public class IdeaController {
         List<Status> statusEnums = statusStrings.stream().map(s -> Status.valueOf(s)).toList();
         // pentru a converti corect, din String in Status nu stie in QueryCreator
 
+
         Pageable pageableAsc = PageRequest.of(pageNumber, pageSize);
 
         return new ResponseEntity<>(ideaService.filterIdeasByAll(title,
-                text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, pageableAsc), HttpStatus.OK);
+                text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, rating, pageableAsc), HttpStatus.OK);
     }
 
 }

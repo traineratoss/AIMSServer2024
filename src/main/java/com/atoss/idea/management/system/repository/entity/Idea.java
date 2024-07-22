@@ -57,6 +57,9 @@ public class Idea {
     @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> commentList;
 
+    @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Rating> rating;
+
     @Override
     public String toString() {
         return "Idea{"
