@@ -157,6 +157,12 @@ public class CommentController {
         return ResponseEntity.ok(likes);
     }
 
+    @GetMapping("/comments/{commentId}/likes/count")
+    public ResponseEntity<Integer> getLikesCountForComment(@PathVariable Long commentId) {
+        int likesCount = commentService.getLikesCountForComment(commentId);
+        return ResponseEntity.ok(likesCount);
+    }
+
     @Transactional
     @DeleteMapping("/comments/like/delete/{commentId}/{userId}")
     public void deleteLikes(@PathVariable Long commentId,

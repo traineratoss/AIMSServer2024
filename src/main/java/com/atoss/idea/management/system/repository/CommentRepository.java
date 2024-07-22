@@ -150,4 +150,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     void deleteLikes(@Param("commentId")Long commentId,@Param("userId")Long userId);
 
 
+    @Query("SELECT COUNT(l) FROM User u JOIN u.likedComments l WHERE l.id = :commentId")
+    int countLikesByCommentId(@Param("commentId") Long commentId);
+
+
 }

@@ -304,7 +304,9 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toList());
     }
 
-
+    public int getLikesCountForComment(Long commentId) {
+        return commentRepository.countLikesByCommentId(commentId);
+    }
 
     @Override
     public void deleteLikes(Long commentId, Long userId){
