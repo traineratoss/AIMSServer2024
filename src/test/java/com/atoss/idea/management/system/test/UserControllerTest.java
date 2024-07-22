@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system;
+package com.atoss.idea.management.system.test;
 
 import com.atoss.idea.management.system.controller.UserController;
 import com.atoss.idea.management.system.repository.UserRepository;

@@ -124,8 +124,6 @@ public class IdeaServiceImpl implements IdeaService {
             String filePath = URLDecoder.decode(resourceUrl.getFile(), "UTF-8");
             readBadWordsFromFile(filePath);
         }
-
-
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("No user found by this username."));
         savedIdea.setUser(user);
         savedIdea.setStatus(idea.getStatus());
@@ -146,8 +144,6 @@ public class IdeaServiceImpl implements IdeaService {
                 savedIdea.setImage(existingImage);
             }
         }
-
-
         for (CategoryDTO categoryDTO : idea.getCategoryList()) {
             Category category = categoryRepository.findByText(modelMapper.map(categoryDTO, Category.class).getText());
 
@@ -157,14 +153,13 @@ public class IdeaServiceImpl implements IdeaService {
                 savedIdea.getCategoryList().add(category);
             }
         }
-
         if (user.getIdeas() == null) {
             user.setIdeas(new ArrayList<>());
         }
 
         user.getIdeas().add(savedIdea);
-
-        IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.save(savedIdea), IdeaResponseDTO.class);
+        ideaRepository.save(savedIdea);
+        IdeaResponseDTO responseDTO = modelMapper.map(savedIdea, IdeaResponseDTO.class);
         responseDTO.setUsername(username);
         return responseDTO;
     }
@@ -191,7 +186,6 @@ public class IdeaServiceImpl implements IdeaService {
             readBadWordsFromFile(filePath);
         }
 
-
         if (ideaRepository.findById(id).isPresent()) {
 
             Idea idea = ideaRepository.findById(id).get();
@@ -201,11 +195,9 @@ public class IdeaServiceImpl implements IdeaService {
                 String filteredCommentText = filterBadWords(idea.getText());
                 idea.setText(filteredCommentText);
             }
-
             if (ideaUpdateDTO.getStatus() != null) {
                 idea.setStatus(ideaUpdateDTO.getStatus());
             }
-
             if (ideaUpdateDTO.getImage() != null) {
                 Image existingImage = imageRepository.findImageByFileName(ideaUpdateDTO.getImage().getFileName());
                 if (existingImage == null) {
@@ -245,7 +237,6 @@ public class IdeaServiceImpl implements IdeaService {
 
                 idea.setCategoryList(newList);
             }
-
             IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);
             responseDTO.setUsername(ideaRepository.findById(id).get().getUser().getUsername());
             responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
@@ -258,7 +249,6 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public void deleteIdeaById(Long id) {
-
         if (ideaRepository.existsById(id)) {
             ideaRepository.deleteById(id);
         } else {
@@ -268,13 +258,10 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Page<IdeaResponseDTO> getAllIdeas(Pageable pageable) {
-
         if (ideaRepository.findAll().size() <= 0) {
             throw new FieldValidationException("No ideas found.");
         }
-
         Page<Idea> ideas = ideaRepository.findAll(pageable);
-
         List<IdeaResponseDTO> ideaResponseDTOs = ideas.stream()
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
@@ -284,7 +271,6 @@ public class IdeaServiceImpl implements IdeaService {
                     return responseDTO;
                 })
                 .toList();
-
         return new PageImpl<>(ideaResponseDTOs, pageable, ideas.getTotalElements());
     }
 
@@ -297,7 +283,6 @@ public class IdeaServiceImpl implements IdeaService {
         if (user.getIdeas() == null || user.getIdeas().isEmpty()) {
             throw new FieldValidationException("No ideas found.");
         }
-
         List<IdeaResponseDTO> ideaResponseDTOs = ideaRepository.findAllByUserUsername(username, pageable)
                 .stream()
                 .map(idea -> {
@@ -311,25 +296,22 @@ public class IdeaServiceImpl implements IdeaService {
         return new PageImpl<>(ideaResponseDTOs, pageable, ideaResponseDTOs.size());
     }
 
-
     @Override
     public Page<IdeaResponseDTO> filterIdeasByAll(String title,
-                                        String text,
-                                        List<Status> statuses,
-                                        List<String> categories,
-                                        List<String> users,
-                                        String selectedDateFrom,
-                                        String selectedDateTo,
-                                        String sortDirection,
-                                        String username,
-                                        Pageable pageable) {
-
+                                                  String text,
+                                                  List<Status> statuses,
+                                                  List<String> categories,
+                                                  List<String> users,
+                                                  String selectedDateFrom,
+                                                  String selectedDateTo,
+                                                  String sortDirection,
+                                                  String username,
+                                                  Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
         Root<Idea> root = criteriaQuery.from(Idea.class);
 
         List<Predicate> predicatesList = new ArrayList<>();
-
         if (username == null) {
             List<Integer> allIdeasStatuses = new ArrayList<>();
             allIdeasStatuses.add(0);
@@ -446,4 +428,3 @@ public class IdeaServiceImpl implements IdeaService {
         return predicatesList;
     }
 }
-
