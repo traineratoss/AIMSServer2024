@@ -78,7 +78,6 @@ public class IdeaServiceImpl implements IdeaService {
         this.modelMapper = modelMapper;
         this.commentServiceImpl = commentServiceImpl;
     }
-
     private String filterBadWords(String text) {
         for (String word : badWords) {
             String pattern = "\\b" + word + "\\b";
@@ -86,7 +85,6 @@ public class IdeaServiceImpl implements IdeaService {
         }
         return text;
     }
-
     private void readBadWordsFromFile(String path) {
         try {
             FileReader fileReader = new FileReader(path);
@@ -104,26 +102,21 @@ public class IdeaServiceImpl implements IdeaService {
             e.printStackTrace();
         }
     }
-
     @Override
     public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws UnsupportedEncodingException {
 
         if (idea.getTitle() == null || idea.getTitle().isEmpty()) {
             throw new FieldValidationException("Please enter a valid title for the idea.");
         }
-
         if (idea.getStatus() == null) {
             throw new FieldValidationException("Please enter a valid status for the idea.");
         }
-
         if (idea.getCategoryList() == null || idea.getCategoryList().size() <= 0) {
             throw new FieldValidationException("Please enter a valid category for the idea.");
         }
-
         if (idea.getText() == null || idea.getText().isEmpty()) {
             throw new FieldValidationException("Please enter a valid text for the idea.");
         }
-
         Idea savedIdea = new Idea();
         String wordsFilePath = "textTerms/badWords.txt";
         URL resourceUrl = classLoader.getResource(wordsFilePath);
@@ -131,7 +124,6 @@ public class IdeaServiceImpl implements IdeaService {
             String filePath = URLDecoder.decode(resourceUrl.getFile(), "UTF-8");
             readBadWordsFromFile(filePath);
         }
-
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("No user found by this username."));
         savedIdea.setUser(user);
         savedIdea.setStatus(idea.getStatus());
@@ -152,7 +144,6 @@ public class IdeaServiceImpl implements IdeaService {
                 savedIdea.setImage(existingImage);
             }
         }
-
         for (CategoryDTO categoryDTO : idea.getCategoryList()) {
             Category category = categoryRepository.findByText(modelMapper.map(categoryDTO, Category.class).getText());
 
@@ -162,18 +153,16 @@ public class IdeaServiceImpl implements IdeaService {
                 savedIdea.getCategoryList().add(category);
             }
         }
-
         if (user.getIdeas() == null) {
             user.setIdeas(new ArrayList<>());
         }
 
         user.getIdeas().add(savedIdea);
-
-        IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.save(savedIdea), IdeaResponseDTO.class);
+        ideaRepository.save(savedIdea);
+        IdeaResponseDTO responseDTO = modelMapper.map(savedIdea, IdeaResponseDTO.class);
         responseDTO.setUsername(username);
         return responseDTO;
     }
-
     @Override
     public IdeaResponseDTO getIdeaById(Long id) throws FieldValidationException {
 
@@ -188,7 +177,6 @@ public class IdeaServiceImpl implements IdeaService {
             throw new IdeaNotFoundException("Idea doesn't exist.");
         }
     }
-
     @Override
     public IdeaResponseDTO updateIdeaById(Long id, IdeaUpdateDTO ideaUpdateDTO) throws UnsupportedEncodingException {
         String wordsFilePath = "textTerms/badWords.txt";
@@ -197,7 +185,6 @@ public class IdeaServiceImpl implements IdeaService {
             String filePath = URLDecoder.decode(resourceUrl.getFile(), "UTF-8");
             readBadWordsFromFile(filePath);
         }
-
 
         if (ideaRepository.findById(id).isPresent()) {
 
@@ -208,11 +195,9 @@ public class IdeaServiceImpl implements IdeaService {
                 String filteredCommentText = filterBadWords(idea.getText());
                 idea.setText(filteredCommentText);
             }
-
             if (ideaUpdateDTO.getStatus() != null) {
                 idea.setStatus(ideaUpdateDTO.getStatus());
             }
-
             if (ideaUpdateDTO.getImage() != null) {
                 Image existingImage = imageRepository.findImageByFileName(ideaUpdateDTO.getImage().getFileName());
                 if (existingImage == null) {
@@ -252,7 +237,6 @@ public class IdeaServiceImpl implements IdeaService {
 
                 idea.setCategoryList(newList);
             }
-
             IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);
             responseDTO.setUsername(ideaRepository.findById(id).get().getUser().getUsername());
             responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
@@ -265,7 +249,6 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public void deleteIdeaById(Long id) {
-
         if (ideaRepository.existsById(id)) {
             ideaRepository.deleteById(id);
         } else {
@@ -275,13 +258,10 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Page<IdeaResponseDTO> getAllIdeas(Pageable pageable) {
-
         if (ideaRepository.findAll().size() <= 0) {
             throw new FieldValidationException("No ideas found.");
         }
-
         Page<Idea> ideas = ideaRepository.findAll(pageable);
-
         List<IdeaResponseDTO> ideaResponseDTOs = ideas.stream()
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
@@ -291,7 +271,6 @@ public class IdeaServiceImpl implements IdeaService {
                     return responseDTO;
                 })
                 .toList();
-
         return new PageImpl<>(ideaResponseDTOs, pageable, ideas.getTotalElements());
     }
 
@@ -304,7 +283,6 @@ public class IdeaServiceImpl implements IdeaService {
         if (user.getIdeas() == null || user.getIdeas().isEmpty()) {
             throw new FieldValidationException("No ideas found.");
         }
-
         List<IdeaResponseDTO> ideaResponseDTOs = ideaRepository.findAllByUserUsername(username, pageable)
                 .stream()
                 .map(idea -> {
@@ -315,7 +293,6 @@ public class IdeaServiceImpl implements IdeaService {
                     return responseDTO;
                 })
                 .toList();
-
         return new PageImpl<>(ideaResponseDTOs, pageable, ideaResponseDTOs.size());
     }
 
@@ -330,13 +307,11 @@ public class IdeaServiceImpl implements IdeaService {
                                         String sortDirection,
                                         String username,
                                         Pageable pageable) {
-
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
         Root<Idea> root = criteriaQuery.from(Idea.class);
 
         List<Predicate> predicatesList = new ArrayList<>();
-
         if (username == null) {
             List<Integer> allIdeasStatuses = new ArrayList<>();
             allIdeasStatuses.add(0);
@@ -344,53 +319,41 @@ public class IdeaServiceImpl implements IdeaService {
 
             predicatesList.add(root.get("status").in(allIdeasStatuses));
         }
-
         if (username != null) {
             predicatesList.add(cb.equal(root.join("user").get("username"), username));
         }
-
         if (title != null) {
             String nonCaseSensitiveTitle = title.toLowerCase();
             predicatesList.add(cb.like(cb.lower(root.get("title")), "%" + nonCaseSensitiveTitle + "%"));
         }
-
         if (text != null) {
             String nonCaseSensitiveText = text.toLowerCase();
             predicatesList.add(cb.like(cb.lower(root.get("text")), "%" + nonCaseSensitiveText + "%"));
         }
-
         if (statuses != null && !statuses.isEmpty()) {
             predicatesList.add(root.get("status").in(statuses));
         }
-
         if (users != null && !users.isEmpty() && username == null) {
             predicatesList.add(root.join("user").get("username").in(users));
         }
-
         if (categories != null && !categories.isEmpty()) {
             predicatesList.add(root.join("categoryList").get("text").in(categories));
         }
-
         predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
-
         List<Order> orders = new ArrayList<>();
-
         if (Objects.equals(sortDirection, "ASC")) {
             orders.add(cb.asc(root.get("creationDate")));
         } else {
             orders.add(cb.desc(root.get("creationDate")));
         }
-
         criteriaQuery.orderBy(orders);
         criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
         TypedQuery<Idea> query = entityManager.createQuery(criteriaQuery);
-
         int totalSize = query.getResultList().size();
 
         if (totalSize == 0) {
             throw new FieldValidationException("No ideas found.");
         }
-
         if (pageable != null) {
             query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
             query.setMaxResults(pageable.getPageSize());
@@ -407,9 +370,7 @@ public class IdeaServiceImpl implements IdeaService {
 
             return new PageImpl<>(allIdeasDTO, pageable, totalSize);
         }
-
         List<Idea> allIdeas = query.getResultList();
-
         List<IdeaResponseDTO> allIdeasUnpaged = allIdeas.stream().map(idea -> {
             IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
             ideaResponseDTO.setUsername(idea.getUser().getUsername());
@@ -420,7 +381,6 @@ public class IdeaServiceImpl implements IdeaService {
 
         return new PageImpl<>(allIdeasUnpaged, Pageable.unpaged(), totalSize);
     }
-
     @Override
     public List<Idea> findIdeasByIds(List<Long> ideaIds) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -432,17 +392,11 @@ public class IdeaServiceImpl implements IdeaService {
         for (Long id:ideaIds) {
             criteriaQuery.where(cb.equal(root.get("id"), id));
         }
-
         return entityManager.createQuery(criteriaQuery).getResultList();
-
     }
-
-
     @Override
     public List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<?> root, CriteriaBuilder cb, String columnName) {
-
         List<Predicate> predicatesList = new ArrayList<>();
-
         if (selectedDateFrom != null && selectedDateTo == null) {
             try {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -452,7 +406,6 @@ public class IdeaServiceImpl implements IdeaService {
                 e.printStackTrace();
             }
         }
-
         if (selectedDateFrom == null && selectedDateTo != null) {
             try {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -462,7 +415,6 @@ public class IdeaServiceImpl implements IdeaService {
                 e.printStackTrace();
             }
         }
-
         if (selectedDateFrom != null && selectedDateTo != null) {
             try {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -473,10 +425,7 @@ public class IdeaServiceImpl implements IdeaService {
                 e.printStackTrace();
             }
         }
-
         return predicatesList;
     }
-
-
 }
 

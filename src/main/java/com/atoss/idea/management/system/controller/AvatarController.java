@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController  
 @RequestMapping("aims/api/v1/avatars")
-public class AvatarController {        
+public class AvatarController {
 
     private final AvatarService avatarService;
     /**
