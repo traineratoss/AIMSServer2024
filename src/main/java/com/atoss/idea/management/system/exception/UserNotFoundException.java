@@ -12,4 +12,5 @@ public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String message) {
         super(message);
     }
+    // this is an example for fetching
 }
