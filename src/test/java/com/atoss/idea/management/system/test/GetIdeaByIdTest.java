@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system;
+package com.atoss.idea.management.system.test;
 
 import com.atoss.idea.management.system.exception.FieldValidationException;
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
