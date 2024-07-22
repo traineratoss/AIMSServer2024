@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.test;
+package com.atoss.idea.management.system.user;
 
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.repository.UserRepository;

@@ -1,6 +1,5 @@
-package com.atoss.idea.management.system.test;
+package com.atoss.idea.management.system.idea;
 
-import com.atoss.idea.management.system.service.IdeaService;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;

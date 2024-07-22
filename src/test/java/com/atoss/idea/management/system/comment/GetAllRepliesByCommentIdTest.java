@@ -1,18 +1,13 @@
-package com.atoss.idea.management.system.test;
+package com.atoss.idea.management.system.comment;
 
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.atoss.idea.management.system.exception.CommentNotFoundException;
-import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.repository.CommentRepository;
-import com.atoss.idea.management.system.repository.IdeaRepository;
-import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
-import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,14 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;

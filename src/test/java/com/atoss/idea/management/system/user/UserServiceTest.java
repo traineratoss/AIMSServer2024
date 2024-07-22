@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.test;
+package com.atoss.idea.management.system.user;
 
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.repository.UserRepository;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ServiceImplTest {
+public class UserServiceTest {
 
     @Mock
     UserRepository userRepository;

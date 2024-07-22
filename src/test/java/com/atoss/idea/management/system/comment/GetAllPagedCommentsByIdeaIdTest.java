@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.commentTests;
+package com.atoss.idea.management.system.comment;
 
 import com.atoss.idea.management.system.exception.CommentNotFoundException;
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
