@@ -121,14 +121,8 @@ public class SendEmailServiceImpl implements SendEmailService {
     }
 
     @Override
-    public void sendEmailForgotPassword(String username) {
-        User user = getUserByUsername(username);
-        String password = PasswordGenerator.generatePassayPassword(15);
-        sendEmailUtils("password-reset-template.ftl", username, password, "Password Reset Request");
-        //Change password
-        user.setPassword(BCrypt.hashpw(password, bcryptSalt));
-        user.setIsFirstLogin(true);
-        userRepository.save(user);
+    public void sendEmailForgotPassword(String username, String otp) {
+        sendEmailUtils("password-reset-template.ftl", username, otp, "Password Reset Request");
     }
 
     /**

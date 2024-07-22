@@ -15,6 +15,24 @@ public class PasswordGenerator {
      */
     public static String generatePassayPassword(int len) {
         final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        return generatePassword(len, chars);
+    }
+
+    /**
+     * Generates a random sequence of numbers of the specified length.
+     *
+     * @param len The length of the code to be generated.
+     *
+     * @return A randomly generated code as a string.
+     *
+     * @see SecureRandom
+     */
+    public static String generateOTP(int len) {
+        final String chars = "0123456789";
+        return generatePassword(len, chars);
+    }
+
+    private static String generatePassword(int len, String chars) {
         SecureRandom random = new SecureRandom();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < len; i++) {

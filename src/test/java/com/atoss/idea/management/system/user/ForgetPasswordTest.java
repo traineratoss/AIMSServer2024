@@ -99,7 +99,7 @@ public class ForgetPasswordTest {
 
         ResponseEntity<Object> response = spyUserService.sendForgotPassword(username);
 
-        Mockito.verify(spySendEmailService).sendEmailForgotPassword(any(String.class));
+        Mockito.verify(spySendEmailService).sendEmailForgotPassword(any(String.class), any(String.class));
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }

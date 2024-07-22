@@ -5,10 +5,12 @@ import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Avatar;
+import com.atoss.idea.management.system.repository.entity.OTP;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.service.UserService;
+import com.atoss.idea.management.system.utils.PasswordGenerator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -20,8 +22,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -206,6 +210,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void verifyOTP(VerifyOTPDTO verifyOTPDTO) {
+        String usernameOrEmail = verifyOTPDTO.getUsernameOrEmail();
+        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail).orElseThrow(() -> new UserNotFoundException("User not found!"));
+
+        OTP otp = user.getOtp();
+        if (otp == null || !otp.getCode().equals(verifyOTPDTO.getOtpCode())) {
+            throw new BadCredentialsException("Bad credentials");
+        }
+
+        if (System.currentTimeMillis() - otp.getCreationDate() >= TimeUnit.MINUTES.toMillis(3)) {
+            throw new BadCredentialsException("Expired OTP");
+        }
+
+        user.setOtp(null);
+    }
+
+    @Override
     public ResponseEntity<Object> sendApproveEmail(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found exception"));
         if (!user.getHasPassword()) {
@@ -252,8 +273,16 @@ public class UserServiceImpl implements UserService {
                 .findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() -> new UserNotFoundException("User or email not found"));
         if (user.getIsActive()) {
-            sendEmailService.sendEmailForgotPassword(user.getUsername());
-            return new ResponseEntity<>("Email send", HttpStatus.OK);
+            OTP otp = new OTP();
+            otp.setCode(PasswordGenerator.generateOTP(6));
+            otp.setCreationDate(System.currentTimeMillis());
+
+            sendEmailService.sendEmailForgotPassword(user.getUsername(), otp.getCode());
+
+            user.setOtp(otp);
+            user.setIsFirstLogin(true);
+            userRepository.save(user);
+            return new ResponseEntity<>("Email sent", HttpStatus.OK);
         } else {
             if (user.getHasPassword()) {
                 throw new UserAlreadyDeactivatedException("User was deactivated");
