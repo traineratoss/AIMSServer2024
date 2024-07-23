@@ -200,9 +200,7 @@ public class UserServiceImpl implements UserService {
         String username = changePasswordDTO.getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!"));
         String hashFrontendNewPassword = BCrypt.hashpw(changePasswordDTO.getNewPassword(), bcryptSalt);
-        if (!BCrypt.checkpw(changePasswordDTO.getOldPassword(), user.getPassword())) {
-            return false;
-        }
+
         user.setPassword(hashFrontendNewPassword);
         user.setIsFirstLogin(false);
         userRepository.save(user);
