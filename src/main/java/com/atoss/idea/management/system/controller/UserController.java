@@ -403,4 +403,15 @@ public class UserController {
     public ResponseEntity<UserSecurityDTO> verifyOTP(@RequestBody VerifyOTPDTO verifyOTPDTO) {
         return new ResponseEntity<>(userService.verifyOTP(verifyOTPDTO), HttpStatus.OK);
     }
+
+
+
+    @GetMapping("/idByUsername")
+    public Long getIdByUsername(@RequestParam(name = "username") String username) {
+        return userService.getIdByUsername(username);
+    }
+
+
+
+
 }

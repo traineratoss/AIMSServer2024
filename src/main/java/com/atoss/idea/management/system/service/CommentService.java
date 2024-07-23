@@ -20,6 +20,7 @@ public interface CommentService {
      * @return time the time difference in a human-readable format
      * @throws CommentNotFoundException when the id is not found in the database
      */
+    void addLike(Long commentId, Long userId);
     String getTimeForComment(Long id);
 
     /**

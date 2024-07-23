@@ -287,6 +287,39 @@ public class CommentServiceImpl implements CommentService {
         return new PageImpl<>(commentList, pageable, commentList.size());
     }
 
+    private boolean verifyCommentOwner(Long commentId, Long userId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException());
+
+        if(!comment.getUser().getId().equals(userId)) {
+            return false;
+        }
+        return true;
+    }
+    @Transactional
+    @Override
+    public void addLike(Long commentId, Long userId) {
+        if (!verifyCommentOwner(commentId, userId)) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+
+            Comment comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new CommentNotFoundException());
+
+            if (user.getLikedComments().contains(comment)) {
+                throw new UserNotFoundException("User has already liked this comment!");
+            }
+
+            user.getLikedComments().add(comment);
+            comment.getUserList().add(user);
+
+            userRepository.save(user);
+            commentRepository.save(comment);
+        } else {
+            throw new UserNotFoundException("A user can't like his own comment !");
+        }
+    }
+
     @Override
     public void deleteComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {

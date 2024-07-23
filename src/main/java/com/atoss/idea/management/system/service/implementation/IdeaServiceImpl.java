@@ -17,6 +17,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -29,10 +30,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Log4j2
@@ -56,6 +54,8 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final CommentServiceImpl commentServiceImpl;
 
+    private final RatingRepository ratingRepository;
+
     /**
      * Constructor for the Idea Service Implementation
      *
@@ -68,9 +68,11 @@ public class IdeaServiceImpl implements IdeaService {
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
                            ImageRepository imageRepository, UserRepository userRepository,
+                           RatingRepository ratingRepository,
                            CategoryRepository categoryRepository,
                            ModelMapper modelMapper,
                            CommentServiceImpl commentServiceImpl) {
+        this.ratingRepository=ratingRepository;
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
         this.userRepository = userRepository;
@@ -430,5 +432,24 @@ public class IdeaServiceImpl implements IdeaService {
             }
         }
         return predicatesList;
+    }
+
+
+
+    @Override
+    public Rating addOrUpdateRating(Long idea_id, Long user_id, int ratingValue){
+        Idea idea = ideaRepository.findById(idea_id).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
+        User user = userRepository.findById(user_id).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
+        Rating rating = ratingRepository.findByIdeaIdAndUserId(idea_id, user_id).orElse(new Rating());
+        rating.setIdea(idea);
+        rating.setUser(user);
+        rating.setRating(ratingValue);
+        return ratingRepository.save(rating);
+    }
+
+    @Override
+    public List<Rating> getRatingById(Long id){
+        Idea idea = ideaRepository.findById(id).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
+        return ratingRepository.findByIdea(idea);
     }
 }

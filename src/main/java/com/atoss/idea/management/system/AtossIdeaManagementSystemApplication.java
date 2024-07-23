@@ -20,7 +20,7 @@ public class AtossIdeaManagementSystemApplication {
 	 * @see AtossIdeaManagementSystemApplication
 	 */
 	public static void main(String[] args) {
-		SpringApplication.run(AtossIdeaManagementSystemApplication.class, args);
+ 		SpringApplication.run(AtossIdeaManagementSystemApplication.class, args);
 	}
 
 

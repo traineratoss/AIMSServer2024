@@ -13,15 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -48,7 +40,7 @@ public class IdeaController {
     /**
      * Adds a new idea to a user that has a given username
      *
-     * @param idea the idea to be added
+     * @param idea     the idea to be added
      * @param username the username associated with the idea
      * @return a Response Entity containing the response DTO of the added idea
      */
@@ -74,7 +66,7 @@ public class IdeaController {
     /**
      * Updates an idea by a given id
      *
-     * @param id the id of the idea we want to update
+     * @param id            the id of the idea we want to update
      * @param ideaUpdateDTO the DTO containing the updated idea information
      * @return a Response Entity containing the response DTO of the updated idea
      */
@@ -90,11 +82,11 @@ public class IdeaController {
      *
      * @param id the id of the idea we want to delete
      * @return a Response Entity containing a text that suggests the fact that we successfully
-     *         deleted the idea
+     * deleted the idea
      */
     @DeleteMapping("/delete")
     @Transactional
-    public ResponseEntity<String> deleteIdeaById(@RequestParam(required = true) Long id)  {
+    public ResponseEntity<String> deleteIdeaById(@RequestParam(required = true) Long id) {
         ideaService.deleteIdeaById(id);
         return new ResponseEntity<>("Idea successfully deleted", HttpStatus.OK);
     }
@@ -102,12 +94,12 @@ public class IdeaController {
     /**
      * Returns all the ideas paged
      *
-     * @param pageSize the size of the page
-     * @param pageNumber the number of the page
-     * @param sortCategory the category we sort the ideas by
+     * @param pageSize      the size of the page
+     * @param pageNumber    the number of the page
+     * @param sortCategory  the category we sort the ideas by
      * @param sortDirection the direction we want the ideas to be sorted by
      * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     *         the page containing the list of ideas )
+     * the page containing the list of ideas )
      */
     @Transactional
     @GetMapping("/all")
@@ -133,21 +125,21 @@ public class IdeaController {
     /**
      * Returns all the ideas that belong to a User, paged
      *
-     * @param username the username of the User whose ideas belong to
-     * @param pageSize the size of the page
-     * @param pageNumber the number of the page
-     * @param sortCategory the category we sort the ideas by
+     * @param username      the username of the User whose ideas belong to
+     * @param pageSize      the size of the page
+     * @param pageNumber    the number of the page
+     * @param sortCategory  the category we sort the ideas by
      * @param sortDirection the direction we want the ideas to be sorted by
      * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     *         the page containing the list of ideas )
+     * the page containing the list of ideas )
      */
     @Transactional
     @GetMapping("/allByUser")
     public ResponseEntity<Page<IdeaResponseDTO>> getAllIdeasByUserUsername(@RequestParam(required = true) String username,
-                                                                 @RequestParam(required = true) int pageSize,
-                                                                 @RequestParam(required = true) int pageNumber,
-                                                                 @RequestParam(required = true) String sortCategory,
-                                                                 @RequestParam(required = true) Sort.Direction sortDirection) {
+                                                                           @RequestParam(required = true) int pageSize,
+                                                                           @RequestParam(required = true) int pageNumber,
+                                                                           @RequestParam(required = true) String sortCategory,
+                                                                           @RequestParam(required = true) Sort.Direction sortDirection) {
         switch (sortDirection) {
             case ASC -> {
                 Pageable pageableAsc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
@@ -166,22 +158,22 @@ public class IdeaController {
     /**
      * Filters ideas based on specified criteria
      *
-     * @param title the ideas matching the specified title criteria
-     * @param text the ideas matching the specified text criteria
-     * @param status a string that will be converted into an array
-     *               of Statuses and filter the ideas matching these
-     * @param category a string that will be converted into an array
-     *                 of Categories and filter the ideas matching these
-     * @param user a string that will be converted into an array
-     *             of Users and filter the ideas matching these
+     * @param title            the ideas matching the specified title criteria
+     * @param text             the ideas matching the specified text criteria
+     * @param status           a string that will be converted into an array
+     *                         of Statuses and filter the ideas matching these
+     * @param category         a string that will be converted into an array
+     *                         of Categories and filter the ideas matching these
+     * @param user             a string that will be converted into an array
+     *                         of Users and filter the ideas matching these
      * @param selectedDateFrom the ideas matching the specified selected date from
-     * @param selectedDateTo the ideas matching the specified selected date to
-     * @param pageSize the size of the page
-     * @param pageNumber the number of the page
-     * @param username if not null, returns filtered ideas belonging to the specified username
-     * @param sortDirection the direction we want the ideas to be sorted by
+     * @param selectedDateTo   the ideas matching the specified selected date to
+     * @param pageSize         the size of the page
+     * @param pageNumber       the number of the page
+     * @param username         if not null, returns filtered ideas belonging to the specified username
+     * @param sortDirection    the direction we want the ideas to be sorted by
      * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     *         the page containing the list of ideas )
+     * the page containing the list of ideas )
      */
     @Transactional
     @GetMapping("/filter")
@@ -189,11 +181,11 @@ public class IdeaController {
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String text,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) String user,
             @RequestParam(required = false) String selectedDateFrom,
             @RequestParam(required = false) String selectedDateTo,
             @RequestParam(required = true) int pageNumber,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String user,
             @RequestParam(required = true) int pageSize,
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String rating,
@@ -223,4 +215,18 @@ public class IdeaController {
                 text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, rating, pageableAsc), HttpStatus.OK);
     }
 
+
+    @Transactional
+    @PostMapping("/ratings")
+    public ResponseEntity<Rating> addOrUpdateRating(@RequestParam(required = true) Long idea_id, @RequestParam(required = true) Long user_id, @RequestParam(required = true) int ratingValue) {
+        Rating rating = ideaService.addOrUpdateRating(idea_id, user_id, ratingValue);
+        return new ResponseEntity<>(rating, HttpStatus.OK);
+    }
+
+    @Transactional
+    @GetMapping("/getRating")
+    public ResponseEntity<List<Rating>> getRatingById(@RequestParam(required = true) Long id) {
+        List<Rating> ratings = ideaService.getRatingById(id);
+        return new ResponseEntity<>(ratings, HttpStatus.OK);
+    }
 }

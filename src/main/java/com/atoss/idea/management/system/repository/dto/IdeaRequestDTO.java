@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.repository.dto;
 
+import com.atoss.idea.management.system.repository.entity.Rating;
 import com.atoss.idea.management.system.repository.entity.Status;
 import lombok.Data;
 import java.util.Date;
@@ -20,4 +21,6 @@ public class IdeaRequestDTO {
     private String text;
 
     private Date creationDate;
+
+    private List<Rating> rating;
 }
