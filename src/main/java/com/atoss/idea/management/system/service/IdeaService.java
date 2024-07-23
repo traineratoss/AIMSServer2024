@@ -127,4 +127,10 @@ public interface IdeaService {
                                  CriteriaBuilder cb,
                                  String columnName);
 
+
+
+    Rating addOrUpdateRating(Long idea_id, Long used_id, int ratingValue);
+
+    List<Rating> getRatingById(Long id);
+
 }
