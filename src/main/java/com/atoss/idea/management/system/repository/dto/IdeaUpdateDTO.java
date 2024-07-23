@@ -12,5 +12,4 @@ public class IdeaUpdateDTO {
     private List<CategoryDTO> categoryList;
     private ImageDTO image;
     private String text;
-
 }

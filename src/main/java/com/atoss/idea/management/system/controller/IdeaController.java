@@ -218,7 +218,7 @@ public class IdeaController {
 
     @Transactional
     @PostMapping("/ratings")
-    public ResponseEntity<Rating> addOrUpdateRating(@RequestParam(required = true) Long idea_id, @RequestParam(required = true) Long user_id, @RequestParam(required = true) int ratingValue) {
+    public ResponseEntity<Rating> addOrUpdateRating(@RequestParam(required = true) Long idea_id, @RequestParam(required = true) Long user_id, @RequestParam(required = true) double ratingValue) {
         Rating rating = ideaService.addOrUpdateRating(idea_id, user_id, ratingValue);
         return new ResponseEntity<>(rating, HttpStatus.OK);
     }

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 public interface IdeaService {
 
@@ -129,8 +130,9 @@ public interface IdeaService {
 
 
 
-    Rating addOrUpdateRating(Long idea_id, Long used_id, int ratingValue);
+    Rating addOrUpdateRating(Long idea_id, Long used_id, Double ratingValue);
 
     List<Rating> getRatingById(Long id);
 
+    Double getAverage(Long idea_id);
 }
