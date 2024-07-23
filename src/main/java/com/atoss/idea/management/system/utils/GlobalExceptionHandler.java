@@ -231,9 +231,9 @@ public class GlobalExceptionHandler {
      */
 
     @ExceptionHandler(value = UserAlreadyDeactivatedException.class)
-    public ResponseEntity<UserAlreadyDeactivatedException> userAlreadyDeactivateException(
+    public ResponseEntity<String> userAlreadyDeactivateException(
             UserAlreadyDeactivatedException userAlreadyDeactivatedException) {
-        return new ResponseEntity<>(userAlreadyDeactivatedException, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(userAlreadyDeactivatedException.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = BadCredentialsException.class)

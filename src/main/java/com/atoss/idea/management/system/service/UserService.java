@@ -111,12 +111,12 @@ public interface UserService {
      * Changes the password of a user
      *
      * @param verifyOTPDTO the dto containing the username, the old password and the new password
-     *
+     * @return UserSecurityDTO with the user's credentials.
      * @throws UserNotFoundException   if a user with the given username doesn't exist in the system
      * @throws BadCredentialsException if no OTP has been generated for a user, the OTP is not correct,
      *                                 or has already expired.
      */
-    void verifyOTP(VerifyOTPDTO verifyOTPDTO);
+    UserSecurityDTO verifyOTP(VerifyOTPDTO verifyOTPDTO);
 
     /**
      * Sends an approval email to the user with the specified username.

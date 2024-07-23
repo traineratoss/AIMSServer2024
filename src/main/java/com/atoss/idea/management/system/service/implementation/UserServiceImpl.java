@@ -210,7 +210,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void verifyOTP(VerifyOTPDTO verifyOTPDTO) {
+    public UserSecurityDTO verifyOTP(VerifyOTPDTO verifyOTPDTO) {
         String usernameOrEmail = verifyOTPDTO.getUsernameOrEmail();
         User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail).orElseThrow(() -> new UserNotFoundException("User not found!"));
 
@@ -224,6 +224,8 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setOtp(null);
+
+        return modelMapper.map(user, UserSecurityDTO.class);
     }
 
     @Override
