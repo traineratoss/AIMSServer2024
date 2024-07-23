@@ -316,7 +316,7 @@ public class CommentServiceImpl implements CommentService {
             userRepository.save(user);
             commentRepository.save(comment);
         } else {
-            throw new UserNotFoundException("A user can't like his own comment!");
+            throw new UserNotFoundException("A user can't like his own comment !");
         }
     }
 
