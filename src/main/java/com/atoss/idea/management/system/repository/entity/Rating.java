@@ -30,7 +30,7 @@ public class Rating {
     private User user;
 
     @Column(name = "rating")
-    private double rating;
+    private Double rating;
 
     @Override
     public String toString() {

@@ -33,4 +33,6 @@ public class IdeaResponseDTO {
     private String elapsedTime;
 
     private List<Rating> rating;
+
 }
+

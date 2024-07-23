@@ -34,6 +34,9 @@ public class Idea {
     @Column(name = "date")
     private Date creationDate;
 
+    @Column(name = "ratingAvg")
+    private Double ratingAvg;
+
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id", referencedColumnName = "image_id")
     @JsonManagedReference(value = "idea-image")
