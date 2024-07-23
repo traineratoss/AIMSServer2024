@@ -233,4 +233,7 @@ public interface UserService {
      */
     Boolean isFirstLogin(String usernameOrEmail);
 
+
+    Long getIdByUsername(String username);
+
 }
