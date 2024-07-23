@@ -2,6 +2,7 @@ package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.exception.*;
 import com.atoss.idea.management.system.repository.dto.*;
+import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.service.UserService;
 import jakarta.transaction.Transactional;
@@ -382,5 +383,25 @@ public class UserController {
     @GetMapping("/is-first-login")
     public ResponseEntity<Boolean> isFirstLogin(@RequestParam(name = "usernameOrEmail") String usernameOrEmail) {
         return new ResponseEntity<>(userService.isFirstLogin(usernameOrEmail), HttpStatus.OK);
+    }
+
+    /**
+     * Checks whether the provided OTP is valid for the specified user.
+     *
+     * @param verifyOTPDTO The username or email of the user to be checked and the one-time password.
+     *
+     * @return Returns HttpStatus.OK if the request is successful.
+     *
+     * @throws UserNotFoundException - if the user is not found in the database
+     * @throws BadCredentialsException - if no OTP password has been generated for the specified user, the OTP password
+     * is invalid, or has expired.
+     *
+     * @see UserService#verifyOTP(VerifyOTPDTO)
+     */
+    @Transactional
+    @PostMapping("/verify-otp")
+    public ResponseEntity<Object> verifyOTP(@RequestBody VerifyOTPDTO verifyOTPDTO) {
+        userService.verifyOTP(verifyOTPDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

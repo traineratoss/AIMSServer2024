@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -169,36 +170,6 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-    private boolean verifyCommentOwner(Long commentId, Long userId)
-    {
-        boolean val = true;
-        Optional<Comment> comment=commentRepository.findById(commentId);
-        Optional<User> user= userRepository.findById(userId);
-        if(comment.isPresent() && user.isPresent())
-        {
-            if(!comment.get().getUser().getId().equals(user.get().getId()))
-            {
-                val=false;
-            }
-        }
-        else
-        {
-            throw new RuntimeException("User or comment not found!");
-        }
-        return val;
-    }
-    @Transactional
-    public void addLike(Long commentId, Long userId) {
-       if (!verifyCommentOwner(commentId, userId)) {
-           commentRepository.saveLike(commentId,userId);
-       } else {
-           throw new RuntimeException("Un user nu poate sa dea like la propriul comentariu!");
-        }
-    }
-
-
-
-
     @Transactional
     @Override
     public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) throws UnsupportedEncodingException {
@@ -316,11 +287,65 @@ public class CommentServiceImpl implements CommentService {
         return new PageImpl<>(commentList, pageable, commentList.size());
     }
 
+    private boolean verifyCommentOwner(Long commentId, Long userId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException());
+
+        if(!comment.getUser().getId().equals(userId)) {
+            return false;
+        }
+        return true;
+    }
+    @Transactional
+    @Override
+    public void addLike(Long commentId, Long userId) {
+        if (!verifyCommentOwner(commentId, userId)) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+
+            Comment comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new CommentNotFoundException());
+
+            if (user.getLikedComments().contains(comment)) {
+                throw new UserNotFoundException("User has already liked this comment!");
+            }
+
+            user.getLikedComments().add(comment);
+            comment.getUserList().add(user);
+
+            userRepository.save(user);
+            commentRepository.save(comment);
+        } else {
+            throw new UserNotFoundException("A user can't like his own comment!");
+        }
+    }
+
     @Override
     public void deleteComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
         commentRepository.deleteById(commentId);
+    }
+
+
+    @Override
+    public List<UserResponseDTO> getLikesForComment(Long commentId){
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
+        return comment.getUserList().stream()
+                .map(user -> modelMapper.map(user, UserResponseDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    public int getLikesCountForComment(Long commentId) {
+        return commentRepository.countLikesByCommentId(commentId);
+    }
+
+    @Override
+    public void deleteLikes(Long commentId, Long userId){
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        commentRepository.deleteLikes(commentId,userId);
     }
 }

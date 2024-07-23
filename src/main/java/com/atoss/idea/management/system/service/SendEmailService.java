@@ -56,14 +56,12 @@ public interface SendEmailService {
      /**
      * Sends a password reset email to a user and updates their password upon request.
      *
-     * This method generates a new random password, sends a password reset email to the user,
-     * and updates their password in the system upon their request.
-     *
      * @param username The username of the user for whom the password reset email will be sent.
-     * @throws RuntimeException If the user does not exist in the repository.
+     * @param otp The one-time password to be sent.
+     *
      * @throws RuntimeException If there are any issues during the email sending process.
      */
-    void sendEmailForgotPassword(String username);
+    void sendEmailForgotPassword(String username, String otp);
 
     /**
      * Sends an account deactivation email to a user and updates their account status.

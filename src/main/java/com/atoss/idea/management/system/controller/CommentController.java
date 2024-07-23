@@ -1,7 +1,6 @@
 package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.repository.dto.*;
-import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -13,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -69,13 +69,7 @@ public class CommentController {
         return new ResponseEntity<ResponseCommentReplyDTO>(responseCommentReplyDTO, HttpStatus.OK);
     }
 
-    @Transactional
-    @PostMapping("/comments/like")
-    public ResponseEntity<String> addLike(@RequestParam Long comment_id, @RequestParam Long user_id) {
 
-            commentService.addLike(comment_id, user_id);
-            return new ResponseEntity<>("Like added successfully", HttpStatus.OK);
-    }
     /**
      * Performs a Get Request in order to get all comments of a certain idea in a paginated form
      *
@@ -155,4 +149,32 @@ public class CommentController {
     public void deleteComment(@RequestParam(name = "commentId") Long commentId) {
         commentService.deleteComment(commentId);
     }
+
+
+    @GetMapping("/comments/{commentId}/likes")
+    public ResponseEntity<List<UserResponseDTO>> getLikesForComment(@PathVariable Long commentId) {
+        List<UserResponseDTO> likes = commentService.getLikesForComment(commentId);
+        return ResponseEntity.ok(likes);
+    }
+
+    @GetMapping("/comments/{commentId}/likes/count")
+    public ResponseEntity<Integer> getLikesCountForComment(@PathVariable Long commentId) {
+        int likesCount = commentService.getLikesCountForComment(commentId);
+        return ResponseEntity.ok(likesCount);
+    }
+
+    @Transactional
+    @PostMapping("/comments/like/{comment_id}/{user_id}")
+    public ResponseEntity<String> addLike(@PathVariable Long comment_id, @PathVariable Long user_id) {
+        commentService.addLike(comment_id, user_id);
+        return new ResponseEntity<>("Like added successfully", HttpStatus.OK);
+    }
+
+    @Transactional
+    @DeleteMapping("/comments/like/delete/{commentId}/{userId}")
+    public void deleteLikes(@PathVariable Long commentId,
+                              @PathVariable Long userId) {
+        commentService.deleteLikes(commentId,userId);
+    }
+
 }

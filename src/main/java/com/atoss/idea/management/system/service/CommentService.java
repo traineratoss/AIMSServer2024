@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
+import java.util.List;
 
 public interface CommentService {
 
@@ -90,5 +91,10 @@ public interface CommentService {
      * @throws CommentNotFoundException when the comment id is not found in the database
      */
     void deleteComment(Long commentId);
+    void deleteLikes(Long commentId,Long userId);
+
+
+    List<UserResponseDTO> getLikesForComment(Long commentId);
+    public int getLikesCountForComment(Long commentId);
 
 }

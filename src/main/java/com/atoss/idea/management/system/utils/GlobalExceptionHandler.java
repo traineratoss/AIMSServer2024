@@ -4,6 +4,7 @@ import com.atoss.idea.management.system.exception.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -73,8 +74,8 @@ public class GlobalExceptionHandler {
      */
 
     @ExceptionHandler(value = UserNotFoundException.class)
-    public ResponseEntity<UserNotFoundException> userNotFoundException(UserNotFoundException userNotFoundException) {
-        return new ResponseEntity<>(userNotFoundException, HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> userNotFoundException(UserNotFoundException userNotFoundException) {
+        return new ResponseEntity<>(userNotFoundException.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -233,6 +234,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<UserAlreadyDeactivatedException> userAlreadyDeactivateException(
             UserAlreadyDeactivatedException userAlreadyDeactivatedException) {
         return new ResponseEntity<>(userAlreadyDeactivatedException, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = BadCredentialsException.class)
+    public ResponseEntity<String> badCredentialsException(
+            BadCredentialsException badCredentialsException) {
+        return new ResponseEntity<>(badCredentialsException.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     //    /**
