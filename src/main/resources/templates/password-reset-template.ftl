@@ -11,7 +11,7 @@
         <tr>
             <td align="center" valign="center" bgcolor="#333333"
                 style="background-color: #333333; height: 100px; ">
-                <h1 style="color: #ffa941; ">Your new password is here!</h1>
+                <h1 style="color: #ffa941; ">Password reset request</h1>
             </td>
         </tr>
         <tr style="background-color: #c8c8ca; box-shadow: 0px -10px 10px rgba(0, 0, 0, 0.1);">
@@ -23,16 +23,10 @@
                 <p style="font-size: 16px; line-height: 1.5;">
                     We hope you are doing well. It appears that you have requested a password reset for your account. We understand how important it is to regain access to your account, and we're here to assist you with the process.
                 </p>
-                <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 50%; margin-left:20px;">
+                <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 50%; margin-left:10px;">
+                    <strong style="padding: 10px;">Account recovery code: </strong><br><span style="font-size: 24px; padding: 10px;">${password}</span>
                     <ol style="font-size: 16px; line-height: 1.5;">
-                        <li>Click
-                            <a href="http://127.0.0.1:5173/login" style="color:#d88f35; text-decoration: none; font-weight: bolder;">here </a>
-                            to access the login page.
-                        </li>
-                        <li>Once you are on the login page, use the temporary password provided below to log in to your account:<br>
-                            <strong>Temporary Password: </strong><span>${password}</span>
-                        </li>
-                        <li>After successfully logging in, you will be automatically redirected to the password reset page.</li>
+                        <li>After successfully verifying this code, you will be automatically redirected to the password reset page.</li>
                         <li>On the password reset page, choose a new, strong, and unique password for your account. Please remember to keep your password secure and avoid sharing it with anyone.</li>
                     </ol>
                 </div>

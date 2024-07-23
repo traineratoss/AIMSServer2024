@@ -331,4 +331,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found!"));
         return user.getIsFirstLogin();
     }
+
+
+    @Override
+    public Long getIdByUsername(String username){
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
+        System.out.println(user.getUsername());
+        return user.getId();
+    }
 }
