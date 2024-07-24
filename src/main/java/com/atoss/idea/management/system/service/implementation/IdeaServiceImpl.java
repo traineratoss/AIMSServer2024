@@ -17,10 +17,12 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -29,10 +31,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Log4j2
@@ -56,6 +55,8 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final CommentServiceImpl commentServiceImpl;
 
+    private final RatingRepository ratingRepository;
+
     /**
      * Constructor for the Idea Service Implementation
      *
@@ -68,9 +69,11 @@ public class IdeaServiceImpl implements IdeaService {
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
                            ImageRepository imageRepository, UserRepository userRepository,
+                           RatingRepository ratingRepository,
                            CategoryRepository categoryRepository,
                            ModelMapper modelMapper,
                            CommentServiceImpl commentServiceImpl) {
+        this.ratingRepository = ratingRepository;
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
         this.userRepository = userRepository;
@@ -78,6 +81,7 @@ public class IdeaServiceImpl implements IdeaService {
         this.modelMapper = modelMapper;
         this.commentServiceImpl = commentServiceImpl;
     }
+
     private String filterBadWords(String text) {
         for (String word : badWords) {
             String pattern = "\\b" + word + "\\b";
@@ -85,6 +89,7 @@ public class IdeaServiceImpl implements IdeaService {
         }
         return text;
     }
+
     private void readBadWordsFromFile(String path) {
         try {
             FileReader fileReader = new FileReader(path);
@@ -102,6 +107,7 @@ public class IdeaServiceImpl implements IdeaService {
             e.printStackTrace();
         }
     }
+
     @Override
     public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws UnsupportedEncodingException {
 
@@ -163,6 +169,7 @@ public class IdeaServiceImpl implements IdeaService {
         responseDTO.setUsername(username);
         return responseDTO;
     }
+
     @Override
     public IdeaResponseDTO getIdeaById(Long id) throws FieldValidationException {
 
@@ -177,6 +184,7 @@ public class IdeaServiceImpl implements IdeaService {
             throw new IdeaNotFoundException("Idea doesn't exist.");
         }
     }
+
     @Override
     public IdeaResponseDTO updateIdeaById(Long id, IdeaUpdateDTO ideaUpdateDTO) throws UnsupportedEncodingException {
         String wordsFilePath = "textTerms/badWords.txt";
@@ -221,7 +229,7 @@ public class IdeaServiceImpl implements IdeaService {
                 idea.setCategoryList(new ArrayList<>());
                 List<Category> newList = new ArrayList<>();
 
-                for (CategoryDTO category: ideaUpdateDTO.getCategoryList()) {
+                for (CategoryDTO category : ideaUpdateDTO.getCategoryList()) {
 
                     Category newCategory = categoryRepository.findByText(category.getText());
                     if (newCategory == null) {
@@ -340,8 +348,14 @@ public class IdeaServiceImpl implements IdeaService {
         if (categories != null && !categories.isEmpty()) {
             predicatesList.add(root.join("categoryList").get("text").in(categories));
         }
-        if(rating != null && !rating.isEmpty()){
-            predicatesList.add(root.join("rating").get("rating").in(rating));
+        if (rating != null && !rating.isEmpty()) {
+            double ratingValue;
+            try {
+                ratingValue = Double.parseDouble(rating);
+            } catch (NumberFormatException e) {
+                throw new FieldValidationException("Invalid rating value.");
+            }
+            predicatesList.add(cb.greaterThan(root.join("rating").get("rating"), ratingValue));
         }
         predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
         List<Order> orders = new ArrayList<>();
@@ -385,6 +399,7 @@ public class IdeaServiceImpl implements IdeaService {
 
         return new PageImpl<>(allIdeasUnpaged, Pageable.unpaged(), totalSize);
     }
+
     @Override
     public List<Idea> findIdeasByIds(List<Long> ideaIds) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
@@ -393,11 +408,12 @@ public class IdeaServiceImpl implements IdeaService {
 
         List<Predicate> predicatesList = new ArrayList<>();
 
-        for (Long id:ideaIds) {
+        for (Long id : ideaIds) {
             criteriaQuery.where(cb.equal(root.get("id"), id));
         }
         return entityManager.createQuery(criteriaQuery).getResultList();
     }
+
     @Override
     public List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<?> root, CriteriaBuilder cb, String columnName) {
         List<Predicate> predicatesList = new ArrayList<>();
@@ -430,5 +446,38 @@ public class IdeaServiceImpl implements IdeaService {
             }
         }
         return predicatesList;
+    }
+
+
+    @Override
+    public Rating addOrUpdateRating(Long idea_id, Long user_id, Double ratingValue) {
+        Idea idea = ideaRepository.findById(idea_id).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
+        User user = userRepository.findById(user_id).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
+        Rating rating = ratingRepository.findByIdeaIdAndUserId(idea_id, user_id).orElse(new Rating());
+        rating.setIdea(idea);
+        rating.setUser(user);
+        rating.setRating(ratingValue);
+        Rating ratingRepositorySave = ratingRepository.save(rating);
+        idea.setRatingAvg(getAverage(idea_id));
+        return ratingRepositorySave;
+    }
+
+    @Override
+    public List<Rating> getRatingById(Long id) {
+        Idea idea = ideaRepository.findById(id).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
+        return ratingRepository.findByIdea(idea);
+    }
+
+    @Override
+    public Double getAverage(Long idea_id) {
+        List<Rating> ratings = ratingRepository.findByIdeaId(idea_id);
+        Double sum = 0D;
+        Double count = 0D;
+        for (Rating rate : ratings) {
+            sum += rate.getRating();
+            count++;
+        }
+        return sum / count;
+
     }
 }

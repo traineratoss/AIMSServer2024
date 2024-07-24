@@ -162,9 +162,4 @@ public class CreateIdeaTest {
         assertEquals(existingImage.getFileName(), response.getBody().getImage().getFileName());
     }
 
-
-
-
-
-
 }

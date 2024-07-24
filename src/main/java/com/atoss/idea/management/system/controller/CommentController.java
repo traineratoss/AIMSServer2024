@@ -164,6 +164,13 @@ public class CommentController {
     }
 
     @Transactional
+    @PostMapping("/comments/like/{comment_id}/{user_id}")
+    public ResponseEntity<String> addLike(@PathVariable Long comment_id, @PathVariable Long user_id) {
+        commentService.addLike(comment_id, user_id);
+        return new ResponseEntity<>("Like added successfully", HttpStatus.OK);
+    }
+
+    @Transactional
     @DeleteMapping("/comments/like/delete/{commentId}/{userId}")
     public void deleteLikes(@PathVariable Long commentId,
                               @PathVariable Long userId) {

@@ -400,9 +400,8 @@ public class UserController {
      */
     @Transactional
     @PostMapping("/verify-otp")
-    public ResponseEntity<Object> verifyOTP(@RequestBody VerifyOTPDTO verifyOTPDTO) {
-        userService.verifyOTP(verifyOTPDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<UserSecurityDTO> verifyOTP(@RequestBody VerifyOTPDTO verifyOTPDTO) {
+        return new ResponseEntity<>(userService.verifyOTP(verifyOTPDTO), HttpStatus.OK);
     }
 
 
