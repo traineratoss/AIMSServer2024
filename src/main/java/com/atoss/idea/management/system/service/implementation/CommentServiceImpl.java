@@ -313,6 +313,9 @@ public class CommentServiceImpl implements CommentService {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException();
+        }
         commentRepository.deleteLikes(commentId,userId);
     }
 }
