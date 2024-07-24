@@ -33,5 +33,6 @@ public class StatisticsDTO {
     private Double implP;
 
     private List<IdeaResponseDTO> mostCommentedIdeas;
+    private List<CommentStatisticsDTO> mostLikedComments;
 
 }

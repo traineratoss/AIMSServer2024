@@ -16,6 +16,16 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
+
+
+    @Query(value = "SELECT c.* FROM comment c " +
+            "JOIN likes l ON c.comment_id = l.comment_id " +
+            "GROUP BY c.comment_id " +
+            "ORDER BY COUNT(l.user_id) DESC " +
+            "LIMIT 5", nativeQuery = true)
+    List<Comment> findTop5CommentsByLikes();
+
+
     /**
      * Overwriting default "findAllById" CRUD method in order to return a Page of type Comment
      *

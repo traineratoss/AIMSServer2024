@@ -4,6 +4,7 @@ package com.atoss.idea.management.system.service.implementation;
 import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
+import com.atoss.idea.management.system.repository.dto.CommentStatisticsDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.StatisticsDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StatisticsServiceImpl implements StatisticsService {
@@ -172,6 +174,19 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(commentRepository.mostCommentedIdeas());
 
+
+
+
+        List<Comment> topComments = commentRepository.findTop5CommentsByLikes();
+        List<CommentStatisticsDTO> commentStatisticsDTOList = topComments.stream()
+                .map(comment -> {
+                    CommentStatisticsDTO dto = new CommentStatisticsDTO();
+                    dto.setCommentText(comment.getCommentText());
+                    dto.setNrLikes(commentRepository.countLikesByCommentId(comment.getId()));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
         statisticsDTO.setMostCommentedIdeas(mostCommentedIdeas);
         statisticsDTO.setNrOfUsers(nrOfUsers);
         statisticsDTO.setNrOfIdeas(nrOfIdeas);
@@ -179,6 +194,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         statisticsDTO.setImplP(implPercentage);
         statisticsDTO.setDraftP(draftPercentage);
         statisticsDTO.setOpenP(openPercentage);
+        statisticsDTO.setMostLikedComments(commentStatisticsDTOList);
 
         return statisticsDTO;
     }
@@ -258,6 +274,26 @@ public class StatisticsServiceImpl implements StatisticsService {
         return filteredStatisticsDTO;
     }
 
-
+//    @Override
+//    public List<CommentStatisticsDTO> findTopCommentsByLikes(){
+//        List<Comment> topComments = commentRepository.findTop5CommentsByLikes();
+//
+//
+//        List<CommentStatisticsDTO> commentStatisticsDTOList = topComments.stream()
+//                .map(comment -> {
+//                    CommentStatisticsDTO dto = new CommentStatisticsDTO();
+//                    dto.setCommentText(comment.getCommentText());
+//                    dto.setNrLikes(commentRepository.countLikesByCommentId(comment.getId()));
+//                    return dto;
+//                })
+//                .collect(Collectors.toList());
+//
+//        commentStatisticsDTOList.forEach(commentStatisticsDTO ->
+//                System.out.println(commentStatisticsDTO.getNrLikes()));
+//
+//
+//
+//        return commentStatisticsDTOList;
+//    }
 
 }
