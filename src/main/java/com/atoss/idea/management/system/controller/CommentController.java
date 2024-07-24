@@ -177,4 +177,8 @@ public class CommentController {
         commentService.deleteLikes(commentId,userId);
     }
 
+    @GetMapping("/comments/find/{commentId}/{userId}")
+    public boolean existsByCommentIdAndUserId(@PathVariable Long commentId,@PathVariable Long userId) {
+        return commentService.existsByCommentIdAndUserId(commentId,userId);
+    }
 }

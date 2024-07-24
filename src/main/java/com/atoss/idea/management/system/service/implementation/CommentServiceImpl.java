@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -350,5 +351,10 @@ public class CommentServiceImpl implements CommentService {
             throw new UserNotFoundException();
         }
         commentRepository.deleteLikes(commentId,userId);
+    }
+
+
+    public boolean existsByCommentIdAndUserId(Long commentId, Long userId){
+       return commentRepository.existsByCommentIdAndUserId(commentId,userId);
     }
 }
