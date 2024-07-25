@@ -28,8 +28,10 @@ public interface CommentService {
      * @param commentId the ID of the comment to which the like is being added
      * @param userId the ID of the user who is liking the comment
      * @throws CommentNotFoundException if the comment with the specified ID does not exist
-     * @throws UserNotFoundException if the user with the specified ID does not exist, or if the user is the owner of the comment, or if the user has already liked the comment
+     * @throws UserNotFoundException if the user with the specified ID does not exist, or if the user is the owner of the comment
+     *                               or if the user has already liked the comment
      */
+
     void addLike(Long commentId, Long userId);
 
     /**
