@@ -6,5 +6,4 @@ import lombok.Data;
 public class CommentStatisticsDTO {
     private String commentText;
     private Integer nrLikes;
-
 }

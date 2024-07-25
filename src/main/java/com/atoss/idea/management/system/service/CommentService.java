@@ -91,7 +91,7 @@ public interface CommentService {
      * @throws CommentNotFoundException when the comment id is not found in the database
      */
     void deleteComment(Long commentId);
-    void deleteLikes(Long commentId,Long userId);
+    void deleteLikes(Long commentId, Long userId);
 
 
     List<UserResponseDTO> getLikesForComment(Long commentId);
