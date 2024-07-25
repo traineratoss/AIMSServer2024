@@ -55,7 +55,7 @@ public class Comment {
     private List<User> userList;
 
     public void setCommentText(String comment) {
-        this.commentText=comment;
+        this.commentText = comment;
     }
 
     public String getCommentText() {

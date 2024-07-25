@@ -342,7 +342,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteLikes(Long commentId, Long userId){
+    public void deleteLikes(Long commentId, Long userId) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
@@ -353,7 +353,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
 
-    public boolean existsByCommentIdAndUserId(Long commentId, Long userId){
+    public boolean existsByCommentIdAndUserId(Long commentId, Long userId) {
        return commentRepository.existsByCommentIdAndUserId(commentId, userId);
     }
 
