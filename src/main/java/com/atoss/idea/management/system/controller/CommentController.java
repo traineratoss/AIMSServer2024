@@ -212,4 +212,11 @@ public class CommentController {
     public boolean existsByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
         return commentService.existsByCommentIdAndUserId(commentId, userId);
     }
+
+    @GetMapping("/comments/reports/count/{commentId}")
+    public ResponseEntity<Integer> getReportsCountForComment(@PathVariable Long commentId) {
+        int reportsCount = commentService.getReportsCountForComment(commentId);
+        return ResponseEntity.ok(reportsCount);
+    }
+
 }

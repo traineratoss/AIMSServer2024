@@ -137,4 +137,6 @@ public interface CommentService {
      */
     boolean existsByCommentIdAndUserId(Long commentId, Long userId);
 
+    int getReportsCountForComment(Long commentId);
+
 }
