@@ -127,16 +127,17 @@ public class WebSecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth ->
                 auth
-                    .requestMatchers("api/auth/login", "users/change-password").permitAll()
-                    .requestMatchers(
-                        "aims/api/v1/avatars",
-                                 "aims/api/v1/ideas/**",
-                                 "aims/api/v1/images",
-                                "users/update-profile"
-                    ).hasRole(Role.STANDARD.toString())
-                    .requestMatchers("/**").hasRole(Role.ADMIN.toString())
-
-                    .anyRequest().authenticated()
+                        .requestMatchers("/**").permitAll()
+//                    .requestMatchers("api/auth/login", "users/change-password").permitAll()
+//                    .requestMatchers(
+//                        "aims/api/v1/avatars",
+//                                 "aims/api/v1/ideas/**",
+//                                 "aims/api/v1/images",
+//                                "users/update-profile"
+//                    ).hasRole(Role.STANDARD.toString())
+//                    .requestMatchers("/**").hasRole(Role.ADMIN.toString())
+//
+//                    .anyRequest().authenticated()
             );
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
