@@ -1,8 +1,7 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.AvatarNotFoundException;
-import com.atoss.idea.management.system.repository.AvatarRepository;
-import com.atoss.idea.management.system.repository.UserRepository;
+import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
@@ -29,8 +28,11 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private final UserRepository userRepository;
-
     private final AvatarRepository avatarRepository;
+
+    private final SubscriptionRepository subscriptionRepository;
+
+    private final IdeaRepository ideaRepository;
     private final JavaMailSender emailSender;
 
     private final Configuration configuration;
@@ -57,11 +59,15 @@ public class SendEmailServiceImpl implements SendEmailService {
     public SendEmailServiceImpl(UserRepository userRepository,
                                 AvatarRepository avatarRepository,
                                 JavaMailSender emailSender,
-                                Configuration configuration) {
+                                Configuration configuration,
+                                SubscriptionRepository subscriptionRepository,
+                                IdeaRepository ideaRepository) {
         this.userRepository = userRepository;
         this.avatarRepository = avatarRepository;
         this.emailSender = emailSender;
         this.configuration = configuration;
+        this.subscriptionRepository = subscriptionRepository;
+        this.ideaRepository = ideaRepository;
     }
 
     @Override
