@@ -1,9 +1,8 @@
 package com.atoss.idea.management.system.service;
 
-import com.atoss.idea.management.system.repository.dto.CommentStatisticsDTO;
 import com.atoss.idea.management.system.repository.dto.StatisticsDTO;
 
-import java.util.List;
+
 
 public interface StatisticsService {
 

@@ -18,7 +18,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -292,11 +291,9 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException());
 
-        if(!comment.getUser().getId().equals(userId)) {
-            return false;
-        }
-        return true;
+        return comment.getUser().getId().equals(userId);
     }
+
     @Transactional
     @Override
     public void addLike(Long commentId, Long userId) {
@@ -329,7 +326,6 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteById(commentId);
     }
 
-
     @Override
     public List<UserResponseDTO> getLikesForComment(Long commentId){
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
@@ -350,11 +346,12 @@ public class CommentServiceImpl implements CommentService {
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException();
         }
-        commentRepository.deleteLikes(commentId,userId);
+        commentRepository.deleteLikes(commentId, userId);
     }
 
 
     public boolean existsByCommentIdAndUserId(Long commentId, Long userId){
-       return commentRepository.existsByCommentIdAndUserId(commentId,userId);
+       return commentRepository.existsByCommentIdAndUserId(commentId, userId);
     }
+
 }

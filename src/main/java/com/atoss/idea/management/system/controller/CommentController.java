@@ -174,11 +174,11 @@ public class CommentController {
     @DeleteMapping("/comments/like/delete/{commentId}/{userId}")
     public void deleteLikes(@PathVariable Long commentId,
                               @PathVariable Long userId) {
-        commentService.deleteLikes(commentId,userId);
+        commentService.deleteLikes(commentId, userId);
     }
 
     @GetMapping("/comments/find/{commentId}/{userId}")
-    public boolean existsByCommentIdAndUserId(@PathVariable Long commentId,@PathVariable Long userId) {
-        return commentService.existsByCommentIdAndUserId(commentId,userId);
+    public boolean existsByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
+        return commentService.existsByCommentIdAndUserId(commentId, userId);
     }
 }

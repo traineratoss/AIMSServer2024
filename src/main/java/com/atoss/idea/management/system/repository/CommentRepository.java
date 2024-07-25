@@ -18,10 +18,14 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
 
 
-    @Query(value = "SELECT c.* FROM comment c " +
-            "JOIN likes l ON c.comment_id = l.comment_id " +
-            "GROUP BY c.comment_id " +
-            "ORDER BY COUNT(l.user_id) DESC " +
+    @Query(value = "SELECT c.* FROM comment c "
+            +
+            "JOIN likes l ON c.comment_id = l.comment_id "
+            +
+            "GROUP BY c.comment_id "
+            +
+            "ORDER BY COUNT(l.user_id) DESC "
+            +
             "LIMIT 5", nativeQuery = true)
     List<Comment> findTop5CommentsByLikes();
 
@@ -155,12 +159,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Long> getRepliesAndCommentsCount(@Param("selectedDateFrom") String selectedDateFrom,
                                           @Param("selectedDateTo") String selectedDateTo);
 
-
-
     @Transactional
     @Modifying
     @Query(value="DELETE FROM likes WHERE user_id=:userId AND comment_id=:commentId",nativeQuery = true)
-    void deleteLikes(@Param("commentId")Long commentId,@Param("userId")Long userId);
+    void deleteLikes(@Param("commentId")Long commentId, @Param("userId")Long userId);
 
 
     @Query("SELECT COUNT(l) FROM User u JOIN u.likedComments l WHERE l.id = :commentId")
