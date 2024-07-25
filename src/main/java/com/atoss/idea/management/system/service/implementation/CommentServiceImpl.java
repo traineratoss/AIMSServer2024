@@ -291,14 +291,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException());
 
-<<<<<<< Updated upstream
         return comment.getUser().getId().equals(userId);
-=======
-        if(!comment.getUser().getId().equals(userId)) {
-            return false;
-        }
-        return true;
->>>>>>> Stashed changes
     }
 
     @Transactional
@@ -334,11 +327,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-<<<<<<< Updated upstream
     public List<UserResponseDTO> getLikesForComment(Long commentId){
-=======
-    public List<UserResponseDTO> getLikesForComment(Long commentId) {
->>>>>>> Stashed changes
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
         return comment.getUserList().stream()
                 .map(user -> modelMapper.map(user, UserResponseDTO.class))
