@@ -71,7 +71,7 @@ public class Idea {
                 + ", title='" + title + '\''
                 + ", status='" + status + '\''
                 + ", text='" + text + '\''
-                +", rating='" + rating + '\''
+                + ", rating='" + rating + '\''
                 + '}';
     }
 }
