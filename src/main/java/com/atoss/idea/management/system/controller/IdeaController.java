@@ -80,9 +80,9 @@ public class IdeaController {
     /**
      * Deletes an idea by a given id
      *
-     * @param id the id of the idea we want to delete
-     * @return a Response Entity containing a text that suggests the fact that we successfully
-     * deleted the idea
+     * @param       id the id of the idea we want to delete
+     * @return      a Response Entity containing a text that suggests the fact that we successfully
+     *              deleted the idea
      */
     @DeleteMapping("/delete")
     @Transactional
@@ -98,8 +98,8 @@ public class IdeaController {
      * @param pageNumber    the number of the page
      * @param sortCategory  the category we sort the ideas by
      * @param sortDirection the direction we want the ideas to be sorted by
-     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     * the page containing the list of ideas )
+     * @return              a Response Entity containing an IdeaPage DTO (the total number of ideas in all the pages +
+     *                      the page containing the list of ideas)
      */
     @Transactional
     @GetMapping("/all")
@@ -130,8 +130,8 @@ public class IdeaController {
      * @param pageNumber    the number of the page
      * @param sortCategory  the category we sort the ideas by
      * @param sortDirection the direction we want the ideas to be sorted by
-     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     * the page containing the list of ideas )
+     * @return              a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
+     *                      the page containing the list of ideas)
      */
     @Transactional
     @GetMapping("/allByUser")
@@ -172,8 +172,9 @@ public class IdeaController {
      * @param pageNumber       the number of the page
      * @param username         if not null, returns filtered ideas belonging to the specified username
      * @param sortDirection    the direction we want the ideas to be sorted by
-     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     * the page containing the list of ideas )
+     * @param rating            rating to filter the ideas
+     * @return                  a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
+     *                          the page containing the list of ideas )
      */
     @Transactional
     @GetMapping("/filter")
@@ -214,15 +215,32 @@ public class IdeaController {
         return new ResponseEntity<>(ideaService.filterIdeasByAll(title,
                 text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, rating, pageableAsc), HttpStatus.OK);
     }
-    //dummy commit
 
+    /**
+     * add a rating to a idea
+     *
+     * @param ideaId            the id of the idea to modify thhe rating
+     * @param userId            the id of the user to be modify the rating
+     * @param ratingValue        a value which is the rating of that idea for that specific user
+     * @return a Response Entity containing a response which includes the rating added for that user and idea
+     */
     @Transactional
     @PostMapping("/ratings")
-    public ResponseEntity<Rating> addOrUpdateRating(@RequestParam(required = true) Long idea_id, @RequestParam(required = true) Long user_id, @RequestParam(required = true) double ratingValue) {
-        Rating rating = ideaService.addOrUpdateRating(idea_id, user_id, ratingValue);
+    public ResponseEntity<Rating> addOrUpdateRating(
+            @RequestParam(required = true) Long ideaId,
+            @RequestParam(required = true) Long userId,
+            @RequestParam(required = true) double ratingValue) {
+        Rating rating = ideaService.addOrUpdateRating(ideaId, userId, ratingValue);
         return new ResponseEntity<>(rating, HttpStatus.OK);
     }
 
+    /**
+     * find the rating based on id an user ids
+     *
+     * @param ideaId            the id of the idea to search for it
+     * @param userId            the id of the user which we search for
+     * @return a Response Entity containing a response which includes the rating of that user for that idea
+     */
     @Transactional
     @GetMapping("/getRating")
     public ResponseEntity<Double> findByIdeaIdAndUserId(@RequestParam(required = true) Long ideaId, @RequestParam(required = true) Long userId) {
