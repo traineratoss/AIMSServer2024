@@ -16,6 +16,15 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
+    /**
+     * Deletes report associated with a specific comment and user.
+     * @param commentId the unique identifier of the comment for which reports should be deleted
+     * @param userId the unique identifier of the user associated with the reports to be deleted
+     */
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM reports WHERE user_id = :userId AND comment_id = :commentId", nativeQuery = true)
+    void deleteReport(Long commentId, Long userId);
 
     /**
      * Finds the top 5 comments with the most likes.
@@ -196,5 +205,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM User u JOIN u.likedComments l WHERE u.id = :userId AND l.id = :commentId")
     boolean existsByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
 
+    @Query("SELECT COUNT(l) FROM User u JOIN u.reportedComments l WHERE l.id = :commentId")
+    int countReportsByCommentId(@Param("commentId") Long commentId);
 
 }

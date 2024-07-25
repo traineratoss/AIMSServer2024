@@ -197,9 +197,18 @@ public class CommentController {
      */
     @Transactional
     @DeleteMapping("/comments/like/delete/{commentId}/{userId}")
-    public void deleteLikes(@PathVariable Long commentId, @PathVariable Long userId) {
+    public ResponseEntity<String> deleteLikes(@PathVariable Long commentId, @PathVariable Long userId) {
         commentService.deleteLikes(commentId, userId);
+        return new ResponseEntity<>("Like succesfully deleted", HttpStatus.OK);
     }
+
+    @Transactional
+    @DeleteMapping("/comments/report/delete/{commentId}/{userId}")
+    public  ResponseEntity<String> deleteReport(@PathVariable Long commentId, @PathVariable Long userId) {
+        commentService.deleteReport(commentId, userId);
+        return new ResponseEntity<>("Report succesfully deleted", HttpStatus.OK);
+    }
+
 
     /**
      * Checks if a specific user has liked a specific comment.
@@ -212,6 +221,13 @@ public class CommentController {
     public boolean existsByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
         return commentService.existsByCommentIdAndUserId(commentId, userId);
     }
+
+    @GetMapping("/comments/reports/count/{commentId}")
+    public ResponseEntity<Integer> getReportsCountForComment(@PathVariable Long commentId) {
+        int reportsCount = commentService.getReportsCountForComment(commentId);
+        return ResponseEntity.ok(reportsCount);
+    }
+
 
     /**
      * @param commentId the ID of the comment

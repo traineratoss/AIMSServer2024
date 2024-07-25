@@ -104,6 +104,14 @@ public interface CommentService {
     void deleteComment(Long commentId);
 
     /**
+     * Deletes reports associated with a specific comment and user.
+     * @param commentId the unique identifier of the comment whose reports are to be deleted
+     * @param userId the unique identifier of the user associated with the reports to be deleted
+     * @throws CommentNotFoundException if no comment is found with the given {@code commentId}
+     * @throws UserNotFoundException if no user is found with the given {@code userId}
+     */
+    void deleteReport(Long commentId,Long userId);
+    /**
      * Deletes a like from a specific comment by a given user.
      *
      * @param commentId the ID of the comment from which the like is to be deleted
@@ -136,6 +144,8 @@ public interface CommentService {
      * @return {@code true} if the user has liked the comment, {@code false} otherwise
      */
     boolean existsByCommentIdAndUserId(Long commentId, Long userId);
+
+    int getReportsCountForComment(Long commentId);
 
 
 
