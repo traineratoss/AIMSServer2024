@@ -96,6 +96,7 @@ public interface CommentService {
     void deleteLikes(Long commentId, Long userId);
 
     List<UserResponseDTO> getLikesForComment(Long commentId);
+
     int getLikesCountForComment(Long commentId);
 
     boolean existsByCommentIdAndUserId(Long commentId, Long userId);

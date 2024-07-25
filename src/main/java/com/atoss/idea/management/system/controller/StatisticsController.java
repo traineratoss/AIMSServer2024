@@ -1,6 +1,5 @@
 package com.atoss.idea.management.system.controller;
 
-
 import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.dto.StatisticsDTO;

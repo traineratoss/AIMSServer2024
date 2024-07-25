@@ -2,7 +2,6 @@ package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.exception.*;
 import com.atoss.idea.management.system.repository.dto.*;
-import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.service.UserService;
 import jakarta.transaction.Transactional;
