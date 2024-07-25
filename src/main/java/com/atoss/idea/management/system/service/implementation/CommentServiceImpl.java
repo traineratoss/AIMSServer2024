@@ -66,7 +66,7 @@ public class CommentServiceImpl implements CommentService {
      * @throws CommentNotFoundException if the comment with the specified ID is not found
      */
 
-   @Override
+    @Override
     public String getTimeForComment(Long id) {
         Optional<Comment> commentOptional = commentRepository.findById(id);
 
@@ -345,9 +345,9 @@ public class CommentServiceImpl implements CommentService {
      * @return a {@link Page} of {@link ResponseCommentDTO} containing comments associated with the specified idea
      * @throws IdeaNotFoundException if the idea with the specified ID does not exist
      */
+
     @Override
     public Page<ResponseCommentDTO> getAllPagedCommentsByIdeaId(Long ideaId, Pageable pageable) {
-
         if (!ideaRepository.existsById(ideaId)) {
             throw new IdeaNotFoundException();
         }
@@ -521,6 +521,8 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteLikes(commentId, userId);
     }
 
+
+
     /**
      * Checks if a specific user has liked a particular comment.
      * <p>
@@ -532,8 +534,8 @@ public class CommentServiceImpl implements CommentService {
      * @return {@code true} if the user has liked the comment, {@code false} otherwise
      */
     @Override
-    public boolean existsByCommentIdAndUserId(Long commentId, Long userId){
-       return commentRepository.existsByCommentIdAndUserId(commentId, userId);
+    public boolean existsByCommentIdAndUserId(Long commentId, Long userId) {
+        return commentRepository.existsByCommentIdAndUserId(commentId, userId);
     }
 
 }
