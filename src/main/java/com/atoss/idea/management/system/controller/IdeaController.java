@@ -214,7 +214,7 @@ public class IdeaController {
         return new ResponseEntity<>(ideaService.filterIdeasByAll(title,
                 text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, rating, pageableAsc), HttpStatus.OK);
     }
-
+    //dummy commit
 
     @Transactional
     @PostMapping("/ratings")
