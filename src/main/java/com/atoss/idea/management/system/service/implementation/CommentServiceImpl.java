@@ -521,23 +521,21 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteLikes(commentId, userId);
     }
 
-<<<<<<< Updated upstream
-    public boolean existsByCommentIdAndUserId(Long commentId, Long userId) {
-=======
-    /**
-     * Checks if a specific user has liked a particular comment.
-     * <p>
-     * This method verifies whether a like exists from the user for the specified comment.
-     * </p>
-     *
-     * @param commentId the ID of the comment to check for likes
-     * @param userId the ID of the user to check for the like
-     * @return {@code true} if the user has liked the comment, {@code false} otherwise
-     */
-    @Override
-    public boolean existsByCommentIdAndUserId(Long commentId, Long userId){
->>>>>>> Stashed changes
-       return commentRepository.existsByCommentIdAndUserId(commentId, userId);
-    }
+
+        /**
+         * Checks if a specific user has liked a particular comment.
+         * <p>
+         * This method verifies whether a like exists from the user for the specified comment.
+         * </p>
+         *
+         * @param commentId the ID of the comment to check for likes
+         * @param userId the ID of the user to check for the like
+         * @return {@code true} if the user has liked the comment, {@code false} otherwise
+         */
+
+        @Override
+        public boolean existsByCommentIdAndUserId(Long commentId, Long userId){
+            return commentRepository.existsByCommentIdAndUserId(commentId, userId);
+        }
 
 }

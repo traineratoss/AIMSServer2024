@@ -54,6 +54,11 @@ public class Comment {
     @JsonIgnoreProperties("likedComments")
     private List<User> userList;
 
+
+    @ManyToMany(mappedBy = "reportedComments")
+    @JsonIgnoreProperties("reportedComments")
+    private List<User> listOfUsers;
+
     /**
      * Sets the text of the comment.
      *
