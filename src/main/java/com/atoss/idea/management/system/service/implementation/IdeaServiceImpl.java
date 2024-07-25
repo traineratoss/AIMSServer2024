@@ -314,7 +314,7 @@ public class IdeaServiceImpl implements IdeaService {
                                                   String selectedDateTo,
                                                   String sortDirection,
                                                   String username,
-                                                  String rating,
+                                                  String ratingAvg,
                                                   Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
@@ -348,14 +348,8 @@ public class IdeaServiceImpl implements IdeaService {
         if (categories != null && !categories.isEmpty()) {
             predicatesList.add(root.join("categoryList").get("text").in(categories));
         }
-        if (rating != null && !rating.isEmpty()) {
-            double ratingValue;
-            try {
-                ratingValue = Double.parseDouble(rating);
-            } catch (NumberFormatException e) {
-                throw new FieldValidationException("Invalid rating value.");
-            }
-            predicatesList.add(cb.greaterThan(root.join("rating").get("rating"), ratingValue));
+        if (ratingAvg != null) {
+            predicatesList.add(cb.equal(root.get("ratingAvg"), ratingAvg));
         }
         predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
         List<Order> orders = new ArrayList<>();

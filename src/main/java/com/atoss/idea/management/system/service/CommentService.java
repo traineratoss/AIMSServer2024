@@ -95,6 +95,8 @@ public interface CommentService {
 
 
     List<UserResponseDTO> getLikesForComment(Long commentId);
-    public int getLikesCountForComment(Long commentId);
+    int getLikesCountForComment(Long commentId);
+
+    boolean existsByCommentIdAndUserId(Long commentId, Long userId);
 
 }

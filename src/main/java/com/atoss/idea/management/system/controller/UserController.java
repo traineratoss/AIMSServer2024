@@ -411,7 +411,18 @@ public class UserController {
         return userService.getIdByUsername(username);
     }
 
-
-
+    /**
+     * Resets the user's state if the change password process is aborted.
+     *
+     * @param changePasswordDTO
+     * @return Returns HttpStatus.OK if the request is successful.
+     * @throws UserNotFoundException if the user is not found in the database
+     * @see UserService#abortChangePassword(ChangePasswordDTO)
+     */
+    @PostMapping("/change-password/abort")
+    public ResponseEntity<Object> abortChangePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        userService.abortChangePassword(changePasswordDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }

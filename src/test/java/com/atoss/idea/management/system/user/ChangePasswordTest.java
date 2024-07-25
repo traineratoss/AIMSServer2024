@@ -72,11 +72,12 @@ public class ChangePasswordTest {
 
         changePasswordDTO.setUsername("username");
         changePasswordDTO.setNewPassword("newpass");
-
+        changePasswordDTO.setOldPassword("oldpass");
 
         User user = new User();
         user.setUsername(changePasswordDTO.getUsername());
-
+        user.setPassword(BCrypt.hashpw(changePasswordDTO.getOldPassword(), bcryptSalt));
+        user.setIsFirstLogin(false);
 
         ReflectionTestUtils.setField(spyUserService, "bcryptSalt", bcryptSalt);
 
@@ -90,5 +91,28 @@ public class ChangePasswordTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
+    @Test
+    void testChangePasswordIncorrectOldPassword() {
+        ChangePasswordDTO changePasswordDTO = new ChangePasswordDTO();
 
+        changePasswordDTO.setUsername("username");
+        changePasswordDTO.setNewPassword("newpass");
+        changePasswordDTO.setOldPassword("oldpass");
+
+        User user = new User();
+        user.setUsername(changePasswordDTO.getUsername());
+        user.setPassword(BCrypt.hashpw(changePasswordDTO.getOldPassword() + "a", bcryptSalt));
+        user.setIsFirstLogin(false);
+
+        ReflectionTestUtils.setField(spyUserService, "bcryptSalt", bcryptSalt);
+
+        Mockito.when(mockUserRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+        Mockito.when(mockUserRepository.save(any(User.class))).thenReturn(user);
+
+        ResponseEntity<Object> response = spyUserController.changePassword(changePasswordDTO);
+
+        Mockito.verify(spyUserController).changePassword(changePasswordDTO);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
 }

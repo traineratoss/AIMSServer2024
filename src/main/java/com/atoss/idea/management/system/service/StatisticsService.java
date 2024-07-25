@@ -1,6 +1,9 @@
 package com.atoss.idea.management.system.service;
 
+import com.atoss.idea.management.system.repository.dto.CommentStatisticsDTO;
 import com.atoss.idea.management.system.repository.dto.StatisticsDTO;
+
+import java.util.List;
 
 public interface StatisticsService {
 
@@ -44,6 +47,5 @@ public interface StatisticsService {
      */
     StatisticsDTO getStatisticsByDate(String selectedDateFrom,
                                       String selectedDateTo);
-
 
 }
