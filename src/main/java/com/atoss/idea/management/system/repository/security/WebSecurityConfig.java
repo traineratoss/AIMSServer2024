@@ -95,6 +95,19 @@ public class WebSecurityConfig {
     }
 
     /**
+     * Creates a custom AuthenticationSuccessHandler bean for handling successful authentication events.
+     *
+     * @return An AuthenticationSuccessHandler object for handling successful authentication events.
+     *
+     * @see AuthenticationSuccessHandler
+     * @see CustomAuthenticationSuccessHandler
+     */
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return new CustomAuthenticationSuccessHandler();
+    }
+
+    /**
      * Configures the security filter chain for HTTP requests.
      *
      * @param http The HttpSecurity object used for configuring the security filter chain.
@@ -111,31 +124,22 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            //            .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth ->
-                        auth
-                                .requestMatchers(HttpMethod.OPTIONS, "users/allUsers").hasRole(Role.ADMIN.toString())
-                                .requestMatchers("**")
-                                .permitAll()
-                                .anyRequest()
-                                .authenticated()
+                auth
+                    .requestMatchers("api/auth/login", "users/change-password").permitAll()
+                    .requestMatchers(
+                        "aims/api/v1/avatars",
+                                 "aims/api/v1/ideas/**",
+                                 "aims/api/v1/images",
+                                "users/update-profile"
+                    ).hasRole(Role.STANDARD.toString())
+                    .requestMatchers("/**").hasRole(Role.ADMIN.toString())
+
+                    .anyRequest().authenticated()
             );
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
-    }
-
-    /**
-     * Creates a custom AuthenticationSuccessHandler bean for handling successful authentication events.
-     *
-     * @return An AuthenticationSuccessHandler object for handling successful authentication events.
-     *
-     * @see AuthenticationSuccessHandler
-     * @see CustomAuthenticationSuccessHandler
-     */
-    @Bean
-    public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new CustomAuthenticationSuccessHandler();
     }
 }
