@@ -80,6 +80,10 @@ public class User {
     @JsonManagedReference
     private List<Rating> rating;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Subscription> isSubscribed;
+
 
     /**
      * Constructor for creating a User object with the provided username and email.
