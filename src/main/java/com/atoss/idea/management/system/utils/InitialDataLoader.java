@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
+
 import java.io.File;
 import java.security.SecureRandom;
 import java.io.IOException;
@@ -53,12 +54,12 @@ public class InitialDataLoader implements CommandLineRunner {
     /**
      * CONSTRUCTOR - save entity in repository
      *
-     * @param avatarRepository for saving a new entity of Avatar
-     * @param userRepository for saving a new entity of User
+     * @param avatarRepository   for saving a new entity of Avatar
+     * @param userRepository     for saving a new entity of User
      * @param categoryRepository for saving a new entity of Category
-     * @param imageRepository for saving a new entity of Image
-     * @param commentRepository for saving a new entity of Comment
-     * @param ideaRepository for saving a new entity of Idea
+     * @param imageRepository    for saving a new entity of Image
+     * @param commentRepository  for saving a new entity of Comment
+     * @param ideaRepository     for saving a new entity of Idea
      */
 
     public InitialDataLoader(AvatarRepository avatarRepository,
@@ -85,13 +86,13 @@ public class InitialDataLoader implements CommandLineRunner {
         // Avatar CONSTRUCTOR
         if (ddlValue.equals("create")) {
             String[] avatarFileNames = {
-                "avatar1.svg",
-                "avatar2.svg",
-                "avatar3.svg",
-                "avatar4.svg",
-                "avatar5.svg",
-                "avatar6.svg",
-                "avatar7.svg"
+                    "avatar1.svg",
+                    "avatar2.svg",
+                    "avatar3.svg",
+                    "avatar4.svg",
+                    "avatar5.svg",
+                    "avatar6.svg",
+                    "avatar7.svg"
             };
             ArrayList<Avatar> avatarList = new ArrayList<>();
 
@@ -165,13 +166,13 @@ public class InitialDataLoader implements CommandLineRunner {
 
             //Image CONSTRUCTOR
             String[] imageFileNames = {
-                "img.png",
-                "img2.png",
-                "img3.png",
-                "img4.png",
-                "img5.png",
-                "img6.png",
-                "img7.png"
+                    "img.png",
+                    "img2.png",
+                    "img3.png",
+                    "img4.png",
+                    "img5.png",
+                    "img6.png",
+                    "img7.png"
             };
 
             ArrayList<Image> imageList = new ArrayList<>();
@@ -287,7 +288,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 String title = "New Idea " + k;
                 String text = "World changing idea number " + k + ". Waiting on opinions!";
                 Idea idea = createIdea(randomElementFromList(userList), randomEnum(Status.class), text, title,
-                        image5, randomDateFromList(randomDateList(30)),  randomElementFromList(categoryMatrix));
+                        image5, randomDateFromList(randomDateList(30)), randomElementFromList(categoryMatrix));
                 ideaList.add(idea);
                 ideaRepository.save(idea);
                 k++;
@@ -325,9 +326,10 @@ public class InitialDataLoader implements CommandLineRunner {
         }
     }
 
-    /** generate child date after parent date
+    /**
+     * generate child date after parent date
      *
-      * @param minDate date of parent (need to be earlier that child date)
+     * @param minDate date of parent (need to be earlier that child date)
      * @return randomDate after parent randomDate
      */
     private Date randomDateAfter(Date minDate) {
@@ -403,7 +405,7 @@ public class InitialDataLoader implements CommandLineRunner {
      * random generic
      *
      * @param randomList - generic list
-     * @param <T> generic type
+     * @param <T>        generic type
      * @return random generic entity
      */
 
@@ -421,15 +423,15 @@ public class InitialDataLoader implements CommandLineRunner {
     /**
      * CONSTRUCTOR - create new User
      *
-     * @param isActive - describe if user have or not an active account
-     * @param role - admin or standard
-     * @param avatar - profile photo
-     * @param email - unique entity
-     * @param username - unique entity
-     * @param fullName - name of user
+     * @param isActive     - describe if user have or not an active account
+     * @param role         - admin or standard
+     * @param avatar       - profile photo
+     * @param email        - unique entity
+     * @param username     - unique entity
+     * @param fullName     - name of user
      * @param hashPassword - encrypted password
-     * @param hasPassword - describes the difference between accepted/declined request for create an account
-     *                    (if user was declined, he doesn't have a password)
+     * @param hasPassword  - describes the difference between accepted/declined request for create an account
+     *                     (if user was declined, he doesn't have a password)
      * @param isFirstLogin - check if the user's login is for the first time
      * @return user
      */
@@ -454,7 +456,7 @@ public class InitialDataLoader implements CommandLineRunner {
      * random function for status (create idea)
      *
      * @param clazz enum class
-     * @param <T> one entity of enum
+     * @param <T>   one entity of enum
      * @return one entity from that enum
      */
 
@@ -525,12 +527,12 @@ public class InitialDataLoader implements CommandLineRunner {
     /**
      * CONSTRUCTOR - create new Idea
      *
-     * @param user -author of idea
-     * @param status - DRAFT/OPEN/IMPLEMENTED
-     * @param text - text of idea
-     * @param title - title of idea
-     * @param image - image name
-     * @param date - create date
+     * @param user       -author of idea
+     * @param status     - DRAFT/OPEN/IMPLEMENTED
+     * @param text       - text of idea
+     * @param title      - title of idea
+     * @param image      - image name
+     * @param date       - create date
      * @param categories - list of categories
      * @return idea
      */
@@ -553,11 +555,11 @@ public class InitialDataLoader implements CommandLineRunner {
     /**
      * CONSTRUCTOR - create new Reply
      *
-     * @param date - create date
+     * @param date      - create date
      * @param commentId - id the unique identifier of the comment (parent of reply)
-     * @param ideaId  - id the unique identifier of the reply
-     * @param user - author of comment
-     * @param text - reply text
+     * @param ideaId    - id the unique identifier of the reply
+     * @param user      - author of comment
+     * @param text      - reply text
      * @return reply
      */
 
@@ -576,11 +578,11 @@ public class InitialDataLoader implements CommandLineRunner {
     /**
      * CONSTRUCTOR - create new Comment
      *
-     * @param date - create date
-     * @param ideaId  - id the unique identifier of the idea
+     * @param date     - create date
+     * @param ideaId   - id the unique identifier of the idea
      * @param parentId - just reply can have this parameter not null
-     * @param user - author of reply
-     * @param text - reply text
+     * @param user     - author of reply
+     * @param text     - reply text
      * @return comment
      */
 

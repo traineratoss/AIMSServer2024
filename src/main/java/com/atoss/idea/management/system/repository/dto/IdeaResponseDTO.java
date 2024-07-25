@@ -1,6 +1,5 @@
 package com.atoss.idea.management.system.repository.dto;
 
-import com.atoss.idea.management.system.repository.entity.Rating;
 import com.atoss.idea.management.system.repository.entity.Status;
 import lombok.Data;
 
@@ -32,7 +31,7 @@ public class IdeaResponseDTO {
 
     private String elapsedTime;
 
-    private List<Rating> rating;
-
+    //private List<Rating> rating;
+    private Double ratingAvg;
 }
 

@@ -165,8 +165,8 @@ public class CommentController {
 
     @Transactional
     @PostMapping("/comments/like/{comment_id}/{user_id}")
-    public ResponseEntity<String> addLike(@PathVariable Long comment_id, @PathVariable Long user_id) {
-        commentService.addLike(comment_id, user_id);
+    public ResponseEntity<String> addLike(@PathVariable Long commentId, @PathVariable Long userId) {
+        commentService.addLike(commentId, userId);
         return new ResponseEntity<>("Like added successfully", HttpStatus.OK);
     }
 
@@ -174,7 +174,11 @@ public class CommentController {
     @DeleteMapping("/comments/like/delete/{commentId}/{userId}")
     public void deleteLikes(@PathVariable Long commentId,
                               @PathVariable Long userId) {
-        commentService.deleteLikes(commentId,userId);
+        commentService.deleteLikes(commentId, userId);
     }
 
+    @GetMapping("/comments/find/{commentId}/{userId}")
+    public boolean existsByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
+        return commentService.existsByCommentIdAndUserId(commentId, userId);
+    }
 }

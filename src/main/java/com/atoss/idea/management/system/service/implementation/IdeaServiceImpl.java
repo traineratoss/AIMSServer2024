@@ -17,7 +17,6 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +62,7 @@ public class IdeaServiceImpl implements IdeaService {
      * @param ideaRepository     repository for the Idea Entity
      * @param imageRepository    repository for the Image Entity
      * @param userRepository     repository for the User Entity
+     * @param ratingRepository   repository for Rating Entity
      * @param categoryRepository repository for the Category Entity
      * @param modelMapper        responsible for mapping our entities
      * @param commentServiceImpl ======
@@ -314,7 +314,7 @@ public class IdeaServiceImpl implements IdeaService {
                                                   String selectedDateTo,
                                                   String sortDirection,
                                                   String username,
-                                                  String rating,
+                                                  String ratingAvg,
                                                   Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
@@ -348,14 +348,8 @@ public class IdeaServiceImpl implements IdeaService {
         if (categories != null && !categories.isEmpty()) {
             predicatesList.add(root.join("categoryList").get("text").in(categories));
         }
-        if (rating != null && !rating.isEmpty()) {
-            double ratingValue;
-            try {
-                ratingValue = Double.parseDouble(rating);
-            } catch (NumberFormatException e) {
-                throw new FieldValidationException("Invalid rating value.");
-            }
-            predicatesList.add(cb.greaterThan(root.join("rating").get("rating"), ratingValue));
+        if (ratingAvg != null) {
+            predicatesList.add(cb.equal(root.get("ratingAvg"), ratingAvg));
         }
         predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
         List<Order> orders = new ArrayList<>();
@@ -450,27 +444,21 @@ public class IdeaServiceImpl implements IdeaService {
 
 
     @Override
-    public Rating addOrUpdateRating(Long idea_id, Long user_id, Double ratingValue) {
-        Idea idea = ideaRepository.findById(idea_id).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
-        User user = userRepository.findById(user_id).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
-        Rating rating = ratingRepository.findByIdeaIdAndUserId(idea_id, user_id).orElse(new Rating());
+    public Rating addOrUpdateRating(Long ideaId, Long userId, Double ratingValue) {
+        Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
+        Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElse(new Rating());
         rating.setIdea(idea);
         rating.setUser(user);
         rating.setRating(ratingValue);
         Rating ratingRepositorySave = ratingRepository.save(rating);
-        idea.setRatingAvg(getAverage(idea_id));
+        idea.setRatingAvg(getAverage(ideaId));
         return ratingRepositorySave;
     }
 
     @Override
-    public List<Rating> getRatingById(Long id) {
-        Idea idea = ideaRepository.findById(id).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
-        return ratingRepository.findByIdea(idea);
-    }
-
-    @Override
-    public Double getAverage(Long idea_id) {
-        List<Rating> ratings = ratingRepository.findByIdeaId(idea_id);
+    public Double getAverage(Long ideaId) {
+        List<Rating> ratings = ratingRepository.findByIdeaId(ideaId);
         Double sum = 0D;
         Double count = 0D;
         for (Rating rate : ratings) {
@@ -478,6 +466,11 @@ public class IdeaServiceImpl implements IdeaService {
             count++;
         }
         return sum / count;
+    }
 
+    @Override
+    public Double getRatingByUserAndByIdea(Long ideaId, Long userId) {
+        Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElseThrow(() -> new IdeaNotFoundException("Not found"));
+        return rating.getRating();
     }
 }

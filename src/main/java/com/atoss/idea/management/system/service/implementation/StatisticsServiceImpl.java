@@ -274,26 +274,4 @@ public class StatisticsServiceImpl implements StatisticsService {
         return filteredStatisticsDTO;
     }
 
-//    @Override
-//    public List<CommentStatisticsDTO> findTopCommentsByLikes(){
-//        List<Comment> topComments = commentRepository.findTop5CommentsByLikes();
-//
-//
-//        List<CommentStatisticsDTO> commentStatisticsDTOList = topComments.stream()
-//                .map(comment -> {
-//                    CommentStatisticsDTO dto = new CommentStatisticsDTO();
-//                    dto.setCommentText(comment.getCommentText());
-//                    dto.setNrLikes(commentRepository.countLikesByCommentId(comment.getId()));
-//                    return dto;
-//                })
-//                .collect(Collectors.toList());
-//
-//        commentStatisticsDTOList.forEach(commentStatisticsDTO ->
-//                System.out.println(commentStatisticsDTO.getNrLikes()));
-//
-//
-//
-//        return commentStatisticsDTOList;
-//    }
-
 }

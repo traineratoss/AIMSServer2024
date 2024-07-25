@@ -21,6 +21,7 @@ public interface CommentService {
      * @throws CommentNotFoundException when the id is not found in the database
      */
     void addLike(Long commentId, Long userId);
+
     String getTimeForComment(Long id);
 
     /**
@@ -91,10 +92,13 @@ public interface CommentService {
      * @throws CommentNotFoundException when the comment id is not found in the database
      */
     void deleteComment(Long commentId);
-    void deleteLikes(Long commentId,Long userId);
 
+    void deleteLikes(Long commentId, Long userId);
 
     List<UserResponseDTO> getLikesForComment(Long commentId);
-    public int getLikesCountForComment(Long commentId);
+
+    int getLikesCountForComment(Long commentId);
+
+    boolean existsByCommentIdAndUserId(Long commentId, Long userId);
 
 }

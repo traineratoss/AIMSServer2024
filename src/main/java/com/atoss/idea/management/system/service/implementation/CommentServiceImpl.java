@@ -291,11 +291,11 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException());
 
-        if(!comment.getUser().getId().equals(userId)) {
-            return false;
-        }
-        return true;
+
+        return comment.getUser().getId().equals(userId);
+
     }
+
     @Transactional
     @Override
     public void addLike(Long commentId, Long userId) {
@@ -328,9 +328,9 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteById(commentId);
     }
 
-
     @Override
-    public List<UserResponseDTO> getLikesForComment(Long commentId){
+    public List<UserResponseDTO> getLikesForComment(Long commentId) {
+
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("Comment not found"));
         return comment.getUserList().stream()
                 .map(user -> modelMapper.map(user, UserResponseDTO.class))
@@ -342,13 +342,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteLikes(Long commentId, Long userId){
+    public void deleteLikes(Long commentId, Long userId) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException();
         }
-        commentRepository.deleteLikes(commentId,userId);
+        commentRepository.deleteLikes(commentId, userId);
     }
+
+    public boolean existsByCommentIdAndUserId(Long commentId, Long userId) {
+       return commentRepository.existsByCommentIdAndUserId(commentId, userId);
+    }
+
 }

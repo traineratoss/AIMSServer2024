@@ -54,13 +54,11 @@ public class Comment {
     @JsonIgnoreProperties("likedComments")
     private List<User> userList;
 
-    public void setCommentText(String comment)
-    {
-        this.commentText=comment;
+    public void setCommentText(String comment) {
+        this.commentText = comment;
     }
 
-    public String getCommentText()
-    {
+    public String getCommentText() {
         return this.commentText;
     }
 
