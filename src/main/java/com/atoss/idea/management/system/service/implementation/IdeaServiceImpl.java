@@ -17,7 +17,6 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -469,8 +468,8 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public Double getRatingByUserAndByIdea(Long ideaId, Long userId){
-        Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElseThrow(()-> new IdeaNotFoundException("Not found"));
+    public Double getRatingByUserAndByIdea(Long ideaId, Long userId) {
+        Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElseThrow(() -> new IdeaNotFoundException("Not found"));
         return rating.getRating();
     }
 }

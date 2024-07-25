@@ -34,11 +34,11 @@ public class Rating {
 
     @Override
     public String toString() {
-        return "Rating{" +
-                "id=" + id +
-                ", idea=" + idea +
-                ", user=" + user +
-                ", rating=" + rating +
-                '}';
+        return "Rating{"
+                + "id=" + id
+                + ", idea=" + idea
+                + ", user=" + user
+                + ", rating=" + rating
+                + '}';
     }
 }
