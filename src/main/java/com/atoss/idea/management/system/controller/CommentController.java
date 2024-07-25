@@ -151,32 +151,63 @@ public class CommentController {
     }
 
 
+    /**
+     * Retrieves the list of users who liked a specific comment.
+     *
+     * @param commentId the ID of the comment
+     * @return ResponseEntity containing the list of UserResponseDTOs who liked the comment
+     */
     @GetMapping("/comments/{commentId}/likes")
     public ResponseEntity<List<UserResponseDTO>> getLikesForComment(@PathVariable Long commentId) {
         List<UserResponseDTO> likes = commentService.getLikesForComment(commentId);
         return ResponseEntity.ok(likes);
     }
 
+    /**
+     * Retrieves the count of likes for a specific comment.
+     *
+     * @param commentId the ID of the comment
+     * @return ResponseEntity containing the count of likes
+     */
     @GetMapping("/comments/{commentId}/likes/count")
     public ResponseEntity<Integer> getLikesCountForComment(@PathVariable Long commentId) {
         int likesCount = commentService.getLikesCountForComment(commentId);
         return ResponseEntity.ok(likesCount);
     }
 
+    /**
+     * Adds a like to a specific comment from a specific user.
+     *
+     * @param commentId the ID of the comment
+     * @param userId    the ID of the user
+     * @return ResponseEntity containing a success message
+     */
     @Transactional
-    @PostMapping("/comments/like/{comment_id}/{user_id}")
+    @PostMapping("/comments/like/{commentId}/{userId}")
     public ResponseEntity<String> addLike(@PathVariable Long commentId, @PathVariable Long userId) {
         commentService.addLike(commentId, userId);
         return new ResponseEntity<>("Like added successfully", HttpStatus.OK);
     }
 
+    /**
+     * Deletes a like from a specific comment by a specific user.
+     *
+     * @param commentId the ID of the comment
+     * @param userId    the ID of the user
+     */
     @Transactional
     @DeleteMapping("/comments/like/delete/{commentId}/{userId}")
-    public void deleteLikes(@PathVariable Long commentId,
-                              @PathVariable Long userId) {
+    public void deleteLikes(@PathVariable Long commentId, @PathVariable Long userId) {
         commentService.deleteLikes(commentId, userId);
     }
 
+    /**
+     * Checks if a specific user has liked a specific comment.
+     *
+     * @param commentId the ID of the comment
+     * @param userId    the ID of the user
+     * @return true if the user has liked the comment, false otherwise
+     */
     @GetMapping("/comments/find/{commentId}/{userId}")
     public boolean existsByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
         return commentService.existsByCommentIdAndUserId(commentId, userId);

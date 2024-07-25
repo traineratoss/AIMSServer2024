@@ -26,11 +26,11 @@
                     has been reactivated, effective immediately as of
                     <span>${date}</span>.
                     <br>
-                    Your account was previously deactivated due to your departure from <b>${companyName}</b>.
+                    Your account was previously deactivated due to you company. As per our internal policies, user accounts are deactivated when an employee leaves the company to ensure the security and integrity of our platform.
                     <br>
-                    However, we are thrilled to welcome you back as you have returned to our company. As per our internal policies, user accounts are deactivated when an employee leaves the company to ensure the security and integrity of our platform.
-                    <br>
-                    With the reactivation of your account, you will once again have full access to all the features and services offered on our platform. <br> Your data and previous interactions have been securely restored, ensuring a seamless experience as you resume using our platform.
+                    With the reactivation of your account, you will once again have full access tr departure from <b>${companyName}</b>.
+                                                                                                                     <br>
+                                                                                                                     However, we are thrilled to welcome you back as you have returned to ouro all the features and services offered on our platform. <br> Your data and previous interactions have been securely restored, ensuring a seamless experience as you resume using our platform.
                 </p>
                 <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 50%; margin-left:20px;">
                      <p style="font-size: 16px; line-height: 1.5; margin: 5px;">

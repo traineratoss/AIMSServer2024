@@ -10,8 +10,22 @@ import java.util.Optional;
 
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Long> {
-    Optional<Rating> findByIdeaIdAndUserId(Long idea_id, Long user_id);
 
+    /**
+     * Returns the idea rating of the user id and idea id
+     *
+     * @param ideaId the id of the idea
+     * @param userId the id of the user
+     * @return the rating of that specific idea of that specific user
+     */
+    Optional<Rating> findByIdeaIdAndUserId(Long ideaId, Long userId);
+
+    /**
+     * Returns rating
+     *
+     * @param id the id of the idea
+     * @return the rating of that specific idea by id
+     */
     List<Rating> findByIdeaId(Long id);
 
 }

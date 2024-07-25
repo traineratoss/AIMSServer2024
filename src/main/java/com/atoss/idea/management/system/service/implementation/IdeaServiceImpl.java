@@ -62,6 +62,7 @@ public class IdeaServiceImpl implements IdeaService {
      * @param ideaRepository     repository for the Idea Entity
      * @param imageRepository    repository for the Image Entity
      * @param userRepository     repository for the User Entity
+     * @param ratingRepository   repository for Rating Entity
      * @param categoryRepository repository for the Category Entity
      * @param modelMapper        responsible for mapping our entities
      * @param commentServiceImpl ======
@@ -443,21 +444,21 @@ public class IdeaServiceImpl implements IdeaService {
 
 
     @Override
-    public Rating addOrUpdateRating(Long idea_id, Long user_id, Double ratingValue) {
-        Idea idea = ideaRepository.findById(idea_id).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
-        User user = userRepository.findById(user_id).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
-        Rating rating = ratingRepository.findByIdeaIdAndUserId(idea_id, user_id).orElse(new Rating());
+    public Rating addOrUpdateRating(Long ideaId, Long userId, Double ratingValue) {
+        Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
+        Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElse(new Rating());
         rating.setIdea(idea);
         rating.setUser(user);
         rating.setRating(ratingValue);
         Rating ratingRepositorySave = ratingRepository.save(rating);
-        idea.setRatingAvg(getAverage(idea_id));
+        idea.setRatingAvg(getAverage(ideaId));
         return ratingRepositorySave;
     }
 
     @Override
-    public Double getAverage(Long idea_id) {
-        List<Rating> ratings = ratingRepository.findByIdeaId(idea_id);
+    public Double getAverage(Long ideaId) {
+        List<Rating> ratings = ratingRepository.findByIdeaId(ideaId);
         Double sum = 0D;
         Double count = 0D;
         for (Rating rate : ratings) {
