@@ -178,7 +178,7 @@ public class CommentServiceImpl implements CommentService {
 
         Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).orElseThrow(() -> new IdeaNotFoundException("Idea not found!"));
 
-        Comment newComment =  new Comment();
+        Comment newComment = new Comment();
         String wordsFilePath = "textTerms/badWords.txt";
         URL resourceUrl = classLoader.getResource(wordsFilePath);
         if (resourceUrl != null) {
@@ -216,7 +216,7 @@ public class CommentServiceImpl implements CommentService {
 
         java.util.Date creationDate = new java.util.Date();
 
-        Comment newReply =  new Comment();
+        Comment newReply = new Comment();
 
         newReply.setUser(user);
         newReply.setIdea(null);
@@ -337,6 +337,7 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public int getLikesCountForComment(Long commentId) {
         return commentRepository.countLikesByCommentId(commentId);
     }
@@ -352,8 +353,9 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteLikes(commentId, userId);
     }
 
+    @Override
     public boolean existsByCommentIdAndUserId(Long commentId, Long userId) {
-       return commentRepository.existsByCommentIdAndUserId(commentId, userId);
+        return commentRepository.existsByCommentIdAndUserId(commentId, userId);
     }
 
 }
