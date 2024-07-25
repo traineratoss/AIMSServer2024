@@ -22,6 +22,8 @@ public class IdeaRequestDTO {
 
     private Date creationDate;
 
-    private List<Rating> rating;
+    //private List<Rating> rating;
+
+    private Double ratingAvg;
 
 }

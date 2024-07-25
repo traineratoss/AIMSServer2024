@@ -463,12 +463,6 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public List<Rating> getRatingById(Long id) {
-        Idea idea = ideaRepository.findById(id).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
-        return ratingRepository.findByIdea(idea);
-    }
-
-    @Override
     public Double getAverage(Long idea_id) {
         List<Rating> ratings = ratingRepository.findByIdeaId(idea_id);
         Double sum = 0D;
@@ -478,6 +472,11 @@ public class IdeaServiceImpl implements IdeaService {
             count++;
         }
         return sum / count;
+    }
 
+    @Override
+    public Double getRatingByUserAndByIdea(Long ideaId, Long userId){
+        Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElseThrow(()-> new IdeaNotFoundException("Not found"));
+        return rating.getRating();
     }
 }

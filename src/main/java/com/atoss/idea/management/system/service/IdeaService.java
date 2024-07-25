@@ -132,7 +132,7 @@ public interface IdeaService {
 
     Rating addOrUpdateRating(Long idea_id, Long used_id, Double ratingValue);
 
-    List<Rating> getRatingById(Long id);
-
     Double getAverage(Long idea_id);
+
+    Double getRatingByUserAndByIdea(Long userId, Long ideaId);
 }

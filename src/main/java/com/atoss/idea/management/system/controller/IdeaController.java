@@ -225,8 +225,7 @@ public class IdeaController {
 
     @Transactional
     @GetMapping("/getRating")
-    public ResponseEntity<List<Rating>> getRatingById(@RequestParam(required = true) Long id) {
-        List<Rating> ratings = ideaService.getRatingById(id);
-        return new ResponseEntity<>(ratings, HttpStatus.OK);
+    public ResponseEntity<Double> findByIdeaIdAndUserId(@RequestParam(required = true) Long ideaId, @RequestParam(required = true) Long userId) {
+        return new ResponseEntity<>(ideaService.getRatingByUserAndByIdea(ideaId, userId), HttpStatus.OK);
     }
 }
