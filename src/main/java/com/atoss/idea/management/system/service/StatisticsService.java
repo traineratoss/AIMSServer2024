@@ -2,7 +2,10 @@ package com.atoss.idea.management.system.service;
 
 import com.atoss.idea.management.system.repository.dto.StatisticsDTO;
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 public interface StatisticsService {
 
