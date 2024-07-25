@@ -1,7 +1,6 @@
 package com.atoss.idea.management.system.user;
 
-import com.atoss.idea.management.system.repository.AvatarRepository;
-import com.atoss.idea.management.system.repository.UserRepository;
+import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
@@ -36,6 +35,12 @@ public class SendEmailTest {
 
     @Mock
     AvatarRepository mockAvatarRepository;
+
+    @Mock
+    SubscriptionRepository mockSubscriptionRepository;
+
+    @Mock
+    IdeaRepository mockIdeaRepository;
 
     JavaMailSenderImpl spyJavaMailSender;
 
@@ -74,7 +79,9 @@ public class SendEmailTest {
                 mockUserRepository,
                 mockAvatarRepository,
                 spyJavaMailSender,
-                spyConfiguration
+                spyConfiguration,
+                mockSubscriptionRepository,
+                mockIdeaRepository
         ));
 
         user = new User();
