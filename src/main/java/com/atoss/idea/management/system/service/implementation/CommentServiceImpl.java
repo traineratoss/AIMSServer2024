@@ -488,6 +488,15 @@ public class CommentServiceImpl implements CommentService {
 
     }
 
+    public void deleteReportsForDeletedComment(Long commentId)
+    {
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        commentRepository.deleteReportsByCommentId(commentId);
+
+    }
+
 
 
         /**

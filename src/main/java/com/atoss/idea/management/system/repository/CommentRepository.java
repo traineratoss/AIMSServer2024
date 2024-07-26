@@ -215,4 +215,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query(value="DELETE FROM likes where comment_id = :commentId",nativeQuery=true)
     void deleteLikesForComment(Long commentId);
 
+    @Modifying
+    @Query(value="DELETE FROM reports where comment_id = :commentId",nativeQuery=true)
+    void deleteReportsByCommentId(Long commentId);
 }

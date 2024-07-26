@@ -178,4 +178,5 @@ public interface CommentService {
     void addReport(Long commentId, Long userId);
 
     void deleteLikesForDeletedComment(Long commentId);
+    void deleteReportsForDeletedComment(Long commentId);
 }
