@@ -85,6 +85,7 @@ public interface IdeaService {
      * @param selectedDateTo the ideas matching the specified selected date to
      * @param sortDirection the sorting direction of the pages
      * @param username if not null, returns filtered ideas belonging to the specified username
+     * @param rating the rating to select
      * @param pageable  it contains all the necessary information about the
      *                  requested page, such as page size, page number,
      *                  sort category and sort direction
@@ -129,9 +130,33 @@ public interface IdeaService {
 
 
 
-    Rating addOrUpdateRating(Long idea_id, Long used_id, Double ratingValue);
+    /**
+     * Adds or updates a rating for a specified idea by a specific user.
+     *
+     * @param       ideaId the ID of the idea to rate.
+     * @param       userId the ID of the user providing the rating.
+     * @param       ratingValue the rating value to be given to the idea.
+     * @return      the updated or newly created Rating object.
+     */
+    Rating addOrUpdateRating(Long ideaId, Long userId, Double ratingValue);
 
-    Double getAverage(Long idea_id);
+    /**
+     * Calculates the average rating for a specified idea.
+     *
+     * @param       ideaId the ID of the idea for which the average rating is to be calculated.
+     * @return      the average rating of the idea, or null if the idea has no ratings.
+     */
+    Double getAverage(Long ideaId);
 
+    /**
+     * Retrieves the rating given by a specific user for a specified idea.
+     *
+     * @param       userId the ID of the user whose rating is to be retrieved.
+     * @param       ideaId the ID of the idea for which the user's rating is to be retrieved.
+     * @return      the rating given by the user for the idea, or null if no rating exists.
+     */
     Double getRatingByUserAndByIdea(Long userId, Long ideaId);
+
+    void sendEmailForRating(Long ideaId);
+
 }

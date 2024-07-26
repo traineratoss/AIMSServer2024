@@ -16,8 +16,21 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
+    /**
+     * Deletes report associated with a specific comment and user.
+     * @param commentId the unique identifier of the comment for which reports should be deleted
+     * @param userId the unique identifier of the user associated with the reports to be deleted
+     */
+    @Transactional
+    @Modifying
+    @Query(value = "DELETE FROM reports WHERE user_id = :userId AND comment_id = :commentId", nativeQuery = true)
+    void deleteReport(Long commentId, Long userId);
 
-
+    /**
+     * Finds the top 5 comments with the most likes.
+     *
+     * @return a list of the top 5 most liked comments.
+     */
     @Query(value = "SELECT c.* FROM comment c "
             +
             "JOIN likes l ON c.comment_id = l.comment_id "
@@ -159,18 +172,44 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Long> getRepliesAndCommentsCount(@Param("selectedDateFrom") String selectedDateFrom,
                                           @Param("selectedDateTo") String selectedDateTo);
 
+
+    /**
+     * Deletes a like from the database for the given user and comment.
+     *
+     * @param commentId the ID of the comment from which the like is to be deleted.
+     * @param userId    the ID of the user who liked the comment.
+     */
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM likes WHERE user_id = :userId AND comment_id = :commentId", nativeQuery = true)
     void deleteLikes(@Param("commentId")Long commentId, @Param("userId")Long userId);
 
 
+    /**
+     * Counts the number of likes for a given comment.
+     *
+     * @param commentId the ID of the comment for which likes are to be counted.
+     * @return the number of likes for the comment.
+     */
     @Query("SELECT COUNT(l) FROM User u JOIN u.likedComments l WHERE l.id = :commentId")
     int countLikesByCommentId(@Param("commentId") Long commentId);
 
 
+    /**
+     * Checks if a like exists for a given user and comment.
+     *
+     * @param commentId the ID of the comment.
+     * @param userId    the ID of the user.
+     * @return true if the user has liked the comment, false otherwise.
+     */
     @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM User u JOIN u.likedComments l WHERE u.id = :userId AND l.id = :commentId")
-    boolean existsByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
+    boolean existsLikeByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
+
+    @Query("SELECT COUNT(l) FROM User u JOIN u.reportedComments l WHERE l.id = :commentId")
+    int countReportsByCommentId(@Param("commentId") Long commentId);
+
+    @Query("SELECT c.id FROM Comment c JOIN c.listOfUsers u GROUP BY c.id HAVING COUNT(u) >= 5")
+    List<Long> moreThenFiveReports();
 
 
 }

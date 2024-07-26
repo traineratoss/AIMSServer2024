@@ -7,20 +7,20 @@ import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.repository.security.request.LoginRequest;
 import com.atoss.idea.management.system.repository.security.request.RegisterRequest;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -56,7 +56,7 @@ public class AuthController {
      * The method may return a String indicating the result of the authentication process, such as "Authentication successful!",
      * or return an error message or throw an exception in case of authentication failure.
      *
-     * @param authRequest The LoginRequest object containing the user's authentication credentials.
+     * @param loginRequest The LoginRequest object containing the user's authentication credentials.
      * @param response    The HttpServletResponse object to set the user information as a cookie.
      *
      * @return A String indicating the result of the authentication process.
@@ -71,33 +71,15 @@ public class AuthController {
      * @see Authentication
      * @see HttpServletResponse
      */
+
     @Transactional
     @PostMapping("/login")
-    public String authenticateUser(@RequestBody LoginRequest authRequest, HttpServletResponse response) {
-        // Get the current authentication from the security context
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-        // Check if the authentication is not null and the user is authenticated
-        if (authentication != null && authentication.isAuthenticated()) {
-            // Retrieve user information from the authentication object
-            String username = authentication.getName();
-            // Get the user's role (authority)
-            String role = authentication.getAuthorities().iterator().next().getAuthority();
-            // Get the user's email (authority)
-            String email = authentication.getAuthorities().iterator().next().getAuthority();
-            // Get the user's full name (authority)
-            String fullName = authentication.getAuthorities().iterator().next().getAuthority();
-            // Get the user's avatar ID (authority)
-            String avatarId = authentication.getAuthorities().iterator().next().getAuthority();
-            //
-            String isFirstLogin = authentication.getAuthorities().iterator().next().getAuthority();
-            // Create a user_info cookie containing user information
-            Cookie userCookie = new Cookie("user_info", username + ":" + role + ":" + email + ":" + fullName + ":" + avatarId + ":" + isFirstLogin);
-            userCookie.setMaxAge(3600);         // Set the maximum age of the cookie to 1 hour (3600 seconds)
-            response.addCookie(userCookie);     // Add the user_cookie to the response
-        }
-        return "Authentication successful!";
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsernameOrEmail(),
+                       loginRequest.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return new ResponseEntity<>("Authentication success", HttpStatus.OK);
     }
 
     /**

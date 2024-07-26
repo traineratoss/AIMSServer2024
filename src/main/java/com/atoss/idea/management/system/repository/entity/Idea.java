@@ -64,9 +64,9 @@ public class Idea {
     @JsonManagedReference
     private List<Rating> rating;
 
-    @OneToOne(mappedBy = "idea", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
-    private Subscription subscription;
+    private List<Subscription> subscription;
 
     @Override
     public String toString() {

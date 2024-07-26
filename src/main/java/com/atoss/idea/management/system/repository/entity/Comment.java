@@ -54,10 +54,25 @@ public class Comment {
     @JsonIgnoreProperties("likedComments")
     private List<User> userList;
 
+
+    @ManyToMany(mappedBy = "reportedComments")
+    @JsonIgnoreProperties("reportedComments")
+    private List<User> listOfUsers;
+
+    /**
+     * Sets the text of the comment.
+     *
+     * @param comment the text of the comment to be set
+     */
     public void setCommentText(String comment) {
         this.commentText = comment;
     }
 
+    /**
+     * Returns the text of the comment.
+     *
+     * @return the text of the comment
+     */
     public String getCommentText() {
         return this.commentText;
     }

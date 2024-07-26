@@ -3,8 +3,7 @@ package com.atoss.idea.management.system.user;
 import com.atoss.idea.management.system.exception.ApproveAlreadyGrantedException;
 import com.atoss.idea.management.system.exception.AvatarNotFoundException;
 import com.atoss.idea.management.system.exception.UserAlreadyActivatedException;
-import com.atoss.idea.management.system.repository.AvatarRepository;
-import com.atoss.idea.management.system.repository.UserRepository;
+import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
@@ -51,6 +50,12 @@ public class UserRegisterApprovalTest {
     @Mock
     PasswordEncoder mockPasswordEncoder;
 
+    @Mock
+    SubscriptionRepository mockSubscriptionRepository;
+
+    @Mock
+    IdeaRepository mockIdeaRepository;
+
     @Spy
     JavaMailSender mockEmailSender;
 
@@ -71,7 +76,9 @@ public class UserRegisterApprovalTest {
                         mockUserRepository,
                         mockAvatarRepository,
                         mockEmailSender,
-                        mockConfiguration
+                        mockConfiguration,
+                        mockSubscriptionRepository,
+                        mockIdeaRepository
                 )
         );
 

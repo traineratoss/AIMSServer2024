@@ -7,6 +7,7 @@ import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.*;
 import com.atoss.idea.management.system.service.IdeaService;
+import com.atoss.idea.management.system.service.SendEmailService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -46,6 +47,8 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final ImageRepository imageRepository;
 
+    private final SubscriptionRepository subscriptionRepository;
+
     private final UserRepository userRepository;
 
     private final CategoryRepository categoryRepository;
@@ -56,12 +59,15 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final RatingRepository ratingRepository;
 
+    private final SendEmailService sendEmailService;
+
     /**
      * Constructor for the Idea Service Implementation
      *
      * @param ideaRepository     repository for the Idea Entity
      * @param imageRepository    repository for the Image Entity
      * @param userRepository     repository for the User Entity
+     * @param ratingRepository   repository for Rating Entity
      * @param categoryRepository repository for the Category Entity
      * @param modelMapper        responsible for mapping our entities
      * @param commentServiceImpl ======
@@ -71,7 +77,9 @@ public class IdeaServiceImpl implements IdeaService {
                            RatingRepository ratingRepository,
                            CategoryRepository categoryRepository,
                            ModelMapper modelMapper,
-                           CommentServiceImpl commentServiceImpl) {
+                           CommentServiceImpl commentServiceImpl,
+                           SendEmailService sendEmailService,
+                           SubscriptionRepository subscriptionRepository) {
         this.ratingRepository = ratingRepository;
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
@@ -79,6 +87,8 @@ public class IdeaServiceImpl implements IdeaService {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
         this.commentServiceImpl = commentServiceImpl;
+        this.sendEmailService = sendEmailService;
+        this.subscriptionRepository = subscriptionRepository;
     }
 
     private String filterBadWords(String text) {
@@ -197,10 +207,22 @@ public class IdeaServiceImpl implements IdeaService {
 
             Idea idea = ideaRepository.findById(id).get();
 
+            List<Long> subscribedUsersIds = subscriptionRepository.findUserIdByIdeaId(id);
+
+            List<User> subscribedUsers = new ArrayList<>();
+
+
             if (ideaUpdateDTO.getText() != null) {
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
                 idea.setText(filteredCommentText);
+                for(Long userId : subscribedUsersIds) {
+                    subscribedUsers.add(userRepository.findById(userId).get());
+                }
+                if(!subscribedUsers.isEmpty()) {
+                    sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
+                }
+
             }
             if (ideaUpdateDTO.getStatus() != null) {
                 idea.setStatus(ideaUpdateDTO.getStatus());
@@ -217,6 +239,9 @@ public class IdeaServiceImpl implements IdeaService {
 
             if (ideaUpdateDTO.getTitle() != null) {
                 idea.setTitle(ideaUpdateDTO.getTitle());
+                if(!subscribedUsers.isEmpty()) {
+                    sendEmailService.sendEmailChangedIdeaTitle(subscribedUsers, id);
+                }
             }
 
             if (ideaUpdateDTO.getCategoryList() != null) {
@@ -224,7 +249,6 @@ public class IdeaServiceImpl implements IdeaService {
                 if (ideaUpdateDTO.getCategoryList().isEmpty()) {
                     throw new RuntimeException("Please select at least one category");
                 }
-
                 idea.setCategoryList(new ArrayList<>());
                 List<Category> newList = new ArrayList<>();
 
@@ -443,21 +467,27 @@ public class IdeaServiceImpl implements IdeaService {
 
 
     @Override
-    public Rating addOrUpdateRating(Long idea_id, Long user_id, Double ratingValue) {
-        Idea idea = ideaRepository.findById(idea_id).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
-        User user = userRepository.findById(user_id).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
-        Rating rating = ratingRepository.findByIdeaIdAndUserId(idea_id, user_id).orElse(new Rating());
+    public Rating addOrUpdateRating(Long ideaId, Long userId, Double ratingValue) {
+        Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
+        Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElse(new Rating());
+        Integer oldRating = idea.getRatingAvg().intValue();
         rating.setIdea(idea);
         rating.setUser(user);
         rating.setRating(ratingValue);
         Rating ratingRepositorySave = ratingRepository.save(rating);
-        idea.setRatingAvg(getAverage(idea_id));
+        idea.setRatingAvg(getAverage(ideaId));
+        Integer newRating = idea.getRatingAvg().intValue();
+
+        if (newRating != oldRating){
+            sendEmailForRating(idea.getId());
+        }
         return ratingRepositorySave;
     }
 
     @Override
-    public Double getAverage(Long idea_id) {
-        List<Rating> ratings = ratingRepository.findByIdeaId(idea_id);
+    public Double getAverage(Long ideaId) {
+        List<Rating> ratings = ratingRepository.findByIdeaId(ideaId);
         Double sum = 0D;
         Double count = 0D;
         for (Rating rate : ratings) {
@@ -471,5 +501,14 @@ public class IdeaServiceImpl implements IdeaService {
     public Double getRatingByUserAndByIdea(Long ideaId, Long userId) {
         Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElseThrow(() -> new IdeaNotFoundException("Not found"));
         return rating.getRating();
+    }
+
+    @Override
+    public void sendEmailForRating(Long ideaId) {
+        List<Long> userIds = subscriptionRepository.findUserIdByIdeaId(ideaId);
+        for (Long userId : userIds) {
+            User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
+            sendEmailService.sendEmailRatingChanged(user.getUsername(), ideaId);
+        }
     }
 }

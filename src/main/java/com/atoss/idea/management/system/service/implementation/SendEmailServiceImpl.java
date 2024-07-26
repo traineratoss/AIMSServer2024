@@ -1,9 +1,11 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.AvatarNotFoundException;
-import com.atoss.idea.management.system.repository.AvatarRepository;
-import com.atoss.idea.management.system.repository.UserRepository;
+import com.atoss.idea.management.system.exception.IdeaNotFoundException;
+import com.atoss.idea.management.system.exception.UserNotFoundException;
+import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.entity.Avatar;
+import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
@@ -29,8 +31,11 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
     private final UserRepository userRepository;
-
     private final AvatarRepository avatarRepository;
+
+    private final SubscriptionRepository subscriptionRepository;
+
+    private final IdeaRepository ideaRepository;
     private final JavaMailSender emailSender;
 
     private final Configuration configuration;
@@ -57,11 +62,15 @@ public class SendEmailServiceImpl implements SendEmailService {
     public SendEmailServiceImpl(UserRepository userRepository,
                                 AvatarRepository avatarRepository,
                                 JavaMailSender emailSender,
-                                Configuration configuration) {
+                                Configuration configuration,
+                                SubscriptionRepository subscriptionRepository,
+                                IdeaRepository ideaRepository) {
         this.userRepository = userRepository;
         this.avatarRepository = avatarRepository;
         this.emailSender = emailSender;
         this.configuration = configuration;
+        this.subscriptionRepository = subscriptionRepository;
+        this.ideaRepository = ideaRepository;
     }
 
     @Override
@@ -84,6 +93,22 @@ public class SendEmailServiceImpl implements SendEmailService {
     @Override
     public void sendDeclineEmailToUser(String username) {
         sendEmailUtils("registration-reject-template.ftl", username, "", "Registration Request - Rejected");
+    }
+
+    public void sendEmailChangedIdeaText(List<User> usernames, Long ideaId) {
+        Idea idea = ideaRepository.findById(ideaId).get();
+        for(User user : usernames) {
+            String username = user.getUsername();
+            sendEmailIdeaSubscription("text-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea title/text change");
+        }
+    }
+
+    public void sendEmailChangedIdeaTitle(List<User> usernames, Long ideaId) {
+        Idea idea = ideaRepository.findById(ideaId).get();
+        for(User user : usernames) {
+            String username = user.getUsername();
+            sendEmailIdeaSubscription("title-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea title/text change");
+        }
     }
 
     @Override
@@ -125,6 +150,11 @@ public class SendEmailServiceImpl implements SendEmailService {
         sendEmailUtils("password-reset-template.ftl", username, otp, "Password Reset Request");
     }
 
+    @Override
+    public void sendEmailRatingChanged(String username, Long ideaId){
+        sendEmailRatingChangedService("star-rating-changes-template.ftl", username,"Rating changed", ideaId);
+    }
+
     /**
      * Retrieves a user from the repository based on the provided username.
      *
@@ -164,6 +194,27 @@ public class SendEmailServiceImpl implements SendEmailService {
         mapUser.put("imageUrl", "./welcome.jpg");
         try {
             Template template  = configuration.getTemplate(fileName);
+            String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapUser);
+            sendEmail(emailTo, subject, htmlTemplate);
+        } catch (IOException | TemplateException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    private void sendEmailRatingChangedService(String fileName, String username, String subject, Long ideaId ){
+        User user = getUserByUsername(username);
+        Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
+        String emailTo = user.getEmail();
+        Map<String, Object> mapUser = new HashMap<>();
+        mapUser.put("username", username);
+        mapUser.put("email", user.getEmail());
+        mapUser.put("companyName", companyName);
+        mapUser.put("date", new Date().toString());
+        mapUser.put("imageUrl", "./welcome.jpg");
+        mapUser.put("ideaTitle", idea.getTitle());
+        mapUser.put("newRating", idea.getRatingAvg().intValue());
+        try {
+            Template template = configuration.getTemplate(fileName);
             String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapUser);
             sendEmail(emailTo, subject, htmlTemplate);
         } catch (IOException | TemplateException exception) {
@@ -229,6 +280,32 @@ public class SendEmailServiceImpl implements SendEmailService {
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void sendEmailIdeaSubscription(String fileName, String username, String title, String text, Long ideaId, String subject) {
+        User user = getUserByUsername(username);
+        String emailTo = user.getEmail();
+        Idea idea = getIdeaById(ideaId);
+
+        Map<String, Object> mapUser = new HashMap<>();
+        mapUser.put("username", username);
+        mapUser.put("email", user.getEmail());
+        mapUser.put("companyName", companyName);
+        mapUser.put("newTitle", idea.getTitle());
+        mapUser.put("newText", idea.getText());
+        mapUser.put("imageUrl", "./welcome.jpg");
+        try {
+            Template template  = configuration.getTemplate(fileName);
+            String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapUser);
+            sendEmail(emailTo, subject, htmlTemplate);
+        } catch (IOException | TemplateException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    private Idea getIdeaById(Long ideaId) {
+        return ideaRepository.findById(ideaId)
+                .orElseThrow(() -> new RuntimeException("Idea does not exist!"));
     }
 
 

@@ -47,9 +47,9 @@ public class CommentServiceImpl implements CommentService {
      * CONSTRUCTOR
      *
      * @param commentRepository for accessing CRUD repository methods for Comment Entity
-     * @param ideaRepository for accessing CRUD repository methods for Idea Entity
-     * @param userRepository for accessing CRUD repository methods for User Entity
-     * @param modelMapper for mapping entity-dto relationships
+     * @param ideaRepository    for accessing CRUD repository methods for Idea Entity
+     * @param userRepository    for accessing CRUD repository methods for User Entity
+     * @param modelMapper       for mapping entity-dto relationships
      */
     public CommentServiceImpl(CommentRepository commentRepository, IdeaRepository ideaRepository,
                               UserRepository userRepository, ModelMapper modelMapper) {
@@ -59,7 +59,14 @@ public class CommentServiceImpl implements CommentService {
         this.modelMapper = modelMapper;
     }
 
-    // create a link between comment and elapsed time function
+    /**
+     * Retrieves the elapsed time since the creation of a comment in a human-readable format.
+     *
+     * @param id the ID of the comment
+     * @return a string representing the elapsed time since the creation of the comment, formatted in a human-readable way
+     * @throws CommentNotFoundException if the comment with the specified ID is not found
+     */
+
     @Override
     public String getTimeForComment(Long id) {
         Optional<Comment> commentOptional = commentRepository.findById(id);
@@ -73,7 +80,13 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-    // converts milliseconds in the correct time unit
+    /**
+     * Calculates the elapsed time from the given creation date to the current date, and returns it in a human-readable format.
+     * The time units used are seconds, minutes, hours, days, months, and years.
+     *
+     * @param creationDate the date when the comment was created
+     * @return a string representing the elapsed time from the creation date to the current date
+     */
     @Override
     public String getElapsedTime(Date creationDate) {
         Date currentDate = new Date();
@@ -170,6 +183,15 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    /**
+     * Adds a new comment to an idea.
+     * @param requestCommentDTO the DTO containing information about the comment to be added
+     * @return a {@link ResponseCommentDTO} representing the added comment
+     * @throws UnsupportedEncodingException if an error occurs while decoding the bad words file path
+     * @throws UserNotFoundException        if the user specified in the DTO does not exist
+     * @throws IdeaNotFoundException        if the idea specified in the DTO does not exist
+     */
+
     @Transactional
     @Override
     public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) throws UnsupportedEncodingException {
@@ -178,7 +200,7 @@ public class CommentServiceImpl implements CommentService {
 
         Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).orElseThrow(() -> new IdeaNotFoundException("Idea not found!"));
 
-        Comment newComment =  new Comment();
+        Comment newComment = new Comment();
         String wordsFilePath = "textTerms/badWords.txt";
         URL resourceUrl = classLoader.getResource(wordsFilePath);
         if (resourceUrl != null) {
@@ -203,6 +225,13 @@ public class CommentServiceImpl implements CommentService {
         return responseCommentDTO;
     }
 
+    /**
+     * Adds a reply to an existing comment.
+     * @param requestCommentReplyDTO the DTO containing information about the reply to be added
+     * @return a {@link ResponseCommentReplyDTO} representing the added reply
+     * @throws UserNotFoundException    if the user specified in the DTO does not exist
+     * @throws CommentNotFoundException if the parent comment specified in the DTO does not exist
+     */
     @Transactional
     @Override
     public ResponseCommentReplyDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO) {
@@ -216,7 +245,7 @@ public class CommentServiceImpl implements CommentService {
 
         java.util.Date creationDate = new java.util.Date();
 
-        Comment newReply =  new Comment();
+        Comment newReply = new Comment();
 
         newReply.setUser(user);
         newReply.setIdea(null);
@@ -234,6 +263,13 @@ public class CommentServiceImpl implements CommentService {
         return responseCommentReplyDTO;
     }
 
+    /**
+     * Retrieves all replies for a given comment, paginated.
+     * @param commentId the ID of the comment for which replies are to be fetched
+     * @param pageable  the pagination information
+     * @return a {@link Page} of {@link ResponseCommentReplyDTO} containing the replies to the specified comment
+     * @throws CommentNotFoundException if the comment with the specified ID does not exist
+     */
     @Transactional
     @Override
     public Page<ResponseCommentReplyDTO> getAllRepliesByCommentId(Long commentId, Pageable pageable) {
@@ -261,6 +297,13 @@ public class CommentServiceImpl implements CommentService {
 
     }
 
+    /**
+     * Retrieves a paginated list of comments for a given idea.
+     * @param ideaId the ID of the idea for which comments are to be fetched
+     * @param pageable the pagination information to control the size and number of pages
+     * @return a {@link Page} of {@link ResponseCommentDTO} containing comments associated with the specified idea
+     * @throws IdeaNotFoundException if the idea with the specified ID does not exist
+     */
     @Override
     public Page<ResponseCommentDTO> getAllPagedCommentsByIdeaId(Long ideaId, Pageable pageable) {
 
@@ -287,6 +330,13 @@ public class CommentServiceImpl implements CommentService {
         return new PageImpl<>(commentList, pageable, commentList.size());
     }
 
+    /**
+     * Verifies if a comment is owned by a specific user.
+     * @param commentId the ID of the comment to be checked
+     * @param userId the ID of the user whose ownership is to be verified
+     * @return {@code true} if the comment is owned by the specified user, {@code false} otherwise
+     * @throws CommentNotFoundException if the comment with the specified ID does not exist
+     */
     private boolean verifyCommentOwner(Long commentId, Long userId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException());
@@ -295,6 +345,14 @@ public class CommentServiceImpl implements CommentService {
         return comment.getUser().getId().equals(userId);
 
     }
+
+    /**
+     * Adds a like from a user to a comment.
+     * @param commentId the ID of the comment to which the like is being added
+     * @param userId the ID of the user who is liking the comment
+     * @throws UserNotFoundException if the user with the specified ID does not exist, or if the user has already liked the comment
+     * @throws CommentNotFoundException if the comment with the specified ID does not exist, or if the user is trying to like their own comment
+     */
 
     @Transactional
     @Override
@@ -320,6 +378,11 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    /**
+     * Deletes a comment by its ID.
+     * @param commentId the ID of the comment to be deleted
+     * @throws CommentNotFoundException if the comment with the specified ID does not exist
+     */
     @Override
     public void deleteComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
@@ -327,6 +390,13 @@ public class CommentServiceImpl implements CommentService {
         }
         commentRepository.deleteById(commentId);
     }
+
+    /**
+     * Retrieves the list of users who liked a specific comment.
+     * @param commentId the ID of the comment for which likes are being retrieved
+     * @return a list of {@link UserResponseDTO} representing the users who liked the comment
+     * @throws RuntimeException if the comment with the specified ID does not exist
+     */
 
     @Override
     public List<UserResponseDTO> getLikesForComment(Long commentId) {
@@ -337,10 +407,23 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Retrieves the count of likes for a specific comment.
+     * @param commentId the ID of the comment for which the like count is being retrieved
+     * @return the number of likes for the specified comment
+     */
+    @Override
     public int getLikesCountForComment(Long commentId) {
         return commentRepository.countLikesByCommentId(commentId);
     }
 
+    /**
+     * Deletes a like from a comment by a specific user.
+     * @param commentId the ID of the comment from which the like is being deleted
+     * @param userId the ID of the user whose like is being removed
+     * @throws CommentNotFoundException if the comment with the specified ID does not exist
+     * @throws UserNotFoundException if the user with the specified ID does not exist
+     */
     @Override
     public void deleteLikes(Long commentId, Long userId) {
         if (!commentRepository.existsById(commentId)) {
@@ -352,8 +435,110 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteLikes(commentId, userId);
     }
 
-    public boolean existsByCommentIdAndUserId(Long commentId, Long userId) {
-       return commentRepository.existsByCommentIdAndUserId(commentId, userId);
+    /**
+     * Deletes reports associated with a specific comment and user.
+
+     * @param commentId the unique identifier of the comment whose reports are to be deleted
+     * @param userId the unique identifier of the user associated with the reports to be deleted
+     * @throws CommentNotFoundException if no comment is found with the given {@code commentId}
+     * @throws UserNotFoundException if no user is found with the given {@code userId}
+     */
+
+    @Transactional
+    @Override
+    public void deleteReport(Long commentId, Long userId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User with id " + userId + " does not exist");
+        }
+        commentRepository.deleteReport(commentId, userId);
     }
+
+
+        /**
+         * Checks if a specific user has liked a particular comment.
+         *
+         * @param commentId the ID of the comment to check for likes
+         * @param userId the ID of the user to check for the like
+         * @return {@code true} if the user has liked the comment, {@code false} otherwise
+         */
+
+    @Override
+    public boolean existsLikeByCommentIdAndUserId(Long commentId, Long userId) {
+        return commentRepository.existsLikeByCommentIdAndUserId(commentId, userId);
+    }
+
+    @Override
+    public int getReportsCountForComment(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        return commentRepository.countReportsByCommentId(commentId);
+    }
+
+    @Override
+    public CommentPageDTO getAllCommentsByReportsNr(Pageable pageable) {
+        List<Long> commentsIds = commentRepository.moreThenFiveReports();
+        //total is the total number of comments, regardless of pagination
+        int total = commentsIds.size();
+
+        List<CommentDashboardResponseDTO> contents = new ArrayList<>();
+
+        for (Long id : commentsIds) {
+            Comment comment = commentRepository.findById(id).orElseThrow(null);
+            CommentDashboardResponseDTO commentDashboardResponseDTO = new CommentDashboardResponseDTO();
+            commentDashboardResponseDTO.setId(comment.getId());
+            commentDashboardResponseDTO.setContent(comment.getCommentText());
+            contents.add(commentDashboardResponseDTO);
+        }
+
+        return new CommentPageDTO(total, new PageImpl<>(contents, pageable, contents.size()));
+    }
+
+
+
+    /**
+     * Adds a report from a user to a comment.
+     *
+     * This method performs the following actions:
+     * - Verifies that the comment exists and throws an exception if not found.
+     * - Verifies that the user exists and throws an exception if not found.
+     * - Checks if the user is the owner of the comment and prevents the report if true.
+     * - Checks if the user has already reported the comment and prevents multiple reports.
+     * - If both the comment and user exist, and the user is not the owner of the comment, and the user hasn't already reported the comment,
+     *   adds the report to both the user and the comment, and saves the changes to the database.
+     *
+     * @param commentId the ID of the comment to be reported
+     * @param userId the ID of the user who is reporting the comment
+     * @throws UserNotFoundException if the user with the specified ID does not exist
+     * @throws CommentNotFoundException if the comment with the specified ID does not exist
+     * @throws IllegalArgumentException if the user tries to report their own comment or if the user has already reported the comment
+     */
+    @Transactional
+    @Override
+    public void addReport(Long commentId, Long userId) {
+        if (!verifyCommentOwner(commentId, userId)) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+
+            Comment comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new CommentNotFoundException());
+
+            if (user.getReportedComments().contains(comment)) {
+                throw new UserNotFoundException("User has already reported this comment!");
+            }
+
+            user.getReportedComments().add(comment);
+            comment.getListOfUsers().add(user);
+
+            userRepository.save(user);
+            commentRepository.save(comment);
+        } else {
+            throw new UserNotFoundException("A user can't report his own comment !");
+        }
+    }
+
 
 }
