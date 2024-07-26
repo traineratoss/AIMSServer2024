@@ -413,7 +413,7 @@ public class UserController {
     /**
      * Resets the user's state if the change password process is aborted.
      *
-     * @param changePasswordDTO
+     * @param changePasswordDTO - Must contain the username of the user who aborts the password recovery.
      * @return Returns HttpStatus.OK if the request is successful.
      * @throws UserNotFoundException if the user is not found in the database
      * @see UserService#abortChangePassword(ChangePasswordDTO)

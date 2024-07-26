@@ -236,6 +236,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(userAlreadyDeactivatedException.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * the credentials used are incorrect
+     *
+     * @see BadCredentialsException
+     * @param badCredentialsException - impossible to approve user that is already approved
+     * @return ResponseEntity - error message
+     */
     @ExceptionHandler(value = BadCredentialsException.class)
     public ResponseEntity<String> badCredentialsException(
             BadCredentialsException badCredentialsException) {
