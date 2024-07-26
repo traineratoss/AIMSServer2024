@@ -1,6 +1,9 @@
 package com.atoss.idea.management.system.service;
 
 import com.atoss.idea.management.system.exception.AvatarNotFoundException;
+import com.atoss.idea.management.system.repository.entity.User;
+
+import java.util.List;
 
 public interface SendEmailService {
     /**
@@ -90,4 +93,8 @@ public interface SendEmailService {
     boolean sendActivateEmailToUser(String username);
 
     void sendEmailRatingChanged(String username, Long ideaId);
+
+    void sendEmailChangedIdeaTitle(List<User> usernames, Long ideaId);
+
+    void sendEmailChangedIdeaText(List<User> usernames, Long ideaId);
 }
