@@ -479,6 +479,16 @@ public class CommentServiceImpl implements CommentService {
        }
     }
 
+    public void deleteLikesForDeletedComment(Long commentId)
+    {
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        commentRepository.deleteLikesForComment(commentId);
+
+    }
+
+
 
         /**
          * Checks if a specific user has liked a particular comment.

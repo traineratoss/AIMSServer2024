@@ -176,4 +176,6 @@ public interface CommentService {
      * @throws IllegalArgumentException if the user tries to report their own comment or if the user has already reported the comment
      */
     void addReport(Long commentId, Long userId);
+
+    void deleteLikesForDeletedComment(Long commentId);
 }

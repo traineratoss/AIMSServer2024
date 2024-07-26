@@ -145,9 +145,11 @@ public class CommentController {
      * @param commentId the unique identifier for the comment we are going to delete
      */
     @Transactional
-    @DeleteMapping("/comments")
-    public void deleteComment(@RequestParam(name = "commentId") Long commentId) {
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
+        commentService.deleteLikesForDeletedComment(commentId);
         commentService.deleteComment(commentId);
+        return new ResponseEntity<>("Comment likes will also be deleted for deleted comment",HttpStatus.OK);
     }
 
 

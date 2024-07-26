@@ -211,5 +211,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c.id FROM Comment c JOIN c.listOfUsers u GROUP BY c.id HAVING COUNT(u) >= 5")
     List<Long> moreThenFiveReports();
 
+    @Modifying
+    @Query(value="DELETE FROM likes where comment_id = :commentId",nativeQuery=true)
+    void deleteLikesForComment(Long commentId);
 
 }
