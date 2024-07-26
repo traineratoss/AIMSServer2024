@@ -387,20 +387,20 @@ public class UserController {
     /**
      * Checks whether the provided OTP is valid for the specified user.
      *
-     * @param verifyOTPDTO The username or email of the user to be checked and the one-time password.
+     * @param verifyOtpDTO The username or email of the user to be checked and the one-time password.
      *
      * @return Returns HttpStatus.OK if the request is successful.
      *
      * @throws UserNotFoundException - if the user is not found in the database
      * @throws BadCredentialsException - if no OTP password has been generated for the specified user, the OTP password
-     * is invalid, or has expired.
+     *                                   is invalid, or has expired
      *
-     * @see UserService#verifyOTP(VerifyOTPDTO)
+     * @see UserService#verifyOtp(VerifyOtpDTO)
      */
     @Transactional
     @PostMapping("/verify-otp")
-    public ResponseEntity<UserSecurityDTO> verifyOTP(@RequestBody VerifyOTPDTO verifyOTPDTO) {
-        return new ResponseEntity<>(userService.verifyOTP(verifyOTPDTO), HttpStatus.OK);
+    public ResponseEntity<UserSecurityDTO> verifyOtp(@RequestBody VerifyOtpDTO verifyOtpDTO) {
+        return new ResponseEntity<>(userService.verifyOtp(verifyOtpDTO), HttpStatus.OK);
     }
 
 

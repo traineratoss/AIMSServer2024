@@ -20,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -152,8 +151,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserPageDTO getAllUsersByUsernamePageable(
             Pageable pageable,
-            String username
-    ) {
+            String username) {
         UserPageDTO userPageDTO = new UserPageDTO();
         userPageDTO.setTotal(userRepository.findByUsernameStartsWithOrderByIsActiveAscIdAsc(username, Pageable.unpaged()).getContent().size());
         List<UserAdminDashboardResponseDTO> result = userRepository
@@ -206,12 +204,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserSecurityDTO verifyOTP(VerifyOTPDTO verifyOTPDTO) {
-        String usernameOrEmail = verifyOTPDTO.getUsernameOrEmail();
-        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail).orElseThrow(() -> new UserNotFoundException("User not found!"));
-
+    public UserSecurityDTO verifyOtp(VerifyOtpDTO verifyOtpDTO) {
+        String usernameOrEmail = verifyOtpDTO.getUsernameOrEmail();
+        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
         OTP otp = user.getOtp();
-        if (otp == null || !otp.getCode().equals(verifyOTPDTO.getOtpCode())) {
+        if (otp == null || !otp.getCode().equals(verifyOtpDTO.getOtpCode())) {
             throw new BadCredentialsException("Bad credentials");
         }
 
@@ -330,11 +328,9 @@ public class UserServiceImpl implements UserService {
         return user.getIsFirstLogin();
     }
 
-
     @Override
-    public Long getIdByUsername(String username){
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found!"));
+    public Long getIdByUsername(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!"));
         System.out.println(user.getUsername());
         return user.getId();
     }

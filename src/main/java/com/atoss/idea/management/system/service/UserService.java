@@ -111,13 +111,13 @@ public interface UserService {
     /**
      * Changes the password of a user
      *
-     * @param verifyOTPDTO the dto containing the username, the old password and the new password
+     * @param verifyOtpDTO the dto containing the username, the old password and the new password
      * @return UserSecurityDTO with the user's credentials.
      * @throws UserNotFoundException   if a user with the given username doesn't exist in the system
      * @throws BadCredentialsException if no OTP has been generated for a user, the OTP is not correct,
      *                                 or has already expired.
      */
-    UserSecurityDTO verifyOTP(VerifyOTPDTO verifyOTPDTO);
+    UserSecurityDTO verifyOtp(VerifyOtpDTO verifyOtpDTO);
 
     /**
      * Sends an approval email to the user with the specified username.
@@ -241,7 +241,7 @@ public interface UserService {
      * Resets the user's state if the change password process is aborted.
      *
      * @param changePasswordDTO
-     * @return Returns HttpStatus.OK if the request is successful.
+     * @return Returns HttpStatus.OK if the request is successful
      * @throws UserNotFoundException if the user is not found in the database
      */
     void abortChangePassword(ChangePasswordDTO changePasswordDTO);
