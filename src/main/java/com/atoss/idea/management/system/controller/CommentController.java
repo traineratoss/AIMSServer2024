@@ -263,5 +263,16 @@ public class CommentController {
         return new ResponseEntity<>("Report added successfully", HttpStatus.OK);
     }
 
+    @Transactional
+    @PatchMapping("/comments/report/patch/{commentId}")
+    public ResponseEntity<String> updateReportedComment(@PathVariable Long commentId)
+    {
+        if(commentService.getReportsCountForComment(commentId) <=5)
+        {
+            return new ResponseEntity<>("This comment does not have enough reports to be reviewed!", HttpStatus.OK);
+        }
+        commentService.displayPlaceholder(commentId);
+        return new ResponseEntity<>("Comment with id "+commentId+" is under review by admin", HttpStatus.OK);
+    }
 
 }

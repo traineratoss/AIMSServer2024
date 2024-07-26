@@ -104,6 +104,11 @@ public interface CommentService {
     void deleteComment(Long commentId);
 
     /**
+     * If a comment received too many reports, display the placeholder instead of text
+     */
+    void displayPlaceholder(Long commentId);
+
+    /**
      * Deletes reports associated with a specific comment and user.
      * @param commentId the unique identifier of the comment whose reports are to be deleted
      * @param userId the unique identifier of the user associated with the reports to be deleted

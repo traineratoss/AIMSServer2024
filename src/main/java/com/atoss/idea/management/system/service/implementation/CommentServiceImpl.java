@@ -1,6 +1,7 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
+import com.atoss.idea.management.system.exception.InsufficientReportsException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.CommentNotFoundException;
 import com.atoss.idea.management.system.repository.CommentRepository;
@@ -454,6 +455,28 @@ public class CommentServiceImpl implements CommentService {
             throw new UserNotFoundException("User with id " + userId + " does not exist");
         }
         commentRepository.deleteReport(commentId, userId);
+    }
+
+    @Override
+    public void displayPlaceholder(Long commentId)
+    {
+       Optional<Comment> comment=commentRepository.findById(commentId);
+       if(comment.isPresent())
+       {
+           if(getReportsCountForComment(comment.get().getId()) > 5)
+           {
+               comment.get().setCommentText("This comment is under review because it received too many reports");
+               commentRepository.save(comment.get());
+           }
+           else
+           {
+               throw new InsufficientReportsException("This comment does not have enough reports to be reviewed!");
+           }
+       }
+       else
+       {
+           throw new CommentNotFoundException();
+       }
     }
 
 
