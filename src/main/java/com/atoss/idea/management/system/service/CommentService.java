@@ -104,7 +104,9 @@ public interface CommentService {
     void deleteComment(Long commentId);
 
     /**
-     * If a comment received too many reports, display the placeholder instead of text
+     * Displays a placeholder for a comment under review.
+     *
+     * @param commentId the ID of the comment to display the placeholder for
      */
     void displayPlaceholder(Long commentId);
 
@@ -151,8 +153,20 @@ public interface CommentService {
      */
     boolean existsLikeByCommentIdAndUserId(Long commentId, Long userId);
 
+    /**
+     * Retrieves the count of reports for a specific comment.
+     *
+     * @param commentId the ID of the comment
+     * @return the count of reports for the specified comment
+     */
     int getReportsCountForComment(Long commentId);
 
+    /**
+     * Retrieves all comments sorted by the number of reports.
+     *
+     * @param pageable the pagination and sorting information
+     * @return a CommentPageDTO containing the comments sorted by the number of reports
+     */
     CommentPageDTO getAllCommentsByReportsNr(Pageable pageable);
 
 
@@ -177,6 +191,17 @@ public interface CommentService {
      */
     void addReport(Long commentId, Long userId);
 
+    /**
+     * Deletes likes associated with a deleted comment.
+     *
+     * @param commentId the ID of the comment whose likes are to be deleted
+     */
     void deleteLikesForDeletedComment(Long commentId);
+
+    /**
+     * Deletes reports associated with a deleted comment.
+     *
+     * @param commentId the ID of the comment whose reports are to be deleted
+     */
     void deleteReportsForDeletedComment(Long commentId);
 }

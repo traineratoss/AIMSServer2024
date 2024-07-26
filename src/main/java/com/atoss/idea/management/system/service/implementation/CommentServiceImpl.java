@@ -186,6 +186,7 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Adds a new comment to an idea.
+     *
      * @param requestCommentDTO the DTO containing information about the comment to be added
      * @return a {@link ResponseCommentDTO} representing the added comment
      * @throws UnsupportedEncodingException if an error occurs while decoding the bad words file path
@@ -228,6 +229,7 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Adds a reply to an existing comment.
+     *
      * @param requestCommentReplyDTO the DTO containing information about the reply to be added
      * @return a {@link ResponseCommentReplyDTO} representing the added reply
      * @throws UserNotFoundException    if the user specified in the DTO does not exist
@@ -266,6 +268,7 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Retrieves all replies for a given comment, paginated.
+     *
      * @param commentId the ID of the comment for which replies are to be fetched
      * @param pageable  the pagination information
      * @return a {@link Page} of {@link ResponseCommentReplyDTO} containing the replies to the specified comment
@@ -300,7 +303,8 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Retrieves a paginated list of comments for a given idea.
-     * @param ideaId the ID of the idea for which comments are to be fetched
+     *
+     * @param ideaId   the ID of the idea for which comments are to be fetched
      * @param pageable the pagination information to control the size and number of pages
      * @return a {@link Page} of {@link ResponseCommentDTO} containing comments associated with the specified idea
      * @throws IdeaNotFoundException if the idea with the specified ID does not exist
@@ -333,8 +337,9 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Verifies if a comment is owned by a specific user.
+     *
      * @param commentId the ID of the comment to be checked
-     * @param userId the ID of the user whose ownership is to be verified
+     * @param userId    the ID of the user whose ownership is to be verified
      * @return {@code true} if the comment is owned by the specified user, {@code false} otherwise
      * @throws CommentNotFoundException if the comment with the specified ID does not exist
      */
@@ -349,9 +354,10 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Adds a like from a user to a comment.
+     *
      * @param commentId the ID of the comment to which the like is being added
-     * @param userId the ID of the user who is liking the comment
-     * @throws UserNotFoundException if the user with the specified ID does not exist, or if the user has already liked the comment
+     * @param userId    the ID of the user who is liking the comment
+     * @throws UserNotFoundException    if the user with the specified ID does not exist, or if the user has already liked the comment
      * @throws CommentNotFoundException if the comment with the specified ID does not exist, or if the user is trying to like their own comment
      */
 
@@ -381,6 +387,7 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Deletes a comment by its ID.
+     *
      * @param commentId the ID of the comment to be deleted
      * @throws CommentNotFoundException if the comment with the specified ID does not exist
      */
@@ -394,6 +401,7 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Retrieves the list of users who liked a specific comment.
+     *
      * @param commentId the ID of the comment for which likes are being retrieved
      * @return a list of {@link UserResponseDTO} representing the users who liked the comment
      * @throws RuntimeException if the comment with the specified ID does not exist
@@ -410,6 +418,7 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Retrieves the count of likes for a specific comment.
+     *
      * @param commentId the ID of the comment for which the like count is being retrieved
      * @return the number of likes for the specified comment
      */
@@ -420,10 +429,11 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Deletes a like from a comment by a specific user.
+     *
      * @param commentId the ID of the comment from which the like is being deleted
-     * @param userId the ID of the user whose like is being removed
+     * @param userId    the ID of the user whose like is being removed
      * @throws CommentNotFoundException if the comment with the specified ID does not exist
-     * @throws UserNotFoundException if the user with the specified ID does not exist
+     * @throws UserNotFoundException    if the user with the specified ID does not exist
      */
     @Override
     public void deleteLikes(Long commentId, Long userId) {
@@ -438,11 +448,11 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Deletes reports associated with a specific comment and user.
-
+     *
      * @param commentId the unique identifier of the comment whose reports are to be deleted
-     * @param userId the unique identifier of the user associated with the reports to be deleted
+     * @param userId    the unique identifier of the user associated with the reports to be deleted
      * @throws CommentNotFoundException if no comment is found with the given {@code commentId}
-     * @throws UserNotFoundException if no user is found with the given {@code userId}
+     * @throws UserNotFoundException    if no user is found with the given {@code userId}
      */
 
     @Transactional
@@ -458,29 +468,28 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void displayPlaceholder(Long commentId)
-    {
-       Optional<Comment> comment=commentRepository.findById(commentId);
-       if(comment.isPresent())
-       {
-           if(getReportsCountForComment(comment.get().getId()) > 5)
-           {
-               comment.get().setCommentText("This comment is under review because it received too many reports");
-               commentRepository.save(comment.get());
-           }
-           else
-           {
-               throw new InsufficientReportsException("This comment does not have enough reports to be reviewed!");
-           }
-       }
-       else
-       {
-           throw new CommentNotFoundException();
-       }
+    public void displayPlaceholder(Long commentId) {
+        Optional<Comment> comment = commentRepository.findById(commentId);
+        if (comment.isPresent()) {
+            if (getReportsCountForComment(comment.get().getId()) > 5) {
+                comment.get().setCommentText("This comment is under review because it received too many reports");
+                commentRepository.save(comment.get());
+            } else {
+                throw new InsufficientReportsException("This comment does not have enough reports to be reviewed!");
+            }
+        } else {
+            throw new CommentNotFoundException();
+        }
     }
 
-    public void deleteLikesForDeletedComment(Long commentId)
-    {
+    /**
+     * Deletes likes associated with a deleted comment.
+     * If the comment does not exist, a CommentNotFoundException is thrown.
+     *
+     * @param commentId the ID of the comment whose likes are to be deleted
+     * @throws CommentNotFoundException if the comment does not exist
+     */
+    public void deleteLikesForDeletedComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
@@ -488,24 +497,20 @@ public class CommentServiceImpl implements CommentService {
 
     }
 
-    public void deleteReportsForDeletedComment(Long commentId)
-    {
+    /**
+     * Deletes reports associated with a deleted comment.
+     * If the comment does not exist, a CommentNotFoundException is thrown.
+     *
+     * @param commentId the ID of the comment whose reports are to be deleted
+     * @throws CommentNotFoundException if the comment does not exist
+     */
+    public void deleteReportsForDeletedComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
         commentRepository.deleteReportsByCommentId(commentId);
 
     }
-
-
-
-        /**
-         * Checks if a specific user has liked a particular comment.
-         *
-         * @param commentId the ID of the comment to check for likes
-         * @param userId the ID of the user to check for the like
-         * @return {@code true} if the user has liked the comment, {@code false} otherwise
-         */
 
     @Override
     public boolean existsLikeByCommentIdAndUserId(Long commentId, Long userId) {
@@ -523,7 +528,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentPageDTO getAllCommentsByReportsNr(Pageable pageable) {
         List<Long> commentsIds = commentRepository.moreThenFiveReports();
-        //total is the total number of comments, regardless of pagination
         int total = commentsIds.size();
 
         List<CommentDashboardResponseDTO> contents = new ArrayList<>();
@@ -540,21 +544,20 @@ public class CommentServiceImpl implements CommentService {
     }
 
 
-
     /**
      * Adds a report from a user to a comment.
-     *
+     * <p>
      * This method performs the following actions:
      * - Verifies that the comment exists and throws an exception if not found.
      * - Verifies that the user exists and throws an exception if not found.
      * - Checks if the user is the owner of the comment and prevents the report if true.
      * - Checks if the user has already reported the comment and prevents multiple reports.
      * - If both the comment and user exist, and the user is not the owner of the comment, and the user hasn't already reported the comment,
-     *   adds the report to both the user and the comment, and saves the changes to the database.
+     * adds the report to both the user and the comment, and saves the changes to the database.
      *
      * @param commentId the ID of the comment to be reported
-     * @param userId the ID of the user who is reporting the comment
-     * @throws UserNotFoundException if the user with the specified ID does not exist
+     * @param userId    the ID of the user who is reporting the comment
+     * @throws UserNotFoundException    if the user with the specified ID does not exist
      * @throws CommentNotFoundException if the comment with the specified ID does not exist
      * @throws IllegalArgumentException if the user tries to report their own comment or if the user has already reported the comment
      */

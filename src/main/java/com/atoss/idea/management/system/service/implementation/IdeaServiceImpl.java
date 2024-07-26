@@ -216,10 +216,10 @@ public class IdeaServiceImpl implements IdeaService {
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
                 idea.setText(filteredCommentText);
-                for(Long userId : subscribedUsersIds) {
+                for (Long userId : subscribedUsersIds) {
                     subscribedUsers.add(userRepository.findById(userId).get());
                 }
-                if(!subscribedUsers.isEmpty()) {
+                if (!subscribedUsers.isEmpty()) {
                     sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
                 }
 
@@ -239,7 +239,7 @@ public class IdeaServiceImpl implements IdeaService {
 
             if (ideaUpdateDTO.getTitle() != null) {
                 idea.setTitle(ideaUpdateDTO.getTitle());
-                if(!subscribedUsers.isEmpty()) {
+                if (!subscribedUsers.isEmpty()) {
                     sendEmailService.sendEmailChangedIdeaTitle(subscribedUsers, id);
                 }
             }
@@ -479,7 +479,7 @@ public class IdeaServiceImpl implements IdeaService {
         idea.setRatingAvg(getAverage(ideaId));
         Integer newRating = idea.getRatingAvg().intValue();
 
-        if (newRating != oldRating){
+        if (newRating != oldRating) {
             sendEmailForRating(idea.getId());
         }
         return ratingRepositorySave;

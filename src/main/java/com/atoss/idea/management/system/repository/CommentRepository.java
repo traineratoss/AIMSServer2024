@@ -205,17 +205,39 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM User u JOIN u.likedComments l WHERE u.id = :userId AND l.id = :commentId")
     boolean existsLikeByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
 
+    /**
+     * Counts the number of reports for a specific comment.
+     *
+     * @param commentId the ID of the comment
+     * @return the count of reports for the specified comment
+     */
     @Query("SELECT COUNT(l) FROM User u JOIN u.reportedComments l WHERE l.id = :commentId")
     int countReportsByCommentId(@Param("commentId") Long commentId);
 
+
+    /**
+     * Retrieves the IDs of comments that have been reported by five or more users.
+     *
+     * @return a list of comment IDs that have five or more reports
+     */
     @Query("SELECT c.id FROM Comment c JOIN c.listOfUsers u GROUP BY c.id HAVING COUNT(u) >= 5")
     List<Long> moreThenFiveReports();
 
+    /**
+     * Deletes likes associated with a specific comment.
+     *
+     * @param commentId the ID of the comment
+     */
     @Modifying
-    @Query(value="DELETE FROM likes where comment_id = :commentId",nativeQuery=true)
+    @Query(value = "DELETE FROM likes where comment_id = :commentId", nativeQuery = true)
     void deleteLikesForComment(Long commentId);
 
+    /**
+     * Deletes reports associated with a specific comment.
+     *
+     * @param commentId the ID of the comment
+     */
     @Modifying
-    @Query(value="DELETE FROM reports where comment_id = :commentId",nativeQuery=true)
+    @Query(value = "DELETE FROM reports where comment_id = :commentId", nativeQuery = true)
     void deleteReportsByCommentId(Long commentId);
 }

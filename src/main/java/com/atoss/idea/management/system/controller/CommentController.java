@@ -143,6 +143,7 @@ public class CommentController {
      * The, the id is used in the CommentService method "deleteComment" and the deleting operation happens
      *
      * @param commentId the unique identifier for the comment we are going to delete
+     * @return ResponseEntity with a message indicating the result of the delete operation
      */
     @Transactional
     @DeleteMapping("/comments/{commentId}")
@@ -150,7 +151,7 @@ public class CommentController {
         commentService.deleteReportsForDeletedComment(commentId);
         commentService.deleteLikesForDeletedComment(commentId);
         commentService.deleteComment(commentId);
-        return new ResponseEntity<>("Comment likes will also be deleted for deleted comment",HttpStatus.OK);
+        return new ResponseEntity<>("Comment likes will also be deleted for deleted comment", HttpStatus.OK);
     }
 
 
@@ -197,6 +198,7 @@ public class CommentController {
      *
      * @param commentId the ID of the comment
      * @param userId    the ID of the user
+     * @return ResponseEntity with a message indicating the result of the delete operation
      */
     @Transactional
     @DeleteMapping("/comments/like/delete/{commentId}/{userId}")
@@ -205,6 +207,13 @@ public class CommentController {
         return new ResponseEntity<>("Like succesfully deleted", HttpStatus.OK);
     }
 
+    /**
+     * Deletes a report from a specific comment by a specific user.
+     *
+     * @param commentId the ID of the comment
+     * @param userId    the ID of the user
+     * @return ResponseEntity with a message indicating the result of the delete operation
+     */
     @Transactional
     @DeleteMapping("/comments/report/delete/{commentId}/{userId}")
     public  ResponseEntity<String> deleteReport(@PathVariable Long commentId, @PathVariable Long userId) {
@@ -225,12 +234,26 @@ public class CommentController {
         return commentService.existsLikeByCommentIdAndUserId(commentId, userId);
     }
 
+    /**
+     * Retrieves the count of reports for a specific comment.
+     *
+     * @param commentId the ID of the comment
+     * @return ResponseEntity with the count of reports for the specified comment
+     */
     @GetMapping("/comments/reports/count/{commentId}")
     public ResponseEntity<Integer> getReportsCountForComment(@PathVariable Long commentId) {
         int reportsCount = commentService.getReportsCountForComment(commentId);
         return ResponseEntity.ok(reportsCount);
     }
 
+    /**
+     * Retrieves all comments sorted by the number of reports.
+     *
+     * @param pageSize    the number of comments per page
+     * @param pageNumber  the page number to retrieve
+     * @param sortCategory the category by which the comments should be sorted
+     * @return ResponseEntity with a CommentPageDTO containing the comments
+     */
     @Transactional
     @GetMapping("/comments/allByReportsNr")
     public ResponseEntity<CommentPageDTO> getAllUserByUsername(@RequestParam(required = true) int pageSize,
@@ -250,14 +273,13 @@ public class CommentController {
 
 
     /**
+     * Adds a report to a specific comment from a specific user
+     *
+     * This method handles the HTTP POST request to add a report for a comment by a user
+     * It calls the CommentService to perform the actual report addition logic
      * @param commentId the ID of the comment
      * @param userId    the ID of the user
      * @return ResponseEntity containing a success message if the report is added successfully
-     * Adds a report to a specific comment from a specific user.
-     *
-     * This method handles the HTTP POST request to add a report for a comment by a user.
-     * It calls the CommentService to perform the actual report addition logic.
-     *
      */
     @Transactional
     @PostMapping("/comments/report/{commentId}/{userId}")
@@ -266,16 +288,21 @@ public class CommentController {
         return new ResponseEntity<>("Report added successfully", HttpStatus.OK);
     }
 
+    /**
+     * Updates the status of a reported comment. If the comment has more than 5 reports,
+     * it is marked as under review by displaying a placeholder.
+     *
+     * @param commentId the ID of the comment to update
+     * @return ResponseEntity with a message indicating the result of the update operation
+     */
     @Transactional
     @PatchMapping("/comments/report/patch/{commentId}")
-    public ResponseEntity<String> updateReportedComment(@PathVariable Long commentId)
-    {
-        if(commentService.getReportsCountForComment(commentId) <=5)
-        {
+    public ResponseEntity<String> updateReportedComment(@PathVariable Long commentId) {
+        if (commentService.getReportsCountForComment(commentId) <= 5) {
             return new ResponseEntity<>("This comment does not have enough reports to be reviewed!", HttpStatus.OK);
         }
         commentService.displayPlaceholder(commentId);
-        return new ResponseEntity<>("Comment with id "+commentId+" is under review by admin", HttpStatus.OK);
+        return new ResponseEntity<>("Comment with id " + commentId + " is under review by admin", HttpStatus.OK);
     }
 
 }
