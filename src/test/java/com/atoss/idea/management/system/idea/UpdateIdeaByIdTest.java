@@ -40,6 +40,9 @@ public class UpdateIdeaByIdTest {
     @Spy
     public ModelMapper modelMapper;
 
+    @Mock
+    public SubscriptionRepository subscriptionRepository;
+
 
     @BeforeEach
     public void setup() {

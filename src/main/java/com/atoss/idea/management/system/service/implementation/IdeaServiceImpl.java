@@ -56,6 +56,10 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final RatingRepository ratingRepository;
 
+    private final SubscriptionRepository subscriptionRepository;
+
+    private final SendEmailServiceImpl sendEmailService;
+
     /**
      * Constructor for the Idea Service Implementation
      *
@@ -72,7 +76,9 @@ public class IdeaServiceImpl implements IdeaService {
                            RatingRepository ratingRepository,
                            CategoryRepository categoryRepository,
                            ModelMapper modelMapper,
-                           CommentServiceImpl commentServiceImpl) {
+                           CommentServiceImpl commentServiceImpl,
+                           SubscriptionRepository subscriptionRepository,
+                           SendEmailServiceImpl sendEmailService) {
         this.ratingRepository = ratingRepository;
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
@@ -80,6 +86,8 @@ public class IdeaServiceImpl implements IdeaService {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
         this.commentServiceImpl = commentServiceImpl;
+        this.subscriptionRepository = subscriptionRepository;
+        this.sendEmailService = sendEmailService;
     }
 
     private String filterBadWords(String text) {
@@ -198,10 +206,22 @@ public class IdeaServiceImpl implements IdeaService {
 
             Idea idea = ideaRepository.findById(id).get();
 
+            List<Long> subscribedUsersIds = subscriptionRepository.findUserIdByIdeaId(id);
+
+            List<User> subscribedUsers = new ArrayList<>();
+
+
             if (ideaUpdateDTO.getText() != null) {
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
                 idea.setText(filteredCommentText);
+                for(Long userId : subscribedUsersIds) {
+                    subscribedUsers.add(userRepository.findById(userId).get());
+                }
+                if(!subscribedUsers.isEmpty()) {
+                    sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
+                }
+
             }
             if (ideaUpdateDTO.getStatus() != null) {
                 idea.setStatus(ideaUpdateDTO.getStatus());
@@ -218,6 +238,9 @@ public class IdeaServiceImpl implements IdeaService {
 
             if (ideaUpdateDTO.getTitle() != null) {
                 idea.setTitle(ideaUpdateDTO.getTitle());
+                if(!subscribedUsers.isEmpty()) {
+                    sendEmailService.sendEmailChangedIdeaTitle(subscribedUsers, id);
+                }
             }
 
             if (ideaUpdateDTO.getCategoryList() != null) {
@@ -225,7 +248,6 @@ public class IdeaServiceImpl implements IdeaService {
                 if (ideaUpdateDTO.getCategoryList().isEmpty()) {
                     throw new RuntimeException("Please select at least one category");
                 }
-
                 idea.setCategoryList(new ArrayList<>());
                 List<Category> newList = new ArrayList<>();
 

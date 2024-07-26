@@ -3,6 +3,7 @@ package com.atoss.idea.management.system.service.implementation;
 import com.atoss.idea.management.system.exception.AvatarNotFoundException;
 import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.entity.Avatar;
+import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
@@ -90,6 +91,22 @@ public class SendEmailServiceImpl implements SendEmailService {
     @Override
     public void sendDeclineEmailToUser(String username) {
         sendEmailUtils("registration-reject-template.ftl", username, "", "Registration Request - Rejected");
+    }
+
+    public void sendEmailChangedIdeaText(List<User> usernames, Long ideaId) {
+        Idea idea = ideaRepository.findById(ideaId).get();
+        for(User user : usernames) {
+            String username = user.getUsername();
+            sendEmailIdeaSubscription("text-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea title/text change");
+        }
+    }
+
+    public void sendEmailChangedIdeaTitle(List<User> usernames, Long ideaId) {
+        Idea idea = ideaRepository.findById(ideaId).get();
+        for(User user : usernames) {
+            String username = user.getUsername();
+            sendEmailIdeaSubscription("title-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea title/text change");
+        }
     }
 
     @Override
@@ -235,6 +252,32 @@ public class SendEmailServiceImpl implements SendEmailService {
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void sendEmailIdeaSubscription(String fileName, String username, String title, String text, Long ideaId, String subject) {
+        User user = getUserByUsername(username);
+        String emailTo = user.getEmail();
+        Idea idea = getIdeaById(ideaId);
+
+        Map<String, Object> mapUser = new HashMap<>();
+        mapUser.put("username", username);
+        mapUser.put("email", user.getEmail());
+        mapUser.put("companyName", companyName);
+        mapUser.put("newTitle", idea.getTitle());
+        mapUser.put("newText", idea.getText());
+        mapUser.put("imageUrl", "./welcome.jpg");
+        try {
+            Template template  = configuration.getTemplate(fileName);
+            String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapUser);
+            sendEmail(emailTo, subject, htmlTemplate);
+        } catch (IOException | TemplateException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    private Idea getIdeaById(Long ideaId) {
+        return ideaRepository.findById(ideaId)
+                .orElseThrow(() -> new RuntimeException("Idea does not exist!"));
     }
 
 
