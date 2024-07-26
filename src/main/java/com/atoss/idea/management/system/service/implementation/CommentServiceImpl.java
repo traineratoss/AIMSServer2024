@@ -498,4 +498,47 @@ public class CommentServiceImpl implements CommentService {
     }
 
 
+
+    /**
+     * Adds a report from a user to a comment.
+     *
+     * This method performs the following actions:
+     * - Verifies that the comment exists and throws an exception if not found.
+     * - Verifies that the user exists and throws an exception if not found.
+     * - Checks if the user is the owner of the comment and prevents the report if true.
+     * - Checks if the user has already reported the comment and prevents multiple reports.
+     * - If both the comment and user exist, and the user is not the owner of the comment, and the user hasn't already reported the comment,
+     *   adds the report to both the user and the comment, and saves the changes to the database.
+     *
+     * @param commentId the ID of the comment to be reported
+     * @param userId the ID of the user who is reporting the comment
+     * @throws UserNotFoundException if the user with the specified ID does not exist
+     * @throws CommentNotFoundException if the comment with the specified ID does not exist
+     * @throws IllegalArgumentException if the user tries to report their own comment or if the user has already reported the comment
+     */
+    @Transactional
+    @Override
+    public void addReport(Long commentId, Long userId) {
+        if (!verifyCommentOwner(commentId, userId)) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+
+            Comment comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new CommentNotFoundException());
+
+            if (user.getReportedComments().contains(comment)) {
+                throw new UserNotFoundException("User has already reported this comment!");
+            }
+
+            user.getReportedComments().add(comment);
+            comment.getListOfUsers().add(user);
+
+            userRepository.save(user);
+            commentRepository.save(comment);
+        } else {
+            throw new UserNotFoundException("A user can't report his own comment !");
+        }
+    }
+
+
 }

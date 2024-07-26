@@ -245,4 +245,23 @@ public class CommentController {
         );
     }
 
+
+    /**
+     * @param commentId the ID of the comment
+     * @param userId    the ID of the user
+     * @return ResponseEntity containing a success message if the report is added successfully
+     * Adds a report to a specific comment from a specific user.
+     *
+     * This method handles the HTTP POST request to add a report for a comment by a user.
+     * It calls the CommentService to perform the actual report addition logic.
+     *
+     */
+    @Transactional
+    @PostMapping("/comments/report/{commentId}/{userId}")
+    public ResponseEntity<String> addReport(@PathVariable Long commentId, @PathVariable Long userId) {
+        commentService.addReport(commentId, userId);
+        return new ResponseEntity<>("Report added successfully", HttpStatus.OK);
+    }
+
+
 }
