@@ -75,6 +75,15 @@ public class User {
     @JsonIgnoreProperties("userList")
     private List<Comment> likedComments;
 
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "reports",
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = { @JoinColumn(name = "comment_id") }
+    )
+    @JsonIgnoreProperties("listOfUsers")
+    private List<Comment> reportedComments;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
