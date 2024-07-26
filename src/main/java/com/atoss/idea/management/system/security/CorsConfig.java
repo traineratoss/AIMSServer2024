@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.repository.security;
+package com.atoss.idea.management.system.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

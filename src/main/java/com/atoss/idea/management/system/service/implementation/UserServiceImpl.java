@@ -38,8 +38,6 @@ public class UserServiceImpl implements UserService {
 
     private final AvatarRepository avatarRepository;
 
-    private final PasswordEncoder passwordEncoder;
-
     @Value("${aims.app.bcrypt.salt}")
     private String bcryptSalt;
 
@@ -49,17 +47,15 @@ public class UserServiceImpl implements UserService {
      * @param modelMapper for mapping entity-dto relationships
      * @param sendEmailService service used for sending emails
      * @param avatarRepository for accessing CRUD repository methods for Avatar Entity
-     * @param passwordEncoder for password hashing and verification
      */
     public UserServiceImpl(UserRepository userRepository,
                            ModelMapper modelMapper,
                            SendEmailService sendEmailService,
-                           AvatarRepository avatarRepository, PasswordEncoder passwordEncoder) {
+                           AvatarRepository avatarRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.sendEmailService = sendEmailService;
         this.avatarRepository = avatarRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -127,9 +123,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDTO getUserByUsername(String username) {
+    public <T> T getUserByUsername(String username, Class<T> type) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
-        return modelMapper.map(user, UserResponseDTO.class);
+        return modelMapper.map(user, type);
     }
 
     @Override

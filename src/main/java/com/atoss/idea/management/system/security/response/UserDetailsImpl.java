@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.repository.security.response;
+package com.atoss.idea.management.system.security.response;
 
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;

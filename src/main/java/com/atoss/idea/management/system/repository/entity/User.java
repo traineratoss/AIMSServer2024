@@ -1,9 +1,23 @@
 package com.atoss.idea.management.system.repository.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -84,6 +98,9 @@ public class User {
     @JsonManagedReference
     private List<Subscription> isSubscribed;
 
+    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "refresh_token_id", referencedColumnName = "id")
+    private RefreshToken refreshToken;
 
     /**
      * Constructor for creating a User object with the provided username and email.
@@ -97,17 +114,6 @@ public class User {
         this.username = username;
         this.email = email;
     }
-
-    public void setUsername(String username)
-    {
-        this.username=username;
-    }
-    public String getUsername()
-    {
-        return this.username;
-    }
-
-
 
     @Override
     public String toString() {
