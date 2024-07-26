@@ -39,3 +39,8 @@ aims:
 logging:
   level:
     root: INFO
+
+cors:
+  allowedOrigins: "http://localhost:5173"
+  allowedMethods: "*"
+  allowedHeaders: "*"
