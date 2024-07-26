@@ -47,9 +47,9 @@ public class CommentServiceImpl implements CommentService {
      * CONSTRUCTOR
      *
      * @param commentRepository for accessing CRUD repository methods for Comment Entity
-     * @param ideaRepository for accessing CRUD repository methods for Idea Entity
-     * @param userRepository for accessing CRUD repository methods for User Entity
-     * @param modelMapper for mapping entity-dto relationships
+     * @param ideaRepository    for accessing CRUD repository methods for Idea Entity
+     * @param userRepository    for accessing CRUD repository methods for User Entity
+     * @param modelMapper       for mapping entity-dto relationships
      */
     public CommentServiceImpl(CommentRepository commentRepository, IdeaRepository ideaRepository,
                               UserRepository userRepository, ModelMapper modelMapper) {
@@ -58,6 +58,7 @@ public class CommentServiceImpl implements CommentService {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
+
     /**
      * Retrieves the elapsed time since the creation of a comment in a human-readable format.
      *
@@ -184,22 +185,11 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Adds a new comment to an idea.
-     * <p>
-     * This method performs the following steps:
-     * <ul>
-     *     <li>Retrieves the user and idea based on the provided DTO.</li>
-     *     <li>Checks for and reads the list of bad words from a file.</li>
-     *     <li>Filters the comment text for any bad words.</li>
-     *     <li>Creates and saves a new comment with the filtered text.</li>
-     *     <li>Maps the newly created comment to a response DTO and sets the username.</li>
-     * </ul>
-     * </p>
-     *
      * @param requestCommentDTO the DTO containing information about the comment to be added
      * @return a {@link ResponseCommentDTO} representing the added comment
      * @throws UnsupportedEncodingException if an error occurs while decoding the bad words file path
-     * @throws UserNotFoundException if the user specified in the DTO does not exist
-     * @throws IdeaNotFoundException if the idea specified in the DTO does not exist
+     * @throws UserNotFoundException        if the user specified in the DTO does not exist
+     * @throws IdeaNotFoundException        if the idea specified in the DTO does not exist
      */
 
     @Transactional
@@ -210,7 +200,7 @@ public class CommentServiceImpl implements CommentService {
 
         Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).orElseThrow(() -> new IdeaNotFoundException("Idea not found!"));
 
-        Comment newComment =  new Comment();
+        Comment newComment = new Comment();
         String wordsFilePath = "textTerms/badWords.txt";
         URL resourceUrl = classLoader.getResource(wordsFilePath);
         if (resourceUrl != null) {
@@ -237,20 +227,9 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Adds a reply to an existing comment.
-     * <p>
-     * This method performs the following steps:
-     * <ul>
-     *     <li>Retrieves the user based on the provided DTO.</li>
-     *     <li>Checks if the parent comment exists.</li>
-     *     <li>Filters the reply text for any bad words.</li>
-     *     <li>Creates and saves a new reply to the parent comment.</li>
-     *     <li>Maps the newly created reply to a response DTO and sets the username.</li>
-     * </ul>
-     * </p>
-     *
      * @param requestCommentReplyDTO the DTO containing information about the reply to be added
      * @return a {@link ResponseCommentReplyDTO} representing the added reply
-     * @throws UserNotFoundException if the user specified in the DTO does not exist
+     * @throws UserNotFoundException    if the user specified in the DTO does not exist
      * @throws CommentNotFoundException if the parent comment specified in the DTO does not exist
      */
     @Transactional
@@ -286,18 +265,8 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Retrieves all replies for a given comment, paginated.
-     * <p>
-     * This method performs the following steps:
-     * <ul>
-     *     <li>Checks if the comment exists.</li>
-     *     <li>Fetches the replies to the comment, applying pagination.</li>
-     *     <li>Maps each reply to a response DTO, including additional information like username and elapsed time.</li>
-     *     <li>Returns the list of replies as a {@link Page} of {@link ResponseCommentReplyDTO}.</li>
-     * </ul>
-     * </p>
-     *
      * @param commentId the ID of the comment for which replies are to be fetched
-     * @param pageable the pagination information
+     * @param pageable  the pagination information
      * @return a {@link Page} of {@link ResponseCommentReplyDTO} containing the replies to the specified comment
      * @throws CommentNotFoundException if the comment with the specified ID does not exist
      */
@@ -327,27 +296,17 @@ public class CommentServiceImpl implements CommentService {
         return new PageImpl<>(replyList, pageable, replyList.size());
 
     }
+
     /**
      * Retrieves a paginated list of comments for a given idea.
-     * <p>
-     * This method performs the following steps:
-     * <ul>
-     *     <li>Checks if the idea with the specified ID exists.</li>
-     *     <li>Fetches all comments associated with the given idea, applying pagination.</li>
-     *     <li>Maps each comment to a response DTO, including additional information like the username of the commenter,
-     *         elapsed time since the comment was created, and whether the comment has replies.</li>
-     *     <li>Returns the paginated list of comments as a {@link Page} of {@link ResponseCommentDTO}.</li>
-     * </ul>
-     * </p>
-     *
      * @param ideaId the ID of the idea for which comments are to be fetched
      * @param pageable the pagination information to control the size and number of pages
      * @return a {@link Page} of {@link ResponseCommentDTO} containing comments associated with the specified idea
      * @throws IdeaNotFoundException if the idea with the specified ID does not exist
      */
-
     @Override
     public Page<ResponseCommentDTO> getAllPagedCommentsByIdeaId(Long ideaId, Pageable pageable) {
+
         if (!ideaRepository.existsById(ideaId)) {
             throw new IdeaNotFoundException();
         }
@@ -373,14 +332,6 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Verifies if a comment is owned by a specific user.
-     * <p>
-     * This method performs the following steps:
-     * <ul>
-     *     <li>Retrieves the comment based on the provided comment ID.</li>
-     *     <li>Checks if the ID of the user who owns the comment matches the provided user ID.</li>
-     * </ul>
-     * </p>
-     *
      * @param commentId the ID of the comment to be checked
      * @param userId the ID of the user whose ownership is to be verified
      * @return {@code true} if the comment is owned by the specified user, {@code false} otherwise
@@ -397,17 +348,6 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Adds a like from a user to a comment.
-     * <p>
-     * This method performs the following checks and actions:
-     * <ul>
-     *     <li>Verifies that the comment is not owned by the user trying to like it, as a user cannot like their own comment.</li>
-     *     <li>Checks if the user exists and throws an exception if not found.</li>
-     *     <li>Checks if the comment exists and throws an exception if not found.</li>
-     *     <li>Checks if the user has already liked the comment; if so, throws an exception.</li>
-     *     <li>If all checks pass, adds the like to both the user and the comment, and saves the changes to the database.</li>
-     * </ul>
-     * </p>
-     *
      * @param commentId the ID of the comment to which the like is being added
      * @param userId the ID of the user who is liking the comment
      * @throws UserNotFoundException if the user with the specified ID does not exist, or if the user has already liked the comment
@@ -440,14 +380,6 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Deletes a comment by its ID.
-     * <p>
-     * This method performs the following actions:
-     * <ul>
-     *     <li>Checks if the comment with the specified ID exists.</li>
-     *     <li>If the comment exists, deletes it from the repository.</li>
-     * </ul>
-     * </p>
-     *
      * @param commentId the ID of the comment to be deleted
      * @throws CommentNotFoundException if the comment with the specified ID does not exist
      */
@@ -461,11 +393,6 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Retrieves the list of users who liked a specific comment.
-     * <p>
-     * This method finds the comment with the given ID and maps the list of users who liked it into a list of
-     * {@link UserResponseDTO} objects.
-     * </p>
-     *
      * @param commentId the ID of the comment for which likes are being retrieved
      * @return a list of {@link UserResponseDTO} representing the users who liked the comment
      * @throws RuntimeException if the comment with the specified ID does not exist
@@ -482,10 +409,6 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Retrieves the count of likes for a specific comment.
-     * <p>
-     * This method returns the total number of likes associated with the comment identified by the given ID.
-     * </p>
-     *
      * @param commentId the ID of the comment for which the like count is being retrieved
      * @return the number of likes for the specified comment
      */
@@ -496,15 +419,6 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Deletes a like from a comment by a specific user.
-     * <p>
-     * This method performs the following actions:
-     * <ul>
-     *     <li>Checks if the comment with the specified ID exists; throws {@link CommentNotFoundException} if not.</li>
-     *     <li>Checks if the user with the specified ID exists; throws {@link UserNotFoundException} if not.</li>
-     *     <li>If both the comment and user exist, deletes the like from the comment by the user.</li>
-     * </ul>
-     * </p>
-     *
      * @param commentId the ID of the comment from which the like is being deleted
      * @param userId the ID of the user whose like is being removed
      * @throws CommentNotFoundException if the comment with the specified ID does not exist
@@ -521,21 +435,110 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteLikes(commentId, userId);
     }
 
+    /**
+     * Deletes reports associated with a specific comment and user.
+
+     * @param commentId the unique identifier of the comment whose reports are to be deleted
+     * @param userId the unique identifier of the user associated with the reports to be deleted
+     * @throws CommentNotFoundException if no comment is found with the given {@code commentId}
+     * @throws UserNotFoundException if no user is found with the given {@code userId}
+     */
+
+    @Transactional
+    @Override
+    public void deleteReport(Long commentId, Long userId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User with id " + userId + " does not exist");
+        }
+        commentRepository.deleteReport(commentId, userId);
+    }
+
+
+        /**
+         * Checks if a specific user has liked a particular comment.
+         *
+         * @param commentId the ID of the comment to check for likes
+         * @param userId the ID of the user to check for the like
+         * @return {@code true} if the user has liked the comment, {@code false} otherwise
+         */
+
+    @Override
+    public boolean existsLikeByCommentIdAndUserId(Long commentId, Long userId) {
+        return commentRepository.existsLikeByCommentIdAndUserId(commentId, userId);
+    }
+
+    @Override
+    public int getReportsCountForComment(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        return commentRepository.countReportsByCommentId(commentId);
+    }
+
+    @Override
+    public CommentPageDTO getAllCommentsByReportsNr(Pageable pageable) {
+        List<Long> commentsIds = commentRepository.moreThenFiveReports();
+        //total is the total number of comments, regardless of pagination
+        int total = commentsIds.size();
+
+        List<CommentDashboardResponseDTO> contents = new ArrayList<>();
+
+        for (Long id : commentsIds) {
+            Comment comment = commentRepository.findById(id).orElseThrow(null);
+            CommentDashboardResponseDTO commentDashboardResponseDTO = new CommentDashboardResponseDTO();
+            commentDashboardResponseDTO.setId(comment.getId());
+            commentDashboardResponseDTO.setContent(comment.getCommentText());
+            contents.add(commentDashboardResponseDTO);
+        }
+
+        return new CommentPageDTO(total, new PageImpl<>(contents, pageable, contents.size()));
+    }
+
 
 
     /**
-     * Checks if a specific user has liked a particular comment.
-     * <p>
-     * This method verifies whether a like exists from the user for the specified comment.
-     * </p>
+     * Adds a report from a user to a comment.
      *
-     * @param commentId the ID of the comment to check for likes
-     * @param userId the ID of the user to check for the like
-     * @return {@code true} if the user has liked the comment, {@code false} otherwise
+     * This method performs the following actions:
+     * - Verifies that the comment exists and throws an exception if not found.
+     * - Verifies that the user exists and throws an exception if not found.
+     * - Checks if the user is the owner of the comment and prevents the report if true.
+     * - Checks if the user has already reported the comment and prevents multiple reports.
+     * - If both the comment and user exist, and the user is not the owner of the comment, and the user hasn't already reported the comment,
+     *   adds the report to both the user and the comment, and saves the changes to the database.
+     *
+     * @param commentId the ID of the comment to be reported
+     * @param userId the ID of the user who is reporting the comment
+     * @throws UserNotFoundException if the user with the specified ID does not exist
+     * @throws CommentNotFoundException if the comment with the specified ID does not exist
+     * @throws IllegalArgumentException if the user tries to report their own comment or if the user has already reported the comment
      */
+    @Transactional
     @Override
-    public boolean existsByCommentIdAndUserId(Long commentId, Long userId) {
-        return commentRepository.existsByCommentIdAndUserId(commentId, userId);
+    public void addReport(Long commentId, Long userId) {
+        if (!verifyCommentOwner(commentId, userId)) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+
+            Comment comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new CommentNotFoundException());
+
+            if (user.getReportedComments().contains(comment)) {
+                throw new UserNotFoundException("User has already reported this comment!");
+            }
+
+            user.getReportedComments().add(comment);
+            comment.getListOfUsers().add(user);
+
+            userRepository.save(user);
+            commentRepository.save(comment);
+        } else {
+            throw new UserNotFoundException("A user can't report his own comment !");
+        }
     }
+
 
 }

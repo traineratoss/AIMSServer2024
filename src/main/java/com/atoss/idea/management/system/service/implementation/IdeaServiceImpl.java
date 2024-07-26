@@ -59,7 +59,13 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final RatingRepository ratingRepository;
 
+<<<<<<< HEAD
     private final SendEmailService sendEmailService;
+=======
+    private final SubscriptionRepository subscriptionRepository;
+
+    private final SendEmailServiceImpl sendEmailService;
+>>>>>>> 4851fc84e6d2b281a5499ed4b396179124ebca8d
 
     /**
      * Constructor for the Idea Service Implementation
@@ -78,8 +84,13 @@ public class IdeaServiceImpl implements IdeaService {
                            CategoryRepository categoryRepository,
                            ModelMapper modelMapper,
                            CommentServiceImpl commentServiceImpl,
+<<<<<<< HEAD
                            SendEmailService sendEmailService,
                            SubscriptionRepository subscriptionRepository) {
+=======
+                           SubscriptionRepository subscriptionRepository,
+                           SendEmailServiceImpl sendEmailService) {
+>>>>>>> 4851fc84e6d2b281a5499ed4b396179124ebca8d
         this.ratingRepository = ratingRepository;
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
@@ -87,8 +98,13 @@ public class IdeaServiceImpl implements IdeaService {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
         this.commentServiceImpl = commentServiceImpl;
+<<<<<<< HEAD
         this.sendEmailService = sendEmailService;
         this.subscriptionRepository = subscriptionRepository;
+=======
+        this.subscriptionRepository = subscriptionRepository;
+        this.sendEmailService = sendEmailService;
+>>>>>>> 4851fc84e6d2b281a5499ed4b396179124ebca8d
     }
 
     private String filterBadWords(String text) {
@@ -207,10 +223,22 @@ public class IdeaServiceImpl implements IdeaService {
 
             Idea idea = ideaRepository.findById(id).get();
 
+            List<Long> subscribedUsersIds = subscriptionRepository.findUserIdByIdeaId(id);
+
+            List<User> subscribedUsers = new ArrayList<>();
+
+
             if (ideaUpdateDTO.getText() != null) {
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
                 idea.setText(filteredCommentText);
+                for(Long userId : subscribedUsersIds) {
+                    subscribedUsers.add(userRepository.findById(userId).get());
+                }
+                if(!subscribedUsers.isEmpty()) {
+                    sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
+                }
+
             }
             if (ideaUpdateDTO.getStatus() != null) {
                 idea.setStatus(ideaUpdateDTO.getStatus());
@@ -227,6 +255,9 @@ public class IdeaServiceImpl implements IdeaService {
 
             if (ideaUpdateDTO.getTitle() != null) {
                 idea.setTitle(ideaUpdateDTO.getTitle());
+                if(!subscribedUsers.isEmpty()) {
+                    sendEmailService.sendEmailChangedIdeaTitle(subscribedUsers, id);
+                }
             }
 
             if (ideaUpdateDTO.getCategoryList() != null) {
@@ -234,7 +265,6 @@ public class IdeaServiceImpl implements IdeaService {
                 if (ideaUpdateDTO.getCategoryList().isEmpty()) {
                     throw new RuntimeException("Please select at least one category");
                 }
-
                 idea.setCategoryList(new ArrayList<>());
                 List<Category> newList = new ArrayList<>();
 
