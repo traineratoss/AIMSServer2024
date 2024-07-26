@@ -1,8 +1,11 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.AvatarNotFoundException;
+import com.atoss.idea.management.system.exception.IdeaNotFoundException;
+import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.entity.Avatar;
+import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
@@ -131,6 +134,11 @@ public class SendEmailServiceImpl implements SendEmailService {
         sendEmailUtils("password-reset-template.ftl", username, otp, "Password Reset Request");
     }
 
+    @Override
+    public void sendEmailRatingChanged(String username, Long ideaId){
+        sendEmailRatingChangedService("star-rating-changes-template.ftl", username,"Rating changed", ideaId);
+    }
+
     /**
      * Retrieves a user from the repository based on the provided username.
      *
@@ -170,6 +178,27 @@ public class SendEmailServiceImpl implements SendEmailService {
         mapUser.put("imageUrl", "./welcome.jpg");
         try {
             Template template  = configuration.getTemplate(fileName);
+            String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapUser);
+            sendEmail(emailTo, subject, htmlTemplate);
+        } catch (IOException | TemplateException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    private void sendEmailRatingChangedService(String fileName, String username, String subject, Long ideaId ){
+        User user = getUserByUsername(username);
+        Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
+        String emailTo = user.getEmail();
+        Map<String, Object> mapUser = new HashMap<>();
+        mapUser.put("username", username);
+        mapUser.put("email", user.getEmail());
+        mapUser.put("companyName", companyName);
+        mapUser.put("date", new Date().toString());
+        mapUser.put("imageUrl", "./welcome.jpg");
+        mapUser.put("ideaTitle", idea.getTitle());
+        mapUser.put("newRating", idea.getRatingAvg().intValue());
+        try {
+            Template template = configuration.getTemplate(fileName);
             String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapUser);
             sendEmail(emailTo, subject, htmlTemplate);
         } catch (IOException | TemplateException exception) {

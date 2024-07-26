@@ -88,4 +88,6 @@ public interface SendEmailService {
      * @throws RuntimeException If there are any issues during the email sending process.
      */
     boolean sendActivateEmailToUser(String username);
+
+    void sendEmailRatingChanged(String username, Long ideaId);
 }

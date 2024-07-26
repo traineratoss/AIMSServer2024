@@ -7,6 +7,7 @@ import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.*;
 import com.atoss.idea.management.system.service.IdeaService;
+import com.atoss.idea.management.system.service.SendEmailService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -46,6 +47,8 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final ImageRepository imageRepository;
 
+    private final SubscriptionRepository subscriptionRepository;
+
     private final UserRepository userRepository;
 
     private final CategoryRepository categoryRepository;
@@ -55,6 +58,8 @@ public class IdeaServiceImpl implements IdeaService {
     private final CommentServiceImpl commentServiceImpl;
 
     private final RatingRepository ratingRepository;
+
+    private final SendEmailService sendEmailService;
 
     /**
      * Constructor for the Idea Service Implementation
@@ -72,7 +77,9 @@ public class IdeaServiceImpl implements IdeaService {
                            RatingRepository ratingRepository,
                            CategoryRepository categoryRepository,
                            ModelMapper modelMapper,
-                           CommentServiceImpl commentServiceImpl) {
+                           CommentServiceImpl commentServiceImpl,
+                           SendEmailService sendEmailService,
+                           SubscriptionRepository subscriptionRepository) {
         this.ratingRepository = ratingRepository;
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
@@ -80,6 +87,8 @@ public class IdeaServiceImpl implements IdeaService {
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
         this.commentServiceImpl = commentServiceImpl;
+        this.sendEmailService = sendEmailService;
+        this.subscriptionRepository = subscriptionRepository;
     }
 
     private String filterBadWords(String text) {
@@ -448,11 +457,17 @@ public class IdeaServiceImpl implements IdeaService {
         Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
         Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElse(new Rating());
+        Integer oldRating = idea.getRatingAvg().intValue();
         rating.setIdea(idea);
         rating.setUser(user);
         rating.setRating(ratingValue);
         Rating ratingRepositorySave = ratingRepository.save(rating);
         idea.setRatingAvg(getAverage(ideaId));
+        Integer newRating = idea.getRatingAvg().intValue();
+
+        if (newRating != oldRating){
+            sendEmailForRating(idea.getId());
+        }
         return ratingRepositorySave;
     }
 
@@ -472,5 +487,14 @@ public class IdeaServiceImpl implements IdeaService {
     public Double getRatingByUserAndByIdea(Long ideaId, Long userId) {
         Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElseThrow(() -> new IdeaNotFoundException("Not found"));
         return rating.getRating();
+    }
+
+    @Override
+    public void sendEmailForRating(Long ideaId) {
+        List<Long> userIds = subscriptionRepository.findUserIdByIdeaId(ideaId);
+        for (Long userId : userIds) {
+            User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
+            sendEmailService.sendEmailRatingChanged(user.getUsername(), ideaId);
+        }
     }
 }

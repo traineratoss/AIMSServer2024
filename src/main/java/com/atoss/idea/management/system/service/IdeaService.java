@@ -157,4 +157,6 @@ public interface IdeaService {
      */
     Double getRatingByUserAndByIdea(Long userId, Long ideaId);
 
+    void sendEmailForRating(Long ideaId);
+
 }
