@@ -110,7 +110,8 @@ public interface CommentService {
      * @throws CommentNotFoundException if no comment is found with the given {@code commentId}
      * @throws UserNotFoundException if no user is found with the given {@code userId}
      */
-    void deleteReport(Long commentId,Long userId);
+    void deleteReport(Long commentId, Long userId);
+
     /**
      * Deletes a like from a specific comment by a given user.
      *
@@ -143,8 +144,11 @@ public interface CommentService {
      * @param userId the ID of the user to check
      * @return {@code true} if the user has liked the comment, {@code false} otherwise
      */
-    boolean existsByCommentIdAndUserId(Long commentId, Long userId);
+    boolean existsLikeByCommentIdAndUserId(Long commentId, Long userId);
 
     int getReportsCountForComment(Long commentId);
+
+    CommentPageDTO getAllCommentsByReportsNr(Pageable pageable);
+
 
 }

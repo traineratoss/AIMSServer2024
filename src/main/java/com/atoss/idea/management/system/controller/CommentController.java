@@ -217,15 +217,32 @@ public class CommentController {
      * @param userId    the ID of the user
      * @return true if the user has liked the comment, false otherwise
      */
-    @GetMapping("/comments/find/{commentId}/{userId}")
-    public boolean existsByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
-        return commentService.existsByCommentIdAndUserId(commentId, userId);
+    @GetMapping("/comments/like/find/{commentId}/{userId}")
+    public boolean existsLikeByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
+        return commentService.existsLikeByCommentIdAndUserId(commentId, userId);
     }
 
     @GetMapping("/comments/reports/count/{commentId}")
     public ResponseEntity<Integer> getReportsCountForComment(@PathVariable Long commentId) {
         int reportsCount = commentService.getReportsCountForComment(commentId);
         return ResponseEntity.ok(reportsCount);
+    }
+
+    @Transactional
+    @GetMapping("/comments/allByReportsNr")
+    public ResponseEntity<CommentPageDTO> getAllUserByUsername(@RequestParam(required = true) int pageSize,
+                                                            @RequestParam(required = true) int pageNumber,
+                                                               @RequestParam(required = true) String sortCategory) {
+        return new ResponseEntity<>(
+                commentService.getAllCommentsByReportsNr(
+                        PageRequest.of(
+                                pageNumber,
+                                pageSize,
+                                Sort.by(Sort.Direction.ASC, "id")
+                        )
+                ),
+                HttpStatus.OK
+        );
     }
 
 }

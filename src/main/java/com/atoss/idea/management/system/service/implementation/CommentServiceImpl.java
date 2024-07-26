@@ -58,6 +58,7 @@ public class CommentServiceImpl implements CommentService {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
     }
+
     /**
      * Retrieves the elapsed time since the creation of a comment in a human-readable format.
      *
@@ -199,7 +200,7 @@ public class CommentServiceImpl implements CommentService {
 
         Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).orElseThrow(() -> new IdeaNotFoundException("Idea not found!"));
 
-        Comment newComment =  new Comment();
+        Comment newComment = new Comment();
         String wordsFilePath = "textTerms/badWords.txt";
         URL resourceUrl = classLoader.getResource(wordsFilePath);
         if (resourceUrl != null) {
@@ -450,7 +451,7 @@ public class CommentServiceImpl implements CommentService {
             throw new CommentNotFoundException();
         }
         if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("User with id "+userId+" does not exist");
+            throw new UserNotFoundException("User with id " + userId + " does not exist");
         }
         commentRepository.deleteReport(commentId, userId);
     }
@@ -464,10 +465,10 @@ public class CommentServiceImpl implements CommentService {
          * @return {@code true} if the user has liked the comment, {@code false} otherwise
          */
 
-        @Override
-        public boolean existsByCommentIdAndUserId(Long commentId, Long userId){
-            return commentRepository.existsByCommentIdAndUserId(commentId, userId);
-        }
+    @Override
+    public boolean existsLikeByCommentIdAndUserId(Long commentId, Long userId) {
+        return commentRepository.existsLikeByCommentIdAndUserId(commentId, userId);
+    }
 
     @Override
     public int getReportsCountForComment(Long commentId) {
@@ -475,6 +476,25 @@ public class CommentServiceImpl implements CommentService {
             throw new CommentNotFoundException();
         }
         return commentRepository.countReportsByCommentId(commentId);
+    }
+
+    @Override
+    public CommentPageDTO getAllCommentsByReportsNr(Pageable pageable) {
+        List<Long> commentsIds = commentRepository.moreThenFiveReports();
+        //total is the total number of comments, regardless of pagination
+        int total = commentsIds.size();
+
+        List<CommentDashboardResponseDTO> contents = new ArrayList<>();
+
+        for (Long id : commentsIds) {
+            Comment comment = commentRepository.findById(id).orElseThrow(null);
+            CommentDashboardResponseDTO commentDashboardResponseDTO = new CommentDashboardResponseDTO();
+            commentDashboardResponseDTO.setId(comment.getId());
+            commentDashboardResponseDTO.setContent(comment.getCommentText());
+            contents.add(commentDashboardResponseDTO);
+        }
+
+        return new CommentPageDTO(total, new PageImpl<>(contents, pageable, contents.size()));
     }
 
 
