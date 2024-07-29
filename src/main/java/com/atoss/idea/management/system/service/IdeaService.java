@@ -3,9 +3,11 @@ package com.atoss.idea.management.system.service;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.SubscriptionDTO;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.Rating;
 import com.atoss.idea.management.system.repository.entity.Status;
+import com.atoss.idea.management.system.repository.entity.Subscription;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -166,8 +168,11 @@ public interface IdeaService {
      */
     void sendEmailForRating(Long ideaId);
 
-    //  Subscription addSubscription(Long ideaId, Long userId);
+    Subscription addSubscription(Long ideaId, Long userId);
 
-    //  void removeSubscription(Long id);
+    void removeSubscription(Long id);
+
+    Page<SubscriptionDTO> getAllSubscriptions(Pageable pageable);
+
 
 }

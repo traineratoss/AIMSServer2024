@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
@@ -27,6 +28,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     @Query(value = "SELECT user_id FROM Subscription WHERE idea_id = :ideaId", nativeQuery = true)
     List<Long> findUserIdByIdeaId(Long ideaId);
 
-    //  Optional<Subscription> findByIdeaIdAndUserId(Long ideaId, Long userId);
+    Optional<Subscription> findByIdeaIdAndUserId(Long ideaId, Long userId);
+
 }
 
