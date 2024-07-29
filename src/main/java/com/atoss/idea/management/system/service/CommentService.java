@@ -103,8 +103,6 @@ public interface CommentService {
      */
     void deleteComment(Long commentId);
 
-    void deleteRepliesForDeletedComment(Long commentId);
-
     /**
      * Displays a placeholder for a comment under review.
      *

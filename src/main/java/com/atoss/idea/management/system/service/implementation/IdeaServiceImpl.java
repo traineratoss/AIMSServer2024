@@ -214,18 +214,24 @@ public class IdeaServiceImpl implements IdeaService {
 
             List<User> subscribedUsers = new ArrayList<>();
 
+            boolean diffText = false;
+
             for (Long userId : subscribedUsersIds) {
                 subscribedUsers.add(userRepository.findById(userId).get());
             }
 
 
             if (ideaUpdateDTO.getText() != null) {
+                if (!Objects.equals(idea.getText(), ideaUpdateDTO.getText())) {
+                    diffText = true;
+                }
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
                 idea.setText(filteredCommentText);
-                if (!subscribedUsers.isEmpty()) {
+                if (!subscribedUsers.isEmpty() && diffText) {
                     sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
                 }
+                diffText = false;
 
             }
             if (ideaUpdateDTO.getStatus() != null) {
@@ -242,8 +248,11 @@ public class IdeaServiceImpl implements IdeaService {
             }
 
             if (ideaUpdateDTO.getTitle() != null) {
+                if (!Objects.equals(idea.getTitle(), ideaUpdateDTO.getTitle())) {
+                    diffText = true;
+                }
                 idea.setTitle(ideaUpdateDTO.getTitle());
-                if (!subscribedUsers.isEmpty()) {
+                if (!subscribedUsers.isEmpty() && diffText) {
                     sendEmailService.sendEmailChangedIdeaTitle(subscribedUsers, id);
                 }
             }
@@ -533,21 +542,23 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public void removeSubscription(Long id){
-        if(subscriptionRepository.existsById(id)){
-            subscriptionRepository.deleteById(id);
+    public void removeSubscription(Long ideaId, Long userId) {
+        Optional<Subscription> subscription = subscriptionRepository.findByIdeaIdAndUserId(ideaId, userId);
+        if (subscription.isPresent()) {
+            subscriptionRepository.deleteByIdeaIdAndUserId(ideaId, userId);
         } else {
             throw new SubscriptionNotFoundException("Subscription doesn't exist");
         }
     }
 
+
     @Override
-    public Page<SubscriptionDTO> getAllSubscriptions(Pageable pageable){
-        if (subscriptionRepository.findAll().size() <= 0){
-            throw new SubscriptionNotFoundException("No subscriptions found.");
+    public List<SubscriptionDTO> getAllSubscriptions(Long userId){
+        if (!userRepository.existsById(userId)){
+            throw new UserNotFoundException("User not found");
         }
 
-        Page<Subscription> subscriptions = subscriptionRepository.findAll(pageable);
+        List<Subscription> subscriptions = subscriptionRepository.findByUserId(userId);
         List<SubscriptionDTO> subscriptionDTOs = subscriptions.stream()
                 .map(subscription -> {
                     SubscriptionDTO responseDTO = modelMapper.map(subscription, SubscriptionDTO.class);
@@ -556,6 +567,6 @@ public class IdeaServiceImpl implements IdeaService {
                     return responseDTO;
                 })
                 .toList();
-        return new PageImpl<>(subscriptionDTOs, pageable, subscriptions.getTotalElements());
+        return subscriptionDTOs;
     }
 }

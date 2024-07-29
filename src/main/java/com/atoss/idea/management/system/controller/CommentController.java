@@ -310,4 +310,11 @@ public class CommentController {
         return new ResponseEntity<>("Comment with id " + commentId + " is under review by admin", HttpStatus.OK);
     }
 
+
+    @Transactional
+    @DeleteMapping("/comments/reports/delete/{commentId}")
+    public ResponseEntity<String> deleteReportsByCommentId(@PathVariable Long commentId) {
+        commentService.deleteReportsByCommentId(commentId);
+        return new ResponseEntity<>("Deleted reports for comment with id: "+commentId, HttpStatus.OK);
+    }
 }
