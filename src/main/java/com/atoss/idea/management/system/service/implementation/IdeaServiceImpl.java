@@ -1,6 +1,7 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
+import com.atoss.idea.management.system.exception.SubscriptionNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.FieldValidationException;
 import com.atoss.idea.management.system.repository.*;
@@ -372,7 +373,9 @@ public class IdeaServiceImpl implements IdeaService {
             predicatesList.add(root.join("categoryList").get("text").in(categories));
         }
         if (ratingAvg != null) {
-            predicatesList.add(cb.equal(root.get("ratingAvg"), ratingAvg));
+            float rating = Float.parseFloat(ratingAvg);
+            float upperBound = rating < 5.0f ? rating + 0.99f : 5.0f;
+            predicatesList.add(cb.between(root.get("ratingAvg"), rating, upperBound));
         }
         predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
         List<Order> orders = new ArrayList<>();
@@ -471,7 +474,10 @@ public class IdeaServiceImpl implements IdeaService {
         Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
         Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElse(new Rating());
-        Integer oldRating = idea.getRatingAvg().intValue();
+        Integer oldRating = 0;
+        if (idea.getRatingAvg() != null){
+            oldRating = idea.getRatingAvg().intValue();
+        }
         rating.setIdea(idea);
         rating.setUser(user);
         rating.setRating(ratingValue);
@@ -479,7 +485,8 @@ public class IdeaServiceImpl implements IdeaService {
         idea.setRatingAvg(getAverage(ideaId));
         Integer newRating = idea.getRatingAvg().intValue();
 
-        if (newRating != oldRating){
+
+        if (newRating != oldRating && oldRating != 0){
             sendEmailForRating(idea.getId());
         }
         return ratingRepositorySave;
