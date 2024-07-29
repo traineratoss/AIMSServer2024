@@ -213,18 +213,24 @@ public class IdeaServiceImpl implements IdeaService {
 
             List<User> subscribedUsers = new ArrayList<>();
 
+            boolean diffText = false;
+
             for (Long userId : subscribedUsersIds) {
                 subscribedUsers.add(userRepository.findById(userId).get());
             }
 
 
             if (ideaUpdateDTO.getText() != null) {
+                if (!Objects.equals(idea.getText(), ideaUpdateDTO.getText())) {
+                    diffText = true;
+                }
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
                 idea.setText(filteredCommentText);
-                if (!subscribedUsers.isEmpty()) {
+                if (!subscribedUsers.isEmpty() && diffText) {
                     sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
                 }
+                diffText = false;
 
             }
             if (ideaUpdateDTO.getStatus() != null) {
@@ -241,8 +247,11 @@ public class IdeaServiceImpl implements IdeaService {
             }
 
             if (ideaUpdateDTO.getTitle() != null) {
+                if (!Objects.equals(idea.getTitle(), ideaUpdateDTO.getTitle())) {
+                    diffText = true;
+                }
                 idea.setTitle(ideaUpdateDTO.getTitle());
-                if (!subscribedUsers.isEmpty()) {
+                if (!subscribedUsers.isEmpty() && diffText) {
                     sendEmailService.sendEmailChangedIdeaTitle(subscribedUsers, id);
                 }
             }
