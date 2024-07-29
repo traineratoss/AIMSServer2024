@@ -26,22 +26,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query(value = "DELETE FROM reports WHERE user_id = :userId AND comment_id = :commentId", nativeQuery = true)
     void deleteReport(Long commentId, Long userId);
 
-    /**
-     * Finds the top 5 comments with the most likes.
-     *
-     * @return a list of the top 5 most liked comments.
-     */
-    @Query(value = "SELECT c.* FROM comment c "
-            +
-            "JOIN likes l ON c.comment_id = l.comment_id "
-            +
-            "GROUP BY c.comment_id "
-            +
-            "ORDER BY COUNT(l.user_id) DESC "
-            +
-            "LIMIT 5", nativeQuery = true)
-    List<Comment> findTop5CommentsByLikes();
-
 
     /**
      * Overwriting default "findAllById" CRUD method in order to return a Page of type Comment
@@ -179,7 +163,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * @param commentId the ID of the comment from which the like is to be deleted.
      * @param userId    the ID of the user who liked the comment.
      */
-    @Transactional
+
     @Modifying
     @Query(value = "DELETE FROM likes WHERE user_id = :userId AND comment_id = :commentId", nativeQuery = true)
     void deleteLikes(@Param("commentId")Long commentId, @Param("userId")Long userId);
@@ -205,11 +189,55 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM User u JOIN u.likedComments l WHERE u.id = :userId AND l.id = :commentId")
     boolean existsLikeByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
 
+    /**
+     * Counts the number of reports for a specific comment.
+     *
+     * @param commentId the ID of the comment
+     * @return the count of reports for the specified comment
+     */
     @Query("SELECT COUNT(l) FROM User u JOIN u.reportedComments l WHERE l.id = :commentId")
     int countReportsByCommentId(@Param("commentId") Long commentId);
 
+
+    /**
+     * Retrieves the IDs of comments that have been reported by five or more users.
+     *
+     * @return a list of comment IDs that have five or more reports
+     */
     @Query("SELECT c.id FROM Comment c JOIN c.listOfUsers u GROUP BY c.id HAVING COUNT(u) >= 5")
     List<Long> moreThenFiveReports();
 
+    /**
+     * Deletes likes associated with a specific comment.
+     *
+     * @param commentId the ID of the comment
+     */
+    @Modifying
+    @Query(value = "DELETE FROM likes where comment_id = :commentId", nativeQuery = true)
+    void deleteLikesForComment(Long commentId);
 
+    /**
+     * Deletes reports associated with a specific comment.
+     *
+     * @param commentId the ID of the comment
+     */
+    @Modifying
+    @Query(value = "DELETE FROM reports where comment_id = :commentId", nativeQuery = true)
+    void deleteReportsByCommentId(Long commentId);
+
+    /**
+     * Finds the top 5 comments with the most likes.
+     *
+     * @return a list of the top 5 most liked comments.
+     */
+    @Query(value = "SELECT c.* FROM comment c "
+            +
+            "JOIN likes l ON c.comment_id = l.comment_id "
+            +
+            "GROUP BY c.comment_id "
+            +
+            "ORDER BY COUNT(l.user_id) DESC "
+            +
+            "LIMIT 5", nativeQuery = true)
+    List<Comment> findTop5CommentsByLikes();
 }

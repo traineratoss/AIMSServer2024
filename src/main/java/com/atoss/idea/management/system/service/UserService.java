@@ -233,7 +233,12 @@ public interface UserService {
      */
     Boolean isFirstLogin(String usernameOrEmail);
 
-
+    /**
+     * Retrieves the ID of a user by their username.
+     *
+     * @param username the username of the user whose ID is to be retrieved
+     * @return the ID of the user with the specified username
+     */
     Long getIdByUsername(String username);
 
     /**

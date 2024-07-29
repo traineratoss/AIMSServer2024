@@ -336,10 +336,9 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Long getIdByUsername(String username){
+    public Long getIdByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found!"));
-        System.out.println(user.getUsername());
+                .orElseThrow(() -> new UserNotFoundException("User" + username + "not found!"));
         return user.getId();
     }
 

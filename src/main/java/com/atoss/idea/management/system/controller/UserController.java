@@ -392,8 +392,7 @@ public class UserController {
      * @return Returns HttpStatus.OK if the request is successful.
      *
      * @throws UserNotFoundException - if the user is not found in the database
-     * @throws BadCredentialsException - if no OTP password has been generated for the specified user, the OTP password
-     * is invalid, or has expired.
+     * @throws BadCredentialsException - if no OTP password has been generated for the specified user, the OTP password is invalid, or has expired.
      *
      * @see UserService#verifyOTP(VerifyOTPDTO)
      */
@@ -403,8 +402,12 @@ public class UserController {
         return new ResponseEntity<>(userService.verifyOTP(verifyOTPDTO), HttpStatus.OK);
     }
 
-
-
+    /**
+     * Retrieves the ID of a user by their username.
+     *
+     * @param username the username of the user whose ID is to be retrieved
+     * @return the ID of the user with the specified username
+     */
     @GetMapping("/idByUsername")
     public Long getIdByUsername(@RequestParam(name = "username") String username) {
         return userService.getIdByUsername(username);
@@ -413,7 +416,7 @@ public class UserController {
     /**
      * Resets the user's state if the change password process is aborted.
      *
-     * @param changePasswordDTO
+     * @param changePasswordDTO the data transfer object containing the details for the password change
      * @return Returns HttpStatus.OK if the request is successful.
      * @throws UserNotFoundException if the user is not found in the database
      * @see UserService#abortChangePassword(ChangePasswordDTO)

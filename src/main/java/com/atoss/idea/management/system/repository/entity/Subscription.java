@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.checkerframework.common.aliasing.qual.Unique;
 
 @Entity
 @Data
@@ -19,9 +18,6 @@ public class Subscription {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @Column(name = "subscribed")
-    private Boolean isSubscribed;
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinColumn(name = "idea_id", referencedColumnName = "idea_id")
@@ -37,7 +33,6 @@ public class Subscription {
     public String toString() {
         return "Subscription{" +
                 "id=" + id +
-                ", isSubscribed=" + isSubscribed +
                 ", idea=" + idea +
                 ", user=" + user +
                 '}';
