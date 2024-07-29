@@ -170,7 +170,7 @@ public interface IdeaService {
 
     Subscription addSubscription(Long ideaId, Long userId);
 
-    void removeSubscription(Long id);
+    void removeSubscription(Long ideaId, Long userId);
 
     Page<SubscriptionDTO> getAllSubscriptions(Pageable pageable);
 

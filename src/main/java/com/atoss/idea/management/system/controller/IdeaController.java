@@ -268,8 +268,11 @@ public class IdeaController {
 
     @Transactional
     @DeleteMapping("/deleteSubscription")
-    public ResponseEntity<String> deleteSubscriptionById(@RequestParam(required = true) Long subscriptionId){
-        ideaService.removeSubscription(subscriptionId);
+    public ResponseEntity<String> deleteSubscriptionById(
+            @RequestParam(required = true) Long ideaId,
+            @RequestParam(required = true) Long userId) {
+        ideaService.removeSubscription(ideaId, userId);
         return new ResponseEntity<>("Subscription successfully deleted", HttpStatus.OK);
     }
+
 }

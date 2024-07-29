@@ -533,13 +533,15 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public void removeSubscription(Long id){
-        if(subscriptionRepository.existsById(id)){
-            subscriptionRepository.deleteById(id);
+    public void removeSubscription(Long ideaId, Long userId) {
+        Optional<Subscription> subscription = subscriptionRepository.findByIdeaIdAndUserId(ideaId, userId);
+        if (subscription.isPresent()) {
+            subscriptionRepository.deleteByIdeaIdAndUserId(ideaId, userId);
         } else {
             throw new SubscriptionNotFoundException("Subscription doesn't exist");
         }
     }
+
 
     @Override
     public Page<SubscriptionDTO> getAllSubscriptions(Pageable pageable){

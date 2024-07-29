@@ -30,5 +30,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
     Optional<Subscription> findByIdeaIdAndUserId(Long ideaId, Long userId);
 
+    void deleteByIdeaIdAndUserId(Long ideaId, Long userId);
 }
 
