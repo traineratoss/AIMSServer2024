@@ -472,12 +472,8 @@ public class CommentServiceImpl implements CommentService {
     public void displayPlaceholder(Long commentId) {
         Optional<Comment> comment = commentRepository.findById(commentId);
         if (comment.isPresent()) {
-            if (getReportsCountForComment(comment.get().getId()) > 5) {
-                comment.get().setCommentText("This comment is under review because it received too many reports");
+                comment.get().setCommentText("This comment was deleted by admin for being offensive");
                 commentRepository.save(comment.get());
-            } else {
-                throw new InsufficientReportsException("This comment does not have enough reports to be reviewed!");
-            }
         } else {
             throw new CommentNotFoundException();
         }
@@ -497,6 +493,20 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteLikesForComment(commentId);
 
     }
+    public void deleteRepliesForDeletedComment(Long commentId)
+    {
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        List<Comment> replies=commentRepository.findAllRepliesForComment(commentId);
+        for(Comment reply:replies)
+        {
+            commentRepository.deleteLikesForComment(reply.getId());
+        }
+        commentRepository.deleteRepliesForComment(commentId);
+
+    }
+
 
     /**
      * Deletes reports associated with a deleted comment.
@@ -506,7 +516,7 @@ public class CommentServiceImpl implements CommentService {
      * @throws CommentNotFoundException if the comment does not exist
      */
     @Transactional
-    public void deleteReportsForDeletedComment(Long commentId) {
+    public void deleteReportsByCommentId(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }

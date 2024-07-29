@@ -201,7 +201,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT COUNT(l) FROM User u JOIN u.reportedComments l WHERE l.id = :commentId")
     int countReportsByCommentId(@Param("commentId") Long commentId);
 
-
+    @Modifying
+    @Query(value="DELETE FROM comment WHERE parent_id= :commentId", nativeQuery=true)
+    void deleteRepliesForComment(Long commentId);
     /**
      * Retrieves the IDs of comments that have been reported by five or more users.
      *
@@ -243,4 +245,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             +
             "LIMIT 5", nativeQuery = true)
     List<Comment> findTop5CommentsByLikes();
+
+    @Query(value="SELECT * from comment WHERE parent_id= :commentId",nativeQuery=true)
+    List<Comment> findAllRepliesForComment(Long commentId);
 }

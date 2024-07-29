@@ -148,10 +148,11 @@ public class CommentController {
     @Transactional
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
-        commentService.deleteReportsForDeletedComment(commentId);
+        commentService.deleteReportsByCommentId(commentId);
         commentService.deleteLikesForDeletedComment(commentId);
+        commentService.deleteRepliesForDeletedComment(commentId);
         commentService.deleteComment(commentId);
-        return new ResponseEntity<>("Comment likes will also be deleted for deleted comment", HttpStatus.OK);
+        return new ResponseEntity<>("Comment likes, reports and replies will also be deleted for deleted comment", HttpStatus.OK);
     }
 
 
@@ -304,6 +305,7 @@ public class CommentController {
         if (commentService.getReportsCountForComment(commentId) <= 5) {
             return new ResponseEntity<>("This comment does not have enough reports to be reviewed!", HttpStatus.OK);
         }
+        commentService.deleteReportsByCommentId(commentId);
         commentService.displayPlaceholder(commentId);
         return new ResponseEntity<>("Comment with id " + commentId + " is under review by admin", HttpStatus.OK);
     }
