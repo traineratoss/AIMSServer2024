@@ -13,6 +13,7 @@ import com.atoss.idea.management.system.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -22,19 +23,24 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
+    @Value("${aims.app.cookie.maxAgeAccessTokenCookieSeconds}")
+    private long maxAccessTokenCookieAgeSeconds;
+
+    @Value("${aims.app.cookie.maxAgeRefreshTokenCookieSeconds}")
+    private long maxRefreshTokenCookieAgeSeconds;
+
     private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
     private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
     private final UserService userService;
@@ -43,7 +49,7 @@ public class AuthController {
      * Constructor for the AuthController class.
      *
      * @param authenticationManager The AuthenticationManager used for handling authentication requests.
-     * @param userRepository        The UserRepository used for accessing user-related data and operations.
+     * @param userService           The UserRepository used for accessing user-related data and operations.
      * @param refreshTokenService   The RefreshTokenService used for handling refresh tokens.
      * @param jwtService            The JwtService used for generating and verifying tokens.
      *
@@ -52,9 +58,8 @@ public class AuthController {
      * @see AuthController
      */
     public AuthController(AuthenticationManager authenticationManager,
-                          UserRepository userRepository, RefreshTokenService refreshTokenService, JwtService jwtService, UserService userService) {
+                          UserService userService, RefreshTokenService refreshTokenService, JwtService jwtService) {
         this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
         this.refreshTokenService = refreshTokenService;
         this.jwtService = jwtService;
         this.userService = userService;
@@ -87,39 +92,43 @@ public class AuthController {
      * @see HttpServletResponse
      */
     @Transactional
+    @CrossOrigin
     @PostMapping("/login")
     public ResponseEntity<UserSecurityDTO> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsernameOrEmail(),
                        loginRequest.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(authentication.getName());
+        if (authentication.isAuthenticated()) {
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(authentication.getName());
 
-        ResponseCookie cookie = ResponseCookie.from("accessToken", jwtService.generateToken(authentication.getName()))
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(180)
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+            ResponseCookie cookie = ResponseCookie.from("accessToken", jwtService.generateToken(authentication.getName()))
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(maxAccessTokenCookieAgeSeconds)
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        ResponseCookie cookieRefresh = ResponseCookie.from("refreshToken", refreshToken.getToken())
-                .httpOnly(true)
-                .secure(false)
-                .path("/api/auth/*")
-                .maxAge(2000)
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookieRefresh.toString());
+            ResponseCookie cookieRefresh = ResponseCookie.from("refreshToken", refreshToken.getToken())
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/api/v1/auth")
+                    .maxAge(maxRefreshTokenCookieAgeSeconds)
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, cookieRefresh.toString());
 
-        return new ResponseEntity<>(
-                userService.getUserByUsername(authentication.getName(), UserSecurityDTO.class),
-                HttpStatus.OK
-        );
+            return new ResponseEntity<>(
+                    userService.getUserByUsername(authentication.getName(), UserSecurityDTO.class),
+                    HttpStatus.OK
+            );
+        } else {
+            throw new UsernameNotFoundException("Bad request");
+        }
     }
 
     /**
-     * Registers a new user in the system based on the provided signup request.
+     ** Registers a new user in the system based on the provided signup request.
      *
      * @param signUpRequest The SignupRequest object containing the user's registration information.
      *
@@ -138,17 +147,10 @@ public class AuthController {
     @Transactional
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest signUpRequest) {
-        if (userRepository.findByUsername(signUpRequest.getUsername()).isPresent()) {
-            throw new UsernameAlreadyExistException("Username already exist!");
-        }
-
-        if (userRepository.findByEmail(signUpRequest.getEmail()).isPresent()) {
-            throw new EmailAlreadyExistException("Email already exist!");
-        }
-        User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail());
-        user.setRole(Role.STANDARD);
-        userRepository.save(user);
-
-        return new ResponseEntity<>("User created!", HttpStatus.CREATED);
+        return new ResponseEntity<>(
+                userService.addUser(signUpRequest.getUsername(), signUpRequest.getEmail()),
+                HttpStatus.CREATED);
     }
+
+
 }

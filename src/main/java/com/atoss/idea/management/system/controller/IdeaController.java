@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.List;
 
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/aims/api/v1/ideas")
 public class IdeaController {

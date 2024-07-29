@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/users")
 public class UserController {

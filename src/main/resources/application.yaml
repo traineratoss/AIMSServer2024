@@ -32,9 +32,12 @@ spring:
 aims:
   app:
     jwt:
-      accessTokenExpirationMs: 180000
-      refreshTokenExpirationMs: 1800000
+      accessTokenExpirationMs: 18000000
+      refreshTokenExpirationMs: 18000000
       secret: 9eadbfa9ea1aa2cfa839853167ed1c9f11fcd0f4977ea84993e7ad2ac338b490
+    cookie:
+      maxAgeAccessTokenCookieSeconds: 10000
+      maxAgeRefreshTokenCookieSeconds: 10000
     bcrypt:
       salt: $2a$10$QkRidA35ea0Fzm/ObrOEgO
 
