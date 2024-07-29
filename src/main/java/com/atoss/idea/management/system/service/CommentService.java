@@ -202,5 +202,7 @@ public interface CommentService {
      *
      * @param commentId the ID of the comment whose reports are to be deleted
      */
-    void deleteReportsForDeletedComment(Long commentId);
+    void deleteReportsByCommentId(Long commentId);
+
+
 }

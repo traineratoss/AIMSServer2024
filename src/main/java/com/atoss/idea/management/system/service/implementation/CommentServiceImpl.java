@@ -506,7 +506,7 @@ public class CommentServiceImpl implements CommentService {
      * @throws CommentNotFoundException if the comment does not exist
      */
     @Transactional
-    public void deleteReportsForDeletedComment(Long commentId) {
+    public void deleteReportsByCommentId(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
@@ -594,6 +594,8 @@ public class CommentServiceImpl implements CommentService {
             throw new UserNotFoundException("A user can't report his own comment !");
         }
     }
+
+
 
 
 }
