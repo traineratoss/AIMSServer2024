@@ -9,6 +9,7 @@ import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.security.request.LoginRequest;
 import com.atoss.idea.management.system.security.request.RegisterRequest;
+import com.atoss.idea.management.system.security.response.AuthResponse;
 import com.atoss.idea.management.system.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
@@ -29,6 +30,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -94,15 +97,17 @@ public class AuthController {
     @Transactional
     @CrossOrigin
     @PostMapping("/login")
-    public ResponseEntity<UserSecurityDTO> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsernameOrEmail(),
                        loginRequest.getPassword()));
 
         if (authentication.isAuthenticated()) {
+
+            String accessToken = jwtService.generateToken(authentication.getName());
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(authentication.getName());
 
-            ResponseCookie cookie = ResponseCookie.from("accessToken", jwtService.generateToken(authentication.getName()))
+            ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
                     .httpOnly(true)
                     .secure(false)
                     .path("/")
@@ -118,8 +123,14 @@ public class AuthController {
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, cookieRefresh.toString());
 
+            UserSecurityDTO userData = userService.getUserByUsername(authentication.getName(), UserSecurityDTO.class);
+
             return new ResponseEntity<>(
-                    userService.getUserByUsername(authentication.getName(), UserSecurityDTO.class),
+                    new AuthResponse(
+                      jwtService.extractExpiration(accessToken),
+                      Date.from(refreshToken.getExpiryDate()),
+                      userData
+                    ),
                     HttpStatus.OK
             );
         } else {
