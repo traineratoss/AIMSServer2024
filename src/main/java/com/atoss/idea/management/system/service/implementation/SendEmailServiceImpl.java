@@ -2,7 +2,6 @@ package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.AvatarNotFoundException;
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
-import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.Idea;
@@ -97,7 +96,7 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     public void sendEmailChangedIdeaText(List<User> usernames, Long ideaId) {
         Idea idea = ideaRepository.findById(ideaId).get();
-        for(User user : usernames) {
+        for (User user : usernames) {
             String username = user.getUsername();
             sendEmailIdeaSubscription("text-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea title/text change");
         }
@@ -105,7 +104,7 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     public void sendEmailChangedIdeaTitle(List<User> usernames, Long ideaId) {
         Idea idea = ideaRepository.findById(ideaId).get();
-        for(User user : usernames) {
+        for (User user : usernames) {
             String username = user.getUsername();
             sendEmailIdeaSubscription("title-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea title/text change");
         }
@@ -151,8 +150,8 @@ public class SendEmailServiceImpl implements SendEmailService {
     }
 
     @Override
-    public void sendEmailRatingChanged(String username, Long ideaId){
-        sendEmailRatingChangedService("star-rating-changes-template.ftl", username,"Rating changed", ideaId);
+    public void sendEmailRatingChanged(String username, Long ideaId) {
+        sendEmailRatingChangedService("star-rating-changes-template.ftl", username, "Rating changed", ideaId);
     }
 
     /**
@@ -201,7 +200,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         }
     }
 
-    private void sendEmailRatingChangedService(String fileName, String username, String subject, Long ideaId ){
+    private void sendEmailRatingChangedService(String fileName, String username, String subject, Long ideaId) {
         User user = getUserByUsername(username);
         Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
         String emailTo = user.getEmail();

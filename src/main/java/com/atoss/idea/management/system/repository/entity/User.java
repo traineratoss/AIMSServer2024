@@ -107,17 +107,6 @@ public class User {
         this.email = email;
     }
 
-    public void setUsername(String username)
-    {
-        this.username=username;
-    }
-    public String getUsername()
-    {
-        return this.username;
-    }
-
-
-
     @Override
     public String toString() {
         return "User{"
