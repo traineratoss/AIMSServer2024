@@ -126,10 +126,8 @@ public class IdeaController {
 
     @Transactional
     @GetMapping("/getAllSubscriptions")
-    public ResponseEntity<Page<SubscriptionDTO>> getAllSubscriptions(@RequestParam(required = true) int pageSize,
-                                                                     @RequestParam(required = true) int pageNumber){
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return new ResponseEntity<>(ideaService.getAllSubscriptions(pageable), HttpStatus.OK);
+    public ResponseEntity<List<SubscriptionDTO>> getAllSubscriptions(@RequestParam Long userId) {
+        return new ResponseEntity<>(ideaService.getAllSubscriptions(userId), HttpStatus.OK);
     }
 
     /**
@@ -262,14 +260,17 @@ public class IdeaController {
     @PostMapping("/addSubscription")
     public ResponseEntity<Subscription> addSubscription(@RequestParam(required = true) Long ideaId,
                                                         @RequestParam(required = true) Long userId)
-        throws UnsupportedEncodingException {
-            return new ResponseEntity<>(ideaService.addSubscription(ideaId, userId), HttpStatus.OK);
+            throws UnsupportedEncodingException {
+        return new ResponseEntity<>(ideaService.addSubscription(ideaId, userId), HttpStatus.OK);
     }
 
     @Transactional
     @DeleteMapping("/deleteSubscription")
-    public ResponseEntity<String> deleteSubscriptionById(@RequestParam(required = true) Long subscriptionId){
-        ideaService.removeSubscription(subscriptionId);
+    public ResponseEntity<String> deleteSubscriptionById(
+            @RequestParam(required = true) Long ideaId,
+            @RequestParam(required = true) Long userId) {
+        ideaService.removeSubscription(ideaId, userId);
         return new ResponseEntity<>("Subscription successfully deleted", HttpStatus.OK);
     }
+
 }
