@@ -1,6 +1,7 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
+import com.atoss.idea.management.system.exception.SubscriptionNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.FieldValidationException;
 import com.atoss.idea.management.system.repository.*;
