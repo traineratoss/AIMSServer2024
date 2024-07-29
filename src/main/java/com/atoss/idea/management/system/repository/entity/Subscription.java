@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "Subscription")
+@Table(name = "subscription")
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -28,4 +28,13 @@ public class Subscription {
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
+
+    @Override
+    public String toString() {
+        return "Subscription{"
+                + "id=" + id
+                + ", idea=" + idea
+                + ", user=" + user
+                + '}';
+    }
 }

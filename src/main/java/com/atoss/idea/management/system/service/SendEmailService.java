@@ -92,9 +92,30 @@ public interface SendEmailService {
      */
     boolean sendActivateEmailToUser(String username);
 
+    /**
+     * Sends an email to notify the subscribed users of a certain idea that its rating average has changed
+     *
+     *
+     * @param username The username of the user which is subscribed to the idea
+     * @param ideaId the id of the idea whose rating average has changed
+     */
     void sendEmailRatingChanged(String username, Long ideaId);
 
+    /**
+     * Sends an email to notify the subscribed users of a certain idea that its title has changed
+     *
+     *
+     * @param usernames The usernames of the users which are subscribed to the idea
+     * @param ideaId the id of the idea whose title has changed
+     */
     void sendEmailChangedIdeaTitle(List<User> usernames, Long ideaId);
 
+    /**
+     * Sends an email to notify the subscribed users of a certain idea that its text has changed
+     *
+     *
+     * @param usernames The usernames of the users which are subscribed to the idea
+     * @param ideaId the id of the idea whose text has changed
+     */
     void sendEmailChangedIdeaText(List<User> usernames, Long ideaId);
 }

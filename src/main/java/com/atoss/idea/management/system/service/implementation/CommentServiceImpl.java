@@ -520,6 +520,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public boolean existsReportByCommentIdAndUserId(Long commentId, Long userId) {
+        return commentRepository.existsReportByCommentIdAndUserId(commentId, userId);
+    }
+
+    @Override
     public int getReportsCountForComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();

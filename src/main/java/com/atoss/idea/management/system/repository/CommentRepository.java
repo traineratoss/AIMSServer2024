@@ -189,6 +189,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM User u JOIN u.likedComments l WHERE u.id = :userId AND l.id = :commentId")
     boolean existsLikeByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
 
+    @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM User u JOIN u.reportedComments l WHERE u.id = :userId AND l.id = :commentId")
+    boolean existsReportByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
+
     /**
      * Counts the number of reports for a specific comment.
      *

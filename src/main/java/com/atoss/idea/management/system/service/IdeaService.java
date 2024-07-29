@@ -159,6 +159,13 @@ public interface IdeaService {
      */
     Double getRatingByUserAndByIdea(Long userId, Long ideaId);
 
+
+    /**
+     * checks if there are any users subscribed to the idea whose rating average has changed and
+     * if there are, sends an email to notify them of the change
+     *
+     * @param       ideaId the ID of the idea whose rating average has changed
+     */
     void sendEmailForRating(Long ideaId);
 
     Subscription addSubscription(Long ideaId, Long userId);
@@ -166,5 +173,6 @@ public interface IdeaService {
     void removeSubscription(Long id);
 
     Page<SubscriptionDTO> getAllSubscriptions(Pageable pageable);
+
 
 }

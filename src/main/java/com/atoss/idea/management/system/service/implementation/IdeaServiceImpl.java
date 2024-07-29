@@ -1,7 +1,6 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
-import com.atoss.idea.management.system.exception.SubscriptionNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.FieldValidationException;
 import com.atoss.idea.management.system.repository.*;
@@ -72,6 +71,8 @@ public class IdeaServiceImpl implements IdeaService {
      * @param categoryRepository repository for the Category Entity
      * @param modelMapper        responsible for mapping our entities
      * @param commentServiceImpl ======
+     * @param sendEmailService   responsible for sending emails to users who have subscriptions
+     * @param subscriptionRepository repository for the Subscription Entity
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
                            ImageRepository imageRepository, UserRepository userRepository,
@@ -212,14 +213,15 @@ public class IdeaServiceImpl implements IdeaService {
 
             List<User> subscribedUsers = new ArrayList<>();
 
+            for (Long userId : subscribedUsersIds) {
+                subscribedUsers.add(userRepository.findById(userId).get());
+            }
+
 
             if (ideaUpdateDTO.getText() != null) {
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
                 idea.setText(filteredCommentText);
-                for (Long userId : subscribedUsersIds) {
-                    subscribedUsers.add(userRepository.findById(userId).get());
-                }
                 if (!subscribedUsers.isEmpty()) {
                     sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
                 }
@@ -475,7 +477,7 @@ public class IdeaServiceImpl implements IdeaService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
         Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElse(new Rating());
         Integer oldRating = 0;
-        if (idea.getRatingAvg() != null){
+        if (idea.getRatingAvg() != null) {
             oldRating = idea.getRatingAvg().intValue();
         }
         rating.setIdea(idea);
@@ -485,7 +487,7 @@ public class IdeaServiceImpl implements IdeaService {
         idea.setRatingAvg(getAverage(ideaId));
         Integer newRating = idea.getRatingAvg().intValue();
 
-        if (newRating != oldRating && oldRating != 0){
+        if (newRating != oldRating && oldRating != 0) {
             sendEmailForRating(idea.getId());
         }
         return ratingRepositorySave;

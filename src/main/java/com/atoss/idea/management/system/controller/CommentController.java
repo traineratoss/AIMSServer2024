@@ -233,6 +233,11 @@ public class CommentController {
         return commentService.existsLikeByCommentIdAndUserId(commentId, userId);
     }
 
+    @GetMapping("/comments/report/find/{commentId}/{userId}")
+    public boolean existsReportByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
+        return commentService.existsReportByCommentIdAndUserId(commentId, userId);
+    }
+
     /**
      * Retrieves the count of reports for a specific comment.
      *
