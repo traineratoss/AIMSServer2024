@@ -126,10 +126,8 @@ public class IdeaController {
 
     @Transactional
     @GetMapping("/getAllSubscriptions")
-    public ResponseEntity<Page<SubscriptionDTO>> getAllSubscriptions(@RequestParam(required = true) int pageSize,
-                                                                     @RequestParam(required = true) int pageNumber){
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return new ResponseEntity<>(ideaService.getAllSubscriptions(pageable), HttpStatus.OK);
+    public ResponseEntity<List<SubscriptionDTO>> getAllSubscriptions(@RequestParam Long userId) {
+        return new ResponseEntity<>(ideaService.getAllSubscriptions(userId), HttpStatus.OK);
     }
 
     /**

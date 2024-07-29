@@ -553,12 +553,12 @@ public class IdeaServiceImpl implements IdeaService {
 
 
     @Override
-    public Page<SubscriptionDTO> getAllSubscriptions(Pageable pageable){
-        if (subscriptionRepository.findAll().size() <= 0){
-            throw new SubscriptionNotFoundException("No subscriptions found.");
+    public List<SubscriptionDTO> getAllSubscriptions(Long userId){
+        if (!userRepository.existsById(userId)){
+            throw new UserNotFoundException("User not found");
         }
 
-        Page<Subscription> subscriptions = subscriptionRepository.findAll(pageable);
+        List<Subscription> subscriptions = subscriptionRepository.findByUserId(userId);
         List<SubscriptionDTO> subscriptionDTOs = subscriptions.stream()
                 .map(subscription -> {
                     SubscriptionDTO responseDTO = modelMapper.map(subscription, SubscriptionDTO.class);
@@ -567,6 +567,6 @@ public class IdeaServiceImpl implements IdeaService {
                     return responseDTO;
                 })
                 .toList();
-        return new PageImpl<>(subscriptionDTOs, pageable, subscriptions.getTotalElements());
+        return subscriptionDTOs;
     }
 }

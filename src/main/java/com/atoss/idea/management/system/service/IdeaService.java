@@ -172,7 +172,7 @@ public interface IdeaService {
 
     void removeSubscription(Long ideaId, Long userId);
 
-    Page<SubscriptionDTO> getAllSubscriptions(Pageable pageable);
+    List<SubscriptionDTO> getAllSubscriptions(Long userId);
 
 
 }
