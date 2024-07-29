@@ -99,7 +99,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         Idea idea = ideaRepository.findById(ideaId).get();
         for(User user : usernames) {
             String username = user.getUsername();
-            sendEmailIdeaSubscription("text-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea title/text change");
+            sendEmailIdeaSubscription("text-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea text change");
         }
     }
 
@@ -107,7 +107,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         Idea idea = ideaRepository.findById(ideaId).get();
         for(User user : usernames) {
             String username = user.getUsername();
-            sendEmailIdeaSubscription("title-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea title/text change");
+            sendEmailIdeaSubscription("title-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea title change");
         }
     }
 

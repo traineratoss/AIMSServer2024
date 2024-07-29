@@ -211,14 +211,15 @@ public class IdeaServiceImpl implements IdeaService {
 
             List<User> subscribedUsers = new ArrayList<>();
 
+            for(Long userId : subscribedUsersIds) {
+                subscribedUsers.add(userRepository.findById(userId).get());
+            }
+
 
             if (ideaUpdateDTO.getText() != null) {
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
                 idea.setText(filteredCommentText);
-                for(Long userId : subscribedUsersIds) {
-                    subscribedUsers.add(userRepository.findById(userId).get());
-                }
                 if(!subscribedUsers.isEmpty()) {
                     sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
                 }

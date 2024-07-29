@@ -21,7 +21,7 @@
                     Dear <span style="font-weight: bold;">${username}</span>,
                 </p>
                 <p style="font-size: 16px; line-height: 1.5;">
-                    We hope you are doing well. It appears that there has been a change in the title of an idea you are subscribed to. Here is the new idea:
+                    We hope you are doing well. It appears that there has been a change in the title of an idea you are subscribed to. Here is the updated idea:
                 </p>
                 <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 25%; margin-left:20px;">
                     <div style="background-color: #e0f7fa; padding: 10px; border-radius: 4px;">
