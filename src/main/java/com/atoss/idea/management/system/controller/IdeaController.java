@@ -3,6 +3,7 @@ package com.atoss.idea.management.system.controller;
 import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.SubscriptionDTO;
 import com.atoss.idea.management.system.repository.entity.Rating;
 import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.repository.entity.Subscription;
@@ -121,6 +122,14 @@ public class IdeaController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
+    }
+
+    @Transactional
+    @GetMapping("/getAllSubscriptions")
+    public ResponseEntity<Page<SubscriptionDTO>> getAllSubscriptions(@RequestParam(required = true) int pageSize,
+                                                                     @RequestParam(required = true) int pageNumber){
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return new ResponseEntity<>(ideaService.getAllSubscriptions(pageable), HttpStatus.OK);
     }
 
     /**
@@ -247,5 +256,20 @@ public class IdeaController {
     public ResponseEntity<Double> findByIdeaIdAndUserId(@RequestParam(required = true) Long ideaId,
                                                         @RequestParam(required = true) Long userId) {
         return new ResponseEntity<>(ideaService.getRatingByUserAndByIdea(ideaId, userId), HttpStatus.OK);
+    }
+
+    @Transactional
+    @PostMapping("/addSubscription")
+    public ResponseEntity<Subscription> addSubscription(@RequestParam(required = true) Long ideaId,
+                                                        @RequestParam(required = true) Long userId)
+        throws UnsupportedEncodingException {
+            return new ResponseEntity<>(ideaService.addSubscription(ideaId, userId), HttpStatus.OK);
+    }
+
+    @Transactional
+    @DeleteMapping("/deleteSubscription")
+    public ResponseEntity<String> deleteSubscriptionById(@RequestParam(required = true) Long subscriptionId){
+        ideaService.removeSubscription(subscriptionId);
+        return new ResponseEntity<>("Subscription successfully deleted", HttpStatus.OK);
     }
 }

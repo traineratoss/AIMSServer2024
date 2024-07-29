@@ -517,4 +517,42 @@ public class IdeaServiceImpl implements IdeaService {
             sendEmailService.sendEmailRatingChanged(user.getUsername(), ideaId);
         }
     }
+
+    @Override
+    public Subscription addSubscription(Long ideaId, Long userId){
+        Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        Subscription subscription = subscriptionRepository.findByIdeaIdAndUserId(ideaId, userId).orElse(new Subscription());
+        subscription.setIdea(idea);
+        subscription.setUser(user);
+        Subscription subscriptionRepositorySave = subscriptionRepository.save(subscription);
+        return  subscriptionRepositorySave;
+    }
+
+    @Override
+    public void removeSubscription(Long id){
+        if(subscriptionRepository.existsById(id)){
+            subscriptionRepository.deleteById(id);
+        } else {
+            throw new SubscriptionNotFoundException("Subscription doesn't exist");
+        }
+    }
+
+    @Override
+    public Page<SubscriptionDTO> getAllSubscriptions(Pageable pageable){
+        if (subscriptionRepository.findAll().size() <= 0){
+            throw new SubscriptionNotFoundException("No subscriptions found.");
+        }
+
+        Page<Subscription> subscriptions = subscriptionRepository.findAll(pageable);
+        List<SubscriptionDTO> subscriptionDTOs = subscriptions.stream()
+                .map(subscription -> {
+                    SubscriptionDTO responseDTO = modelMapper.map(subscription, SubscriptionDTO.class);
+                    responseDTO.setIdeaId(subscription.getIdea().getId());
+                    responseDTO.setUserId(subscription.getUser().getId());
+                    return responseDTO;
+                })
+                .toList();
+        return new PageImpl<>(subscriptionDTOs, pageable, subscriptions.getTotalElements());
+    }
 }
