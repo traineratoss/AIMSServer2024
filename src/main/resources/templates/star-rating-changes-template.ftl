@@ -21,7 +21,7 @@
                     Dear <span style="font-weight: bold;">${username}</span>,
                 </p>
                 <p style="font-size: 16px; line-height: 1.5;">
-                    We hope this message finds you well. We are pleased to inform you that the rating for the idea titled <b>${ideaTitle}</b> has been updated as of <span>${date}</span>.
+                    We hope this message finds you well. We are pleased to inform you that the rating for the idea titled <br>"<b>${ideaTitle}</b>"<br> has been updated as of <span>${date}</span>.
                 </p>
                 <p style="font-size: 16px; line-height: 1.5;">
                     The new rating is now: <span style="font-weight: bold; color: #ffa941;">${newRating} stars</span>.

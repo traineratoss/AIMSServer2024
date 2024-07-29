@@ -19,9 +19,6 @@ public class Subscription {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "subscribed")
-    private Boolean isSubscribed;
-
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinColumn(name = "idea_id", referencedColumnName = "idea_id")
     @JsonBackReference
