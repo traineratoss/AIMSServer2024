@@ -9,6 +9,6 @@ import org.springframework.data.domain.Page;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CommentPageDTO {
-    private int total; //pt paginare
-    private Page<CommentDashboardResponseDTO> pagedComments; //pt eu ma folosesc doar de contentul din comment si pt stergere e nevoie de id
+    private int total;
+    private Page<CommentDashboardResponseDTO> pagedComments;
 }

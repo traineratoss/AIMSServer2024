@@ -435,6 +435,7 @@ public class CommentServiceImpl implements CommentService {
      * @throws CommentNotFoundException if the comment with the specified ID does not exist
      * @throws UserNotFoundException    if the user with the specified ID does not exist
      */
+    @Transactional
     @Override
     public void deleteLikes(Long commentId, Long userId) {
         if (!commentRepository.existsById(commentId)) {
@@ -504,6 +505,7 @@ public class CommentServiceImpl implements CommentService {
      * @param commentId the ID of the comment whose reports are to be deleted
      * @throws CommentNotFoundException if the comment does not exist
      */
+    @Transactional
     public void deleteReportsForDeletedComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
@@ -525,6 +527,7 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.countReportsByCommentId(commentId);
     }
 
+    @Transactional
     @Override
     public CommentPageDTO getAllCommentsByReportsNr(Pageable pageable) {
         List<Long> commentsIds = commentRepository.moreThenFiveReports();
@@ -537,8 +540,10 @@ public class CommentServiceImpl implements CommentService {
             CommentDashboardResponseDTO commentDashboardResponseDTO = new CommentDashboardResponseDTO();
             commentDashboardResponseDTO.setId(comment.getId());
             commentDashboardResponseDTO.setContent(comment.getCommentText());
+            commentDashboardResponseDTO.setNrReports(commentRepository.countReportsByCommentId(id));
             contents.add(commentDashboardResponseDTO);
         }
+        contents.sort((c1, c2) -> Integer.compare(c2.getNrReports(), c1.getNrReports()));
 
         return new CommentPageDTO(total, new PageImpl<>(contents, pageable, contents.size()));
     }

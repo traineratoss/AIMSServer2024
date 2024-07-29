@@ -200,7 +200,6 @@ public class CommentController {
      * @param userId    the ID of the user
      * @return ResponseEntity with a message indicating the result of the delete operation
      */
-    @Transactional
     @DeleteMapping("/comments/like/delete/{commentId}/{userId}")
     public ResponseEntity<String> deleteLikes(@PathVariable Long commentId, @PathVariable Long userId) {
         commentService.deleteLikes(commentId, userId);
@@ -254,17 +253,16 @@ public class CommentController {
      * @param sortCategory the category by which the comments should be sorted
      * @return ResponseEntity with a CommentPageDTO containing the comments
      */
-    @Transactional
+
     @GetMapping("/comments/allByReportsNr")
     public ResponseEntity<CommentPageDTO> getAllUserByUsername(@RequestParam(required = true) int pageSize,
-                                                            @RequestParam(required = true) int pageNumber,
-                                                               @RequestParam(required = true) String sortCategory) {
+                                                            @RequestParam(required = true) int pageNumber) {
         return new ResponseEntity<>(
                 commentService.getAllCommentsByReportsNr(
                         PageRequest.of(
                                 pageNumber,
                                 pageSize,
-                                Sort.by(Sort.Direction.ASC, "id")
+                                Sort.by(Sort.Direction.DESC, "id")
                         )
                 ),
                 HttpStatus.OK

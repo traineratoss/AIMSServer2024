@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class CommentDashboardResponseDTO {
     private Long id;
     private String content;
+    private int nrReports;
 }

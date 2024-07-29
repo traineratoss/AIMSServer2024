@@ -169,9 +169,6 @@ public interface CommentService {
      */
     CommentPageDTO getAllCommentsByReportsNr(Pageable pageable);
 
-
-
-
     /**
      * Adds a report from a user to a comment.
      *
