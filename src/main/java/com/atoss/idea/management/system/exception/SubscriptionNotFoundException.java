@@ -4,5 +4,13 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class SubscriptionNotFoundException extends RuntimeException {
-    public SubscriptionNotFoundException(String message) {super(message); }
+
+    /**
+     *   Constructor with a specified detail message.
+     *
+     * @param message The detail message
+     */
+    public SubscriptionNotFoundException(String message) {
+        super(message);
+    }
 }

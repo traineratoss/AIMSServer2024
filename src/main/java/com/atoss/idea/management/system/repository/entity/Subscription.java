@@ -31,10 +31,10 @@ public class Subscription {
 
     @Override
     public String toString() {
-        return "Subscription{" +
-                "id=" + id +
-                ", idea=" + idea +
-                ", user=" + user +
-                '}';
+        return "Subscription{"
+                + "id=" + id
+                + ", idea=" + idea
+                + ", user=" + user
+                + '}';
     }
 }

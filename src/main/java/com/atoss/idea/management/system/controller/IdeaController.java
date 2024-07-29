@@ -5,7 +5,6 @@ import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.repository.entity.Rating;
 import com.atoss.idea.management.system.repository.entity.Status;
-import com.atoss.idea.management.system.repository.entity.Subscription;
 import com.atoss.idea.management.system.service.IdeaService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;

@@ -57,6 +57,8 @@ public class SendEmailServiceImpl implements SendEmailService {
      * @param avatarRepository The AvatarRepository instance for accessing avatar data.
      * @param emailSender      The JavaMailSender instance for sending emails.
      * @param configuration The Configuration instance for email templates.
+     * @param ideaRepository The repository for the Idea Entity
+     * @param subscriptionRepository The repository for the Subscription Entity
      */
     public SendEmailServiceImpl(UserRepository userRepository,
                                 AvatarRepository avatarRepository,
@@ -94,6 +96,14 @@ public class SendEmailServiceImpl implements SendEmailService {
         sendEmailUtils("registration-reject-template.ftl", username, "", "Registration Request - Rejected");
     }
 
+
+    /**
+     * Sends an email to notify the subscribed users of a certain idea that its text has changed
+     *
+     *
+     * @param usernames The usernames of the users which are subscribed to the idea
+     * @param ideaId the id of the idea whose text has changed
+     */
     public void sendEmailChangedIdeaText(List<User> usernames, Long ideaId) {
         Idea idea = ideaRepository.findById(ideaId).get();
         for (User user : usernames) {
@@ -102,6 +112,13 @@ public class SendEmailServiceImpl implements SendEmailService {
         }
     }
 
+    /**
+     * Sends an email to notify the subscribed users of a certain idea that its title has changed
+     *
+     *
+     * @param usernames The usernames of the users which are subscribed to the idea
+     * @param ideaId the id of the idea whose title has changed
+     */
     public void sendEmailChangedIdeaTitle(List<User> usernames, Long ideaId) {
         Idea idea = ideaRepository.findById(ideaId).get();
         for (User user : usernames) {
@@ -302,6 +319,16 @@ public class SendEmailServiceImpl implements SendEmailService {
         }
     }
 
+    /**
+     * Retrieves an idea from the repository based on the provided id
+     *
+     * This method fetches an idea from the idea repository using the given id. If the idea does not exist,
+     * a RuntimeException is thrown.
+     *
+     * @param ideaId The id of the idea to retrieve.
+     * @return The Idea object corresponding to the given id.
+     * @throws RuntimeException If the user does not exist in the repository.
+     */
     private Idea getIdeaById(Long ideaId) {
         return ideaRepository.findById(ideaId)
                 .orElseThrow(() -> new RuntimeException("Idea does not exist!"));

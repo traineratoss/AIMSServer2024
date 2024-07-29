@@ -6,7 +6,6 @@ import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.Rating;
 import com.atoss.idea.management.system.repository.entity.Status;
-import com.atoss.idea.management.system.repository.entity.Subscription;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -158,10 +157,17 @@ public interface IdeaService {
      */
     Double getRatingByUserAndByIdea(Long userId, Long ideaId);
 
+
+    /**
+     * checks if there are any users subscribed to the idea whose rating average has changed and
+     * if there are, sends an email to notify them of the change
+     *
+     * @param       ideaId the ID of the idea whose rating average has changed
+     */
     void sendEmailForRating(Long ideaId);
 
-//    Subscription addSubscription(Long ideaId, Long userId);
+    //  Subscription addSubscription(Long ideaId, Long userId);
 
-//    void removeSubscription(Long id);
+    //  void removeSubscription(Long id);
 
 }
