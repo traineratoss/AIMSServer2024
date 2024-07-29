@@ -153,6 +153,8 @@ public interface CommentService {
      */
     boolean existsLikeByCommentIdAndUserId(Long commentId, Long userId);
 
+    boolean existsReportByCommentIdAndUserId(Long commentId, Long userId);
+
     /**
      * Retrieves the count of reports for a specific comment.
      *
