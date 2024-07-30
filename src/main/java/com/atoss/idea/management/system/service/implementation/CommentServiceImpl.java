@@ -500,6 +500,7 @@ public class CommentServiceImpl implements CommentService {
         List<Comment> replies=commentRepository.findAllRepliesForComment(commentId);
         for(Comment reply:replies)
         {
+            commentRepository.deleteReportsByCommentId(reply.getId());
             commentRepository.deleteLikesForComment(reply.getId());
         }
         commentRepository.deleteRepliesForComment(commentId);
