@@ -471,8 +471,8 @@ public class CommentServiceImpl implements CommentService {
     public void displayPlaceholder(Long commentId) {
         Optional<Comment> comment = commentRepository.findById(commentId);
         if (comment.isPresent()) {
-                comment.get().setCommentText("This comment was deleted by admin for being offensive");
-                commentRepository.save(comment.get());
+            comment.get().setCommentText("This comment was deleted by admin for being offensive");
+            commentRepository.save(comment.get());
         } else {
             throw new CommentNotFoundException();
         }
@@ -492,8 +492,20 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteLikesForComment(commentId);
 
     }
-    public void deleteRepliesForDeletedComment(Long commentId)
-    {
+
+    /**
+     * Deletes all replies for a given deleted comment ID.
+     *
+     * This method first checks if the comment exists by the given ID.
+     * If the comment does not exist, it throws a {@link CommentNotFoundException}.
+     * If the comment exists, it retrieves all replies associated with the comment.
+     * For each reply, it deletes any likes associated with that reply.
+     * Finally, it deletes all replies associated with the given comment ID.
+     *
+     * @param commentId the ID of the deleted comment whose replies are to be deleted
+     * @throws CommentNotFoundException if the comment with the specified ID does not exist
+     */
+    public void deleteRepliesForDeletedComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }

@@ -309,7 +309,12 @@ public class CommentController {
         return new ResponseEntity<>("Comment with id " + commentId + " is under review by admin", HttpStatus.OK);
     }
 
-
+    /**
+     * Deletes all reports associated with a specific comment ID.
+     *
+     * @param commentId the ID of the comment
+     * @return a ResponseEntity containing a confirmation message and HTTP status code
+     */
     @Transactional
     @DeleteMapping("/comments/reports/delete/{commentId}")
     public ResponseEntity<String> deleteReportsByCommentId(@PathVariable Long commentId) {
