@@ -124,12 +124,6 @@ public class IdeaController {
         }
     }
 
-    @Transactional
-    @GetMapping("/getAllSubscriptions")
-    public ResponseEntity<List<SubscriptionDTO>> getAllSubscriptions(@RequestParam Long userId) {
-        return new ResponseEntity<>(ideaService.getAllSubscriptions(userId), HttpStatus.OK);
-    }
-
     /**
      * Returns all the ideas that belong to a User, paged
      *
@@ -256,21 +250,46 @@ public class IdeaController {
         return new ResponseEntity<>(ideaService.getRatingByUserAndByIdea(ideaId, userId), HttpStatus.OK);
     }
 
+    /**
+     * Adds a subscription for a user to an idea.
+     *
+     * @param ideaId the ID of the idea to subscribe to
+     * @param userId the ID of the user subscribing to the idea
+     * @return ResponseEntity containing the created Subscription object and HTTP status OK
+     * @throws UnsupportedEncodingException if there is an encoding issue during the process
+     */
     @Transactional
     @PostMapping("/addSubscription")
     public ResponseEntity<Subscription> addSubscription(@RequestParam(required = true) Long ideaId,
                                                         @RequestParam(required = true) Long userId)
-        throws UnsupportedEncodingException {
-            return new ResponseEntity<>(ideaService.addSubscription(ideaId, userId), HttpStatus.OK);
+            throws UnsupportedEncodingException {
+        return new ResponseEntity<>(ideaService.addSubscription(ideaId, userId), HttpStatus.OK);
     }
 
+    /**
+     * Deletes a subscription for a user from an idea.
+     *
+     * @param ideaId the ID of the idea to unsubscribe from
+     * @param userId the ID of the user unsubscribing from the idea
+     * @return ResponseEntity containing a success message and HTTP status OK
+     */
     @Transactional
     @DeleteMapping("/deleteSubscription")
-    public ResponseEntity<String> deleteSubscriptionById(
-            @RequestParam(required = true) Long ideaId,
-            @RequestParam(required = true) Long userId) {
+    public ResponseEntity<String> deleteSubscriptionById(@RequestParam(required = true) Long ideaId,
+                                                         @RequestParam(required = true) Long userId) {
         ideaService.removeSubscription(ideaId, userId);
         return new ResponseEntity<>("Subscription successfully deleted", HttpStatus.OK);
     }
 
+    /**
+     * Retrieves all subscriptions for a user.
+     *
+     * @param userId the ID of the user whose subscriptions are being retrieved
+     * @return ResponseEntity containing a list of SubscriptionDTO objects and HTTP status OK
+     */
+    @Transactional
+    @GetMapping("/getAllSubscriptions")
+    public ResponseEntity<List<SubscriptionDTO>> getAllSubscriptions(@RequestParam Long userId) {
+        return new ResponseEntity<>(ideaService.getAllSubscriptions(userId), HttpStatus.OK);
+    }
 }
