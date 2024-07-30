@@ -68,6 +68,10 @@ public class Idea {
     @JsonManagedReference
     private List<Subscription> subscription;
 
+    @OneToMany(mappedBy = "idea", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Document> documentList;
+
     @Override
     public String toString() {
         return "Idea{"

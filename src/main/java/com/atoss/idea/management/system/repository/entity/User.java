@@ -93,6 +93,10 @@ public class User {
     @JsonManagedReference
     private List<Subscription> isSubscribed;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Document> documentList;
+
 
     /**
      * Constructor for creating a User object with the provided username and email.
