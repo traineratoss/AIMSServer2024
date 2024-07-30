@@ -28,8 +28,21 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
     @Query(value = "SELECT user_id FROM Subscription WHERE idea_id = :ideaId", nativeQuery = true)
     List<Long> findUserIdByIdeaId(Long ideaId);
 
+    /**
+     * Finds a subscription by idea ID and user ID.
+     *
+     * @param ideaId the ID of the idea
+     * @param userId the ID of the user
+     * @return an Optional containing the Subscription if found, or an empty Optional if not found
+     */
     Optional<Subscription> findByIdeaIdAndUserId(Long ideaId, Long userId);
 
+    /**
+     * Deletes a subscription by idea ID and user ID.
+     *
+     * @param ideaId the ID of the idea
+     * @param userId the ID of the user
+     */
     void deleteByIdeaIdAndUserId(Long ideaId, Long userId);
 }
 

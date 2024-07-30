@@ -123,7 +123,14 @@ public class SendEmailServiceImpl implements SendEmailService {
         Idea idea = ideaRepository.findById(ideaId).get();
         for (User user : usernames) {
             String username = user.getUsername();
-            sendEmailIdeaSubscription("title-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea title change");
+            sendEmailIdeaSubscription(
+                    "title-change-subscription-template.ftl",
+                    username,
+                    idea.getTitle(),
+                    idea.getText(),
+                    ideaId,
+                    "Idea title change"
+            );
         }
     }
 

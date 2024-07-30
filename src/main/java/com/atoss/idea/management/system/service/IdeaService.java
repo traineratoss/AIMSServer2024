@@ -168,10 +168,29 @@ public interface IdeaService {
      */
     void sendEmailForRating(Long ideaId);
 
+    /**
+     * Adds a subscription for a user to an idea.
+     *
+     * @param ideaId the ID of the idea to subscribe to
+     * @param userId the ID of the user subscribing to the idea
+     * @return the created Subscription object
+     */
     Subscription addSubscription(Long ideaId, Long userId);
 
+    /**
+     * Removes a subscription for a user from an idea.
+     *
+     * @param ideaId the ID of the idea to unsubscribe from
+     * @param userId the ID of the user unsubscribing from the idea
+     */
     void removeSubscription(Long ideaId, Long userId);
 
+    /**
+     * Retrieves all subscriptions for a user.
+     *
+     * @param userId the ID of the user whose subscriptions are being retrieved
+     * @return a list of SubscriptionDTO objects representing the user's subscriptions
+     */
     List<SubscriptionDTO> getAllSubscriptions(Long userId);
 
 

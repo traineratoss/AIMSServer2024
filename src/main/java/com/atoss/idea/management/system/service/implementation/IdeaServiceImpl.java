@@ -531,7 +531,7 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public Subscription addSubscription(Long ideaId, Long userId){
+    public Subscription addSubscription(Long ideaId, Long userId) {
         Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Subscription subscription = subscriptionRepository.findByIdeaIdAndUserId(ideaId, userId).orElse(new Subscription());
@@ -553,8 +553,8 @@ public class IdeaServiceImpl implements IdeaService {
 
 
     @Override
-    public List<SubscriptionDTO> getAllSubscriptions(Long userId){
-        if (!userRepository.existsById(userId)){
+    public List<SubscriptionDTO> getAllSubscriptions(Long userId) {
+        if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("User not found");
         }
 
