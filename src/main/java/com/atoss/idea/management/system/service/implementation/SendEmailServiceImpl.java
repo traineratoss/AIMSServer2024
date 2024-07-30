@@ -122,7 +122,6 @@ public class SendEmailServiceImpl implements SendEmailService {
         Idea idea = ideaRepository.findById(ideaId).get();
         for (User user : usernames) {
             String username = user.getUsername();
-<<<<<<< Updated upstream
             sendEmailIdeaSubscription(
                     "title-change-subscription-template.ftl",
                     username,
@@ -131,10 +130,6 @@ public class SendEmailServiceImpl implements SendEmailService {
                     ideaId,
                     "Idea title change"
             );
-=======
-            sendEmailIdeaSubscription("title-change-subscription-template.ftl", username, idea.getTitle(),
-                    idea.getText(), ideaId, "Idea title change");
->>>>>>> Stashed changes
         }
     }
 
