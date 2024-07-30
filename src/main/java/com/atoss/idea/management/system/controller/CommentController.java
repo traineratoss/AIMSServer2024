@@ -256,12 +256,11 @@ public class CommentController {
      *
      * @param pageSize    the number of comments per page
      * @param pageNumber  the page number to retrieve
-     * @param sortCategory the category by which the comments should be sorted
      * @return ResponseEntity with a CommentPageDTO containing the comments
      */
 
     @GetMapping("/comments/allByReportsNr")
-    public ResponseEntity<CommentPageDTO> getAllUserByUsername(@RequestParam(required = true) int pageSize,
+    public ResponseEntity<CommentPageDTO> getAllCommentsByReportsNr(@RequestParam(required = true) int pageSize,
                                                             @RequestParam(required = true) int pageNumber) {
         return new ResponseEntity<>(
                 commentService.getAllCommentsByReportsNr(
@@ -315,6 +314,6 @@ public class CommentController {
     @DeleteMapping("/comments/reports/delete/{commentId}")
     public ResponseEntity<String> deleteReportsByCommentId(@PathVariable Long commentId) {
         commentService.deleteReportsByCommentId(commentId);
-        return new ResponseEntity<>("Deleted reports for comment with id: "+commentId, HttpStatus.OK);
+        return new ResponseEntity<>("Deleted reports for comment with id: " + commentId, HttpStatus.OK);
     }
 }

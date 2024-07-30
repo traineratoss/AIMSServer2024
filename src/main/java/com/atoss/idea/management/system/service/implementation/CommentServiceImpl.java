@@ -1,7 +1,6 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
-import com.atoss.idea.management.system.exception.InsufficientReportsException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.CommentNotFoundException;
 import com.atoss.idea.management.system.repository.CommentRepository;
