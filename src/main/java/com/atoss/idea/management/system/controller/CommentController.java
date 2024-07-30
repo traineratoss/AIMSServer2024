@@ -234,6 +234,14 @@ public class CommentController {
         return commentService.existsLikeByCommentIdAndUserId(commentId, userId);
     }
 
+
+    /**
+     * Checks if a report exists for a given comment ID and user ID.
+     *
+     * @param commentId the ID of the comment
+     * @param userId the ID of the user
+     * @return {@code true} if a report exists for the given comment ID and user ID, otherwise {@code false}
+     */
     @GetMapping("/comments/report/find/{commentId}/{userId}")
     public boolean existsReportByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
         return commentService.existsReportByCommentIdAndUserId(commentId, userId);
@@ -306,7 +314,7 @@ public class CommentController {
         }
         commentService.deleteReportsByCommentId(commentId);
         commentService.displayPlaceholder(commentId);
-        return new ResponseEntity<>("Comment with id " + commentId + " is under review by admin", HttpStatus.OK);
+        return new ResponseEntity<>("Comment with id "  +  commentId  +  " is under review by admin", HttpStatus.OK);
     }
 
     /**
