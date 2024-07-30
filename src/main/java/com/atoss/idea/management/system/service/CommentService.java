@@ -153,6 +153,13 @@ public interface CommentService {
      */
     boolean existsLikeByCommentIdAndUserId(Long commentId, Long userId);
 
+    /**
+     * Checks if a report exists for a given comment ID and user ID.
+     *
+     * @param commentId the ID of the comment
+     * @param userId the ID of the user
+     * @return {@code true} if a report exists for the given comment ID and user ID, otherwise {@code false}
+     */
     boolean existsReportByCommentIdAndUserId(Long commentId, Long userId);
 
     /**
@@ -205,4 +212,10 @@ public interface CommentService {
     void deleteReportsByCommentId(Long commentId);
 
 
+    /**
+     * Deletes all replies for a given deleted comment ID.
+     *
+     * @param commentId the ID of the deleted comment whose replies are to be deleted
+     */
+    void deleteRepliesForDeletedComment(Long commentId);
 }

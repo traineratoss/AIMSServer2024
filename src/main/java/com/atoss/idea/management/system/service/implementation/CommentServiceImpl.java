@@ -1,7 +1,6 @@
 package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
-import com.atoss.idea.management.system.exception.InsufficientReportsException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.CommentNotFoundException;
 import com.atoss.idea.management.system.repository.CommentRepository;
@@ -472,12 +471,8 @@ public class CommentServiceImpl implements CommentService {
     public void displayPlaceholder(Long commentId) {
         Optional<Comment> comment = commentRepository.findById(commentId);
         if (comment.isPresent()) {
-            if (getReportsCountForComment(comment.get().getId()) > 5) {
-                comment.get().setCommentText("This comment is under review because it received too many reports");
-                commentRepository.save(comment.get());
-            } else {
-                throw new InsufficientReportsException("This comment does not have enough reports to be reviewed!");
-            }
+            comment.get().setCommentText("This comment was deleted by admin for being offensive");
+            commentRepository.save(comment.get());
         } else {
             throw new CommentNotFoundException();
         }
@@ -497,6 +492,30 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.deleteLikesForComment(commentId);
 
     }
+
+    /**
+     * Deletes all replies for a given deleted comment ID.
+     *
+     * This method first checks if the comment exists by the given ID.
+     * If the comment does not exist, it throws a {@link CommentNotFoundException}.
+     * If the comment exists, it retrieves all replies associated with the comment.
+     * For each reply, it deletes any likes associated with that reply.
+     * Finally, it deletes all replies associated with the given comment ID.
+     *
+     * @param commentId the ID of the deleted comment whose replies are to be deleted
+     * @throws CommentNotFoundException if the comment with the specified ID does not exist
+     */
+    public void deleteRepliesForDeletedComment(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        List<Comment> replies = commentRepository.findAllRepliesForComment(commentId);
+        for (Comment reply:replies) {
+            commentRepository.deleteLikesForComment(reply.getId());
+        }
+        commentRepository.deleteRepliesForComment(commentId);
+    }
+
 
     /**
      * Deletes reports associated with a deleted comment.
@@ -594,8 +613,6 @@ public class CommentServiceImpl implements CommentService {
             throw new UserNotFoundException("A user can't report his own comment !");
         }
     }
-
-
 
 
 }

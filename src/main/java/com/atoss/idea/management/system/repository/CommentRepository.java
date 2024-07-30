@@ -189,6 +189,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM User u JOIN u.likedComments l WHERE u.id = :userId AND l.id = :commentId")
     boolean existsLikeByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
 
+    /**
+     * Checks if a report exists for a given comment ID and user ID.
+     *
+     * @param commentId the ID of the comment
+     * @param userId the ID of the user
+     * @return {@code true} if a report exists for the given comment ID and user ID, otherwise {@code false}
+     */
     @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM User u JOIN u.reportedComments l WHERE u.id = :userId AND l.id = :commentId")
     boolean existsReportByCommentIdAndUserId(@Param("commentId") Long commentId, @Param("userId") Long userId);
 
@@ -203,11 +210,20 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
 
     /**
+     * Deletes all replies for a given comment ID.
+     *
+     * @param commentId the ID of the comment whose replies are to be deleted
+     */
+    @Modifying
+    @Query(value = "DELETE FROM comment WHERE parent_id = :commentId", nativeQuery = true)
+    void deleteRepliesForComment(Long commentId);
+
+    /**
      * Retrieves the IDs of comments that have been reported by five or more users.
      *
      * @return a list of comment IDs that have five or more reports
      */
-    @Query("SELECT c.id FROM Comment c JOIN c.listOfUsers u GROUP BY c.id HAVING COUNT(u) >= 5")
+    @Query("SELECT c.id FROM Comment c JOIN c.listOfUsers u GROUP BY c.id HAVING COUNT(u) > 5")
     List<Long> moreThenFiveReports();
 
     /**
@@ -243,4 +259,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             +
             "LIMIT 5", nativeQuery = true)
     List<Comment> findTop5CommentsByLikes();
+
+    /**
+     * Finds all replies for a given comment ID.
+     *
+     * @param commentId the ID of the comment whose replies are to be retrieved
+     * @return a list of replies for the specified comment
+     */
+    @Query(value = "SELECT * from comment WHERE parent_id = :commentId", nativeQuery = true)
+    List<Comment> findAllRepliesForComment(Long commentId);
 }

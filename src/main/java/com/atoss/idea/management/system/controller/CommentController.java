@@ -150,8 +150,9 @@ public class CommentController {
     public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
         commentService.deleteReportsByCommentId(commentId);
         commentService.deleteLikesForDeletedComment(commentId);
+        commentService.deleteRepliesForDeletedComment(commentId);
         commentService.deleteComment(commentId);
-        return new ResponseEntity<>("Comment likes will also be deleted for deleted comment", HttpStatus.OK);
+        return new ResponseEntity<>("Comment likes, reports and replies will also be deleted for deleted comment", HttpStatus.OK);
     }
 
 
@@ -233,6 +234,14 @@ public class CommentController {
         return commentService.existsLikeByCommentIdAndUserId(commentId, userId);
     }
 
+
+    /**
+     * Checks if a report exists for a given comment ID and user ID.
+     *
+     * @param commentId the ID of the comment
+     * @param userId the ID of the user
+     * @return {@code true} if a report exists for the given comment ID and user ID, otherwise {@code false}
+     */
     @GetMapping("/comments/report/find/{commentId}/{userId}")
     public boolean existsReportByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
         return commentService.existsReportByCommentIdAndUserId(commentId, userId);
@@ -255,12 +264,11 @@ public class CommentController {
      *
      * @param pageSize    the number of comments per page
      * @param pageNumber  the page number to retrieve
-     * @param sortCategory the category by which the comments should be sorted
      * @return ResponseEntity with a CommentPageDTO containing the comments
      */
 
     @GetMapping("/comments/allByReportsNr")
-    public ResponseEntity<CommentPageDTO> getAllUserByUsername(@RequestParam(required = true) int pageSize,
+    public ResponseEntity<CommentPageDTO> getAllCommentsByReportsNr(@RequestParam(required = true) int pageSize,
                                                             @RequestParam(required = true) int pageNumber) {
         return new ResponseEntity<>(
                 commentService.getAllCommentsByReportsNr(
@@ -304,15 +312,21 @@ public class CommentController {
         if (commentService.getReportsCountForComment(commentId) <= 5) {
             return new ResponseEntity<>("This comment does not have enough reports to be reviewed!", HttpStatus.OK);
         }
+        commentService.deleteReportsByCommentId(commentId);
         commentService.displayPlaceholder(commentId);
-        return new ResponseEntity<>("Comment with id " + commentId + " is under review by admin", HttpStatus.OK);
+        return new ResponseEntity<>("Comment with id "  +  commentId  +  " is under review by admin", HttpStatus.OK);
     }
 
-
+    /**
+     * Deletes all reports associated with a specific comment ID.
+     *
+     * @param commentId the ID of the comment
+     * @return a ResponseEntity containing a confirmation message and HTTP status code
+     */
     @Transactional
     @DeleteMapping("/comments/reports/delete/{commentId}")
     public ResponseEntity<String> deleteReportsByCommentId(@PathVariable Long commentId) {
         commentService.deleteReportsByCommentId(commentId);
-        return new ResponseEntity<>("Deleted reports for comment with id: "+commentId, HttpStatus.OK);
+        return new ResponseEntity<>("Deleted reports for comment with id: " + commentId, HttpStatus.OK);
     }
 }
