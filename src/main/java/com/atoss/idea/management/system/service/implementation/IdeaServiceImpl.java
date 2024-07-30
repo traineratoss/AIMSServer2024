@@ -516,13 +516,13 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public Double getRatingByUserAndByIdea(Long ideaId, Long userId) {
+    public Double getRatingByUserAndByIdea(Long ideaId, Long userId){
         Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElseThrow(() -> new IdeaNotFoundException("Not found"));
         return rating.getRating();
     }
 
     @Override
-    public void sendEmailForRating(Long ideaId) {
+    public void sendEmailForRating(Long ideaId){
         List<Long> userIds = subscriptionRepository.findUserIdByIdeaId(ideaId);
         for (Long userId : userIds) {
             User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
@@ -542,7 +542,7 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public void removeSubscription(Long ideaId, Long userId) {
+    public void removeSubscription(Long ideaId, Long userId){
         Optional<Subscription> subscription = subscriptionRepository.findByIdeaIdAndUserId(ideaId, userId);
         if (subscription.isPresent()) {
             subscriptionRepository.deleteByIdeaIdAndUserId(ideaId, userId);

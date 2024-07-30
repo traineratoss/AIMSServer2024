@@ -20,6 +20,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -48,16 +49,16 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     /**
      * Constructs a new instance of the SendEmailServiceImpl.
-     *
+     * <p>
      * This constructor initializes the SendEmailServiceImpl with the required dependencies, including
      * the UserRepository for accessing user data, the AvatarRepository for accessing avatar data, and
      * the JavaMailSender for sending emails.
      *
-     * @param userRepository   The UserRepository instance for accessing user data.
-     * @param avatarRepository The AvatarRepository instance for accessing avatar data.
-     * @param emailSender      The JavaMailSender instance for sending emails.
-     * @param configuration The Configuration instance for email templates.
-     * @param ideaRepository The repository for the Idea Entity
+     * @param userRepository         The UserRepository instance for accessing user data.
+     * @param avatarRepository       The AvatarRepository instance for accessing avatar data.
+     * @param emailSender            The JavaMailSender instance for sending emails.
+     * @param configuration          The Configuration instance for email templates.
+     * @param ideaRepository         The repository for the Idea Entity
      * @param subscriptionRepository The repository for the Subscription Entity
      */
     public SendEmailServiceImpl(UserRepository userRepository,
@@ -78,7 +79,7 @@ public class SendEmailServiceImpl implements SendEmailService {
     public void sendApproveEmailToUser(String username) {
         User user = getUserByUsername(username);
         String password = PasswordGenerator.generatePassayPassword(15);
-        String subject = "Account Activation for "  + companyName + " app";
+        String subject = "Account Activation for " + companyName + " app";
         sendEmailUtils("welcome-template.ftl", username, password, subject);
         // Set the password, status, and isActive for the user
         user.setPassword(BCrypt.hashpw(password, bcryptSalt));
@@ -100,9 +101,8 @@ public class SendEmailServiceImpl implements SendEmailService {
     /**
      * Sends an email to notify the subscribed users of a certain idea that its text has changed
      *
-     *
      * @param usernames The usernames of the users which are subscribed to the idea
-     * @param ideaId the id of the idea whose text has changed
+     * @param ideaId    the id of the idea whose text has changed
      */
     public void sendEmailChangedIdeaText(List<User> usernames, Long ideaId) {
         Idea idea = ideaRepository.findById(ideaId).get();
@@ -115,14 +115,14 @@ public class SendEmailServiceImpl implements SendEmailService {
     /**
      * Sends an email to notify the subscribed users of a certain idea that its title has changed
      *
-     *
      * @param usernames The usernames of the users which are subscribed to the idea
-     * @param ideaId the id of the idea whose title has changed
+     * @param ideaId    the id of the idea whose title has changed
      */
     public void sendEmailChangedIdeaTitle(List<User> usernames, Long ideaId) {
         Idea idea = ideaRepository.findById(ideaId).get();
         for (User user : usernames) {
             String username = user.getUsername();
+<<<<<<< Updated upstream
             sendEmailIdeaSubscription(
                     "title-change-subscription-template.ftl",
                     username,
@@ -131,6 +131,10 @@ public class SendEmailServiceImpl implements SendEmailService {
                     ideaId,
                     "Idea title change"
             );
+=======
+            sendEmailIdeaSubscription("title-change-subscription-template.ftl", username, idea.getTitle(),
+                    idea.getText(), ideaId, "Idea title change");
+>>>>>>> Stashed changes
         }
     }
 
@@ -180,7 +184,7 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     /**
      * Retrieves a user from the repository based on the provided username.
-     *
+     * <p>
      * This method fetches a user from the user repository using the given username. If the user does not exist,
      * a RuntimeException is thrown.
      *
@@ -196,14 +200,14 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     /**
      * Sends an email using email template utilities.
-     *
+     * <p>
      * This method generates and sends an email using the provided email template file, user information,
      * and subject. It retrieves user-specific details, processes the template, and sends the email.
      *
      * @param fileName The name of the email template file to use.
      * @param username The username of the user for whom the email is intended.
      * @param password The password to include in the email content.
-     * @param subject The subject of the email.
+     * @param subject  The subject of the email.
      */
     private void sendEmailUtils(String fileName, String username, String password, String subject) {
         User user = getUserByUsername(username);
@@ -216,7 +220,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         mapUser.put("date", new Date().toString());
         mapUser.put("imageUrl", "./welcome.jpg");
         try {
-            Template template  = configuration.getTemplate(fileName);
+            Template template = configuration.getTemplate(fileName);
             String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapUser);
             sendEmail(emailTo, subject, htmlTemplate);
         } catch (IOException | TemplateException exception) {
@@ -247,15 +251,15 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     /**
      * Sends an email to administrators using email template utilities.
-     *
+     * <p>
      * This method generates and sends an email to administrators using the provided email template file,
      * user information, admin details, and subject. It retrieves user-specific and admin-specific details,
      * processes the template, and sends the email to administrators.
      *
-     * @param fileName The name of the email template file to use.
+     * @param fileName     The name of the email template file to use.
      * @param usernameUser The username of the user for whom the email is intended.
-     * @param admin The User object representing the administrator to whom the email is sent.
-     * @param subject The subject of the email.
+     * @param admin        The User object representing the administrator to whom the email is sent.
+     * @param subject      The subject of the email.
      */
     private void sendEmailUtilsToAdmins(String fileName, String usernameUser, User admin, String subject) {
         User user = getUserByUsername(usernameUser);
@@ -267,7 +271,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         mapUser.put("companyName", companyName);
         mapUser.put("date", new Date().toString());
         try {
-            Template template  = configuration.getTemplate(fileName);
+            Template template = configuration.getTemplate(fileName);
             String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapUser);
             sendEmail(admin.getEmail(), subject, htmlTemplate);
         } catch (IOException | TemplateException exception) {
@@ -277,7 +281,7 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     /**
      * Sends an email to the provided recipient email address with the given subject and text content.
-     *
+     * <p>
      * This method uses the JavaMail API to send an email to the specified email address with the given subject and
      * text content. The email is sent using the emailSender object, and if any errors occur during the email sending
      * process, a RuntimeException is thrown.
@@ -318,7 +322,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         mapUser.put("newText", idea.getText());
         mapUser.put("imageUrl", "./welcome.jpg");
         try {
-            Template template  = configuration.getTemplate(fileName);
+            Template template = configuration.getTemplate(fileName);
             String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapUser);
             sendEmail(emailTo, subject, htmlTemplate);
         } catch (IOException | TemplateException exception) {
@@ -328,7 +332,7 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     /**
      * Retrieves an idea from the repository based on the provided id
-     *
+     * <p>
      * This method fetches an idea from the idea repository using the given id. If the idea does not exist,
      * a RuntimeException is thrown.
      *
@@ -340,7 +344,6 @@ public class SendEmailServiceImpl implements SendEmailService {
         return ideaRepository.findById(ideaId)
                 .orElseThrow(() -> new RuntimeException("Idea does not exist!"));
     }
-
 
 
 }
