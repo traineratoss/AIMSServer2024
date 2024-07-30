@@ -37,16 +37,11 @@ import java.util.Date;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    @Value("${aims.app.cookie.maxAgeAccessTokenCookieSeconds}")
-    private long maxAccessTokenCookieAgeSeconds;
-
-    @Value("${aims.app.cookie.maxAgeRefreshTokenCookieSeconds}")
-    private long maxRefreshTokenCookieAgeSeconds;
-
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
     private final UserService userService;
+    private final CookieService cookieService;
 
     /**
      * Constructor for the AuthController class.
@@ -61,11 +56,12 @@ public class AuthController {
      * @see AuthController
      */
     public AuthController(AuthenticationManager authenticationManager,
-                          UserService userService, RefreshTokenService refreshTokenService, JwtService jwtService) {
+                          UserService userService, RefreshTokenService refreshTokenService, JwtService jwtService, CookieService cookieService) {
         this.authenticationManager = authenticationManager;
         this.refreshTokenService = refreshTokenService;
         this.jwtService = jwtService;
         this.userService = userService;
+        this.cookieService = cookieService;
     }
 
     /**
@@ -107,20 +103,10 @@ public class AuthController {
             String accessToken = jwtService.generateToken(authentication.getName());
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(authentication.getName());
 
-            ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
-                    .httpOnly(true)
-                    .secure(false)
-                    .path("/")
-                    .maxAge(maxAccessTokenCookieAgeSeconds)
-                    .build();
+            ResponseCookie cookie = cookieService.createAccessTokenCookie(accessToken);
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-            ResponseCookie cookieRefresh = ResponseCookie.from("refreshToken", refreshToken.getToken())
-                    .httpOnly(true)
-                    .secure(false)
-                    .path("/api/v1/auth")
-                    .maxAge(maxRefreshTokenCookieAgeSeconds)
-                    .build();
+            ResponseCookie cookieRefresh = cookieService.createRefreshTokenCookie(refreshToken.getToken());
             response.addHeader(HttpHeaders.SET_COOKIE, cookieRefresh.toString());
 
             UserSecurityDTO userData = userService.getUserByUsername(authentication.getName(), UserSecurityDTO.class);
