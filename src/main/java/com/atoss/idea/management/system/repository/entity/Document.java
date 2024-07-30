@@ -16,7 +16,7 @@ public class Document {
     @Column(name = "document_id")
     private Long id;
 
-    @Column(name = "document", length = 1000)
+    @Column(name = "document", length = 5000)
     private byte[] document;
 
     @Column(name = "file_name")
@@ -35,4 +35,9 @@ public class Document {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
+    public Document(String fileName, String filetType, byte[] document) {
+        this.fileName = fileName;
+        this.fileType = filetType;
+        this.document = document;
+    }
 }
