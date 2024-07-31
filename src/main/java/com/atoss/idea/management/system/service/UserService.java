@@ -244,8 +244,7 @@ public interface UserService {
     /**
      * Resets the user's state if the change password process is aborted.
      *
-     * @param changePasswordDTO
-     * @return Returns HttpStatus.OK if the request is successful.
+     * @param changePasswordDTO - Must contain the username of the user who aborts the password recovery.
      * @throws UserNotFoundException if the user is not found in the database
      */
     void abortChangePassword(ChangePasswordDTO changePasswordDTO);

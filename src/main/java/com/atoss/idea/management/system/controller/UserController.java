@@ -260,7 +260,7 @@ public class UserController {
      *         If the password is successfully changed, the response entity has an HTTP status of 200 (HttpStatus.OK).
      *         If the password change operation fails, the response entity has an HTTP status of 400 (HttpStatus.BAD_REQUEST).
      *
-     * @see ChangePasswordDTO
+     * @see ChangePasswordDTO - Must contain the username of the user who aborts the password recovery.
      * @see ResponseEntity
      * @see UserService#changePassword(ChangePasswordDTO)
      */
