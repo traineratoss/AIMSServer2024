@@ -210,12 +210,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserSecurityDTO verifyOTP(VerifyOTPDTO verifyOTPDTO) {
-        String usernameOrEmail = verifyOTPDTO.getUsernameOrEmail();
-        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail).orElseThrow(() -> new UserNotFoundException("User not found!"));
+    public UserSecurityDTO verifyOTP(VerifyOtpDTO verifyOtpDTO) {
+        String usernameOrEmail = verifyOtpDTO.getUsernameOrEmail();
+        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
 
         OTP otp = user.getOtp();
-        if (otp == null || !otp.getCode().equals(verifyOTPDTO.getOtpCode())) {
+        if (otp == null || !otp.getCode().equals(verifyOtpDTO.getOtpCode())) {
             throw new BadCredentialsException("Bad credentials");
         }
 
