@@ -44,8 +44,6 @@ public class ChangePasswordTest {
     @Mock
     AvatarRepository mockAvatarRepository;
 
-    @Spy
-    PasswordEncoder spyPasswordEncoder;
 
     String bcryptSalt;
 
@@ -58,8 +56,7 @@ public class ChangePasswordTest {
                         mockUserRepository,
                         spyModelMapper,
                         mockSendEmailService,
-                        mockAvatarRepository,
-                        spyPasswordEncoder
+                        mockAvatarRepository
                 )
         );
         spyUserController = spy(new UserController(spyUserService, mockSendEmailService));

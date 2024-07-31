@@ -45,9 +45,6 @@ public class ForgetPasswordTest {
     @Mock
     AvatarRepository mockAvatarRepository;
 
-    @Mock
-    PasswordEncoder mockPasswordEncoder;
-
     @Spy
     JavaMailSender mockEmailSender;
 
@@ -77,8 +74,8 @@ public class ForgetPasswordTest {
                         mockUserRepository,
                         spyModelMapper,
                         spySendEmailService,
-                        mockAvatarRepository,
-                        mockPasswordEncoder
+                        mockAvatarRepository
+
                 )
         );
         user = new User();

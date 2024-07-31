@@ -83,12 +83,11 @@ public class User {
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name = "likes",
-            joinColumns = { @JoinColumn(name = "user_id") },
-            inverseJoinColumns = { @JoinColumn(name = "comment_id") }
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "comment_id")}
     )
     @JsonIgnoreProperties("userList")
     private List<Comment> likedComments;
-
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
@@ -98,8 +97,7 @@ public class User {
     @JsonManagedReference
     private List<Subscription> isSubscribed;
 
-    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "refresh_token_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private RefreshToken refreshToken;
 
     /**
@@ -107,7 +105,6 @@ public class User {
      *
      * @param username The username of the user to be created.
      * @param email    The email address of the user to be created.
-     *
      * @see User
      */
     public User(String username, String email) {

@@ -45,8 +45,6 @@ public class UserActivationTest {
     @Mock
     AvatarRepository mockAvatarRepository;
 
-    @Mock
-    PasswordEncoder mockPasswordEncoder;
 
     @Spy
     JavaMailSender mockEmailSender;
@@ -77,8 +75,7 @@ public class UserActivationTest {
                         mockUserRepository,
                         spyModelMapper,
                         spySendEmailService,
-                        mockAvatarRepository,
-                        mockPasswordEncoder
+                        mockAvatarRepository
                 )
         );
         user = new User();

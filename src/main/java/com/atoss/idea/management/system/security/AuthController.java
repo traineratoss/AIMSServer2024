@@ -11,10 +11,10 @@ import com.atoss.idea.management.system.security.request.LoginRequest;
 import com.atoss.idea.management.system.security.request.RegisterRequest;
 import com.atoss.idea.management.system.security.response.AuthResponse;
 import com.atoss.idea.management.system.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -25,11 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
@@ -50,7 +46,7 @@ public class AuthController {
      * @param userService           The UserRepository used for accessing user-related data and operations.
      * @param refreshTokenService   The RefreshTokenService used for handling refresh tokens.
      * @param jwtService            The JwtService used for generating and verifying tokens.
-     *
+     * @param cookieService
      * @see AuthenticationManager
      * @see UserRepository
      * @see AuthController
@@ -148,6 +144,16 @@ public class AuthController {
                 userService.addUser(signUpRequest.getUsername(), signUpRequest.getEmail()),
                 HttpStatus.CREATED);
     }
+
+    @Transactional
+    @PostMapping("/refresh-token")
+    public ResponseEntity<AuthResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+
+        AuthResponse authResponse = refreshTokenService.refreshAuthToken(request, response);
+        return new ResponseEntity<>(authResponse, HttpStatus.OK);
+
+    }
+
 
 
 }

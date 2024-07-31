@@ -48,9 +48,6 @@ public class UserRegisterApprovalTest {
     @Mock
     AvatarRepository mockAvatarRepository;
 
-    @Mock
-    PasswordEncoder mockPasswordEncoder;
-
     @Spy
     JavaMailSender mockEmailSender;
 
@@ -80,8 +77,7 @@ public class UserRegisterApprovalTest {
                         mockUserRepository,
                         spyModelMapper,
                         spySendEmailService,
-                        mockAvatarRepository,
-                        mockPasswordEncoder
+                        mockAvatarRepository
                 )
         );
         user = new User();

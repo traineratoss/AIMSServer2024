@@ -44,8 +44,6 @@ public class CreateUserTest {
     @Mock
     AvatarRepository mockAvatarRepository;
 
-    @Mock
-    PasswordEncoder mockPasswordEncoder;
 
     private String username = "username";
     private String email = "email@email.email";
@@ -58,8 +56,7 @@ public class CreateUserTest {
                         mockUserRepository,
                         spyModelMapper,
                         mockSendEmailService,
-                        mockAvatarRepository,
-                        mockPasswordEncoder
+                        mockAvatarRepository
                 )
         );
         spyUserController = spy(new UserController(spyUserService, mockSendEmailService));

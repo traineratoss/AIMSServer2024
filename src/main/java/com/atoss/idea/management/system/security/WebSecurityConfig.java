@@ -34,7 +34,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
      * Creates a BCryptPasswordEncoder bean for encoding passwords.
      *
      * @return A BCryptPasswordEncoder object for password encoding.
-     *
      * @see PasswordEncoder
      * @see BCryptPasswordEncoder
      */
@@ -47,7 +46,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
      * Creates an AuthTokenFilter bean for filtering and validating JWT authentication tokens.
      *
      * @return An AuthTokenFilter object for filtering and validating JWT authentication tokens.
-     *
      * @see AuthFilter
      */
     @Bean
@@ -59,7 +57,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
      * Creates a DaoAuthenticationProvider bean for custom authentication using UserDetailsServiceImpl.
      *
      * @return A DaoAuthenticationProvider object for custom authentication using UserDetailsServiceImpl.
-     *
      * @see DaoAuthenticationProvider
      * @see UserDetailsServiceImpl
      */
@@ -75,10 +72,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
      * Creates a custom AuthenticationManager bean to manage user authentication.
      *
      * @param authConfig The AuthenticationConfiguration to configure the authentication manager.
-     *
      * @return An AuthenticationManager object to manage user authentication.
      * @throws Exception If an exception occurs while configuring the authentication manager.
-     *
      * @see AuthenticationManager
      * @see AuthenticationConfiguration
      */
@@ -91,10 +86,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
      * Configures the security filter chain for HTTP requests.
      *
      * @param http The HttpSecurity object used for configuring the security filter chain.
-     *
      * @return A SecurityFilterChain object representing the configured security filter chain.
      * @throws Exception If an exception occurs during the configuration of the security filter chain.
-     *
      * @see HttpSecurity
      * @see HttpMethod
      * @see UsernamePasswordAuthenticationFilter
@@ -105,7 +98,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
-                        req.requestMatchers("/api/v1/login")
+                        req.requestMatchers("/api/v1/auth/**")
                                 .permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS, "/**")
                                 .permitAll()
@@ -115,7 +108,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                         "/aims/api/v1/avatars/**",
                                         "/aims/api/v1/statistics/**",
                                         "/aims/api/v1/images/**")
-                                .hasRole(Role.STANDARD.name())
+                                .hasAnyRole(Role.STANDARD.name(), Role.ADMIN.name())
                                 .requestMatchers("/**")
                                 .hasRole(Role.ADMIN.name())
                                 .anyRequest()
