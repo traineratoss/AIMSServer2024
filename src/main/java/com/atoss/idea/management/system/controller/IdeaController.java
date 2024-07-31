@@ -293,6 +293,16 @@ public class IdeaController {
         return new ResponseEntity<>(ideaService.getAllSubscriptions(userId), HttpStatus.OK);
     }
 
+    /**
+     * Retrieves an idea based on the provided comment ID.
+     *
+     * This method handles HTTP GET requests to the "/getByComment" endpoint.
+     * It expects a query parameter "commentId" which is mandatory.
+     * The method is transactional, meaning that it will be executed within a database transaction context.
+     *
+     * @param commentId The ID of the comment used to find the associated idea.
+     * @return A ResponseEntity containing the IdeaResponseDTO and an HTTP status of OK.
+     */
     @GetMapping("/getByComment")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> getIdeaByCommentId(@RequestParam(required = true) Long commentId) {

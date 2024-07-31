@@ -77,9 +77,28 @@ public interface IdeaRepository extends JpaRepository<Idea, Long> {
                                  @Param("selectedDateTo") String selectedDateTo);
 
 
+    /**
+     * Finds an idea based on the provided comment ID.
+     *
+     * This method executes a query that joins the Idea entity with its associated comments
+     * and retrieves the idea where the comment ID matches the provided parameter.
+     *
+     * @param commentId The ID of the comment used to find the associated idea.
+     * @return An Optional containing the found Idea, or an empty Optional if no idea is found.
+     */
     @Query("SELECT i FROM Idea i JOIN i.commentList c WHERE c.id = :commentId")
     Optional<Idea> findIdeaByCommentId(@Param("commentId") Long commentId);
 
+
+    /**
+     * Finds an idea based on the provided reply ID.
+     *
+     * This method executes a query that joins the Idea entity with its associated comments and their replies,
+     * and retrieves the idea where the reply ID matches the provided parameter.
+     *
+     * @param replyId The ID of the reply used to find the associated idea.
+     * @return An Optional containing the found Idea, or an empty Optional if no idea is found.
+     */
     @Query("SELECT i FROM Idea i JOIN i.commentList c JOIN c.replies r WHERE r.id = :replyId")
     Optional<Idea> findIdeaByReplyId(@Param("replyId") Long replyId);
 }

@@ -193,7 +193,14 @@ public interface IdeaService {
      */
     List<SubscriptionDTO> getAllSubscriptions(Long userId);
 
-
+    /**
+     * Retrieves an IdeaResponseDTO based on the provided comment ID.
+     *
+     * This method fetches the idea associated with the given comment ID and returns it as an IdeaResponseDTO.
+     *
+     * @param commentId The ID of the comment used to find the associated idea.
+     * @return The IdeaResponseDTO containing the details of the found idea.
+     */
     IdeaResponseDTO getIdeaByCommentId(Long commentId);
 
 
