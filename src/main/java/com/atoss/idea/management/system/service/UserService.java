@@ -234,6 +234,14 @@ public interface UserService {
      */
     Boolean isFirstLogin(String usernameOrEmail);
 
+    /**
+     * Retrieves the Id associated with a specified username.
+     * @param username The username for which the id is to be retrieved
+     * @return the unique identifier (ID) associated with the provided username. If no user is found with
+     *         the specified username, the method may return {@code -1} or some other default value indicating
+     *         that the user does not exist.
+     * @throws UserNotFoundException If the user with the given username is not found.
+     */
 
     Long getIdByUsername(String username);
 

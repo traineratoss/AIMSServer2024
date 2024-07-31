@@ -16,6 +16,11 @@ public class CookieService {
     @Value("${aims.app.cookie.maxAgeRefreshTokenCookieSeconds}")
     private long maxRefreshTokenCookieAgeSeconds;
 
+    /**
+     * Creates a refresh token cookie.
+     * @param token  The refresh token to be set in the cookie
+     * @return  A refresh token cookie
+     */
     public ResponseCookie createRefreshTokenCookie(String token) {
         return ResponseCookie.from("refreshToken", token)
                 .httpOnly(true)
@@ -24,6 +29,12 @@ public class CookieService {
                 .maxAge(maxRefreshTokenCookieAgeSeconds)
                 .build();
     }
+
+    /**
+     * Creates an access token cookie
+     * @param token The access token to be set in the cookie
+     * @return    An access token cookie
+     */
 
     public ResponseCookie createAccessTokenCookie(String token) {
         return ResponseCookie.from("accessToken", token)
@@ -34,6 +45,12 @@ public class CookieService {
                 .build();
     }
 
+    /**
+     * Recovers a token from cookies in the request
+     * @param request  The HTTP request containing the cookies
+     * @param type      Type of token recovered (accessToken or refreshToken)
+     * @return          Return the value of cookie if it's found, otherwise will return null
+     */
     public String getTokenFromCookies(HttpServletRequest request, String type) {
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {

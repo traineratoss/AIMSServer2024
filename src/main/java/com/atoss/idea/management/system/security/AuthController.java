@@ -46,9 +46,11 @@ public class AuthController {
      * @param userService           The UserRepository used for accessing user-related data and operations.
      * @param refreshTokenService   The RefreshTokenService used for handling refresh tokens.
      * @param jwtService            The JwtService used for generating and verifying tokens.
+     * @param cookieService         The CookieService used for creating access and refresh token
      * @see AuthenticationManager
      * @see UserRepository
      * @see AuthController
+     * @see CookieService
      */
     public AuthController(AuthenticationManager authenticationManager,
                           UserService userService, RefreshTokenService refreshTokenService, JwtService jwtService, CookieService cookieService) {
@@ -144,6 +146,12 @@ public class AuthController {
                 HttpStatus.CREATED);
     }
 
+    /**
+     * Generates a new refresh token in the system
+     * @param request The HttpServletRequest contains the request details
+     * @param response The HttpServletResponse contains the response details
+     * @return ResponseEntity contains the authResponse and an HTTP ok status
+     */
     @Transactional
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {

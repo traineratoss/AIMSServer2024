@@ -34,6 +34,14 @@ public class RefreshTokenService {
     private final JwtService jwtService;
     private final CookieService cookieService;
 
+    /**
+     * Creates a new refresh token for the specified username
+     *
+     * @param username The username for which the refresh token is to be created.
+     * @return the newly created {@link RefreshToken} instance.
+     * @throws UserNotFoundException If no user is found with the given username.
+     */
+
     public RefreshToken createRefreshToken(String username) {
         refreshTokenRepository.findByUser_Username(username).ifPresent(refreshTokenRepository::delete);
         refreshTokenRepository.flush();
@@ -49,10 +57,23 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
+    /**
+     * Finds a refresh token by its token value.
+     *
+     * @param token The token value of the refresh token to be found
+     * @return Return a {@link Optional} containing the found {@link RefreshToken} if present, otherwise {@link Optional#empty()}
+     */
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
     }
 
+    /**
+     * Verifies the expiration of the provided refresh token.
+     *
+     * @param token The {@link RefreshToken} to be verified
+     * @return The {@link RefreshToken} if it has not expired
+     * @throws RefreshTokenExpiredException if the token has expired
+     */
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(token);
@@ -61,6 +82,15 @@ public class RefreshTokenService {
         return token;
     }
 
+    /**
+     * Refreshes the authentication token by issuing a new access token and refresh token
+     *
+     * @param request  Request the {@link HttpServletRequest} containing the current refresh token in cookies
+     * @param response The {@link HttpServletResponse} to which new cookies will be added
+     * @return Return an {@link AuthResponse} containing the new access token expiration date
+     * @throws InvalidRefreshTokenException if the refresh token is invalid
+     * @throws RefreshTokenExpiredException if the refresh token has expired
+     */
     public AuthResponse refreshAuthToken(HttpServletRequest request, HttpServletResponse response) {
 
         String token = cookieService.getTokenFromCookies(request, "refreshToken");
