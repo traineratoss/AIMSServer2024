@@ -58,7 +58,7 @@ public class AuthFilter extends OncePerRequestFilter {
             }
         }
 
-        if (token == null) {
+        if (token == null || request.getRequestURI().contains("/api/v1/auth/")) {
             filterChain.doFilter(request, response);
             return;
         }
