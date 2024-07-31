@@ -32,7 +32,7 @@ public interface DocumentService {
 
 
     /**
-     *  Gets an document by an idea id
+     *  Gets a document by an idea id
      *
      * @param ideaId the id of the idea
      * @return it returns the document.
@@ -40,9 +40,10 @@ public interface DocumentService {
     List<DocumentDTO> getDocumentsByIdeaId(Long ideaId);
 
     /**
-     *  Deletes an document by an document id
+     *  Removes a document from the DB by the id of the user who uploaded it and the id of the idea where it is uploaded
      *
-     * @param id the id of the document
+     * @param ideaId the id of the idea
+     * @param userId the id of the user
      */
-    void deleteDocumentById(Long id);
+    void removeDocument(Long ideaId, Long userId);
 }

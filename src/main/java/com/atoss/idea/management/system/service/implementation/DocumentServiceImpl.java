@@ -63,7 +63,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (documentRepository.findById(id).isPresent()) {
             return modelMapper.map(documentRepository.findById(id).get(), DocumentDTO.class);
         } else {
-            throw new DocumentNotFoundException();
+            throw new DocumentNotFoundException("Document does not exist");
         }
     }
 
@@ -84,10 +84,12 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void deleteDocumentById(Long id){
-        Optional<Document> document = documentRepository.findById(id);
-        if(document.isPresent()){
-            documentRepository.deleteById(id);
+    public void removeDocument(Long ideaId, Long userId) {
+        Optional<Document> document = documentRepository.findByIdeaIdAndUserId(ideaId, userId);
+        if(document.isPresent()) {
+            documentRepository.deleteByIdeaIdAndUserId(ideaId, userId);
+        } else {
+            throw new DocumentNotFoundException("Document does not exist");
         }
     }
 }

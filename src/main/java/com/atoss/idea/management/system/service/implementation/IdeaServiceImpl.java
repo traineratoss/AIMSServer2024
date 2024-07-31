@@ -542,7 +542,7 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public void removeSubscription(Long ideaId, Long userId){
+    public void removeSubscription(Long ideaId, Long userId) {
         Optional<Subscription> subscription = subscriptionRepository.findByIdeaIdAndUserId(ideaId, userId);
         if (subscription.isPresent()) {
             subscriptionRepository.deleteByIdeaIdAndUserId(ideaId, userId);

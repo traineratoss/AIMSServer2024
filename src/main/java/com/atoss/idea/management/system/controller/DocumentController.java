@@ -4,6 +4,7 @@ import com.atoss.idea.management.system.exception.DocumentNotFoundException;
 import com.atoss.idea.management.system.repository.dto.DocumentDTO;
 import com.atoss.idea.management.system.repository.entity.Document;
 import com.atoss.idea.management.system.service.DocumentService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
@@ -70,14 +71,16 @@ public class DocumentController {
     }
 
     /**
-     *  Deletes an document by an document id
+     *  Deletes a document by the id of the user who attached it and the id of the idea where it is attached
      *
-     * @param id the id of the document
+     * @param ideaId the id of the idea where the document is attached
+     * @param userId the id of the user who attached the document
      * @return it returns a response entity with confirmation.
      */
-    @DeleteMapping("/deleteById")
-    public ResponseEntity<String> deleteDocumentById(@RequestParam Long id) {
-        documentService.deleteDocumentById(id);
-        return new ResponseEntity<>("Document deleted succsefully", HttpStatus.OK);
+    @Transactional
+    @DeleteMapping("/deleteDocument")
+    public ResponseEntity<String> deleteDocumentByIds(@RequestParam Long ideaId, @RequestParam Long userId) {
+        documentService.removeDocument(ideaId, userId);
+        return new ResponseEntity<>("Document deleted successfully", HttpStatus.OK);
     }
 }
