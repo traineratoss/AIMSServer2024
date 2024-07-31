@@ -2,7 +2,6 @@ package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.exception.DocumentNotFoundException;
 import com.atoss.idea.management.system.repository.dto.DocumentDTO;
-import com.atoss.idea.management.system.repository.entity.Document;
 import com.atoss.idea.management.system.service.DocumentService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +36,15 @@ public class DocumentController {
      * Uploads an document to the database in the form of an DocumentDTO.
      *
      * @param file the multipart file representing the document to be uploaded.
+     * @param ideaId id of the idea to which the documents are attached
+     * @param userId id of the user which attached the documents
      * @return it returns an DocumentDTO that represents the added document.
      * @throws IOException it throws when the I/O operation fails, or it was interrupted.
      */
     @PostMapping("/addDocument")
-    public ResponseEntity<DocumentDTO> addDocument(@RequestBody MultipartFile file, @RequestParam Long ideaId, @RequestParam Long userId) throws IOException {
+    public ResponseEntity<DocumentDTO> addDocument(@RequestBody MultipartFile file,
+                                                   @RequestParam Long ideaId,
+                                                   @RequestParam Long userId) throws IOException {
         return new ResponseEntity<>(documentService.addDocument(file, ideaId, userId), HttpStatus.OK);
     }
 
@@ -79,7 +82,8 @@ public class DocumentController {
      */
     @Transactional
     @DeleteMapping("/deleteDocument")
-    public ResponseEntity<String> deleteDocumentByIds(@RequestParam Long ideaId, @RequestParam Long userId) {
+    public ResponseEntity<String> deleteDocumentByIds(@RequestParam Long ideaId,
+                                                      @RequestParam Long userId) {
         documentService.removeDocument(ideaId, userId);
         return new ResponseEntity<>("Document deleted successfully", HttpStatus.OK);
     }

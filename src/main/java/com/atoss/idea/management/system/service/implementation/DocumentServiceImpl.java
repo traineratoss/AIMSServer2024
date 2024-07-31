@@ -7,7 +7,6 @@ import com.atoss.idea.management.system.repository.DocumentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.DocumentDTO;
-import com.atoss.idea.management.system.repository.dto.SubscriptionDTO;
 import com.atoss.idea.management.system.repository.entity.Document;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,8 +35,13 @@ public class DocumentServiceImpl implements DocumentService {
      *
      * @param documentRepository accessing CRUD Repository for Document Entity
      * @param modelMapper mapping Entity-DTO relationship
+     * @param userRepository repository of the user entity
+     * @param ideaRepository repository idea entity
      */
-    public DocumentServiceImpl(DocumentRepository documentRepository, ModelMapper modelMapper, UserRepository userRepository, IdeaRepository ideaRepository) {
+    public DocumentServiceImpl(DocumentRepository documentRepository,
+                               ModelMapper modelMapper,
+                               UserRepository userRepository,
+                               IdeaRepository ideaRepository) {
         this.documentRepository = documentRepository;
         this.modelMapper = modelMapper;
         this.userRepository = userRepository;
@@ -86,7 +89,7 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public void removeDocument(Long ideaId, Long userId) {
         Optional<Document> document = documentRepository.findByIdeaIdAndUserId(ideaId, userId);
-        if(document.isPresent()) {
+        if (document.isPresent()) {
             documentRepository.deleteByIdeaIdAndUserId(ideaId, userId);
         } else {
             throw new DocumentNotFoundException("Document does not exist");

@@ -86,13 +86,13 @@ public class InitialDataLoader implements CommandLineRunner {
         // Avatar CONSTRUCTOR
         if (ddlValue.equals("create")) {
             String[] avatarFileNames = {
-                    "avatar1.svg",
-                    "avatar2.svg",
-                    "avatar3.svg",
-                    "avatar4.svg",
-                    "avatar5.svg",
-                    "avatar6.svg",
-                    "avatar7.svg"
+                "avatar1.svg",
+                "avatar2.svg",
+                "avatar3.svg",
+                "avatar4.svg",
+                "avatar5.svg",
+                "avatar6.svg",
+                "avatar7.svg"
             };
             ArrayList<Avatar> avatarList = new ArrayList<>();
 
@@ -166,13 +166,13 @@ public class InitialDataLoader implements CommandLineRunner {
 
             //Image CONSTRUCTOR
             String[] imageFileNames = {
-                    "img.png",
-                    "img2.png",
-                    "img3.png",
-                    "img4.png",
-                    "img5.png",
-                    "img6.png",
-                    "img7.png"
+                "img.png",
+                "img2.png",
+                "img3.png",
+                "img4.png",
+                "img5.png",
+                "img6.png",
+                "img7.png"
             };
 
             ArrayList<Image> imageList = new ArrayList<>();

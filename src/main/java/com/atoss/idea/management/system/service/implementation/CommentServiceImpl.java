@@ -509,9 +509,8 @@ public class CommentServiceImpl implements CommentService {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
-        List<Comment> replies=commentRepository.findAllRepliesForComment(commentId);
-        for(Comment reply:replies)
-        {
+        List<Comment> replies = commentRepository.findAllRepliesForComment(commentId);
+        for (Comment reply : replies) {
             commentRepository.deleteReportsByCommentId(reply.getId());
             commentRepository.deleteLikesForComment(reply.getId());
         }
