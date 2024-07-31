@@ -50,6 +50,10 @@ public class Comment {
     @Column(name = "creation_date")
     private Date creationDate;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "review_status")
+    private ReviewStatus reviewStatus = ReviewStatus.NOT_REVIEWED;
+
     @ManyToMany(mappedBy = "likedComments")
     @JsonIgnoreProperties("likedComments")
     private List<User> userList;
@@ -59,22 +63,5 @@ public class Comment {
     @JsonIgnoreProperties("reportedComments")
     private List<User> listOfUsers;
 
-    /**
-     * Sets the text of the comment.
-     *
-     * @param comment the text of the comment to be set
-     */
-    public void setCommentText(String comment) {
-        this.commentText = comment;
-    }
-
-    /**
-     * Returns the text of the comment.
-     *
-     * @return the text of the comment
-     */
-    public String getCommentText() {
-        return this.commentText;
-    }
 
 }

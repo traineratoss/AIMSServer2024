@@ -4,6 +4,7 @@ import com.atoss.idea.management.system.exception.CommentNotFoundException;
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.repository.dto.*;
+import com.atoss.idea.management.system.repository.entity.ReviewStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -218,4 +219,24 @@ public interface CommentService {
      * @param commentId the ID of the deleted comment whose replies are to be deleted
      */
     void deleteRepliesForDeletedComment(Long commentId);
+
+    /**
+     * Sets the review status for a specific comment identified by its ID.
+     *
+     * @param reviewStatus the new review status to be set for the comment
+     * @param commentId the ID of the comment whose review status is to be updated
+     * @throws IllegalArgumentException if the commentId is null
+     * @throws CommentNotFoundException if a comment with the specified ID is not found
+     */
+    void setReviewStatusByCommentId(ReviewStatus reviewStatus, Long commentId);
+
+    /**
+     * Retrieves the review status for a specific comment identified by its ID.
+     *
+     * @param commentId the ID of the comment whose review status is to be retrieved
+     * @return the review status of the specified comment
+     * @throws IllegalArgumentException if the commentId is null
+     * @throws CommentNotFoundException if a comment with the specified ID is not found
+     */
+    ReviewStatus getReviewStatusByCommentId(Long commentId);
 }

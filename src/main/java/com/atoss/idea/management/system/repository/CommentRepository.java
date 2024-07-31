@@ -1,6 +1,7 @@
 package com.atoss.idea.management.system.repository;
 
 import com.atoss.idea.management.system.repository.entity.Comment;
+import com.atoss.idea.management.system.repository.entity.ReviewStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -268,4 +269,14 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      */
     @Query(value = "SELECT * from comment WHERE parent_id = :commentId", nativeQuery = true)
     List<Comment> findAllRepliesForComment(Long commentId);
+
+    /**
+     * Retrieves the review status of a comment by its ID.
+     *
+     * @param commentId the ID of the comment
+     * @return the review status of the comment
+     */
+    @Query(value = "SELECT review_status FROM comment  WHERE comment_id = :commentId", nativeQuery = true)
+    ReviewStatus getReviewStatusByCommentId(Long commentId);
+
 }

@@ -9,6 +9,7 @@ import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.repository.entity.Idea;
+import com.atoss.idea.management.system.repository.entity.ReviewStatus;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
@@ -495,7 +496,7 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Deletes all replies for a given deleted comment ID.
-     *
+     * <p>
      * This method first checks if the comment exists by the given ID.
      * If the comment does not exist, it throws a {@link CommentNotFoundException}.
      * If the comment exists, it retrieves all replies associated with the comment.
@@ -616,5 +617,25 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+
+    @Transactional
+    @Override
+    public void setReviewStatusByCommentId(ReviewStatus reviewStatus, Long commentId) {
+        Optional<Comment> comment = commentRepository.findById(commentId);
+        if (comment.isPresent()) {
+            comment.get().setReviewStatus(reviewStatus);
+            commentRepository.save(comment.get());
+        } else {
+            throw new CommentNotFoundException();
+        }
+    }
+
+    @Override
+    public ReviewStatus getReviewStatusByCommentId(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        return commentRepository.getReviewStatusByCommentId(commentId);
+    }
 
 }
