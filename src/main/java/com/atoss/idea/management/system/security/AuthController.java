@@ -46,7 +46,6 @@ public class AuthController {
      * @param userService           The UserRepository used for accessing user-related data and operations.
      * @param refreshTokenService   The RefreshTokenService used for handling refresh tokens.
      * @param jwtService            The JwtService used for generating and verifying tokens.
-     * @param cookieService
      * @see AuthenticationManager
      * @see UserRepository
      * @see AuthController

@@ -1,5 +1,8 @@
 package com.atoss.idea.management.system.security;
 
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
@@ -30,4 +33,16 @@ public class CookieService {
                 .maxAge(maxAccessTokenCookieAgeSeconds)
                 .build();
     }
+
+    public String getTokenFromCookies(HttpServletRequest request, String type) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals(type)) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
 }

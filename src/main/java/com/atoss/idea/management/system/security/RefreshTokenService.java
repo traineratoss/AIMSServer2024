@@ -8,7 +8,6 @@ import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
 import com.atoss.idea.management.system.repository.entity.RefreshToken;
 import com.atoss.idea.management.system.security.response.AuthResponse;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -64,19 +63,7 @@ public class RefreshTokenService {
 
     public AuthResponse refreshAuthToken(HttpServletRequest request, HttpServletResponse response) {
 
-        String token = null;
-
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals("refreshToken")) {
-                    token = cookie.getValue();
-                }
-            }
-        }
-
-        if (token == null) {
-            throw new InvalidRefreshTokenException("Invalid refresh token");
-        }
+        String token = cookieService.getTokenFromCookies(request, "refreshToken");
 
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
@@ -94,7 +81,6 @@ public class RefreshTokenService {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookieService
                 .createRefreshTokenCookie(newRefreshToken.getToken()).toString());
-
 
 
         return new AuthResponse(
