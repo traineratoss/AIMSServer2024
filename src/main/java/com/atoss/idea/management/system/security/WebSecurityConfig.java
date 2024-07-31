@@ -29,6 +29,10 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     private final JwtService jwtService;
 
+    private CookieService cookieService;
+
+
+
 
     /**
      * Creates a BCryptPasswordEncoder bean for encoding passwords.
@@ -50,7 +54,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
      */
     @Bean
     public AuthFilter authenticationJwtTokenFilter() {
-        return new AuthFilter(jwtService, userDetailsService);
+        return new AuthFilter(jwtService, userDetailsService, cookieService);
     }
 
     /**

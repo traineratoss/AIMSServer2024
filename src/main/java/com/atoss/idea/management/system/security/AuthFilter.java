@@ -26,6 +26,8 @@ public class AuthFilter extends OncePerRequestFilter {
 
     private UserDetailsService userDetailsService;
 
+    private CookieService cookieService;
+
     /**
      * Performs filtering on the incoming HTTP request and response to set user information as a cookie.
      *
@@ -46,17 +48,9 @@ public class AuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
-        String token = null;
         String username;
 
-        if (request.getCookies() != null) {
-            for (Cookie cookie: request.getCookies()) {
-                if (cookie.getName().equals("accessToken")) {
-                    token = cookie.getValue();
-                }
-            }
-        }
+        String token = cookieService.getTokenFromCookies(request, "accessToken");
 
         if (token == null) {
             filterChain.doFilter(request, response);
