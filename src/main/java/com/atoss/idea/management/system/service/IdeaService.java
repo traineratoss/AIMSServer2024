@@ -194,4 +194,7 @@ public interface IdeaService {
     List<SubscriptionDTO> getAllSubscriptions(Long userId);
 
 
+    IdeaResponseDTO getIdeaByCommentId(Long commentId);
+
+
 }

@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface IdeaRepository extends JpaRepository<Idea, Long> {
@@ -75,4 +76,10 @@ public interface IdeaRepository extends JpaRepository<Idea, Long> {
     List<Idea> filterIdeasByDate(@Param("selectedDateFrom") String selectedDateFrom,
                                  @Param("selectedDateTo") String selectedDateTo);
 
+
+    @Query("SELECT i FROM Idea i JOIN i.commentList c WHERE c.id = :commentId")
+    Optional<Idea> findIdeaByCommentId(@Param("commentId") Long commentId);
+
+    @Query("SELECT i FROM Idea i JOIN i.commentList c JOIN c.replies r WHERE r.id = :replyId")
+    Optional<Idea> findIdeaByReplyId(@Param("replyId") Long replyId);
 }

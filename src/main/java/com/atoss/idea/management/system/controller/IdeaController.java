@@ -292,4 +292,11 @@ public class IdeaController {
     public ResponseEntity<List<SubscriptionDTO>> getAllSubscriptions(@RequestParam Long userId) {
         return new ResponseEntity<>(ideaService.getAllSubscriptions(userId), HttpStatus.OK);
     }
+
+    @GetMapping("/getByComment")
+    @Transactional
+    public ResponseEntity<IdeaResponseDTO> getIdeaByCommentId(@RequestParam(required = true) Long commentId) {
+        return new ResponseEntity<>(ideaService.getIdeaByCommentId(commentId), HttpStatus.OK);
+    }
+
 }
