@@ -40,9 +40,6 @@ public class LoginTest {
     @Mock
     AvatarRepository mockAvatarRepository;
 
-    @Mock
-    PasswordEncoder mockPasswordEncoder;
-
     private String userNameOrEmail;
     private String password = "$2a$10$QkRidA35ea0Fzm/ObrOEgO";
 
@@ -56,8 +53,7 @@ public class LoginTest {
                         mockUserRepository,
                         spyModelMapper,
                         mockSendEmailService,
-                        mockAvatarRepository,
-                        mockPasswordEncoder
+                        mockAvatarRepository
                 )
         );
         user = new User();

@@ -46,9 +46,6 @@ public class UpdateUserTest {
     @Mock
     AvatarRepository mockAvatarRepository;
 
-    @Mock
-    PasswordEncoder mockPasswordEncoder;
-
     private UserUpdateDTO userUpdateDTO;
     private User user;
     private String username = "username";
@@ -61,8 +58,7 @@ public class UpdateUserTest {
                         mockUserRepository,
                         spyModelMapper,
                         mockSendEmailService,
-                        mockAvatarRepository,
-                        mockPasswordEncoder
+                        mockAvatarRepository
                 )
         );
         spyUserController = spy(new UserController(spyUserService, mockSendEmailService));

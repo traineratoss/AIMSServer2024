@@ -1,9 +1,23 @@
 package com.atoss.idea.management.system.service.implementation;
 
-import com.atoss.idea.management.system.exception.*;
+import com.atoss.idea.management.system.exception.ApproveAlreadyGrantedException;
+import com.atoss.idea.management.system.exception.AvatarNotFoundException;
+import com.atoss.idea.management.system.exception.EmailAlreadyExistException;
+import com.atoss.idea.management.system.exception.EmailFailedException;
+import com.atoss.idea.management.system.exception.UserAlreadyActivatedException;
+import com.atoss.idea.management.system.exception.UserAlreadyDeactivatedException;
+import com.atoss.idea.management.system.exception.UserAlreadyExistException;
+import com.atoss.idea.management.system.exception.UserNotFoundException;
+import com.atoss.idea.management.system.exception.UsernameAlreadyExistException;
 import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.*;
+import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
+import com.atoss.idea.management.system.repository.dto.UserAdminDashboardResponseDTO;
+import com.atoss.idea.management.system.repository.dto.UserPageDTO;
+import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
+import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
+import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.VerifyOtpDTO;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.OTP;
 import com.atoss.idea.management.system.repository.entity.Role;
@@ -20,7 +34,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,8 +51,6 @@ public class UserServiceImpl implements UserService {
 
     private final AvatarRepository avatarRepository;
 
-    private final PasswordEncoder passwordEncoder;
-
     @Value("${aims.app.bcrypt.salt}")
     private String bcryptSalt;
 
@@ -49,24 +60,27 @@ public class UserServiceImpl implements UserService {
      * @param modelMapper for mapping entity-dto relationships
      * @param sendEmailService service used for sending emails
      * @param avatarRepository for accessing CRUD repository methods for Avatar Entity
-     * @param passwordEncoder for password hashing and verification
      */
     public UserServiceImpl(UserRepository userRepository,
                            ModelMapper modelMapper,
                            SendEmailService sendEmailService,
-                           AvatarRepository avatarRepository, PasswordEncoder passwordEncoder) {
+                           AvatarRepository avatarRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.sendEmailService = sendEmailService;
         this.avatarRepository = avatarRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserResponseDTO addUser(String username, String email) {
         if (userRepository.findByUsernameOrEmail(username, email).isPresent()) {
-            throw new UserAlreadyExistException("User already exist! ");
+            throw new UserAlreadyExistException("User already exists!");
         }
+
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new EmailAlreadyExistException("Email already exist!");
+        }
+
         User user = new User();
         user.setUsername(username);
         user.setEmail(email);
@@ -75,6 +89,7 @@ public class UserServiceImpl implements UserService {
         user.setIsFirstLogin(true);
         userRepository.save(user);
         sendEmailService.sendEmailToUser(username);
+
         return modelMapper.map(user, UserResponseDTO.class);
     }
 
@@ -127,9 +142,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDTO getUserByUsername(String username) {
+    public <T> T getUserByUsername(String username, Class<T> type) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
-        return modelMapper.map(user, UserResponseDTO.class);
+        return modelMapper.map(user, type);
     }
 
     @Override
@@ -337,9 +352,9 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Long getIdByUsername(String username) {
+    public Long getIdByUsername(String username){
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User" + username + "not found!"));
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
         return user.getId();
     }
 

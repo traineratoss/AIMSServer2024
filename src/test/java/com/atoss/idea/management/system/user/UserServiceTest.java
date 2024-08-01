@@ -79,7 +79,7 @@ public class UserServiceTest {
         user.setIsFirstLogin(false);
         user.setHasPassword(true);
         Mockito.when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
-        UserResponseDTO userResponseDTOPage = userService.getUserByUsername("testName");
+        UserResponseDTO userResponseDTOPage = userService.getUserByUsername("testName", UserResponseDTO.class);
         assertEquals("testName", userResponseDTOPage.getUsername());
     }
 
@@ -97,7 +97,7 @@ public class UserServiceTest {
         user.setIsFirstLogin(false);
         user.setHasPassword(true);
         Mockito.when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.empty());
-        assertThrows(UserNotFoundException.class, () -> userService.getUserByUsername("testName"));
+        assertThrows(UserNotFoundException.class, () -> userService.getUserByUsername("testName", UserResponseDTO.class));
     }
 
 //    @Test

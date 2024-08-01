@@ -1,39 +1,38 @@
-package com.atoss.idea.management.system.repository.security;
+package com.atoss.idea.management.system.security;
 
+import com.atoss.idea.management.system.repository.entity.Role;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@EnableMethodSecurity
-public class WebSecurityConfig {
-    private final UserDetailsServiceImpl userDetailsService;
+@EnableWebSecurity
+@AllArgsConstructor
+public class WebSecurityConfig implements WebMvcConfigurer {
+    private final UserDetailsService userDetailsService;
 
     private final AuthEntryPoint unauthorizedHandler;
 
-    /**
-     * Constructor for the WebSecurityConfig class.
-     *
-     * @param userDetailsService  The UserDetailsServiceImpl used for loading user-specific data during authentication.
-     * @param unauthorizedHandler The AuthEntryPointJwt used for handling unauthorized access and authentication errors.
-     * @see UserDetailsServiceImpl
-     * @see AuthEntryPoint
-     */
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsService, AuthEntryPoint unauthorizedHandler) {
-        this.userDetailsService = userDetailsService;
-        this.unauthorizedHandler = unauthorizedHandler;
-    }
+    private final JwtService jwtService;
+
+    private CookieService cookieService;
+
+
+
 
     /**
      * Creates a BCryptPasswordEncoder bean for encoding passwords.
@@ -55,7 +54,7 @@ public class WebSecurityConfig {
      */
     @Bean
     public AuthFilter authenticationJwtTokenFilter() {
-        return new AuthFilter();
+        return new AuthFilter(jwtService, userDetailsService, cookieService);
     }
 
     /**
@@ -88,18 +87,6 @@ public class WebSecurityConfig {
     }
 
     /**
-     * Creates a custom AuthenticationSuccessHandler bean for handling successful authentication events.
-     *
-     * @return An AuthenticationSuccessHandler object for handling successful authentication events.
-     * @see AuthenticationSuccessHandler
-     * @see CustomAuthenticationSuccessHandler
-     */
-    @Bean
-    public AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new CustomAuthenticationSuccessHandler();
-    }
-
-    /**
      * Configures the security filter chain for HTTP requests.
      *
      * @param http The HttpSecurity object used for configuring the security filter chain.
@@ -113,13 +100,27 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(req ->
+                        req.requestMatchers("/api/v1/auth/**")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS, "/**")
+                                .permitAll()
+                                .requestMatchers(
+                                        "/users/**",
+                                        "/aims/api/v1/ideas/**",
+                                        "/aims/api/v1/avatars/**",
+                                        "/aims/api/v1/statistics/**",
+                                        "/aims/api/v1/images/**")
+                                .hasAnyRole(Role.STANDARD.name(), Role.ADMIN.name())
+                                .requestMatchers("/**")
+                                .hasRole(Role.ADMIN.name())
+                                .anyRequest()
+                                .authenticated()
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth ->
-                        auth
-                                .requestMatchers("/**").permitAll());
-        http.authenticationProvider(authenticationProvider());
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

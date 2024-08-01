@@ -110,12 +110,12 @@ public class UserController {
      *
      * @see UserResponseDTO
      * @see UserNotFoundException
-     * @see UserService#getUserByUsername(String)
+     * @see UserService#getUserByUsername(String, Class)
      */
     @Transactional
     @GetMapping
     public UserResponseDTO getUserByUsername(@RequestParam(name = "username") String username) {
-        return userService.getUserByUsername(username);
+        return userService.getUserByUsername(username, UserResponseDTO.class);
     }
 
     /**
