@@ -56,6 +56,8 @@ public interface UserService {
      * This method fetches the user from the repository using the given username and returns the DTO representation of the user's information.
      *
      * @param username the username of the user to be retrieved
+     * @param <T> a user DTO
+     * @param type the class of the user DTO
      * @return the dto representation of the user entity
      * @throws UserNotFoundException if a user with the given username doesn't exist in the system
      */
