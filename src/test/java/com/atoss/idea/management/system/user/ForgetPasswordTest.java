@@ -2,6 +2,8 @@ package com.atoss.idea.management.system.user;
 
 import com.atoss.idea.management.system.exception.UserAlreadyDeactivatedException;
 import com.atoss.idea.management.system.repository.AvatarRepository;
+import com.atoss.idea.management.system.repository.IdeaRepository;
+import com.atoss.idea.management.system.repository.SubscriptionRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
@@ -20,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
@@ -45,14 +46,19 @@ public class ForgetPasswordTest {
     @Mock
     AvatarRepository mockAvatarRepository;
 
-    @Mock
-    PasswordEncoder mockPasswordEncoder;
 
     @Spy
     JavaMailSender mockEmailSender;
 
     @Spy
     Configuration mockConfiguration;
+
+    @Mock
+    IdeaRepository mockIdeaRepository;
+
+    @Mock
+    SubscriptionRepository mockSubscriptionRepository;
+
 
     String bcryptSalt;
 
@@ -68,7 +74,10 @@ public class ForgetPasswordTest {
                         mockUserRepository,
                         mockAvatarRepository,
                         mockEmailSender,
-                        mockConfiguration
+                        mockConfiguration,
+                        mockSubscriptionRepository,
+                        mockIdeaRepository
+
                 )
         );
 

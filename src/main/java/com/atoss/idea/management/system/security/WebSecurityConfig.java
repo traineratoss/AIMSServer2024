@@ -102,17 +102,22 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
-                        req.requestMatchers("/api/v1/auth/**")
+                        req.requestMatchers(
+                                "/api/v1/auth/**",
+                                        "/users/change-password/**",
+                                        "/users/verify-otp",
+                                        "/users/send-forgot-password")
                                 .permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS, "/**")
                                 .permitAll()
                                 .requestMatchers(
-                                        "/users/**",
+                                        "/users/all",
+                                        "/users/update-profile",
                                         "/aims/api/v1/ideas/**",
                                         "/aims/api/v1/avatars/**",
-                                        "/aims/api/v1/statistics/**",
-                                        "/aims/api/v1/images/**")
-                                .hasAnyRole(Role.STANDARD.name(), Role.ADMIN.name())
+                                        "/aims/api/v1/images/**",
+                                        "/aims/api/v1/statistics/**")
+                                .hasAnyRole(Role.STANDARD.name())
                                 .requestMatchers("/**")
                                 .hasRole(Role.ADMIN.name())
                                 .anyRequest()
