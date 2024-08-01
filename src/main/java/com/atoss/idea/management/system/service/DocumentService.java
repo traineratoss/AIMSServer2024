@@ -47,13 +47,7 @@ public interface DocumentService {
     /**
      *  Removes a document from the DB by the id of the user who uploaded it and the id of the idea where it is uploaded
      *
-     * @param ideaId the id of the idea
-     * @param userId the id of the user
+     * @param id the id of the idea
      */
-<<<<<<< HEAD
     void deleteDocumentById(Long id);
 }
-=======
-    void removeDocument(Long ideaId, Long userId);
-}
->>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b

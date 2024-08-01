@@ -35,17 +35,13 @@ public class DocumentController {
     /**
      * Uploads an document to the database in the form of an DocumentDTO.
      *
-<<<<<<< HEAD
-=======
-     * @param file the multipart file representing the document to be uploaded.
+     * @param files the multipart file representing the document to be uploaded.
      * @param ideaId id of the idea to which the documents are attached
->>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b
      * @param userId id of the user which attached the documents
      * @return it returns an DocumentDTO that represents the added document.
      * @throws IOException it throws when the I/O operation fails, or it was interrupted.
      */
     @PostMapping("/addDocument")
-<<<<<<< HEAD
     public ResponseEntity<List<DocumentDTO>> addDocument(@RequestParam("files") MultipartFile[] files,
                                                          @RequestParam Long ideaId,
                                                          @RequestParam Long userId) throws IOException {
@@ -55,12 +51,6 @@ public class DocumentController {
             documentDTOs.add(documentDTO);
         }
         return new ResponseEntity<>(documentDTOs, HttpStatus.OK);
-=======
-    public ResponseEntity<DocumentDTO> addDocument(@RequestBody MultipartFile file,
-                                                   @RequestParam Long ideaId,
-                                                   @RequestParam Long userId) throws IOException {
-        return new ResponseEntity<>(documentService.addDocument(file, ideaId, userId), HttpStatus.OK);
->>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b
     }
 
 
@@ -103,14 +93,12 @@ public class DocumentController {
      *  Deletes a document by the id of the user who attached it and the id of the idea where it is attached
      *
      * @param ideaId the id of the idea where the document is attached
-     * @param userId the id of the user who attached the document
      * @return it returns a response entity with confirmation.
      */
     @Transactional
     @DeleteMapping("/deleteDocument")
-    public ResponseEntity<String> deleteDocumentByIds(@RequestParam Long ideaId,
-                                                      @RequestParam Long userId) {
-        documentService.removeDocument(ideaId, userId);
+    public ResponseEntity<String> deleteDocumentByIds(@RequestParam Long ideaId) {
+        documentService.deleteDocumentById(ideaId);
         return new ResponseEntity<>("Document deleted successfully", HttpStatus.OK);
     }
 }

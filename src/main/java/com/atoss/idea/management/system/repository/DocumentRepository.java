@@ -40,8 +40,5 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
      * @param userId id of the user who attached the documents
      */
     void deleteByIdeaIdAndUserId(Long ideaId, Long userId);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b
+

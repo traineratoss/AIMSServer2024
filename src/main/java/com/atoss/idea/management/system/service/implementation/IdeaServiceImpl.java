@@ -63,14 +63,10 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final SendEmailService sendEmailService;
 
-<<<<<<< HEAD
     private final DocumentServiceImpl documentService;
 
-    public static long ideaResponseId;
-=======
     private final HtmlServiceImpl htmlService;
 
->>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b
 
     /**
      * Constructor for the Idea Service Implementation
@@ -94,11 +90,8 @@ public class IdeaServiceImpl implements IdeaService {
                            CommentServiceImpl commentServiceImpl,
                            SendEmailService sendEmailService,
                            SubscriptionRepository subscriptionRepository,
-<<<<<<< HEAD
-                           DocumentServiceImpl documentService) {
-=======
+                           DocumentServiceImpl documentService,
                            HtmlServiceImpl htmlService) {
->>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b
         this.ratingRepository = ratingRepository;
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
@@ -108,11 +101,8 @@ public class IdeaServiceImpl implements IdeaService {
         this.commentServiceImpl = commentServiceImpl;
         this.sendEmailService = sendEmailService;
         this.subscriptionRepository = subscriptionRepository;
-<<<<<<< HEAD
         this.documentService = documentService;
-=======
         this.htmlService = htmlService;
->>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b
     }
 
     private String filterBadWords(String text) {
