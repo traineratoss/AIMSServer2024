@@ -11,6 +11,7 @@ import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.ImageDTO;
 import com.atoss.idea.management.system.repository.entity.*;
+import com.atoss.idea.management.system.service.implementation.HtmlServiceImpl;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,9 @@ public class CreateIdeaTest {
 
     @Mock
     private ImageRepository imageRepository;
+
+    @Mock
+    private HtmlServiceImpl htmlService;
 
 
     @BeforeEach

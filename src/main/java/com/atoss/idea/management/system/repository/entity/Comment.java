@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.springframework.stereotype.Component;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -56,12 +57,12 @@ public class Comment {
 
     @ManyToMany(mappedBy = "likedComments")
     @JsonIgnoreProperties("likedComments")
-    private List<User> userList;
+    private List<User> userList = new ArrayList<>();
 
 
     @ManyToMany(mappedBy = "reportedComments")
     @JsonIgnoreProperties("reportedComments")
-    private List<User> listOfUsers;
+    private List<User> listOfUsers = new ArrayList<>();
 
 
 }
