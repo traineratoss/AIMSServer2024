@@ -16,11 +16,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -49,7 +52,7 @@ public class IdeaController {
     @PostMapping("/create")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> addIdea(@RequestBody IdeaRequestDTO idea,
-                                                   @RequestParam String username) throws UnsupportedEncodingException {
+                                                   @RequestParam String username) throws IOException {
         return new ResponseEntity<>(ideaService.addIdea(idea, username), HttpStatus.OK);
     }
 

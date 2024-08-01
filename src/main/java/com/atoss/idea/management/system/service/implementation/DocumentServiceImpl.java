@@ -7,7 +7,6 @@ import com.atoss.idea.management.system.repository.DocumentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.DocumentDTO;
-import com.atoss.idea.management.system.repository.dto.SubscriptionDTO;
 import com.atoss.idea.management.system.repository.entity.Document;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,8 +35,13 @@ public class DocumentServiceImpl implements DocumentService {
      *
      * @param documentRepository accessing CRUD Repository for Document Entity
      * @param modelMapper mapping Entity-DTO relationship
+     * @param userRepository repository of the user entity
+     * @param ideaRepository repository idea entity
      */
-    public DocumentServiceImpl(DocumentRepository documentRepository, ModelMapper modelMapper, UserRepository userRepository, IdeaRepository ideaRepository) {
+    public DocumentServiceImpl(DocumentRepository documentRepository,
+                               ModelMapper modelMapper,
+                               UserRepository userRepository,
+                               IdeaRepository ideaRepository) {
         this.documentRepository = documentRepository;
         this.modelMapper = modelMapper;
         this.userRepository = userRepository;
@@ -52,7 +55,10 @@ public class DocumentServiceImpl implements DocumentService {
         Document document = new Document(fileName, file.getContentType(), file.getBytes());
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
         document.setUser(user);
-        Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found."));
+        Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
+//        Long id1 = IdeaServiceImpl.ideaResponseId;
+//        System.out.println(id1 + " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+//        Idea idea = ideaRepository.findById(id1).orElseThrow(() -> new IdeaNotFoundException("Idea not found."));
         document.setIdea(idea);
         return modelMapper.map(documentRepository.save(document), DocumentDTO.class);
     }
@@ -63,7 +69,7 @@ public class DocumentServiceImpl implements DocumentService {
         if (documentRepository.findById(id).isPresent()) {
             return modelMapper.map(documentRepository.findById(id).get(), DocumentDTO.class);
         } else {
-            throw new DocumentNotFoundException();
+            throw new UserNotFoundException("user");
         }
     }
 

@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -62,6 +63,10 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final SendEmailService sendEmailService;
 
+    private final DocumentServiceImpl documentService;
+
+    public static long ideaResponseId;
+
     /**
      * Constructor for the Idea Service Implementation
      *
@@ -82,7 +87,8 @@ public class IdeaServiceImpl implements IdeaService {
                            ModelMapper modelMapper,
                            CommentServiceImpl commentServiceImpl,
                            SendEmailService sendEmailService,
-                           SubscriptionRepository subscriptionRepository) {
+                           SubscriptionRepository subscriptionRepository,
+                           DocumentServiceImpl documentService) {
         this.ratingRepository = ratingRepository;
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
@@ -92,6 +98,7 @@ public class IdeaServiceImpl implements IdeaService {
         this.commentServiceImpl = commentServiceImpl;
         this.sendEmailService = sendEmailService;
         this.subscriptionRepository = subscriptionRepository;
+        this.documentService = documentService;
     }
 
     private String filterBadWords(String text) {
@@ -121,7 +128,7 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws UnsupportedEncodingException {
+    public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws IOException {
 
         if (idea.getTitle() == null || idea.getTitle().isEmpty()) {
             throw new FieldValidationException("Please enter a valid title for the idea.");
@@ -516,13 +523,13 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public Double getRatingByUserAndByIdea(Long ideaId, Long userId){
+    public Double getRatingByUserAndByIdea(Long ideaId, Long userId) {
         Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElseThrow(() -> new IdeaNotFoundException("Not found"));
         return rating.getRating();
     }
 
     @Override
-    public void sendEmailForRating(Long ideaId){
+    public void sendEmailForRating(Long ideaId) {
         List<Long> userIds = subscriptionRepository.findUserIdByIdeaId(ideaId);
         for (Long userId : userIds) {
             User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
@@ -542,7 +549,7 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public void removeSubscription(Long ideaId, Long userId){
+    public void removeSubscription(Long ideaId, Long userId) {
         Optional<Subscription> subscription = subscriptionRepository.findByIdeaIdAndUserId(ideaId, userId);
         if (subscription.isPresent()) {
             subscriptionRepository.deleteByIdeaIdAndUserId(ideaId, userId);

@@ -13,9 +13,12 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Optional;
 
 public interface IdeaService {
 
@@ -27,7 +30,7 @@ public interface IdeaService {
      * @return the idea DTO that we want to add to the User that has
      *         the username passed as an argument
      */
-    IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws UnsupportedEncodingException;
+    IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws IOException;
 
     /**
      * Gets an Idea by an id

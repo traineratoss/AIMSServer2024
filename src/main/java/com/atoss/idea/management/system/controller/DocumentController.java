@@ -2,17 +2,17 @@ package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.exception.DocumentNotFoundException;
 import com.atoss.idea.management.system.repository.dto.DocumentDTO;
-import com.atoss.idea.management.system.repository.entity.Document;
 import com.atoss.idea.management.system.service.DocumentService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -35,14 +35,22 @@ public class DocumentController {
     /**
      * Uploads an document to the database in the form of an DocumentDTO.
      *
-     * @param file the multipart file representing the document to be uploaded.
+     * @param userId id of the user which attached the documents
      * @return it returns an DocumentDTO that represents the added document.
      * @throws IOException it throws when the I/O operation fails, or it was interrupted.
      */
     @PostMapping("/addDocument")
-    public ResponseEntity<DocumentDTO> addDocument(@RequestBody MultipartFile file, @RequestParam Long ideaId, @RequestParam Long userId) throws IOException {
-        return new ResponseEntity<>(documentService.addDocument(file, ideaId, userId), HttpStatus.OK);
+    public ResponseEntity<List<DocumentDTO>> addDocument(@RequestParam("files") MultipartFile[] files,
+                                                         @RequestParam Long ideaId,
+                                                         @RequestParam Long userId) throws IOException {
+        List<DocumentDTO> documentDTOs = new ArrayList<>();
+        for (MultipartFile file : files) {
+            DocumentDTO documentDTO = documentService.addDocument(file, ideaId, userId);
+            documentDTOs.add(documentDTO);
+        }
+        return new ResponseEntity<>(documentDTOs, HttpStatus.OK);
     }
+
 
 
     /**
@@ -54,9 +62,19 @@ public class DocumentController {
      *                                it will throw an exception
      */
     @GetMapping("/get")
-    public ResponseEntity<DocumentDTO> getDocument(@RequestParam Long id) throws DocumentNotFoundException {
-        return new ResponseEntity<>(documentService.getDocument(id), HttpStatus.OK);
+    public ResponseEntity<byte[]> getDocument(@RequestParam Long id) throws DocumentNotFoundException {
+        DocumentDTO document = documentService.getDocument(id);
+        byte[] fileContent = document.getDocument();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDisposition(ContentDisposition.builder("attachment")
+                .filename(document.getFileName())
+                .build());
+
+        return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
     }
+
 
     /**
      *  Gets an document by an idea id
