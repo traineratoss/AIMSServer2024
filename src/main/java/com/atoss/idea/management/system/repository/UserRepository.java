@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.repository;
 
+import com.atoss.idea.management.system.repository.entity.RefreshToken;
 import com.atoss.idea.management.system.repository.entity.Role;
 import com.atoss.idea.management.system.repository.entity.User;
 import org.springframework.data.domain.Page;
@@ -67,4 +68,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return A Page containing a subset of User entities with usernames that start with the specified string.
      */
     Page<User> findByUsernameStartsWithOrderByIsActiveAscIdAsc(String username, Pageable pageable);
+
+    /**
+     * Retrieves a User entity from the database based on the refresh token.
+     * This method searches for a User entity in the database that matches the provided refresh token.
+     * If a match is found, it returns the User wrapped in an Optional. Otherwise, it returns an empty Optional.
+     *
+     * @param refreshToken The email address to search for.
+     * @return An Optional containing the User entity if a match is found, or an empty Optional if no match is found.
+     */
+    Optional<User> findUserByRefreshToken(RefreshToken refreshToken);
 }

@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.repository.security;
+package com.atoss.idea.management.system.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

@@ -98,6 +98,8 @@ public class User {
     @JsonManagedReference
     private List<Document> documentList;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private RefreshToken refreshToken;
 
     /**
      * Constructor for creating a User object with the provided username and email.

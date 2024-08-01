@@ -577,4 +577,23 @@ public class IdeaServiceImpl implements IdeaService {
                 .toList();
         return subscriptionDTOs;
     }
+
+
+    @Override
+    public IdeaResponseDTO getIdeaByCommentId(Long commentId) {
+        Optional<Idea> idea = ideaRepository.findIdeaByCommentId(commentId);
+
+        if (idea.isEmpty()) {
+            idea = ideaRepository.findIdeaByReplyId(commentId);
+        }
+
+        return idea.map(i -> {
+            IdeaResponseDTO responseDTO = modelMapper.map(i, IdeaResponseDTO.class);
+            responseDTO.setUsername(i.getUser().getUsername());
+            responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(i.getCreationDate()));
+            responseDTO.setCommentsNumber(i.getCommentList().size());
+            return responseDTO;
+        }).orElseThrow(() -> new IdeaNotFoundException("Idea not found for the given comment/reply ID"));
+    }
+
 }
