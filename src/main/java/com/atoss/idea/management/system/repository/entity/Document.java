@@ -35,9 +35,16 @@ public class Document {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
-    public Document(String fileName, String filetType, byte[] document) {
+    /**
+     * Constructor
+     *
+     * @param fileName the name of the file.
+     * @param fileType the file format of the file.
+     * @param document the byte array of the document data.
+     */
+    public Document(String fileName, String fileType, byte[] document) {
         this.fileName = fileName;
-        this.fileType = filetType;
+        this.fileType = fileType;
         this.document = document;
     }
 }

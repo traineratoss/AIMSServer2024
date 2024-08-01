@@ -63,9 +63,14 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final SendEmailService sendEmailService;
 
+<<<<<<< HEAD
     private final DocumentServiceImpl documentService;
 
     public static long ideaResponseId;
+=======
+    private final HtmlServiceImpl htmlService;
+
+>>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b
 
     /**
      * Constructor for the Idea Service Implementation
@@ -79,6 +84,7 @@ public class IdeaServiceImpl implements IdeaService {
      * @param commentServiceImpl ======
      * @param sendEmailService   responsible for sending emails to users who have subscriptions
      * @param subscriptionRepository repository for the Subscription Entity
+     * @param htmlService            for handling HTML content and processing
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
                            ImageRepository imageRepository, UserRepository userRepository,
@@ -88,7 +94,11 @@ public class IdeaServiceImpl implements IdeaService {
                            CommentServiceImpl commentServiceImpl,
                            SendEmailService sendEmailService,
                            SubscriptionRepository subscriptionRepository,
+<<<<<<< HEAD
                            DocumentServiceImpl documentService) {
+=======
+                           HtmlServiceImpl htmlService) {
+>>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b
         this.ratingRepository = ratingRepository;
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
@@ -98,7 +108,11 @@ public class IdeaServiceImpl implements IdeaService {
         this.commentServiceImpl = commentServiceImpl;
         this.sendEmailService = sendEmailService;
         this.subscriptionRepository = subscriptionRepository;
+<<<<<<< HEAD
         this.documentService = documentService;
+=======
+        this.htmlService = htmlService;
+>>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b
     }
 
     private String filterBadWords(String text) {
@@ -153,7 +167,8 @@ public class IdeaServiceImpl implements IdeaService {
         savedIdea.setUser(user);
         savedIdea.setStatus(idea.getStatus());
         String filteredIdeaText = filterBadWords(idea.getText());
-        savedIdea.setText(filteredIdeaText);
+        String htmlContent = htmlService.markdownToHtml(filteredIdeaText);
+        savedIdea.setText(htmlContent);
         String filteredIdeaTitle = filterBadWords(idea.getTitle());
         savedIdea.setTitle(filteredIdeaTitle);
         savedIdea.setCategoryList(new ArrayList<>());
@@ -234,7 +249,8 @@ public class IdeaServiceImpl implements IdeaService {
                 }
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
-                idea.setText(filteredCommentText);
+                String htmlContent = htmlService.markdownToHtml(filteredCommentText);
+                idea.setText(htmlContent);
                 if (!subscribedUsers.isEmpty() && diffText) {
                     sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
                 }
@@ -545,7 +561,7 @@ public class IdeaServiceImpl implements IdeaService {
         subscription.setIdea(idea);
         subscription.setUser(user);
         Subscription subscriptionRepositorySave = subscriptionRepository.save(subscription);
-        return  subscriptionRepositorySave;
+        return subscriptionRepositorySave;
     }
 
     @Override
@@ -576,4 +592,23 @@ public class IdeaServiceImpl implements IdeaService {
                 .toList();
         return subscriptionDTOs;
     }
+
+
+    @Override
+    public IdeaResponseDTO getIdeaByCommentId(Long commentId) {
+        Optional<Idea> idea = ideaRepository.findIdeaByCommentId(commentId);
+
+        if (idea.isEmpty()) {
+            idea = ideaRepository.findIdeaByReplyId(commentId);
+        }
+
+        return idea.map(i -> {
+            IdeaResponseDTO responseDTO = modelMapper.map(i, IdeaResponseDTO.class);
+            responseDTO.setUsername(i.getUser().getUsername());
+            responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(i.getCreationDate()));
+            responseDTO.setCommentsNumber(i.getCommentList().size());
+            return responseDTO;
+        }).orElseThrow(() -> new IdeaNotFoundException("Idea not found for the given comment/reply ID"));
+    }
+
 }

@@ -56,10 +56,12 @@ public interface UserService {
      * This method fetches the user from the repository using the given username and returns the DTO representation of the user's information.
      *
      * @param username the username of the user to be retrieved
+     * @param <T> a user DTO
+     * @param type the class of the user DTO
      * @return the dto representation of the user entity
      * @throws UserNotFoundException if a user with the given username doesn't exist in the system
      */
-    UserResponseDTO getUserByUsername(String username);
+    <T> T getUserByUsername(String username, Class<T> type);
 
     /**
      * Retrieves a paginated list of all the users with summarized information for administrative purposes
@@ -110,13 +112,13 @@ public interface UserService {
     /**
      * Changes the password of a user
      *
-     * @param verifyOTPDTO the dto containing the username, the old password and the new password
+     * @param verifyOtpDTO the dto containing the username, the old password and the new password
      * @return UserSecurityDTO with the user's credentials.
      * @throws UserNotFoundException   if a user with the given username doesn't exist in the system
      * @throws BadCredentialsException if no OTP has been generated for a user, the OTP is not correct,
      *                                 or has already expired.
      */
-    UserSecurityDTO verifyOTP(VerifyOTPDTO verifyOTPDTO);
+    UserSecurityDTO verifyOTP(VerifyOtpDTO verifyOtpDTO);
 
     /**
      * Sends an approval email to the user with the specified username.
@@ -244,8 +246,7 @@ public interface UserService {
     /**
      * Resets the user's state if the change password process is aborted.
      *
-     * @param changePasswordDTO
-     * @return Returns HttpStatus.OK if the request is successful.
+     * @param changePasswordDTO - Must contain the username of the user who aborts the password recovery.
      * @throws UserNotFoundException if the user is not found in the database
      */
     void abortChangePassword(ChangePasswordDTO changePasswordDTO);

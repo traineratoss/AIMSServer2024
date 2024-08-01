@@ -13,7 +13,12 @@ public interface DocumentService {
     /**
      * This method will save the document that is received as a parameter in the database.
      *
+<<<<<<< HEAD
 //     * @param documentFile it is for the document we receive from the client.
+=======
+     * @param documentFile it is for the document we receive from the client.
+     * @param ideaId the id of the idea to which the document is attached
+>>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b
      * @param userId the id of the user who attached the document
      * @return it returns an DocumentDTO that represents the added document data.
      * @throws IOException it throws when the I/O operation fails, or it was interrupted.
@@ -42,7 +47,13 @@ public interface DocumentService {
     /**
      *  Removes a document from the DB by the id of the user who uploaded it and the id of the idea where it is uploaded
      *
-     * @param id the id of the document
+     * @param ideaId the id of the idea
+     * @param userId the id of the user
      */
+<<<<<<< HEAD
     void deleteDocumentById(Long id);
 }
+=======
+    void removeDocument(Long ideaId, Long userId);
+}
+>>>>>>> d0b03483c62ab70986ef7b1953b0208a1e67a39b

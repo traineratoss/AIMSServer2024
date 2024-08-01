@@ -21,7 +21,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 
@@ -47,8 +46,6 @@ public class UserRegisterApprovalTest {
     @Mock
     AvatarRepository mockAvatarRepository;
 
-    @Mock
-    PasswordEncoder mockPasswordEncoder;
 
     @Mock
     SubscriptionRepository mockSubscriptionRepository;
@@ -87,8 +84,7 @@ public class UserRegisterApprovalTest {
                         mockUserRepository,
                         spyModelMapper,
                         spySendEmailService,
-                        mockAvatarRepository,
-                        mockPasswordEncoder
+                        mockAvatarRepository
                 )
         );
         user = new User();

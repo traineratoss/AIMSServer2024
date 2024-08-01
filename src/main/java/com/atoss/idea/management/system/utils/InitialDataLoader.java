@@ -86,13 +86,13 @@ public class InitialDataLoader implements CommandLineRunner {
         // Avatar CONSTRUCTOR
         if (ddlValue.equals("create")) {
             String[] avatarFileNames = {
-                    "avatar1.svg",
-                    "avatar2.svg",
-                    "avatar3.svg",
-                    "avatar4.svg",
-                    "avatar5.svg",
-                    "avatar6.svg",
-                    "avatar7.svg"
+                "avatar1.svg",
+                "avatar2.svg",
+                "avatar3.svg",
+                "avatar4.svg",
+                "avatar5.svg",
+                "avatar6.svg",
+                "avatar7.svg"
             };
             ArrayList<Avatar> avatarList = new ArrayList<>();
 
@@ -137,7 +137,6 @@ public class InitialDataLoader implements CommandLineRunner {
                     null, null, false, true);
             userRepository.save(user5);
 
-
             //Category CONSTRUCTOR
             Category category1 = createCategory("Innovation");
             categoryRepository.save(category1);
@@ -166,13 +165,13 @@ public class InitialDataLoader implements CommandLineRunner {
 
             //Image CONSTRUCTOR
             String[] imageFileNames = {
-                    "img.png",
-                    "img2.png",
-                    "img3.png",
-                    "img4.png",
-                    "img5.png",
-                    "img6.png",
-                    "img7.png"
+                "img.png",
+                "img2.png",
+                "img3.png",
+                "img4.png",
+                "img5.png",
+                "img6.png",
+                "img7.png"
             };
 
             ArrayList<Image> imageList = new ArrayList<>();
@@ -256,8 +255,35 @@ public class InitialDataLoader implements CommandLineRunner {
                     user2, "It's a great idea");
             commentRepository.save(comment2);
 
+            Comment comment3 = createComment(staticDate, idea2, null,
+                    user3, "It's unnecessary");
+            commentRepository.save(comment3);
+
+            Comment comment4 = createComment(staticDate2, idea3, null,
+                    user4, "It's a great idea");
+            commentRepository.save(comment4);
+
             Comment reply1 = createReply(new Date(), comment2, idea2, user1, "I don't think so");
             commentRepository.save(reply1);
+
+            Comment reply2 = createReply(new Date(), comment3, idea2, user3, "I think it is too");
+            commentRepository.save(reply2);
+
+            Comment reply3 = createReply(new Date(), comment3, idea2, user4, "I think it is");
+            commentRepository.save(reply3);
+
+            addLike(comment2, user1);
+            addLike(comment2, user3);
+            addLike(comment2, user4);
+            addLike(comment2, user5);
+
+            addLike(reply1, user3);
+            addLike(reply1, user5);
+
+            addLike(reply3, user1);
+            addLike(reply3, user2);
+            addLike(reply3, user5);
+
 
             //initialize CommentList for using it in another Constructor (for replies)
             ArrayList<Comment> commentList = new ArrayList<>();
@@ -278,6 +304,7 @@ public class InitialDataLoader implements CommandLineRunner {
                 User user = createUser(true, Role.STANDARD, randomElementFromList(avatarList), email, username, name, password, true, false);
                 userList.add(user);
                 userRepository.save(user);
+                addReport(reply2, user);
             }
 
             // Dummy ideas
@@ -325,6 +352,25 @@ public class InitialDataLoader implements CommandLineRunner {
 
         }
     }
+
+
+
+    private void addLike(Comment comment, User user) {
+        user.getLikedComments().add(comment);
+        comment.getUserList().add(user);
+
+        userRepository.save(user);
+        commentRepository.save(comment);
+    }
+
+    private void addReport(Comment comment, User user) {
+        user.getReportedComments().add(comment);
+        comment.getListOfUsers().add(user);
+
+        userRepository.save(user);
+        commentRepository.save(comment);
+    }
+
 
     /**
      * generate child date after parent date

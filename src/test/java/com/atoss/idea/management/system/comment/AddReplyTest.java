@@ -8,6 +8,7 @@ import com.atoss.idea.management.system.repository.dto.RequestCommentReplyDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
+import com.atoss.idea.management.system.service.implementation.HtmlServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -40,6 +41,9 @@ public class AddReplyTest {
     private User user;
 
     private Comment comment;
+
+    @Mock
+    private HtmlServiceImpl htmlService;
 
     @BeforeEach
     public void setUp() {

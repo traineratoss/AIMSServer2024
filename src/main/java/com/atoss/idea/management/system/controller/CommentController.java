@@ -1,6 +1,7 @@
 package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.repository.dto.*;
+import com.atoss.idea.management.system.repository.entity.ReviewStatus;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/aims/api/v1/ideas")
 public class CommentController {
@@ -328,5 +328,38 @@ public class CommentController {
     public ResponseEntity<String> deleteReportsByCommentId(@PathVariable Long commentId) {
         commentService.deleteReportsByCommentId(commentId);
         return new ResponseEntity<>("Deleted reports for comment with id: " + commentId, HttpStatus.OK);
+    }
+
+    /**
+     * Sets the review status for a specific comment identified by its ID via a PATCH request.
+     *
+     * This method is transactional to ensure that the operation is completed successfully or rolled back in case of failure.
+     * The endpoint for this method is "/comments/reports/review/set".
+     *
+     * @param reviewStatus the new review status to be set for the comment, passed as a request parameter
+     * @param commentId the ID of the comment whose review status is to be updated, passed as a request parameter
+     * @throws IllegalArgumentException if the commentId or reviewStatus is null
+     * @throws CommentNotFoundException if a comment with the specified ID is not found
+     */
+    @Transactional
+    @PatchMapping("/comments/reports/review/set")
+    public void setReviewStatusByCommentId(@RequestParam(required = true) ReviewStatus reviewStatus, @RequestParam(required = true) Long commentId)  {
+        commentService.setReviewStatusByCommentId(reviewStatus, commentId);
+    }
+
+    /**
+     * Retrieves the review status for a specific comment identified by its ID via a GET request.
+     *
+     * The endpoint for this method is "/comments/reports/review/get/{commentId}" where {commentId} is a path variable.
+     *
+     * @param commentId the ID of the comment whose review status is to be retrieved, passed as a path variable
+     * @return a ResponseEntity containing the review status of the specified comment
+     * @throws IllegalArgumentException if the commentId is null
+     * @throws CommentNotFoundException if a comment with the specified ID is not found
+     */
+    @GetMapping("/comments/reports/review/get/{commentId}")
+    public ResponseEntity<ReviewStatus> getReviewStatusByCommentId(@PathVariable  Long commentId) {
+        ReviewStatus reviewStatus = commentService.getReviewStatusByCommentId(commentId);
+        return ResponseEntity.ok(reviewStatus);
     }
 }

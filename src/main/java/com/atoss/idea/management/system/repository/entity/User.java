@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.checkerframework.common.aliasing.qual.Unique;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -73,7 +74,7 @@ public class User {
             inverseJoinColumns = { @JoinColumn(name = "comment_id") }
     )
     @JsonIgnoreProperties("userList")
-    private List<Comment> likedComments;
+    private List<Comment> likedComments = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
@@ -82,7 +83,7 @@ public class User {
             inverseJoinColumns = { @JoinColumn(name = "comment_id") }
     )
     @JsonIgnoreProperties("listOfUsers")
-    private List<Comment> reportedComments;
+    private List<Comment> reportedComments = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -97,6 +98,8 @@ public class User {
     @JsonManagedReference
     private List<Document> documentList;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private RefreshToken refreshToken;
 
     /**
      * Constructor for creating a User object with the provided username and email.

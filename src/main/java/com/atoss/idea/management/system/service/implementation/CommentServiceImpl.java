@@ -9,6 +9,7 @@ import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.repository.entity.Idea;
+import com.atoss.idea.management.system.repository.entity.ReviewStatus;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
@@ -42,6 +43,7 @@ public class CommentServiceImpl implements CommentService {
     private final IdeaRepository ideaRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final HtmlServiceImpl htmlService;
 
     /**
      * CONSTRUCTOR
@@ -50,13 +52,15 @@ public class CommentServiceImpl implements CommentService {
      * @param ideaRepository    for accessing CRUD repository methods for Idea Entity
      * @param userRepository    for accessing CRUD repository methods for User Entity
      * @param modelMapper       for mapping entity-dto relationships
+     * @param htmlService       for handling HTML content and processing
      */
     public CommentServiceImpl(CommentRepository commentRepository, IdeaRepository ideaRepository,
-                              UserRepository userRepository, ModelMapper modelMapper) {
+                              UserRepository userRepository, ModelMapper modelMapper, HtmlServiceImpl htmlService) {
         this.commentRepository = commentRepository;
         this.ideaRepository = ideaRepository;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.htmlService = htmlService;
     }
 
     /**
@@ -213,7 +217,8 @@ public class CommentServiceImpl implements CommentService {
         newComment.setUser(user);
         newComment.setIdea(idea);
         newComment.setParent(null);
-        newComment.setCommentText(requestCommentDTO.getCommentText());
+        String htmlContent = htmlService.markdownToHtml(requestCommentDTO.getCommentText());
+        newComment.setCommentText(htmlContent);
         newComment.setCreationDate(creationDate);
         String filteredCommentText = filterBadWords(newComment.getCommentText());
         newComment.setCommentText(filteredCommentText);
@@ -252,7 +257,8 @@ public class CommentServiceImpl implements CommentService {
         newReply.setUser(user);
         newReply.setIdea(null);
         newReply.setParent(commentRepository.findById(requestCommentReplyDTO.getParentId()).get());
-        newReply.setCommentText(requestCommentReplyDTO.getCommentText());
+        String htmlContent = htmlService.markdownToHtml(requestCommentReplyDTO.getCommentText());
+        newReply.setCommentText(htmlContent);
         newReply.setCreationDate(creationDate);
         String filteredCommentText = filterBadWords(newReply.getCommentText());
         newReply.setCommentText(filteredCommentText);
@@ -495,7 +501,7 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Deletes all replies for a given deleted comment ID.
-     *
+     * <p>
      * This method first checks if the comment exists by the given ID.
      * If the comment does not exist, it throws a {@link CommentNotFoundException}.
      * If the comment exists, it retrieves all replies associated with the comment.
@@ -509,9 +515,8 @@ public class CommentServiceImpl implements CommentService {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
-        List<Comment> replies=commentRepository.findAllRepliesForComment(commentId);
-        for(Comment reply:replies)
-        {
+        List<Comment> replies = commentRepository.findAllRepliesForComment(commentId);
+        for (Comment reply : replies) {
             commentRepository.deleteReportsByCommentId(reply.getId());
             commentRepository.deleteLikesForComment(reply.getId());
         }
@@ -617,5 +622,25 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+
+    @Transactional
+    @Override
+    public void setReviewStatusByCommentId(ReviewStatus reviewStatus, Long commentId) {
+        Optional<Comment> comment = commentRepository.findById(commentId);
+        if (comment.isPresent()) {
+            comment.get().setReviewStatus(reviewStatus);
+            commentRepository.save(comment.get());
+        } else {
+            throw new CommentNotFoundException();
+        }
+    }
+
+    @Override
+    public ReviewStatus getReviewStatusByCommentId(Long commentId) {
+        if (!commentRepository.existsById(commentId)) {
+            throw new CommentNotFoundException();
+        }
+        return commentRepository.getReviewStatusByCommentId(commentId);
+    }
 
 }

@@ -14,6 +14,7 @@ import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
+import com.atoss.idea.management.system.service.implementation.HtmlServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -43,6 +44,8 @@ public class AddCommentTest {
     @InjectMocks
     private CommentServiceImpl commentService;
 
+    @Mock
+    private HtmlServiceImpl htmlService;
 
     private RequestCommentDTO requestCommentDTO;
     private User user;

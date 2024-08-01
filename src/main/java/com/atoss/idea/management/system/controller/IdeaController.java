@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/aims/api/v1/ideas")
 public class IdeaController {
@@ -295,4 +294,21 @@ public class IdeaController {
     public ResponseEntity<List<SubscriptionDTO>> getAllSubscriptions(@RequestParam Long userId) {
         return new ResponseEntity<>(ideaService.getAllSubscriptions(userId), HttpStatus.OK);
     }
+
+    /**
+     * Retrieves an idea based on the provided comment ID.
+     *
+     * This method handles HTTP GET requests to the "/getByComment" endpoint.
+     * It expects a query parameter "commentId" which is mandatory.
+     * The method is transactional, meaning that it will be executed within a database transaction context.
+     *
+     * @param commentId The ID of the comment used to find the associated idea.
+     * @return A ResponseEntity containing the IdeaResponseDTO and an HTTP status of OK.
+     */
+    @GetMapping("/getByComment")
+    @Transactional
+    public ResponseEntity<IdeaResponseDTO> getIdeaByCommentId(@RequestParam(required = true) Long commentId) {
+        return new ResponseEntity<>(ideaService.getIdeaByCommentId(commentId), HttpStatus.OK);
+    }
+
 }

@@ -181,6 +181,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<CommentStatisticsDTO> commentStatisticsDTOList = topComments.stream()
                 .map(comment -> {
                     CommentStatisticsDTO dto = new CommentStatisticsDTO();
+                    dto.setCommentId(comment.getId());
                     dto.setCommentText(comment.getCommentText());
                     dto.setNrLikes(commentRepository.countLikesByCommentId(comment.getId()));
                     return dto;
