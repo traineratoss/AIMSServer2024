@@ -2,10 +2,11 @@ package com.atoss.idea.management.system.security;
 
 
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class CookieService {
@@ -46,20 +47,25 @@ public class CookieService {
     }
 
     /**
-     * Recovers a token from cookies in the request
-     * @param request  The HTTP request containing the cookies
-     * @param type      Type of token recovered (accessToken or refreshToken)
-     * @return          Return the value of cookie if it's found, otherwise will return null
+     * Recovers a token from a cookie array based on its name if any match is found.
+     *
+     * @param cookies       A Cookie[] in which to perform the search for the token.
+     * @param identifier    Type of token recovered (eg. accessToken or refreshToken)
+     * @return              An Optional containing the token if it's found, otherwise an empty Optional
      */
-    public String getTokenFromCookies(HttpServletRequest request, String type) {
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals(type)) {
-                    return cookie.getValue();
-                }
+    public Optional<String> getTokenFromCookies(Cookie[] cookies, String identifier) {
+
+        if (cookies == null) {
+            return Optional.empty();
+        }
+
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(identifier)) {
+                return Optional.of(cookie.getValue());
             }
         }
-        return null;
+
+        return Optional.empty();
     }
 
 }

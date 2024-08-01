@@ -1,15 +1,21 @@
 package com.atoss.idea.management.system.security;
 
+import com.atoss.idea.management.system.repository.BlacklistedAccessTokenRepository;
 import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
+import com.atoss.idea.management.system.repository.entity.BlacklistedAccessToken;
 import com.atoss.idea.management.system.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +26,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@Configuration
+@EnableScheduling
 @RequiredArgsConstructor
 public class JwtService {
 
@@ -31,6 +39,7 @@ public class JwtService {
 
     private final ObjectMapper objectMapper;
     private final UserService userService;
+    private final BlacklistedAccessTokenRepository blacklistedAccessTokenRepository;
 
     /**
      * Extracts of any claim for JWT token
@@ -85,7 +94,7 @@ public class JwtService {
      */
     public Boolean validateToken(String token, UserDetails userDetails) {
         String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && !isTokenBlacklisted(token));
     }
 
     /**
@@ -109,6 +118,10 @@ public class JwtService {
 
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
+    }
+
+    private Boolean isTokenBlacklisted(String token) {
+        return blacklistedAccessTokenRepository.findByToken(token).isPresent();
     }
 
     /**
@@ -137,4 +150,36 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+
+    /**
+     *
+     * Invalidates an access token by blacklisting it.
+     *
+     * @param token The token to be blacklisted.
+     * @see BlacklistedAccessToken
+     * @see BlacklistedAccessTokenRepository
+     *
+     */
+    public void invalidateToken(String token) {
+        BlacklistedAccessToken blacklistedAccessToken = new BlacklistedAccessToken();
+        blacklistedAccessToken.setToken(token);
+
+        try {
+            blacklistedAccessToken.setExpiry(extractExpiration(token));
+        } catch (ExpiredJwtException e) {
+            blacklistedAccessToken.setExpiry(e.getClaims().getExpiration());
+        }
+
+        blacklistedAccessTokenRepository.save(blacklistedAccessToken);
+    }
+
+    /**
+     * Regularly deletes the blacklisted tokens from the database.
+     * @see BlacklistedAccessToken
+     * @see Scheduled
+     */
+    @Scheduled(cron = "0 0 12 * * ?")
+    private void deleteExpiredTokens() {
+        blacklistedAccessTokenRepository.deleteAllByExpiryLessThan(new Date());
+    }
 }

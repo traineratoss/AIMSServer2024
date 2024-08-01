@@ -25,7 +25,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 
@@ -162,5 +166,24 @@ public class AuthController {
     }
 
 
+    /**
+     * Logs out a user by invalidating the session. This encompasses invalidating the refresh token
+     * and blacklisting the access token, preventing any further usage thereof for authentication purposes.
+     *
+     * @param request The HttpServletRequest containing the request details
+     * @return ResponseEntity containing a string confirming a successful logout.
+     */
+    @Transactional
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(HttpServletRequest request) {
+
+        cookieService.getTokenFromCookies(request.getCookies(), "refreshToken")
+                .ifPresent(refreshTokenService::invalidateToken);
+
+        cookieService.getTokenFromCookies(request.getCookies(), "accessToken")
+                .ifPresent(jwtService::invalidateToken);
+
+        return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);
+    }
 
 }

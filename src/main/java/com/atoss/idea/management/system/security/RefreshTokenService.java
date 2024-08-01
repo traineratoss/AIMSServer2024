@@ -77,7 +77,7 @@ public class RefreshTokenService {
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(token);
-            throw new RefreshTokenExpiredException("Expired refresh token");
+            throw new RefreshTokenExpiredException(token, "Expired refresh token");
         }
         return token;
     }
@@ -93,9 +93,13 @@ public class RefreshTokenService {
      */
     public AuthResponse refreshAuthToken(HttpServletRequest request, HttpServletResponse response) {
 
-        String token = cookieService.getTokenFromCookies(request, "refreshToken");
+        Optional<String> token = cookieService.getTokenFromCookies(request.getCookies(), "refreshToken");
 
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+        if (token.isEmpty()) {
+            throw new InvalidRefreshTokenException("Invalid refresh token");
+        }
+
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token.get())
                 .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
 
         verifyExpiration(refreshToken);
@@ -119,4 +123,14 @@ public class RefreshTokenService {
                 new UserSecurityDTO());
 
     }
+
+    /**
+     * Invalidates a refresh token by deleting it from the repository.
+     *
+     * @param token The refresh token to be deleted.
+     */
+    public void invalidateToken(String token) {
+        refreshTokenRepository.findByToken(token).ifPresent(refreshTokenRepository::delete);
+    }
+
 }

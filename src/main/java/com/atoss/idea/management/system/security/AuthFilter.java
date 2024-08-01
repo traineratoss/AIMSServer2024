@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.security;
 
+import com.atoss.idea.management.system.exception.RefreshTokenExpiredException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -48,32 +49,38 @@ public class AuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String username;
 
-        String token = cookieService.getTokenFromCookies(request, "accessToken");
+        try {
+            cookieService.getTokenFromCookies(request.getCookies(), "accessToken").ifPresent(
+                    token -> {
+                        if (request.getRequestURI().contains("/api/v1/auth/")) {
+                            return;
+                        }
 
-        if (token == null || request.getRequestURI().contains("/api/v1/auth/")) {
+                        String username = jwtService.extractUsername(token);
+
+                        if (username != null) {
+                            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                            if (jwtService.validateToken(token, userDetails)) {
+                                UsernamePasswordAuthenticationToken authenticationToken =
+                                        new UsernamePasswordAuthenticationToken(
+                                                userDetails,
+                                                null,
+                                                userDetails.getAuthorities());
+                                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                            }
+                        }
+                    }
+            );
+
             filterChain.doFilter(request, response);
-            return;
+
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            log.info("Tried authenticating with access token expired at {}", e.getClaims().getExpiration());
+        } catch (RefreshTokenExpiredException e) {
+            log.info("Tried authenticating with refresh token expired at {}", e.getRefreshToken().getExpiryDate());
         }
-
-        username = jwtService.extractUsername(token);
-
-        if (username != null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (jwtService.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
-
-        }
-
-        filterChain.doFilter(request, response);
     }
 
 }
