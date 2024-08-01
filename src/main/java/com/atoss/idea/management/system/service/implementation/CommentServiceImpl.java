@@ -43,6 +43,7 @@ public class CommentServiceImpl implements CommentService {
     private final IdeaRepository ideaRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final HtmlServiceImpl htmlService;
 
     /**
      * CONSTRUCTOR
@@ -51,13 +52,15 @@ public class CommentServiceImpl implements CommentService {
      * @param ideaRepository    for accessing CRUD repository methods for Idea Entity
      * @param userRepository    for accessing CRUD repository methods for User Entity
      * @param modelMapper       for mapping entity-dto relationships
+     * @param htmlService       for handling HTML content and processing
      */
     public CommentServiceImpl(CommentRepository commentRepository, IdeaRepository ideaRepository,
-                              UserRepository userRepository, ModelMapper modelMapper) {
+                              UserRepository userRepository, ModelMapper modelMapper, HtmlServiceImpl htmlService) {
         this.commentRepository = commentRepository;
         this.ideaRepository = ideaRepository;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.htmlService = htmlService;
     }
 
     /**
@@ -214,7 +217,8 @@ public class CommentServiceImpl implements CommentService {
         newComment.setUser(user);
         newComment.setIdea(idea);
         newComment.setParent(null);
-        newComment.setCommentText(requestCommentDTO.getCommentText());
+        String htmlContent = htmlService.markdownToHtml(requestCommentDTO.getCommentText());
+        newComment.setCommentText(htmlContent);
         newComment.setCreationDate(creationDate);
         String filteredCommentText = filterBadWords(newComment.getCommentText());
         newComment.setCommentText(filteredCommentText);
@@ -253,7 +257,8 @@ public class CommentServiceImpl implements CommentService {
         newReply.setUser(user);
         newReply.setIdea(null);
         newReply.setParent(commentRepository.findById(requestCommentReplyDTO.getParentId()).get());
-        newReply.setCommentText(requestCommentReplyDTO.getCommentText());
+        String htmlContent = htmlService.markdownToHtml(requestCommentReplyDTO.getCommentText());
+        newReply.setCommentText(htmlContent);
         newReply.setCreationDate(creationDate);
         String filteredCommentText = filterBadWords(newReply.getCommentText());
         newReply.setCommentText(filteredCommentText);

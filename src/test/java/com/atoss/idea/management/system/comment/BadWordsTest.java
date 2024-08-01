@@ -4,6 +4,7 @@ import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
+import com.atoss.idea.management.system.service.implementation.HtmlServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -22,6 +23,9 @@ public class BadWordsTest {
     @Mock
     private CommentRepository commentRepository;
 
+    @Mock
+    private HtmlServiceImpl htmlService;
+
     @Spy
     private ModelMapper modelMapper;
 
@@ -32,7 +36,7 @@ public class BadWordsTest {
     public void setup()
     {
         MockitoAnnotations.openMocks(this);
-        commentService=new CommentServiceImpl(commentRepository,ideaRepository,userRepository,modelMapper);
+        commentService=new CommentServiceImpl(commentRepository,ideaRepository,userRepository,modelMapper,htmlService);
     }
     /*
     @Test
