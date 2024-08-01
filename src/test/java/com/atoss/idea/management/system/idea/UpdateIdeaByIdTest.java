@@ -6,6 +6,7 @@ import com.atoss.idea.management.system.repository.dto.CategoryDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.repository.entity.*;
+import com.atoss.idea.management.system.service.implementation.HtmlServiceImpl;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +44,8 @@ public class UpdateIdeaByIdTest {
     @Mock
     public SubscriptionRepository subscriptionRepository;
 
+    @Mock
+    private HtmlServiceImpl htmlService;
 
     @BeforeEach
     public void setup() {

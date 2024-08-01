@@ -62,6 +62,9 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final SendEmailService sendEmailService;
 
+    private final HtmlServiceImpl htmlService;
+
+
     /**
      * Constructor for the Idea Service Implementation
      *
@@ -74,6 +77,7 @@ public class IdeaServiceImpl implements IdeaService {
      * @param commentServiceImpl ======
      * @param sendEmailService   responsible for sending emails to users who have subscriptions
      * @param subscriptionRepository repository for the Subscription Entity
+     * @param htmlService            for handling HTML content and processing
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
                            ImageRepository imageRepository, UserRepository userRepository,
@@ -82,7 +86,8 @@ public class IdeaServiceImpl implements IdeaService {
                            ModelMapper modelMapper,
                            CommentServiceImpl commentServiceImpl,
                            SendEmailService sendEmailService,
-                           SubscriptionRepository subscriptionRepository) {
+                           SubscriptionRepository subscriptionRepository,
+                           HtmlServiceImpl htmlService) {
         this.ratingRepository = ratingRepository;
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
@@ -92,6 +97,7 @@ public class IdeaServiceImpl implements IdeaService {
         this.commentServiceImpl = commentServiceImpl;
         this.sendEmailService = sendEmailService;
         this.subscriptionRepository = subscriptionRepository;
+        this.htmlService = htmlService;
     }
 
     private String filterBadWords(String text) {
@@ -146,7 +152,8 @@ public class IdeaServiceImpl implements IdeaService {
         savedIdea.setUser(user);
         savedIdea.setStatus(idea.getStatus());
         String filteredIdeaText = filterBadWords(idea.getText());
-        savedIdea.setText(filteredIdeaText);
+        String htmlContent = htmlService.markdownToHtml(filteredIdeaText);
+        savedIdea.setText(htmlContent);
         String filteredIdeaTitle = filterBadWords(idea.getTitle());
         savedIdea.setTitle(filteredIdeaTitle);
         savedIdea.setCategoryList(new ArrayList<>());
@@ -227,7 +234,8 @@ public class IdeaServiceImpl implements IdeaService {
                 }
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
-                idea.setText(filteredCommentText);
+                String htmlContent = htmlService.markdownToHtml(filteredCommentText);
+                idea.setText(htmlContent);
                 if (!subscribedUsers.isEmpty() && diffText) {
                     sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
                 }
@@ -538,7 +546,7 @@ public class IdeaServiceImpl implements IdeaService {
         subscription.setIdea(idea);
         subscription.setUser(user);
         Subscription subscriptionRepositorySave = subscriptionRepository.save(subscription);
-        return  subscriptionRepositorySave;
+        return subscriptionRepositorySave;
     }
 
     @Override
