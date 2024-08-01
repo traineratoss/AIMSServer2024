@@ -113,6 +113,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                 .requestMatchers(
                                         "/users/all",
                                         "/users/update-profile",
+                                        "/users/idByUsername",
                                         "/aims/api/v1/ideas/**",
                                         "/aims/api/v1/avatars/**",
                                         "/aims/api/v1/images/**",
