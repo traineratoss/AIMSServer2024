@@ -7,6 +7,7 @@ import com.atoss.idea.management.system.repository.RefreshTokenRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
 import com.atoss.idea.management.system.repository.entity.RefreshToken;
+import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.security.response.AuthResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -103,9 +104,19 @@ public class RefreshTokenService {
                 .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
 
         verifyExpiration(refreshToken);
-        refreshTokenRepository.delete(refreshToken);
 
-        String username = refreshToken.getUser().getUsername();
+        Optional<User> userOptional = userRepository.findUserByRefreshToken(refreshToken);
+
+        User user;
+        if (userOptional.isPresent()) {
+            user = userOptional.get();
+        } else {
+            throw new UserNotFoundException("User not found " + refreshToken.getUser().getUsername());
+        }
+
+        String username = user.getUsername();
+
+        refreshTokenRepository.delete(refreshToken);
 
         String newAccessToken = jwtService.generateToken(username);
         RefreshToken newRefreshToken = createRefreshToken(username);
