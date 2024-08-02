@@ -92,13 +92,13 @@ public class DocumentController {
     /**
      *  Deletes a document by the id of the user who attached it and the id of the idea where it is attached
      *
-     * @param ideaId the id of the idea where the document is attached
+     * @param id the id of the idea where the document is attached
      * @return it returns a response entity with confirmation.
      */
     @Transactional
     @DeleteMapping("/deleteDocument")
-    public ResponseEntity<String> deleteDocumentByIds(@RequestParam Long ideaId) {
-        documentService.deleteDocumentById(ideaId);
+    public ResponseEntity<String> deleteDocumentByIds(@RequestParam Long id) {
+        documentService.deleteDocumentById(id);
         return new ResponseEntity<>("Document deleted successfully", HttpStatus.OK);
     }
 }

@@ -115,6 +115,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                         "/users/update-profile",
                                         "/users/idByUsername",
                                         "/aims/api/v1/ideas/**",
+                                        "/aims/api/v1/documents/**",
                                         "/aims/api/v1/avatars/**",
                                         "/aims/api/v1/images/**",
                                         "/aims/api/v1/statistics/**")

@@ -56,9 +56,6 @@ public class DocumentServiceImpl implements DocumentService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
         document.setUser(user);
         Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
-//        Long id1 = IdeaServiceImpl.ideaResponseId;
-//        System.out.println(id1 + " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-//        Idea idea = ideaRepository.findById(id1).orElseThrow(() -> new IdeaNotFoundException("Idea not found."));
         document.setIdea(idea);
         return modelMapper.map(documentRepository.save(document), DocumentDTO.class);
     }
@@ -76,7 +73,6 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Override
     public List<DocumentDTO> getDocumentsByIdeaId(Long ideaId) {
-        //return Arrays.asList(modelMapper.map(documentRepository.findByIdeaId(id), Document.class));
         List<Document> documents = documentRepository.findDocumentsByIdeaId(ideaId);
         List<DocumentDTO> documentDTOs = documents.stream()
                 .map(document -> {
