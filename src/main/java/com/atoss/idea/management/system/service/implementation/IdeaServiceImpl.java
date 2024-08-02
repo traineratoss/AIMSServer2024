@@ -23,7 +23,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -80,6 +79,7 @@ public class IdeaServiceImpl implements IdeaService {
      * @param commentServiceImpl ======
      * @param sendEmailService   responsible for sending emails to users who have subscriptions
      * @param subscriptionRepository repository for the Subscription Entity
+     * @param documentService    service for documents
      * @param htmlService            for handling HTML content and processing
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
@@ -530,8 +530,9 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Double getRatingByUserAndByIdea(Long ideaId, Long userId) {
-        Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElseThrow(() -> new IdeaNotFoundException("Not found"));
-        return rating.getRating();
+        return ratingRepository.findByIdeaIdAndUserId(ideaId, userId)
+                .map(Rating::getRating)
+                .orElse(0.0);
     }
 
     @Override
