@@ -118,4 +118,36 @@ public interface SendEmailService {
      * @param ideaId the id of the idea whose text has changed
      */
     void sendEmailChangedIdeaText(List<User> usernames, Long ideaId);
+
+    /**
+     * Sends an email to notify the subscribed users of a certain idea that its comment has changed
+     *
+     *
+     * @param usernames The usernames of the users which are subscribed to the idea
+     * @param commentId the id of the changed comment
+     * @param comment The comment text that was added
+     */
+    void sendEmailDeletedComment(List<User> usernames, Long commentId, String comment);
+
+    /**
+     * Sends an email to notify the subscribed users of a certain idea that its comment has changed
+     *
+     *
+     * @param fileName The usernames of the users which are subscribed to the idea
+     * @param commentId the id of the changed comment
+     * @param comment The comment text that was added
+     * @param username a
+     * @param subject a
+     */
+    void sendEmailChangedComment(String fileName, String username, String comment, Long commentId, String subject);
+
+    /**
+     * Sends an email to notify the subscribed users of a certain idea that its comment has changed
+     *
+     *
+     * @param usernames The usernames of the users which are subscribed to the idea
+     * @param commentId the id of the changed comment
+     * @param comment The comment text that was added
+     */
+    void sendEmailAddedComment(List<User> usernames, Long commentId, String comment);
 }

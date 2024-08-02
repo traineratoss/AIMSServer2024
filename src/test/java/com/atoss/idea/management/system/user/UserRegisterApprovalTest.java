@@ -53,6 +53,9 @@ public class UserRegisterApprovalTest {
     @Mock
     IdeaRepository mockIdeaRepository;
 
+    @Mock
+    CommentRepository commentRepository;
+
     @Spy
     JavaMailSender mockEmailSender;
 
@@ -75,7 +78,8 @@ public class UserRegisterApprovalTest {
                         mockEmailSender,
                         mockConfiguration,
                         mockSubscriptionRepository,
-                        mockIdeaRepository
+                        mockIdeaRepository,
+                        commentRepository
                 )
         );
 

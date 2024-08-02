@@ -1,10 +1,7 @@
 package com.atoss.idea.management.system.user;
 
 import com.atoss.idea.management.system.exception.UserAlreadyDeactivatedException;
-import com.atoss.idea.management.system.repository.AvatarRepository;
-import com.atoss.idea.management.system.repository.IdeaRepository;
-import com.atoss.idea.management.system.repository.SubscriptionRepository;
-import com.atoss.idea.management.system.repository.UserRepository;
+import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.service.UserService;
@@ -59,6 +56,9 @@ public class ForgetPasswordTest {
     @Mock
     SubscriptionRepository mockSubscriptionRepository;
 
+    @Mock
+    CommentRepository mockCommentRepository;
+
 
     String bcryptSalt;
 
@@ -76,7 +76,8 @@ public class ForgetPasswordTest {
                         mockEmailSender,
                         mockConfiguration,
                         mockSubscriptionRepository,
-                        mockIdeaRepository
+                        mockIdeaRepository,
+                        mockCommentRepository
 
                 )
         );

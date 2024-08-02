@@ -51,6 +51,9 @@ public class UserActivationTest {
     @Mock
     IdeaRepository mockIdeaRepository;
 
+    @Mock
+    CommentRepository commentRepository;
+
     @Spy
     JavaMailSender mockEmailSender;
 
@@ -73,7 +76,8 @@ public class UserActivationTest {
                         mockEmailSender,
                         mockConfiguration,
                         mockSubscriptionRepository,
-                        mockIdeaRepository
+                        mockIdeaRepository,
+                        commentRepository
                 )
         );
 

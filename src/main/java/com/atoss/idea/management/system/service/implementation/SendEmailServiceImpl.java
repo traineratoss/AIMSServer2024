@@ -3,10 +3,7 @@ package com.atoss.idea.management.system.service.implementation;
 import com.atoss.idea.management.system.exception.AvatarNotFoundException;
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.repository.*;
-import com.atoss.idea.management.system.repository.entity.Avatar;
-import com.atoss.idea.management.system.repository.entity.Idea;
-import com.atoss.idea.management.system.repository.entity.Role;
-import com.atoss.idea.management.system.repository.entity.User;
+import com.atoss.idea.management.system.repository.entity.*;
 import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.utils.PasswordGenerator;
 import freemarker.template.Configuration;
@@ -40,6 +37,8 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     private final Configuration configuration;
 
+    private final CommentRepository commentRepository;
+
     @Value("${spring.mail.username}")
     private String adminEmail;
 
@@ -60,19 +59,22 @@ public class SendEmailServiceImpl implements SendEmailService {
      * @param configuration          The Configuration instance for email templates.
      * @param ideaRepository         The repository for the Idea Entity
      * @param subscriptionRepository The repository for the Subscription Entity
+     * @param commentRepository      The commentRepository instance for accessing comment data.
      */
     public SendEmailServiceImpl(UserRepository userRepository,
                                 AvatarRepository avatarRepository,
                                 JavaMailSender emailSender,
                                 Configuration configuration,
                                 SubscriptionRepository subscriptionRepository,
-                                IdeaRepository ideaRepository) {
+                                IdeaRepository ideaRepository,
+                                CommentRepository commentRepository) {
         this.userRepository = userRepository;
         this.avatarRepository = avatarRepository;
         this.emailSender = emailSender;
         this.configuration = configuration;
         this.subscriptionRepository = subscriptionRepository;
         this.ideaRepository = ideaRepository;
+        this.commentRepository = commentRepository;
     }
 
     @Override
@@ -330,7 +332,6 @@ public class SendEmailServiceImpl implements SendEmailService {
      * <p>
      * This method fetches an idea from the idea repository using the given id. If the idea does not exist,
      * a RuntimeException is thrown.
-     *
      * @param ideaId The id of the idea to retrieve.
      * @return The Idea object corresponding to the given id.
      * @throws RuntimeException If the user does not exist in the repository.
@@ -340,5 +341,67 @@ public class SendEmailServiceImpl implements SendEmailService {
                 .orElseThrow(() -> new RuntimeException("Idea does not exist!"));
     }
 
+    /**
+     * Retrieves a comment from the repository based on the provided id
+     * This method fetches a idea from the comment repository using the given id. If the comment does not exist,
+     *
+     * @param commentId The id of the idea to retrieve.
+     * @param comment The comment text
+     * @throws RuntimeException If the user does not exist in the repository.
+     */
+    @Override
+    public void sendEmailDeletedComment(List<User> usernames, Long commentId, String comment) {
+        for (User user : usernames) {
+            sendEmailChangedComment("comment-delete-subscription-template.ftl",
+                    user.getUsername(),
+                    comment,
+                    commentId,
+                    "Deleted comment on subscribed idea.");
+        }
+    }
 
+    /**
+     * Retrieves a comment from the repository based on the provided id
+     * This method fetches a comment from the comment repository using the given id. If the comment does not exist,
+     *
+     * @param commentId The id of the comment to retrieve.
+     * @param usernames the usernames of the users who are subscribed to the idea
+     * @param comment the text of the comment that has been added
+     */
+    @Override
+    public void sendEmailAddedComment(List<User> usernames, Long commentId, String comment) {
+        for (User user : usernames) {
+            sendEmailChangedComment("comment-added-subscription-template.ftl",
+                    user.getUsername(),
+                    comment,
+                    commentId,
+                    "Added comment on subscribed idea.");
+        }
+    }
+
+    private Comment getCommentById(Long commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("Comment does not exist!"));
+    }
+
+    @Override
+    public void sendEmailChangedComment(String fileName, String username, String commentText, Long commentId, String subject) {
+        User user = getUserByUsername(username);
+        String emailTo = user.getEmail();
+        Comment comment = getCommentById(commentId);
+
+        Map<String, Object> mapComment = new HashMap<>();
+        mapComment.put("username", username);
+        mapComment.put("email", user.getEmail());
+        mapComment.put("companyName", companyName);
+        mapComment.put("newComment", comment.getCommentText());
+        mapComment.put("imageUrl", "./welcome.jpg");
+        try {
+            Template template = configuration.getTemplate(fileName);
+            String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapComment);
+            sendEmail(emailTo, subject, htmlTemplate);
+        } catch (IOException | TemplateException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
 }
