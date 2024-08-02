@@ -1,8 +1,8 @@
 package com.atoss.idea.management.system.security;
 
 
+import com.atoss.idea.management.system.security.token.TokenConfig;
 import jakarta.servlet.http.Cookie;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
@@ -11,38 +11,20 @@ import java.util.Optional;
 @Service
 public class CookieService {
 
-    @Value("${aims.app.cookie.maxAgeAccessTokenCookieSeconds}")
-    private long maxAccessTokenCookieAgeSeconds;
-
-    @Value("${aims.app.cookie.maxAgeRefreshTokenCookieSeconds}")
-    private long maxRefreshTokenCookieAgeSeconds;
-
     /**
-     * Creates a refresh token cookie.
-     * @param token  The refresh token to be set in the cookie
-     * @return  A refresh token cookie
+     * Creates a cookie containing the provided token with the identifier given as a parameter.
+     * The cookie's properties depend on the token configuration.
+     * @param identifier    The cookie's identifier
+     * @param token         The token to be stored in the cookie
+     * @param tokenConfig   Sets the cookie's properties based on the token's type
+     * @return              The ResponseCookie containing the token
      */
-    public ResponseCookie createRefreshTokenCookie(String token) {
-        return ResponseCookie.from("refreshToken", token)
+    public ResponseCookie createTokenCookie(String identifier, String token, TokenConfig tokenConfig) {
+        return ResponseCookie.from(identifier, token)
                 .httpOnly(true)
                 .secure(false)
-                .path("/api/v1/auth")
-                .maxAge(maxRefreshTokenCookieAgeSeconds)
-                .build();
-    }
-
-    /**
-     * Creates an access token cookie
-     * @param token The access token to be set in the cookie
-     * @return    An access token cookie
-     */
-
-    public ResponseCookie createAccessTokenCookie(String token) {
-        return ResponseCookie.from("accessToken", token)
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(maxAccessTokenCookieAgeSeconds)
+                .path(tokenConfig.getPath())
+                .maxAge(tokenConfig.getExpirySeconds())
                 .build();
     }
 
@@ -66,6 +48,19 @@ public class CookieService {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Provides the identifier for a cookie based on the token's type and session's id.
+     * @param type The type of the token (e.g. accessToken, refreshToken)
+     * @param sessionId The id of the current user's session
+     * @return The cookie's identifier
+     */
+    public String getIdentifier(String type, String sessionId) {
+        if (sessionId != null) {
+            return type + sessionId;
+        }
+        return type;
     }
 
 }

@@ -1,6 +1,7 @@
 package com.atoss.idea.management.system.security;
 
 import com.atoss.idea.management.system.exception.RefreshTokenExpiredException;
+import com.atoss.idea.management.system.security.token.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 
 @Component
@@ -32,13 +34,11 @@ public class AuthFilter extends OncePerRequestFilter {
     /**
      * Performs filtering on the incoming HTTP request and response to set user information as a cookie.
      *
-     * @param request      The HttpServletRequest object representing the incoming request.
-     * @param response     The HttpServletResponse object representing the response to be sent to the client.
-     * @param filterChain  The FilterChain to continue the filter chain with the next filter or servlet in the chain.
-     *
+     * @param request     The HttpServletRequest object representing the incoming request.
+     * @param response    The HttpServletResponse object representing the response to be sent to the client.
+     * @param filterChain The FilterChain to continue the filter chain with the next filter or servlet in the chain.
      * @throws ServletException If a general servlet exception occurs during the processing of the request or response.
      * @throws IOException      If an input or output exception occurs during the processing of the request or response.
-     *
      * @see HttpServletRequest
      * @see HttpServletResponse
      * @see FilterChain
@@ -51,28 +51,32 @@ public class AuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         try {
-            cookieService.getTokenFromCookies(request.getCookies(), "accessToken").ifPresent(
-                    token -> {
-                        if (request.getRequestURI().contains("/api/v1/auth/")) {
-                            return;
-                        }
+            cookieService.getTokenFromCookies(
+                            request.getCookies(),
+                            cookieService.getIdentifier(jwtService.getTokenConfig().getType(), null))
+                    .ifPresent(
+                            token -> {
+                                if (request.getRequestURI().contains("/api/v1/auth/")) {
+                                    return;
+                                }
 
-                        String username = jwtService.extractUsername(token);
+                                String username = jwtService.extractUsername(token);
 
-                        if (username != null) {
-                            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                            if (jwtService.validateToken(token, userDetails)) {
-                                UsernamePasswordAuthenticationToken authenticationToken =
-                                        new UsernamePasswordAuthenticationToken(
-                                                userDetails,
-                                                null,
-                                                userDetails.getAuthorities());
-                                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                                if (username != null) {
+                                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                                    if (jwtService.validateToken(token, userDetails)) {
+                                        UsernamePasswordAuthenticationToken authenticationToken =
+                                                new UsernamePasswordAuthenticationToken(
+                                                        userDetails,
+                                                        null,
+                                                        userDetails.getAuthorities());
+                                        authenticationToken.setDetails(new WebAuthenticationDetailsSource()
+                                                .buildDetails(request));
+                                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                                    }
+                                }
                             }
-                        }
-                    }
-            );
+                );
 
             filterChain.doFilter(request, response);
 

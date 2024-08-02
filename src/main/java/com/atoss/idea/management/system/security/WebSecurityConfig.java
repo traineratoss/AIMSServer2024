@@ -1,6 +1,7 @@
 package com.atoss.idea.management.system.security;
 
 import com.atoss.idea.management.system.repository.entity.Role;
+import com.atoss.idea.management.system.security.token.JwtService;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

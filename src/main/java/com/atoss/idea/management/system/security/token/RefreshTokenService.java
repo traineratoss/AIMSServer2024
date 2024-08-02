@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.security;
+package com.atoss.idea.management.system.security.token;
 
 import com.atoss.idea.management.system.exception.InvalidRefreshTokenException;
 import com.atoss.idea.management.system.exception.RefreshTokenExpiredException;
@@ -8,11 +8,12 @@ import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
 import com.atoss.idea.management.system.repository.entity.RefreshToken;
 import com.atoss.idea.management.system.repository.entity.User;
+import com.atoss.idea.management.system.security.CookieService;
 import com.atoss.idea.management.system.security.response.AuthResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -25,15 +26,15 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    @Value("${aims.app.jwt.refreshTokenExpirationMs}")
-    private Long expirationMs;
-
     private final RefreshTokenRepository refreshTokenRepository;
 
     private final UserRepository userRepository;
 
     private final JwtService jwtService;
     private final CookieService cookieService;
+
+    @Getter
+    private final RefreshTokenConfig tokenConfig;
 
     /**
      * Creates a new refresh token for the specified username
@@ -52,7 +53,7 @@ public class RefreshTokenService {
                         .findByUsername(username)
                         .orElseThrow(() -> new UserNotFoundException("User not found")))
                 .token(UUID.randomUUID().toString())
-                .expiryDate(Instant.now().plusMillis(expirationMs))
+                .expiryDate(Instant.now().plusMillis(tokenConfig.getExpiryMs()))
                 .build();
 
         return refreshTokenRepository.save(refreshToken);
@@ -122,10 +123,10 @@ public class RefreshTokenService {
         RefreshToken newRefreshToken = createRefreshToken(username);
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookieService
-                .createAccessTokenCookie((newAccessToken)).toString());
+                .createTokenCookie(jwtService.getTokenConfig().getType(), newAccessToken, jwtService.getTokenConfig()).toString());
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookieService
-                .createRefreshTokenCookie(newRefreshToken.getToken()).toString());
+                .createTokenCookie(tokenConfig.getType(), newRefreshToken.getToken(), tokenConfig).toString());
 
 
         return new AuthResponse(

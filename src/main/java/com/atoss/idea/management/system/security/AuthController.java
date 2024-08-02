@@ -10,6 +10,8 @@ import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.security.request.LoginRequest;
 import com.atoss.idea.management.system.security.request.RegisterRequest;
 import com.atoss.idea.management.system.security.response.AuthResponse;
+import com.atoss.idea.management.system.security.token.JwtService;
+import com.atoss.idea.management.system.security.token.RefreshTokenService;
 import com.atoss.idea.management.system.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -104,10 +106,16 @@ public class AuthController {
             String accessToken = jwtService.generateToken(authentication.getName());
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(authentication.getName());
 
-            ResponseCookie cookie = cookieService.createAccessTokenCookie(accessToken);
+            ResponseCookie cookie = cookieService.createTokenCookie(
+                    cookieService.getIdentifier(jwtService.getTokenConfig().getType(), null),
+                    accessToken,
+                    jwtService.getTokenConfig());
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-            ResponseCookie cookieRefresh = cookieService.createRefreshTokenCookie(refreshToken.getToken());
+            ResponseCookie cookieRefresh = cookieService.createTokenCookie(
+                    cookieService.getIdentifier(refreshTokenService.getTokenConfig().getType(), null),
+                    refreshToken.getToken(),
+                    refreshTokenService.getTokenConfig());
             response.addHeader(HttpHeaders.SET_COOKIE, cookieRefresh.toString());
 
             UserSecurityDTO userData = userService.getUserByUsername(authentication.getName(), UserSecurityDTO.class);
