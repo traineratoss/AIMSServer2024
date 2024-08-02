@@ -101,6 +101,9 @@ public class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private RefreshToken refreshToken;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Session sessionId;
+
     /**
      * Constructor for creating a User object with the provided username and email.
      *
