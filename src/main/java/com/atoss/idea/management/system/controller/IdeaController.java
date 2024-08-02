@@ -66,6 +66,22 @@ public class IdeaController {
     }
 
     /**
+     * Handles HTTP GET requests to retrieve an idea by its ID for the purpose of updating it.
+     *
+     * <p>This method is transactional, ensuring that any database interactions are performed
+     * within a transaction context.</p>
+     *
+     * @param id the ID of the idea to retrieve; must not be null
+     * @return a ResponseEntity containing the IdeaResponseDTO and an HTTP status of OK
+     * @throws IllegalArgumentException if the provided id is null
+     */
+    @GetMapping("/get/updateIdea")
+    @Transactional
+    public ResponseEntity<IdeaResponseDTO> getIdeaByIdForUpdateIdea(@RequestParam(required = true) Long id) {
+        return new ResponseEntity<>(ideaService.getIdeaByIdForUpdateIdea(id), HttpStatus.OK);
+    }
+
+    /**
      * Updates an idea by a given id
      *
      * @param id            the id of the idea we want to update
@@ -82,9 +98,9 @@ public class IdeaController {
     /**
      * Deletes an idea by a given id
      *
-     * @param       id the id of the idea we want to delete
-     * @return      a Response Entity containing a text that suggests the fact that we successfully
-     *              deleted the idea
+     * @param id the id of the idea we want to delete
+     * @return a Response Entity containing a text that suggests the fact that we successfully
+     *         deleted the idea
      */
     @DeleteMapping("/delete")
     @Transactional
@@ -100,8 +116,8 @@ public class IdeaController {
      * @param pageNumber    the number of the page
      * @param sortCategory  the category we sort the ideas by
      * @param sortDirection the direction we want the ideas to be sorted by
-     * @return              a Response Entity containing an IdeaPage DTO (the total number of ideas in all the pages +
-     *                      the page containing the list of ideas)
+     * @return a Response Entity containing an IdeaPage DTO (the total number of ideas in all the pages +
+     *         the page containing the list of ideas)
      */
     @Transactional
     @GetMapping("/all")
@@ -132,8 +148,8 @@ public class IdeaController {
      * @param pageNumber    the number of the page
      * @param sortCategory  the category we sort the ideas by
      * @param sortDirection the direction we want the ideas to be sorted by
-     * @return              a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     *                      the page containing the list of ideas)
+     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
+     *         the page containing the list of ideas)
      */
     @Transactional
     @GetMapping("/allByUser")
@@ -174,9 +190,9 @@ public class IdeaController {
      * @param pageNumber       the number of the page
      * @param username         if not null, returns filtered ideas belonging to the specified username
      * @param sortDirection    the direction we want the ideas to be sorted by
-     * @param rating            rating to filter the ideas
-     * @return                  a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     *                          the page containing the list of ideas )
+     * @param rating           rating to filter the ideas
+     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
+     *         the page containing the list of ideas )
      */
     @Transactional
     @GetMapping("/filter")
@@ -221,9 +237,9 @@ public class IdeaController {
     /**
      * add a rating to a idea
      *
-     * @param ideaId            the id of the idea to modify thhe rating
-     * @param userId            the id of the user to be modify the rating
-     * @param ratingValue        a value which is the rating of that idea for that specific user
+     * @param ideaId      the id of the idea to modify thhe rating
+     * @param userId      the id of the user to be modify the rating
+     * @param ratingValue a value which is the rating of that idea for that specific user
      * @return a Response Entity containing a response which includes the rating added for that user and idea
      */
     @Transactional
@@ -239,8 +255,8 @@ public class IdeaController {
     /**
      * find the rating based on id an user ids
      *
-     * @param ideaId            the id of the idea to search for it
-     * @param userId            the id of the user which we search for
+     * @param ideaId the id of the idea to search for it
+     * @param userId the id of the user which we search for
      * @return a Response Entity containing a response which includes the rating of that user for that idea
      */
     @Transactional
@@ -295,7 +311,7 @@ public class IdeaController {
 
     /**
      * Retrieves an idea based on the provided comment ID.
-     *
+     * <p>
      * This method handles HTTP GET requests to the "/getByComment" endpoint.
      * It expects a query parameter "commentId" which is mandatory.
      * The method is transactional, meaning that it will be executed within a database transaction context.

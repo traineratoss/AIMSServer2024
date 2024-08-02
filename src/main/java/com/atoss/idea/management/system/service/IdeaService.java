@@ -23,7 +23,7 @@ public interface IdeaService {
     /**
      * Creates an idea for the user that has a specific username
      *
-     * @param idea it is the Object we receive from the client
+     * @param idea     it is the Object we receive from the client
      * @param username the username of the User we want to attribute this idea to
      * @return the idea DTO that we want to add to the User that has
      *         the username passed as an argument
@@ -39,9 +39,18 @@ public interface IdeaService {
     IdeaResponseDTO getIdeaById(Long id);
 
     /**
+     * Retrieves an idea by its ID for the purpose of updating it.
+     *
+     * @param id the ID of the idea to retrieve; must not be null
+     * @return the IdeaResponseDTO containing the idea details
+     * @throws IllegalArgumentException if the provided id is null
+     */
+    IdeaResponseDTO getIdeaByIdForUpdateIdea(Long id);
+
+    /**
      * Updates an idea by receiving its id and the fields we want to update
      *
-     * @param id the id of the idea we want to update
+     * @param id            the id of the idea we want to update
      * @param ideaUpdateDTO the DTO that contains all the necessary fields to update
      * @return an updated idea DTO that overwrites the initial idea
      */
@@ -49,6 +58,7 @@ public interface IdeaService {
 
     /**
      * Deletes an idea by its id
+     *
      * @param id the id of the idea we wish to delete
      */
     void deleteIdeaById(Long id);
@@ -79,19 +89,19 @@ public interface IdeaService {
     /**
      * Filters ideas based on specified criteria
      *
-     * @param title the ideas matching the specified title criteria
-     * @param text the ideas matching the specified text criteria
-     * @param status  the ideas matching the specified statuses
-     * @param categories the ideas matching the specified categories
-     * @param user the ideas matching the specified users
+     * @param title            the ideas matching the specified title criteria
+     * @param text             the ideas matching the specified text criteria
+     * @param status           the ideas matching the specified statuses
+     * @param categories       the ideas matching the specified categories
+     * @param user             the ideas matching the specified users
      * @param selectedDateFrom the ideas matching the specified selected date from
-     * @param selectedDateTo the ideas matching the specified selected date to
-     * @param sortDirection the sorting direction of the pages
-     * @param username if not null, returns filtered ideas belonging to the specified username
-     * @param rating the rating to select
-     * @param pageable  it contains all the necessary information about the
-     *                  requested page, such as page size, page number,
-     *                  sort category and sort direction
+     * @param selectedDateTo   the ideas matching the specified selected date to
+     * @param sortDirection    the sorting direction of the pages
+     * @param username         if not null, returns filtered ideas belonging to the specified username
+     * @param rating           the rating to select
+     * @param pageable         it contains all the necessary information about the
+     *                         requested page, such as page size, page number,
+     *                         sort category and sort direction
      * @return an IdeaPageDTO containing filtered ideas based on the given criteria
      */
     Page<IdeaResponseDTO> filterIdeasByAll(String title,
@@ -118,11 +128,11 @@ public interface IdeaService {
      * Filters ideas based on date criteria
      *
      * @param selectedDateFrom the starting date for filtering
-     * @param selectedDateTo the ending date for filtering
-     * @param root the root (Idea) for constructing criteria queries
-     * @param cb the CriteriaBuilder for building criteria queries (used for more complex
-     *           queries and to prevent writing raw SQL code)
-     * @param columnName specifies the name of the desired database column to be accesed
+     * @param selectedDateTo   the ending date for filtering
+     * @param root             the root (Idea) for constructing criteria queries
+     * @param cb               the CriteriaBuilder for building criteria queries (used for more complex
+     *                         queries and to prevent writing raw SQL code)
+     * @param columnName       specifies the name of the desired database column to be accesed
      * @return a list of predicates to filter Ideas based on the specified date range
      */
     List<Predicate> filterByDate(String selectedDateFrom,
@@ -132,31 +142,30 @@ public interface IdeaService {
                                  String columnName);
 
 
-
     /**
      * Adds or updates a rating for a specified idea by a specific user.
      *
-     * @param       ideaId the ID of the idea to rate.
-     * @param       userId the ID of the user providing the rating.
-     * @param       ratingValue the rating value to be given to the idea.
-     * @return      the updated or newly created Rating object.
+     * @param ideaId      the ID of the idea to rate.
+     * @param userId      the ID of the user providing the rating.
+     * @param ratingValue the rating value to be given to the idea.
+     * @return the updated or newly created Rating object.
      */
     Rating addOrUpdateRating(Long ideaId, Long userId, Double ratingValue);
 
     /**
      * Calculates the average rating for a specified idea.
      *
-     * @param       ideaId the ID of the idea for which the average rating is to be calculated.
-     * @return      the average rating of the idea, or null if the idea has no ratings.
+     * @param ideaId the ID of the idea for which the average rating is to be calculated.
+     * @return the average rating of the idea, or null if the idea has no ratings.
      */
     Double getAverage(Long ideaId);
 
     /**
      * Retrieves the rating given by a specific user for a specified idea.
      *
-     * @param       userId the ID of the user whose rating is to be retrieved.
-     * @param       ideaId the ID of the idea for which the user's rating is to be retrieved.
-     * @return      the rating given by the user for the idea, or null if no rating exists.
+     * @param userId the ID of the user whose rating is to be retrieved.
+     * @param ideaId the ID of the idea for which the user's rating is to be retrieved.
+     * @return the rating given by the user for the idea, or null if no rating exists.
      */
     Double getRatingByUserAndByIdea(Long userId, Long ideaId);
 
@@ -165,7 +174,7 @@ public interface IdeaService {
      * checks if there are any users subscribed to the idea whose rating average has changed and
      * if there are, sends an email to notify them of the change
      *
-     * @param       ideaId the ID of the idea whose rating average has changed
+     * @param ideaId the ID of the idea whose rating average has changed
      */
     void sendEmailForRating(Long ideaId);
 
@@ -196,7 +205,7 @@ public interface IdeaService {
 
     /**
      * Retrieves an IdeaResponseDTO based on the provided comment ID.
-     *
+     * <p>
      * This method fetches the idea associated with the given comment ID and returns it as an IdeaResponseDTO.
      *
      * @param commentId The ID of the comment used to find the associated idea.
