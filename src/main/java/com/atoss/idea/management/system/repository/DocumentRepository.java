@@ -41,3 +41,4 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
      */
     void deleteByIdeaIdAndUserId(Long ideaId, Long userId);
 }
+

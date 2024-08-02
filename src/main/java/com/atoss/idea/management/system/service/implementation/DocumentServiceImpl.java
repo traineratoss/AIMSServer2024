@@ -55,7 +55,10 @@ public class DocumentServiceImpl implements DocumentService {
         Document document = new Document(fileName, file.getContentType(), file.getBytes());
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
         document.setUser(user);
-        Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found."));
+        Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
+//        Long id1 = IdeaServiceImpl.ideaResponseId;
+//        System.out.println(id1 + " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+//        Idea idea = ideaRepository.findById(id1).orElseThrow(() -> new IdeaNotFoundException("Idea not found."));
         document.setIdea(idea);
         return modelMapper.map(documentRepository.save(document), DocumentDTO.class);
     }
@@ -87,12 +90,10 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
-    public void removeDocument(Long ideaId, Long userId) {
-        Optional<Document> document = documentRepository.findByIdeaIdAndUserId(ideaId, userId);
+    public void deleteDocumentById(Long id) {
+        Optional<Document> document = documentRepository.findById(id);
         if (document.isPresent()) {
-            documentRepository.deleteByIdeaIdAndUserId(ideaId, userId);
-        } else {
-            throw new DocumentNotFoundException("Document does not exist");
+            documentRepository.deleteById(id);
         }
     }
 }

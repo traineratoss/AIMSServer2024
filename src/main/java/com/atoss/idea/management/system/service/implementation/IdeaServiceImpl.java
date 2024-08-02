@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -62,6 +63,8 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final SendEmailService sendEmailService;
 
+    private final DocumentServiceImpl documentService;
+
     private final HtmlServiceImpl htmlService;
 
 
@@ -87,6 +90,7 @@ public class IdeaServiceImpl implements IdeaService {
                            CommentServiceImpl commentServiceImpl,
                            SendEmailService sendEmailService,
                            SubscriptionRepository subscriptionRepository,
+                           DocumentServiceImpl documentService,
                            HtmlServiceImpl htmlService) {
         this.ratingRepository = ratingRepository;
         this.ideaRepository = ideaRepository;
@@ -97,6 +101,7 @@ public class IdeaServiceImpl implements IdeaService {
         this.commentServiceImpl = commentServiceImpl;
         this.sendEmailService = sendEmailService;
         this.subscriptionRepository = subscriptionRepository;
+        this.documentService = documentService;
         this.htmlService = htmlService;
     }
 
@@ -127,7 +132,7 @@ public class IdeaServiceImpl implements IdeaService {
     }
 
     @Override
-    public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws UnsupportedEncodingException {
+    public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws IOException {
 
         if (idea.getTitle() == null || idea.getTitle().isEmpty()) {
             throw new FieldValidationException("Please enter a valid title for the idea.");
