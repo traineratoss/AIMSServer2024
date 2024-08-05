@@ -118,8 +118,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                         "/aims/api/v1/ideas/**",
                                         "/aims/api/v1/documents/**",
                                         "/aims/api/v1/avatars/**",
-                                        "/aims/api/v1/images/**",
-                                        "/aims/api/v1/statistics/**")
+                                        "/aims/api/v1/images/**")
                                 .hasAnyRole(Role.STANDARD.name(), Role.ADMIN.name())
                                 .requestMatchers("/**")
                                 .hasRole(Role.ADMIN.name())
