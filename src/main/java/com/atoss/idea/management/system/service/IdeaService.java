@@ -1,9 +1,6 @@
 package com.atoss.idea.management.system.service;
 
-import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
-import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
-import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
-import com.atoss.idea.management.system.repository.dto.SubscriptionDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.Rating;
 import com.atoss.idea.management.system.repository.entity.Status;
@@ -17,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 public interface IdeaService {
 
@@ -212,6 +210,29 @@ public interface IdeaService {
      * @return The IdeaResponseDTO containing the details of the found idea.
      */
     IdeaResponseDTO getIdeaByCommentId(Long commentId);
+
+    /**
+     * Gets all ratings for a specific user.
+     *
+     * @param userId the ID of the user
+     * @return a list of rating objects representing the ratings for the specified user
+     */
+    List<RatingDTO> getAllRatings(Long userId);
+
+    /**
+     * Gets the number of ratings for a specific idea.
+     *
+     * @param ideaId the ID of the idea
+     * @return the number of ratings for the idea
+     */
+    Long getNumberOfRatingsForIdea(Long ideaId);
+
+    /**
+     * Gets numbr of rating for each idea
+     *
+     * @return a list of objects
+     */
+    List<Map<Long, Object>> getRatingsCountForEachIdea();
 
 
 }

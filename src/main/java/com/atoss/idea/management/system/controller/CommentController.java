@@ -148,9 +148,6 @@ public class CommentController {
     @Transactional
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
-        commentService.deleteReportsByCommentId(commentId);
-        commentService.deleteLikesForDeletedComment(commentId);
-        commentService.deleteRepliesForDeletedComment(commentId);
         commentService.deleteComment(commentId);
         return new ResponseEntity<>("Comment likes, reports and replies will also be deleted for deleted comment", HttpStatus.OK);
     }
@@ -339,7 +336,6 @@ public class CommentController {
      * @param reviewStatus the new review status to be set for the comment, passed as a request parameter
      * @param commentId the ID of the comment whose review status is to be updated, passed as a request parameter
      * @throws IllegalArgumentException if the commentId or reviewStatus is null
-     * @throws CommentNotFoundException if a comment with the specified ID is not found
      */
     @Transactional
     @PatchMapping("/comments/reports/review/set")
@@ -355,7 +351,6 @@ public class CommentController {
      * @param commentId the ID of the comment whose review status is to be retrieved, passed as a path variable
      * @return a ResponseEntity containing the review status of the specified comment
      * @throws IllegalArgumentException if the commentId is null
-     * @throws CommentNotFoundException if a comment with the specified ID is not found
      */
     @GetMapping("/comments/reports/review/get/{commentId}")
     public ResponseEntity<ReviewStatus> getReviewStatusByCommentId(@PathVariable  Long commentId) {

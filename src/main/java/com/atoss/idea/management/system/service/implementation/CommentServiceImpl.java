@@ -53,12 +53,12 @@ public class CommentServiceImpl implements CommentService {
     /**
      * CONSTRUCTOR
      *
-     * @param commentRepository for accessing CRUD repository methods for Comment Entity
-     * @param ideaRepository    for accessing CRUD repository methods for Idea Entity
-     * @param userRepository    for accessing CRUD repository methods for User Entity
-     * @param modelMapper       for mapping entity-dto relationships
-     * @param htmlService       for handling HTML content and processing
-     * @param sendEmailService  for handling email content and processing
+     * @param commentRepository      for accessing CRUD repository methods for Comment Entity
+     * @param ideaRepository         for accessing CRUD repository methods for Idea Entity
+     * @param userRepository         for accessing CRUD repository methods for User Entity
+     * @param modelMapper            for mapping entity-dto relationships
+     * @param htmlService            for handling HTML content and processing
+     * @param sendEmailService       for handling email content and processing
      * @param subscriptionRepository for accessing CRUD repository methods for Subscription Entity
      */
     public CommentServiceImpl(CommentRepository commentRepository, IdeaRepository ideaRepository,
@@ -314,12 +314,20 @@ public class CommentServiceImpl implements CommentService {
                 .stream()
                 .map(pagedReply -> {
                     String username = pagedReply.getUser().getUsername();
-                    String time = getTimeForComment(pagedReply.getId());
 
                     ResponseCommentReplyDTO responseCommentReplyDTO = new ResponseCommentReplyDTO();
                     responseCommentReplyDTO.setId(pagedReply.getId());
                     responseCommentReplyDTO.setUsername(username);
-                    responseCommentReplyDTO.setCommentText(pagedReply.getCommentText());
+
+                    Long id = pagedReply.getId();
+                    if (getReportsCountForComment(id) > 5) {
+                        responseCommentReplyDTO.setCommentText("This reply is under review");
+                    } else {
+                        responseCommentReplyDTO.setCommentText(pagedReply.getCommentText());
+                    }
+
+                    String time = getTimeForComment(pagedReply.getId());
+
                     responseCommentReplyDTO.setElapsedTime(time);
                     responseCommentReplyDTO.setParentId(commentId);
                     return responseCommentReplyDTO;
@@ -357,6 +365,13 @@ public class CommentServiceImpl implements CommentService {
                     responseCommentDTO.setUsername(username);
                     responseCommentDTO.setElapsedTime(time);
                     responseCommentDTO.setHasReplies(hasReplies);
+
+                    Long id = pagedComment.getId();
+
+                    if (getReportsCountForComment(id) > 5) {
+                        responseCommentDTO.setCommentText("This comment is under review");
+                    }
+
                     return responseCommentDTO;
                 }).toList();
 
@@ -421,6 +436,11 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     public void deleteComment(Long commentId) {
+
+        deleteReportsByCommentId(commentId);
+        deleteLikesForDeletedComment(commentId);
+        deleteRepliesForDeletedComment(commentId);
+
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }

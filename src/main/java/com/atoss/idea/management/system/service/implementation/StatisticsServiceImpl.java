@@ -23,6 +23,8 @@ import jakarta.persistence.criteria.Root;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,13 +74,18 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public Long getSelectionRepliesNumber(String selectedDateFrom, String selectedDateTo) {
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(selectedDateTo, formatter);
+        LocalDate updatedDate = date.plusDays(1);
+        String selectedDateToAux = updatedDate.format(formatter);
+
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Comment> criteriaQuery = cb.createQuery(Comment.class);
         Root<Comment> root = criteriaQuery.from(Comment.class);
 
         List<Predicate> predicatesList = new ArrayList<>();
 
-        predicatesList.addAll(ideaService.filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
+        predicatesList.addAll(ideaService.filterByDate(selectedDateFrom, selectedDateToAux, root, cb, "creationDate"));
         predicatesList.add(cb.isNotNull(root.get("parent")));
 
         criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
@@ -86,11 +93,15 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         Long allReplies = (long) repliesQuery.getResultList().size();
 
-        return  allReplies;
+        return allReplies;
     }
 
     @Override
     public Long getSelectionCommentNumber(String selectedDateFrom, String selectedDateTo) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(selectedDateTo, formatter);
+        LocalDate updatedDate = date.plusDays(1);
+        String selectedDateToAux = updatedDate.format(formatter);
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Comment> criteriaQuery = cb.createQuery(Comment.class);
@@ -102,7 +113,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<Predicate> predicatesList = new ArrayList<>();
 
         // used to incorporate multiple filtering conditions into the predicatesList
-        predicatesList.addAll(ideaService.filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
+        predicatesList.addAll(ideaService.filterByDate(selectedDateFrom, selectedDateToAux, root, cb, "creationDate"));
         predicatesList.add(cb.isNull(root.get("parent")));
 
         criteriaQuery.where(predicatesList.toArray(new Predicate[0]));
@@ -168,13 +179,11 @@ public class StatisticsServiceImpl implements StatisticsService {
         double implPercentage = ((double) implIdeas / (double) nrOfIdeas * 100);
 
         // we calculate difference in case the sum is not 100%
-        double totalP = (int) draftPercentage + (int) openPercentage + (int)  implPercentage;
+        double totalP = (int) draftPercentage + (int) openPercentage + (int) implPercentage;
         double diff = 100.00 - totalP;
         draftPercentage = draftPercentage + diff;
 
         List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(commentRepository.mostCommentedIdeas());
-
-
 
 
         List<Comment> topComments = commentRepository.findTop5CommentsByLikes();
@@ -204,9 +213,29 @@ public class StatisticsServiceImpl implements StatisticsService {
     public StatisticsDTO getStatisticsByDate(String selectedDateFrom,
                                              String selectedDateTo) {
 
+        // This code checks if the penultimate character of the string is '-' and if the last character is a digit.
+        // This is because the date may be transmitted in the format "2024-08-5" and needs to be standardized to "2024-08-05"
+        // when filtering statistics. The condition ensures that a '0' is added before the last digit if it's preceded by a '-'.
+        // This helps maintain consistency in date formatting for statistical analysis.
+        if (selectedDateTo.length() > 1 && selectedDateTo.charAt(selectedDateTo.length() - 2) == '-') {
+            if (Character.isDigit(selectedDateTo.charAt(selectedDateTo.length() - 1))) {
+                selectedDateTo = selectedDateTo.substring(0, selectedDateTo.length() - 1)
+                        + '0'
+                        + selectedDateTo.charAt(selectedDateTo.length() - 1);
+            }
+        }
+
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(selectedDateTo, formatter);
+        LocalDate updatedDate = date.plusDays(1);
+        String selectedDateToAux = updatedDate.format(formatter);
+
+
+        System.out.println(selectedDateToAux);
         StatisticsDTO filteredStatisticsDTO = new StatisticsDTO();
 
-        List<Long> listOfRepliesAndComments = commentRepository.getRepliesAndCommentsCount(selectedDateFrom, selectedDateTo);
+        List<Long> listOfRepliesAndComments = commentRepository.getRepliesAndCommentsCount(selectedDateFrom, selectedDateToAux);
 
         Long noOfReplies;
         try {
@@ -225,7 +254,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         filteredStatisticsDTO.setTotalNrOfComments(noOfComments);
 
         List<Long> listOfStatusesCount = ideaRepository.countStatusByDate(selectedDateFrom,
-                selectedDateTo);
+                selectedDateToAux);
 
         Long openIdeasCount;
         Long draftIdeasCount;
@@ -252,14 +281,14 @@ public class StatisticsServiceImpl implements StatisticsService {
         Long totalIdeasCount = openIdeasCount + draftIdeasCount + implIdeasCount;
 
         double draftPercentage = ((double) draftIdeasCount / (double) totalIdeasCount * 100);
-        double openPercentage =  ((double) openIdeasCount / (double) totalIdeasCount * 100);
+        double openPercentage = ((double) openIdeasCount / (double) totalIdeasCount * 100);
         double implPercentage = ((double) implIdeasCount / (double) totalIdeasCount * 100);
-        double totalP = (int) draftPercentage + (int) openPercentage + (int)  implPercentage;
+        double totalP = (int) draftPercentage + (int) openPercentage + (int) implPercentage;
         double diff = 100.00 - totalP;
         draftPercentage = draftPercentage + diff;
 
         List<IdeaResponseDTO> mostCommentedIdeas = getMostCommentedIdeas(
-                commentRepository.mostCommentedIdeasIdsByDate(selectedDateFrom, selectedDateTo));
+                commentRepository.mostCommentedIdeasIdsByDate(selectedDateFrom, selectedDateToAux));
 
         filteredStatisticsDTO.setImplP(implPercentage);
         filteredStatisticsDTO.setOpenP(openPercentage);

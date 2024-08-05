@@ -243,6 +243,10 @@ public class IdeaServiceImpl implements IdeaService {
             List<User> subscribedUsers = new ArrayList<>();
 
             boolean diffText = false;
+            boolean diffTitle = false;
+
+            String oldText = idea.getText();
+            String oldTitle = idea.getTitle();
 
             for (Long userId : subscribedUsersIds) {
                 subscribedUsers.add(userRepository.findById(userId).get());
@@ -256,11 +260,6 @@ public class IdeaServiceImpl implements IdeaService {
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
                 idea.setText(filteredCommentText);
-                if (!subscribedUsers.isEmpty() && diffText) {
-                    sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
-                }
-                diffText = false;
-
             }
             if (ideaUpdateDTO.getStatus() != null) {
                 idea.setStatus(ideaUpdateDTO.getStatus());
@@ -277,12 +276,13 @@ public class IdeaServiceImpl implements IdeaService {
 
             if (ideaUpdateDTO.getTitle() != null) {
                 if (!Objects.equals(idea.getTitle(), ideaUpdateDTO.getTitle())) {
-                    diffText = true;
+                    diffTitle = true;
                 }
                 idea.setTitle(ideaUpdateDTO.getTitle());
-                if (!subscribedUsers.isEmpty() && diffText) {
-                    sendEmailService.sendEmailChangedIdeaTitle(subscribedUsers, id);
-                }
+            }
+
+            if ((diffText == true || diffTitle == true) && (!subscribedUsers.isEmpty())) {
+                sendEmailService.sendEmailUpdatedIdea(subscribedUsers, id, oldText, oldTitle);
             }
 
             if (ideaUpdateDTO.getCategoryList() != null) {
@@ -418,8 +418,9 @@ public class IdeaServiceImpl implements IdeaService {
         }
         if (ratingAvg != null) {
             float rating = Float.parseFloat(ratingAvg);
-            float upperBound = rating < 5.0f ? rating + 0.99f : 5.0f;
-            predicatesList.add(cb.between(root.get("ratingAvg"), rating, upperBound));
+            float lowerBound = rating;
+            float upperBound = rating + 0.99f;
+            predicatesList.add(cb.between(root.get("ratingAvg"), lowerBound, upperBound));
         }
         predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
         List<Order> orders = new ArrayList<>();
@@ -607,6 +608,25 @@ public class IdeaServiceImpl implements IdeaService {
         return subscriptionDTOs;
     }
 
+    @Override
+    public List<RatingDTO> getAllRatings(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User not found");
+        }
+
+        List<Rating> ratings = ratingRepository.findByUserId(userId);
+        List<RatingDTO> ratingDTOs = ratings.stream()
+                .map(rating -> {
+                    RatingDTO responseDTO = modelMapper.map(rating, RatingDTO.class);
+                    responseDTO.setIdeaId(rating.getIdea().getId());
+                    responseDTO.setUserId(rating.getUser().getId());
+                    responseDTO.setRating(rating.getRating());
+                    return responseDTO;
+                })
+                .toList();
+        return ratingDTOs;
+    }
+
 
     @Override
     public IdeaResponseDTO getIdeaByCommentId(Long commentId) {
@@ -625,6 +645,16 @@ public class IdeaServiceImpl implements IdeaService {
             responseDTO.setCommentsNumber(i.getCommentList().size());
             return responseDTO;
         }).orElseThrow(() -> new IdeaNotFoundException("Idea not found for the given comment/reply ID"));
+    }
+
+    @Override
+    public Long getNumberOfRatingsForIdea(Long ideaId) {
+        return ratingRepository.countByIdeaId(ideaId);
+    }
+
+    @Override
+    public List<Map<Long, Object>> getRatingsCountForEachIdea() {
+        return ratingRepository.countRatingsForEachIdea();
     }
 
 }
