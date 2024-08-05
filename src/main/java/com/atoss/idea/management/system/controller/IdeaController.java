@@ -1,9 +1,6 @@
 package com.atoss.idea.management.system.controller;
 
-import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
-import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
-import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
-import com.atoss.idea.management.system.repository.dto.SubscriptionDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Rating;
 import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.repository.entity.Subscription;
@@ -22,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -98,9 +96,9 @@ public class IdeaController {
     /**
      * Deletes an idea by a given id
      *
-     * @param id the id of the idea we want to delete
-     * @return a Response Entity containing a text that suggests the fact that we successfully
-     *         deleted the idea
+     * @param       id the id of the idea we want to delete
+     * @return      a Response Entity containing a text that suggests the fact that we successfully
+     *              deleted the idea
      */
     @DeleteMapping("/delete")
     @Transactional
@@ -116,8 +114,8 @@ public class IdeaController {
      * @param pageNumber    the number of the page
      * @param sortCategory  the category we sort the ideas by
      * @param sortDirection the direction we want the ideas to be sorted by
-     * @return a Response Entity containing an IdeaPage DTO (the total number of ideas in all the pages +
-     *         the page containing the list of ideas)
+     * @return              a Response Entity containing an IdeaPage DTO (the total number of ideas in all the pages +
+     *                      the page containing the list of ideas)
      */
     @Transactional
     @GetMapping("/all")
@@ -148,8 +146,8 @@ public class IdeaController {
      * @param pageNumber    the number of the page
      * @param sortCategory  the category we sort the ideas by
      * @param sortDirection the direction we want the ideas to be sorted by
-     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     *         the page containing the list of ideas)
+     * @return              a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
+     *                      the page containing the list of ideas)
      */
     @Transactional
     @GetMapping("/allByUser")
@@ -190,9 +188,9 @@ public class IdeaController {
      * @param pageNumber       the number of the page
      * @param username         if not null, returns filtered ideas belonging to the specified username
      * @param sortDirection    the direction we want the ideas to be sorted by
-     * @param rating           rating to filter the ideas
-     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     *         the page containing the list of ideas )
+     * @param rating            rating to filter the ideas
+     * @return                  a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
+     *                          the page containing the list of ideas )
      */
     @Transactional
     @GetMapping("/filter")
@@ -237,9 +235,9 @@ public class IdeaController {
     /**
      * add a rating to a idea
      *
-     * @param ideaId      the id of the idea to modify thhe rating
-     * @param userId      the id of the user to be modify the rating
-     * @param ratingValue a value which is the rating of that idea for that specific user
+     * @param ideaId            the id of the idea to modify thhe rating
+     * @param userId            the id of the user to be modify the rating
+     * @param ratingValue        a value which is the rating of that idea for that specific user
      * @return a Response Entity containing a response which includes the rating added for that user and idea
      */
     @Transactional
@@ -255,15 +253,38 @@ public class IdeaController {
     /**
      * find the rating based on id an user ids
      *
-     * @param ideaId the id of the idea to search for it
      * @param userId the id of the user which we search for
      * @return a Response Entity containing a response which includes the rating of that user for that idea
      */
+
+    @Transactional
+    @GetMapping("/getAllRatings")
+    public ResponseEntity<List<RatingDTO>> getAllRatings(@RequestParam(required = true) Long userId) {
+        return new ResponseEntity<>(ideaService.getAllRatings(userId), HttpStatus.OK);
+    }
+
+    /**
+     * find the rating based on id a user id and idea id
+     *
+     * @param userId the id of the user which we search for
+     * @param ideaId the id of the user which we search for
+     * @return a Response Entity containing a response which includes the rating of that user for that idea
+     */
+
     @Transactional
     @GetMapping("/getRating")
-    public ResponseEntity<Double> findByIdeaIdAndUserId(@RequestParam(required = true) Long ideaId,
-                                                        @RequestParam(required = true) Long userId) {
+    public ResponseEntity<Double> getRating(@RequestParam Long ideaId, @RequestParam Long userId) {
         return new ResponseEntity<>(ideaService.getRatingByUserAndByIdea(ideaId, userId), HttpStatus.OK);
+    }
+
+    /**
+     * Endpoint to get the number of ratings for a specific idea.
+     *
+     * @return the number of ratings for the idea
+     */
+    @GetMapping("/countRatings")
+    public ResponseEntity<List<Map<Long, Object>>> getNumberOfRatings() {
+        return new ResponseEntity<>(ideaService.getRatingsCountForEachIdea(), HttpStatus.OK);
     }
 
     /**
@@ -311,7 +332,7 @@ public class IdeaController {
 
     /**
      * Retrieves an idea based on the provided comment ID.
-     * <p>
+     *
      * This method handles HTTP GET requests to the "/getByComment" endpoint.
      * It expects a query parameter "commentId" which is mandatory.
      * The method is transactional, meaning that it will be executed within a database transaction context.
@@ -324,5 +345,4 @@ public class IdeaController {
     public ResponseEntity<IdeaResponseDTO> getIdeaByCommentId(@RequestParam(required = true) Long commentId) {
         return new ResponseEntity<>(ideaService.getIdeaByCommentId(commentId), HttpStatus.OK);
     }
-
 }
