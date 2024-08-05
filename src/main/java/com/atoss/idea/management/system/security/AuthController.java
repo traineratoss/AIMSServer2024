@@ -43,7 +43,7 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
     private final UserService userService;
-    private final CookieService cookieService;
+    private final SessionService sessionService;
 
     /**
      * Constructor for the AuthController class.
@@ -52,19 +52,25 @@ public class AuthController {
      * @param userService           The UserRepository used for accessing user-related data and operations.
      * @param refreshTokenService   The RefreshTokenService used for handling refresh tokens.
      * @param jwtService            The JwtService used for generating and verifying tokens.
-     * @param cookieService         The CookieService used for creating access and refresh token
+     * @param cookieService         The SessionService used for creating access and refresh token
+     * @param sessionService        The SessionService used for managing the user's session.
      * @see AuthenticationManager
      * @see UserRepository
      * @see AuthController
-     * @see CookieService
+     * @see SessionService
      */
-    public AuthController(AuthenticationManager authenticationManager,
-                          UserService userService, RefreshTokenService refreshTokenService, JwtService jwtService, CookieService cookieService) {
+    public AuthController(
+            AuthenticationManager authenticationManager,
+            UserService userService,
+            RefreshTokenService refreshTokenService,
+            JwtService jwtService,
+            SessionService cookieService,
+            SessionService sessionService) {
         this.authenticationManager = authenticationManager;
         this.refreshTokenService = refreshTokenService;
         this.jwtService = jwtService;
         this.userService = userService;
-        this.cookieService = cookieService;
+        this.sessionService = sessionService;
     }
 
     /**
@@ -79,6 +85,7 @@ public class AuthController {
      * or return an error message or throw an exception in case of authentication failure.
      *
      * @param loginRequest The LoginRequest object containing the user's authentication credentials.
+     * @param request      The HttpServletRequest object for parsing the request headers.
      * @param response    The HttpServletResponse object to set the user information as a cookie.
      *
      * @return A String indicating the result of the authentication process.
@@ -92,28 +99,37 @@ public class AuthController {
      * @see SecurityContextHolder
      * @see Authentication
      * @see HttpServletResponse
+     * @see HttpServletRequest
      */
     @Transactional
     @CrossOrigin
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<AuthResponse> login(
+            @RequestBody LoginRequest loginRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsernameOrEmail(),
                        loginRequest.getPassword()));
 
         if (authentication.isAuthenticated()) {
 
+            sessionService.createSession(
+                    sessionService.extractSessionHeader(request),
+                    userService.getUserByUsername(authentication.getName(), User.class)
+            );
+
             String accessToken = jwtService.generateToken(authentication.getName());
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(authentication.getName());
 
-            ResponseCookie cookie = cookieService.createTokenCookie(
-                    cookieService.getIdentifier(jwtService.getTokenConfig().getType(), null),
+            ResponseCookie cookie = sessionService.createTokenCookie(
+                    sessionService.extractSessionHeader(request),
                     accessToken,
                     jwtService.getTokenConfig());
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-            ResponseCookie cookieRefresh = cookieService.createTokenCookie(
-                    cookieService.getIdentifier(refreshTokenService.getTokenConfig().getType(), null),
+            ResponseCookie cookieRefresh = sessionService.createTokenCookie(
+                    sessionService.extractSessionHeader(request),
                     refreshToken.getToken(),
                     refreshTokenService.getTokenConfig());
             response.addHeader(HttpHeaders.SET_COOKIE, cookieRefresh.toString());
@@ -185,10 +201,10 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(HttpServletRequest request) {
 
-        cookieService.getTokenFromCookies(request.getCookies(), "refreshToken")
+        sessionService.extractToken(request, refreshTokenService.getTokenConfig())
                 .ifPresent(refreshTokenService::invalidateToken);
 
-        cookieService.getTokenFromCookies(request.getCookies(), "accessToken")
+        sessionService.extractToken(request, jwtService.getTokenConfig())
                 .ifPresent(jwtService::invalidateToken);
 
         return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);

@@ -8,7 +8,7 @@ import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
 import com.atoss.idea.management.system.repository.entity.RefreshToken;
 import com.atoss.idea.management.system.repository.entity.User;
-import com.atoss.idea.management.system.security.CookieService;
+import com.atoss.idea.management.system.security.SessionService;
 import com.atoss.idea.management.system.security.response.AuthResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,7 +31,7 @@ public class RefreshTokenService {
     private final UserRepository userRepository;
 
     private final JwtService jwtService;
-    private final CookieService cookieService;
+    private final SessionService sessionService;
 
     @Getter
     private final RefreshTokenConfig tokenConfig;
@@ -95,7 +95,7 @@ public class RefreshTokenService {
      */
     public AuthResponse refreshAuthToken(HttpServletRequest request, HttpServletResponse response) {
 
-        Optional<String> token = cookieService.getTokenFromCookies(request.getCookies(), "refreshToken");
+        Optional<String> token = sessionService.extractToken(request, tokenConfig);
 
         if (token.isEmpty()) {
             throw new InvalidRefreshTokenException("Invalid refresh token");
@@ -122,11 +122,19 @@ public class RefreshTokenService {
         String newAccessToken = jwtService.generateToken(username);
         RefreshToken newRefreshToken = createRefreshToken(username);
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookieService
-                .createTokenCookie(jwtService.getTokenConfig().getType(), newAccessToken, jwtService.getTokenConfig()).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, sessionService
+                .createTokenCookie(
+                        sessionService.extractSessionHeader(request),
+                        newAccessToken,
+                        jwtService.getTokenConfig())
+                .toString());
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookieService
-                .createTokenCookie(tokenConfig.getType(), newRefreshToken.getToken(), tokenConfig).toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, sessionService
+                .createTokenCookie(
+                        sessionService.extractSessionHeader(request),
+                        newRefreshToken.getToken(),
+                        tokenConfig)
+                .toString());
 
 
         return new AuthResponse(

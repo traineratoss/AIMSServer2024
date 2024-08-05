@@ -19,4 +19,8 @@ public class Session {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private User user;
 
+    @PreRemove void preRemove() {
+        user.setSessionId(null);
+    }
+
 }

@@ -30,7 +30,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     private final JwtService jwtService;
 
-    private CookieService cookieService;
+    private final SessionService sessionService;
 
 
 
@@ -55,7 +55,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
      */
     @Bean
     public AuthFilter authenticationJwtTokenFilter() {
-        return new AuthFilter(jwtService, userDetailsService, cookieService);
+        return new AuthFilter(jwtService, userDetailsService, sessionService);
     }
 
     /**

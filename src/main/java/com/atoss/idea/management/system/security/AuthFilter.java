@@ -7,7 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,15 +21,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Log4j2
 public class AuthFilter extends OncePerRequestFilter {
 
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
-    private CookieService cookieService;
+    private final SessionService sessionService;
 
     /**
      * Performs filtering on the incoming HTTP request and response to set user information as a cookie.
@@ -51,9 +51,7 @@ public class AuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         try {
-            cookieService.getTokenFromCookies(
-                            request.getCookies(),
-                            cookieService.getIdentifier(jwtService.getTokenConfig().getType(), null))
+            sessionService.extractToken(request, jwtService.getTokenConfig())
                     .ifPresent(
                             token -> {
                                 if (request.getRequestURI().contains("/api/v1/auth/")) {
