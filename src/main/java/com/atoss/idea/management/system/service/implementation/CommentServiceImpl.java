@@ -5,6 +5,7 @@ import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.exception.CommentNotFoundException;
 import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
+import com.atoss.idea.management.system.repository.SubscriptionRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Comment;
@@ -45,6 +46,10 @@ public class CommentServiceImpl implements CommentService {
     private final ModelMapper modelMapper;
     private final HtmlServiceImpl htmlService;
 
+    private final SendEmailServiceImpl sendEmailService;
+
+    private final SubscriptionRepository subscriptionRepository;
+
     /**
      * CONSTRUCTOR
      *
@@ -53,14 +58,19 @@ public class CommentServiceImpl implements CommentService {
      * @param userRepository    for accessing CRUD repository methods for User Entity
      * @param modelMapper       for mapping entity-dto relationships
      * @param htmlService       for handling HTML content and processing
+     * @param sendEmailService  for handling email content and processing
+     * @param subscriptionRepository for accessing CRUD repository methods for Subscription Entity
      */
     public CommentServiceImpl(CommentRepository commentRepository, IdeaRepository ideaRepository,
-                              UserRepository userRepository, ModelMapper modelMapper, HtmlServiceImpl htmlService) {
+                              UserRepository userRepository, ModelMapper modelMapper, HtmlServiceImpl htmlService,
+                              SendEmailServiceImpl sendEmailService, SubscriptionRepository subscriptionRepository) {
         this.commentRepository = commentRepository;
         this.ideaRepository = ideaRepository;
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.htmlService = htmlService;
+        this.sendEmailService = sendEmailService;
+        this.subscriptionRepository = subscriptionRepository;
     }
 
     /**
@@ -196,7 +206,6 @@ public class CommentServiceImpl implements CommentService {
      * @throws UserNotFoundException        if the user specified in the DTO does not exist
      * @throws IdeaNotFoundException        if the idea specified in the DTO does not exist
      */
-
     @Transactional
     @Override
     public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) throws UnsupportedEncodingException {
@@ -217,6 +226,7 @@ public class CommentServiceImpl implements CommentService {
         newComment.setUser(user);
         newComment.setIdea(idea);
         newComment.setParent(null);
+        newComment.setCommentText(requestCommentDTO.getCommentText());
         String htmlContent = htmlService.markdownToHtml(requestCommentDTO.getCommentText());
         newComment.setCommentText(htmlContent);
         newComment.setCreationDate(creationDate);
@@ -228,6 +238,19 @@ public class CommentServiceImpl implements CommentService {
         ResponseCommentDTO responseCommentDTO = modelMapper.map(newComment, ResponseCommentDTO.class);
         responseCommentDTO.setUsername(user.getUsername());
 
+
+        List<Long> subscribedUsersIds = subscriptionRepository.findUserIdByIdeaId(requestCommentDTO.getIdeaId());
+
+        List<User> subscribedUsers = new ArrayList<>();
+
+
+        for (Long userId : subscribedUsersIds) {
+            subscribedUsers.add(userRepository.findById(userId).get());
+        }
+
+        if (!subscribedUsers.isEmpty()) {
+            sendEmailService.sendEmailAddedComment(subscribedUsers, newComment.getId(), requestCommentDTO.getCommentText());
+        }
         return responseCommentDTO;
     }
 
@@ -400,6 +423,22 @@ public class CommentServiceImpl implements CommentService {
     public void deleteComment(Long commentId) {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
+        }
+        String commentText = commentRepository.findById(commentId).get().getCommentText();
+        Comment comment = commentRepository.findById(commentId).get();
+        Long ideaId = comment.getIdea().getId();
+
+        List<Long> subscribedUsersIds = subscriptionRepository.findUserIdByIdeaId(ideaId);
+
+        List<User> subscribedUsers = new ArrayList<>();
+
+
+        for (Long userId : subscribedUsersIds) {
+            subscribedUsers.add(userRepository.findById(userId).get());
+        }
+
+        if (!subscribedUsers.isEmpty()) {
+            sendEmailService.sendEmailDeletedComment(subscribedUsers, commentId, commentText);
         }
         commentRepository.deleteById(commentId);
     }

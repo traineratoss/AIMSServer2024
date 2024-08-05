@@ -42,6 +42,9 @@ public class SendEmailTest {
     @Mock
     IdeaRepository mockIdeaRepository;
 
+    @Mock
+    CommentRepository commentRepository;
+
     JavaMailSenderImpl spyJavaMailSender;
 
     Configuration spyConfiguration;
@@ -81,7 +84,8 @@ public class SendEmailTest {
                 spyJavaMailSender,
                 spyConfiguration,
                 mockSubscriptionRepository,
-                mockIdeaRepository
+                mockIdeaRepository,
+                commentRepository
         ));
 
         user = new User();

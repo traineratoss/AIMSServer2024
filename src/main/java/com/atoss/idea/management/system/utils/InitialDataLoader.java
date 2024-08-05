@@ -137,6 +137,10 @@ public class InitialDataLoader implements CommandLineRunner {
                     null, null, false, true);
             userRepository.save(user5);
 
+            User user6 = createUser(true, Role.STANDARD, avatar1, "sularbogdan@yahoo.com", "sularbogdan",
+                    "Bogdan Sular", BCrypt.hashpw("sularbogdan", bcryptSalt), true, false);
+            userRepository.save(user6);
+
             //Category CONSTRUCTOR
             Category category1 = createCategory("Innovation");
             categoryRepository.save(category1);
@@ -263,6 +267,17 @@ public class InitialDataLoader implements CommandLineRunner {
                     user4, "It's a great idea");
             commentRepository.save(comment4);
 
+            Comment comment5 = createComment(staticDate2, idea1, null,
+                    user4, "Comment 5");
+            commentRepository.save(comment5);
+
+            Comment comment6 = createComment(staticDate2, idea1, null,
+                    user4, "Comment 6");
+            commentRepository.save(comment6);
+
+            Comment comment7 = createComment(staticDate2, idea2, null, user4, "Comment 7 Comment 7 Comment 7");
+            commentRepository.save(comment7);
+
             Comment reply1 = createReply(new Date(), comment2, idea2, user1, "I don't think so");
             commentRepository.save(reply1);
 
@@ -271,6 +286,12 @@ public class InitialDataLoader implements CommandLineRunner {
 
             Comment reply3 = createReply(new Date(), comment3, idea2, user4, "I think it is");
             commentRepository.save(reply3);
+
+            Comment reply4 = createReply(new Date(), comment5, idea2, user4, "Reply 4 for comment 5");
+            commentRepository.save(reply4);
+
+            Comment reply5 = createReply(new Date(), comment5, idea2, user4, "Reply 5 for comment 5");
+            commentRepository.save(reply5);
 
             addLike(comment2, user1);
             addLike(comment2, user3);
@@ -284,6 +305,7 @@ public class InitialDataLoader implements CommandLineRunner {
             addLike(reply3, user2);
             addLike(reply3, user5);
 
+            addReport(reply2, user2);
 
             //initialize CommentList for using it in another Constructor (for replies)
             ArrayList<Comment> commentList = new ArrayList<>();
@@ -305,6 +327,8 @@ public class InitialDataLoader implements CommandLineRunner {
                 userList.add(user);
                 userRepository.save(user);
                 addReport(reply2, user);
+                addReport(comment6, user);
+                addReport(comment7, user);
             }
 
             // Dummy ideas
@@ -352,8 +376,6 @@ public class InitialDataLoader implements CommandLineRunner {
 
         }
     }
-
-
 
     private void addLike(Comment comment, User user) {
         user.getLikedComments().add(comment);
