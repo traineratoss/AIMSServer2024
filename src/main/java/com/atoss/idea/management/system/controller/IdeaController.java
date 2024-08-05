@@ -1,9 +1,6 @@
 package com.atoss.idea.management.system.controller;
 
-import com.atoss.idea.management.system.repository.dto.IdeaRequestDTO;
-import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
-import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
-import com.atoss.idea.management.system.repository.dto.SubscriptionDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Rating;
 import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.repository.entity.Subscription;
@@ -22,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -63,6 +61,22 @@ public class IdeaController {
     @Transactional
     public ResponseEntity<IdeaResponseDTO> getIdeaById(@RequestParam(required = true) Long id) {
         return new ResponseEntity<>(ideaService.getIdeaById(id), HttpStatus.OK);
+    }
+
+    /**
+     * Handles HTTP GET requests to retrieve an idea by its ID for the purpose of updating it.
+     *
+     * <p>This method is transactional, ensuring that any database interactions are performed
+     * within a transaction context.</p>
+     *
+     * @param id the ID of the idea to retrieve; must not be null
+     * @return a ResponseEntity containing the IdeaResponseDTO and an HTTP status of OK
+     * @throws IllegalArgumentException if the provided id is null
+     */
+    @GetMapping("/get/updateIdea")
+    @Transactional
+    public ResponseEntity<IdeaResponseDTO> getIdeaByIdForUpdateIdea(@RequestParam(required = true) Long id) {
+        return new ResponseEntity<>(ideaService.getIdeaByIdForUpdateIdea(id), HttpStatus.OK);
     }
 
     /**
@@ -239,15 +253,38 @@ public class IdeaController {
     /**
      * find the rating based on id an user ids
      *
-     * @param ideaId            the id of the idea to search for it
-     * @param userId            the id of the user which we search for
+     * @param userId the id of the user which we search for
      * @return a Response Entity containing a response which includes the rating of that user for that idea
      */
+
+    @Transactional
+    @GetMapping("/getAllRatings")
+    public ResponseEntity<List<RatingDTO>> getAllRatings(@RequestParam(required = true) Long userId) {
+        return new ResponseEntity<>(ideaService.getAllRatings(userId), HttpStatus.OK);
+    }
+
+    /**
+     * find the rating based on id a user id and idea id
+     *
+     * @param userId the id of the user which we search for
+     * @param ideaId the id of the user which we search for
+     * @return a Response Entity containing a response which includes the rating of that user for that idea
+     */
+
     @Transactional
     @GetMapping("/getRating")
-    public ResponseEntity<Double> findByIdeaIdAndUserId(@RequestParam(required = true) Long ideaId,
-                                                        @RequestParam(required = true) Long userId) {
+    public ResponseEntity<Double> getRating(@RequestParam Long ideaId, @RequestParam Long userId) {
         return new ResponseEntity<>(ideaService.getRatingByUserAndByIdea(ideaId, userId), HttpStatus.OK);
+    }
+
+    /**
+     * Endpoint to get the number of ratings for a specific idea.
+     *
+     * @return the number of ratings for the idea
+     */
+    @GetMapping("/countRatings")
+    public ResponseEntity<List<Map<Long, Object>>> getNumberOfRatings() {
+        return new ResponseEntity<>(ideaService.getRatingsCountForEachIdea(), HttpStatus.OK);
     }
 
     /**
@@ -308,5 +345,4 @@ public class IdeaController {
     public ResponseEntity<IdeaResponseDTO> getIdeaByCommentId(@RequestParam(required = true) Long commentId) {
         return new ResponseEntity<>(ideaService.getIdeaByCommentId(commentId), HttpStatus.OK);
     }
-
 }

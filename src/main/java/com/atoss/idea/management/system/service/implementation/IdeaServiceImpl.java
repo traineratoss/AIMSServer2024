@@ -157,8 +157,7 @@ public class IdeaServiceImpl implements IdeaService {
         savedIdea.setUser(user);
         savedIdea.setStatus(idea.getStatus());
         String filteredIdeaText = filterBadWords(idea.getText());
-        String htmlContent = htmlService.markdownToHtml(filteredIdeaText);
-        savedIdea.setText(htmlContent);
+        savedIdea.setText(filteredIdeaText);
         String filteredIdeaTitle = filterBadWords(idea.getTitle());
         savedIdea.setTitle(filteredIdeaTitle);
         savedIdea.setCategoryList(new ArrayList<>());
@@ -196,6 +195,23 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO getIdeaById(Long id) throws FieldValidationException {
+
+        if (ideaRepository.findById(id).isPresent()) {
+            Idea idea = ideaRepository.findById(id).get();
+            IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
+            responseDTO.setUsername(ideaRepository.findById(id).get().getUser().getUsername());
+            String htmlContent = htmlService.markdownToHtml(ideaRepository.findById(id).get().getText());
+            responseDTO.setText(htmlContent);
+            responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
+            responseDTO.setCommentsNumber(idea.getCommentList().size());
+            return responseDTO;
+        } else {
+            throw new IdeaNotFoundException("Idea doesn't exist.");
+        }
+    }
+
+    @Override
+    public IdeaResponseDTO getIdeaByIdForUpdateIdea(Long id) throws FieldValidationException {
 
         if (ideaRepository.findById(id).isPresent()) {
             Idea idea = ideaRepository.findById(id).get();
@@ -239,8 +255,7 @@ public class IdeaServiceImpl implements IdeaService {
                 }
                 idea.setText(ideaUpdateDTO.getText());
                 String filteredCommentText = filterBadWords(idea.getText());
-                String htmlContent = htmlService.markdownToHtml(filteredCommentText);
-                idea.setText(htmlContent);
+                idea.setText(filteredCommentText);
                 if (!subscribedUsers.isEmpty() && diffText) {
                     sendEmailService.sendEmailChangedIdeaText(subscribedUsers, id);
                 }
@@ -323,6 +338,8 @@ public class IdeaServiceImpl implements IdeaService {
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
                     responseDTO.setUsername(idea.getUser().getUsername());
+                    String htmlContent = htmlService.markdownToHtml(ideaRepository.findById(idea.getId()).get().getText());
+                    responseDTO.setText(htmlContent);
                     responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
                     responseDTO.setCommentsNumber(idea.getCommentList().size());
                     return responseDTO;
@@ -345,6 +362,8 @@ public class IdeaServiceImpl implements IdeaService {
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
                     responseDTO.setUsername(user.getUsername());
+                    String htmlContent = htmlService.markdownToHtml(ideaRepository.findById(idea.getId()).get().getText());
+                    responseDTO.setText(htmlContent);
                     responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
                     responseDTO.setCommentsNumber(idea.getCommentList().size());
                     return responseDTO;
@@ -399,8 +418,9 @@ public class IdeaServiceImpl implements IdeaService {
         }
         if (ratingAvg != null) {
             float rating = Float.parseFloat(ratingAvg);
-            float upperBound = rating < 5.0f ? rating + 0.99f : 5.0f;
-            predicatesList.add(cb.between(root.get("ratingAvg"), rating, upperBound));
+            float lowerBound = rating;
+            float upperBound = rating + 0.99f;
+            predicatesList.add(cb.between(root.get("ratingAvg"), lowerBound, upperBound));
         }
         predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
         List<Order> orders = new ArrayList<>();
@@ -426,6 +446,8 @@ public class IdeaServiceImpl implements IdeaService {
             List<IdeaResponseDTO> allIdeasDTO = pagedIdeas.stream().map(idea -> {
                 IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
                 ideaResponseDTO.setUsername(idea.getUser().getUsername());
+                String htmlContent = htmlService.markdownToHtml(ideaRepository.findById(idea.getId()).get().getText());
+                ideaResponseDTO.setText(htmlContent);
                 ideaResponseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
                 ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
                 return ideaResponseDTO;
@@ -437,6 +459,8 @@ public class IdeaServiceImpl implements IdeaService {
         List<IdeaResponseDTO> allIdeasUnpaged = allIdeas.stream().map(idea -> {
             IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
             ideaResponseDTO.setUsername(idea.getUser().getUsername());
+            String htmlContent = htmlService.markdownToHtml(ideaRepository.findById(idea.getId()).get().getText());
+            ideaResponseDTO.setText(htmlContent);
             ideaResponseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
             ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
             return ideaResponseDTO;
@@ -584,6 +608,25 @@ public class IdeaServiceImpl implements IdeaService {
         return subscriptionDTOs;
     }
 
+    @Override
+    public List<RatingDTO> getAllRatings(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("User not found");
+        }
+
+        List<Rating> ratings = ratingRepository.findByUserId(userId);
+        List<RatingDTO> ratingDTOs = ratings.stream()
+                .map(rating -> {
+                    RatingDTO responseDTO = modelMapper.map(rating, RatingDTO.class);
+                    responseDTO.setIdeaId(rating.getIdea().getId());
+                    responseDTO.setUserId(rating.getUser().getId());
+                    responseDTO.setRating(rating.getRating());
+                    return responseDTO;
+                })
+                .toList();
+        return ratingDTOs;
+    }
+
 
     @Override
     public IdeaResponseDTO getIdeaByCommentId(Long commentId) {
@@ -596,10 +639,22 @@ public class IdeaServiceImpl implements IdeaService {
         return idea.map(i -> {
             IdeaResponseDTO responseDTO = modelMapper.map(i, IdeaResponseDTO.class);
             responseDTO.setUsername(i.getUser().getUsername());
+            String htmlContent = htmlService.markdownToHtml(ideaRepository.findById(i.getId()).get().getText());
+            responseDTO.setText(htmlContent);
             responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(i.getCreationDate()));
             responseDTO.setCommentsNumber(i.getCommentList().size());
             return responseDTO;
         }).orElseThrow(() -> new IdeaNotFoundException("Idea not found for the given comment/reply ID"));
+    }
+
+    @Override
+    public Long getNumberOfRatingsForIdea(Long ideaId) {
+        return ratingRepository.countByIdeaId(ideaId);
+    }
+
+    @Override
+    public List<Map<Long, Object>> getRatingsCountForEachIdea() {
+        return ratingRepository.countRatingsForEachIdea();
     }
 
 }
