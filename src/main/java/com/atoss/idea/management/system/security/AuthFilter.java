@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
@@ -30,6 +32,9 @@ public class AuthFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     private final SessionService sessionService;
+
+    @Value("${aims.app.publicRoutes}")
+    private String[] publicRoutes;
 
     /**
      * Performs filtering on the incoming HTTP request and response to set user information as a cookie.
@@ -54,9 +59,12 @@ public class AuthFilter extends OncePerRequestFilter {
             sessionService.extractToken(request, jwtService.getTokenConfig())
                     .ifPresent(
                             token -> {
-                                if (request.getRequestURI().contains("/api/v1/auth/")) {
+                                if (Arrays.stream(publicRoutes)
+                                        .map(route -> route.replaceAll("\\*", ""))
+                                        .anyMatch(route -> request.getRequestURI().contains(route))) {
                                     return;
                                 }
+
 
                                 String username = jwtService.extractUsername(token);
 
