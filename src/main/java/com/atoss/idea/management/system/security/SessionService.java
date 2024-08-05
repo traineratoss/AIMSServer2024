@@ -102,7 +102,7 @@ public class SessionService {
     /**
      * Extracts the session id from a HttpServletRequest
      * @param request The request containing the session header
-     * @return
+     * @return The session id from the header
      */
     public String extractSessionHeader(HttpServletRequest request) {
         return request.getHeader(sessionIDHeader);
