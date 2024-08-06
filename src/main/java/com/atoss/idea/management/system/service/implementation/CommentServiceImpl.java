@@ -447,21 +447,21 @@ public class CommentServiceImpl implements CommentService {
         String commentText = commentRepository.findById(commentId).get().getCommentText();
         Comment comment = commentRepository.findById(commentId).get();
 
-       if(comment.getIdea() != null){
-           Long ideaId = comment.getIdea().getId();
-           List<Long> subscribedUsersIds = subscriptionRepository.findUserIdByIdeaId(ideaId);
+        if (comment.getIdea() != null) {
+            Long ideaId = comment.getIdea().getId();
+            List<Long> subscribedUsersIds = subscriptionRepository.findUserIdByIdeaId(ideaId);
 
-           List<User> subscribedUsers = new ArrayList<>();
+            List<User> subscribedUsers = new ArrayList<>();
 
 
-           for (Long userId : subscribedUsersIds) {
-               subscribedUsers.add(userRepository.findById(userId).get());
-           }
+            for (Long userId : subscribedUsersIds) {
+                subscribedUsers.add(userRepository.findById(userId).get());
+            }
 
-           if (!subscribedUsers.isEmpty()) {
-               sendEmailService.sendEmailDeletedComment(subscribedUsers, commentId, commentText);
-           }
-       }
+            if (!subscribedUsers.isEmpty()) {
+                sendEmailService.sendEmailDeletedComment(subscribedUsers, commentId, commentText);
+            }
+        }
         commentRepository.deleteById(commentId);
     }
 
