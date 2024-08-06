@@ -427,4 +427,14 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * Retrieves the avatar of a user by their username.
+     *
+     * @param username the username of the user whose avatar is to be retrieved.
+     * @return a ResponseEntity containing the ImageDTO of the user's avatar and an HTTP status of OK.
+     */
+    @GetMapping("/get-avatar-by-username")
+    public ResponseEntity<ImageDTO> getAvatarByUsername(@RequestParam(name = "username") String username) {
+        return new ResponseEntity<>(userService.getAvatarByUsername(username), HttpStatus.OK);
+    }
 }
