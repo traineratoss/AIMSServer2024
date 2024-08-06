@@ -3,13 +3,7 @@ package com.atoss.idea.management.system.service.implementation;
 import com.atoss.idea.management.system.exception.*;
 import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
-import com.atoss.idea.management.system.repository.dto.UserAdminDashboardResponseDTO;
-import com.atoss.idea.management.system.repository.dto.UserPageDTO;
-import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
-import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
-import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
-import com.atoss.idea.management.system.repository.dto.VerifyOtpDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.OTP;
 import com.atoss.idea.management.system.repository.entity.Role;
@@ -369,5 +363,12 @@ public class UserServiceImpl implements UserService {
 
         user.setIsFirstLogin(false);
         userRepository.save(user);
+    }
+
+    @Override
+    public ImageDTO getAvatarByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
+        return user.getImage();
     }
 }

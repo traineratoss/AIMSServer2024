@@ -4,6 +4,8 @@ import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.ReviewStatus;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequestMapping("/aims/api/v1/ideas")
 public class CommentController {
 
+    private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
     private final CommentService commentService;
 
     /**
@@ -44,10 +47,15 @@ public class CommentController {
     @PostMapping("/comments")
     @ResponseBody
     public ResponseEntity<ResponseCommentDTO> addComment(@RequestBody RequestCommentDTO newComment) throws UnsupportedEncodingException {
-
-        ResponseCommentDTO responseCommentDTO = commentService.addComment(newComment);
-
-        return new ResponseEntity<ResponseCommentDTO>(responseCommentDTO, HttpStatus.OK);
+        logger.info("Received request to add comment: {}", newComment);
+        try {
+            ResponseCommentDTO responseCommentDTO = commentService.addComment(newComment);
+            logger.debug("Successfully added comment: {}", responseCommentDTO);
+            return new ResponseEntity<>(responseCommentDTO, HttpStatus.OK);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Error adding comment: {}", e.getMessage());
+            throw e;
+        }
     }
 
     /**
@@ -77,19 +85,19 @@ public class CommentController {
      * The CommentService method "getAllPagedCommentsByIdeaId" gets all the comments that belong to a certain idea in the pageable object format
      * In the end, a ResponseEntity is returned
      *
-     * @param ideaId the unique identifier for the idea we are searching for
-     * @param pageSize how many elements will be displayed on the page
-     * @param pageNumber the page accesed
+     * @param ideaId       the unique identifier for the idea we are searching for
+     * @param pageSize     how many elements will be displayed on the page
+     * @param pageNumber   the page accesed
      * @param sortCategory DESC so that we get the comments from newest to oldest
      * @return ResponseEntity with the resulted paginated list and the HttpStatus
      */
     @Transactional
     @GetMapping("/comments")
-    public  ResponseEntity<Page<ResponseCommentDTO>> getAllCommentsByIdeaIdWithPaging(
-                                                                 @RequestParam(required = true) Long ideaId,
-                                                                 @RequestParam(required = true) int pageSize,
-                                                                 @RequestParam(required = true) int pageNumber,
-                                                                 @RequestParam(required = true) String sortCategory) {
+    public ResponseEntity<Page<ResponseCommentDTO>> getAllCommentsByIdeaIdWithPaging(
+            @RequestParam(required = true) Long ideaId,
+            @RequestParam(required = true) int pageSize,
+            @RequestParam(required = true) int pageNumber,
+            @RequestParam(required = true) String sortCategory) {
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
 
@@ -103,18 +111,18 @@ public class CommentController {
      * The CommentService method "getAllRepliesByCommentId" gets all the replies that belong to a certain comment in the pageable object format
      * In the end, a ResponseEntity is returned
      *
-     * @param commentId the unique identifier for the comment we are searching for
-     * @param pageSize how many elements will be displayed on the page
-     * @param pageNumber the page accesed
+     * @param commentId    the unique identifier for the comment we are searching for
+     * @param pageSize     how many elements will be displayed on the page
+     * @param pageNumber   the page accesed
      * @param sortCategory DESC so that we get the replies from newest to oldest
      * @return ResponseEntity with the resulted paginated list and the HttpStatus
      */
     @Transactional
     @GetMapping("/comments/replies")
     public ResponseEntity<Page<ResponseCommentReplyDTO>> getAllRepliesByCommentId(@RequestParam(name = "commentId") Long commentId,
-                                                                  @RequestParam(required = true) int pageSize,
-                                                                  @RequestParam(required = true) int pageNumber,
-                                                                  @RequestParam(required = true) String sortCategory) {
+                                                                                  @RequestParam(required = true) int pageSize,
+                                                                                  @RequestParam(required = true) int pageNumber,
+                                                                                  @RequestParam(required = true) String sortCategory) {
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
 
@@ -213,7 +221,7 @@ public class CommentController {
      */
     @Transactional
     @DeleteMapping("/comments/report/delete/{commentId}/{userId}")
-    public  ResponseEntity<String> deleteReport(@PathVariable Long commentId, @PathVariable Long userId) {
+    public ResponseEntity<String> deleteReport(@PathVariable Long commentId, @PathVariable Long userId) {
         commentService.deleteReport(commentId, userId);
         return new ResponseEntity<>("Report succesfully deleted", HttpStatus.OK);
     }
@@ -236,7 +244,7 @@ public class CommentController {
      * Checks if a report exists for a given comment ID and user ID.
      *
      * @param commentId the ID of the comment
-     * @param userId the ID of the user
+     * @param userId    the ID of the user
      * @return {@code true} if a report exists for the given comment ID and user ID, otherwise {@code false}
      */
     @GetMapping("/comments/report/find/{commentId}/{userId}")
@@ -259,14 +267,14 @@ public class CommentController {
     /**
      * Retrieves all comments sorted by the number of reports.
      *
-     * @param pageSize    the number of comments per page
-     * @param pageNumber  the page number to retrieve
+     * @param pageSize   the number of comments per page
+     * @param pageNumber the page number to retrieve
      * @return ResponseEntity with a CommentPageDTO containing the comments
      */
 
     @GetMapping("/comments/allByReportsNr")
     public ResponseEntity<CommentPageDTO> getAllCommentsByReportsNr(@RequestParam(required = true) int pageSize,
-                                                            @RequestParam(required = true) int pageNumber) {
+                                                                    @RequestParam(required = true) int pageNumber) {
         return new ResponseEntity<>(
                 commentService.getAllCommentsByReportsNr(
                         PageRequest.of(
@@ -285,6 +293,7 @@ public class CommentController {
      *
      * This method handles the HTTP POST request to add a report for a comment by a user
      * It calls the CommentService to perform the actual report addition logic
+     *
      * @param commentId the ID of the comment
      * @param userId    the ID of the user
      * @return ResponseEntity containing a success message if the report is added successfully
@@ -311,7 +320,7 @@ public class CommentController {
         }
         commentService.deleteReportsByCommentId(commentId);
         commentService.displayPlaceholder(commentId);
-        return new ResponseEntity<>("Comment with id "  +  commentId  +  " is under review by admin", HttpStatus.OK);
+        return new ResponseEntity<>("Comment with id " + commentId + " is under review by admin", HttpStatus.OK);
     }
 
     /**
@@ -334,12 +343,12 @@ public class CommentController {
      * The endpoint for this method is "/comments/reports/review/set".
      *
      * @param reviewStatus the new review status to be set for the comment, passed as a request parameter
-     * @param commentId the ID of the comment whose review status is to be updated, passed as a request parameter
+     * @param commentId    the ID of the comment whose review status is to be updated, passed as a request parameter
      * @throws IllegalArgumentException if the commentId or reviewStatus is null
      */
     @Transactional
     @PatchMapping("/comments/reports/review/set")
-    public void setReviewStatusByCommentId(@RequestParam(required = true) ReviewStatus reviewStatus, @RequestParam(required = true) Long commentId)  {
+    public void setReviewStatusByCommentId(@RequestParam(required = true) ReviewStatus reviewStatus, @RequestParam(required = true) Long commentId) {
         commentService.setReviewStatusByCommentId(reviewStatus, commentId);
     }
 
@@ -353,13 +362,14 @@ public class CommentController {
      * @throws IllegalArgumentException if the commentId is null
      */
     @GetMapping("/comments/reports/review/get/{commentId}")
-    public ResponseEntity<ReviewStatus> getReviewStatusByCommentId(@PathVariable  Long commentId) {
+    public ResponseEntity<ReviewStatus> getReviewStatusByCommentId(@PathVariable Long commentId) {
         ReviewStatus reviewStatus = commentService.getReviewStatusByCommentId(commentId);
         return ResponseEntity.ok(reviewStatus);
     }
 
     /**
      * Retrieves the number of likes from table.
+     *
      * @return a ResponseEntity containing the number of likes
      */
     @GetMapping("/likes/count")
