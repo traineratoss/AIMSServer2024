@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -45,12 +44,7 @@ public class DocumentController {
     public ResponseEntity<List<DocumentDTO>> addDocument(@RequestParam("files") MultipartFile[] files,
                                                          @RequestParam Long ideaId,
                                                          @RequestParam Long userId) throws IOException {
-        List<DocumentDTO> documentDTOs = new ArrayList<>();
-        for (MultipartFile file : files) {
-            DocumentDTO documentDTO = documentService.addDocument(file, ideaId, userId);
-            documentDTOs.add(documentDTO);
-        }
-        return new ResponseEntity<>(documentDTOs, HttpStatus.OK);
+        return new ResponseEntity<>(documentService.addDocument(files, ideaId, userId), HttpStatus.OK);
     }
 
 

@@ -1,5 +1,6 @@
 package com.atoss.idea.management.system.repository.entity;
 
+import com.atoss.idea.management.system.repository.dto.ImageDTO;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -67,6 +68,10 @@ public class User {
     @Column(name = "is_first_login")
     private Boolean isFirstLogin;
 
+    @Column(name = "custom_avatar")
+    @Embedded
+    private ImageDTO image;
+
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(
             name = "likes",
@@ -100,6 +105,9 @@ public class User {
 
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private RefreshToken refreshToken;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Session sessionId;
 
     /**
      * Constructor for creating a User object with the provided username and email.

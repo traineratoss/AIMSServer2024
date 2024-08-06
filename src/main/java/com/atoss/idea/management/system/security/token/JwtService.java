@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.security;
+package com.atoss.idea.management.system.security.token;
 
 import com.atoss.idea.management.system.repository.BlacklistedAccessTokenRepository;
 import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
@@ -11,6 +11,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -34,12 +35,12 @@ public class JwtService {
     @Value("${aims.app.jwt.secret}")
     private String secret;
 
-    @Value("${aims.app.jwt.accessTokenExpirationMs}")
-    private Long expirationMs;
-
     private final ObjectMapper objectMapper;
     private final UserService userService;
     private final BlacklistedAccessTokenRepository blacklistedAccessTokenRepository;
+
+    @Getter
+    private final AccessTokenConfig tokenConfig;
 
     /**
      * Extracts of any claim for JWT token
@@ -135,7 +136,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenConfig.getExpiryMs()))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

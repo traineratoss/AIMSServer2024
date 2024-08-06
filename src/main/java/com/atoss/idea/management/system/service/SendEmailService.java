@@ -101,14 +101,6 @@ public interface SendEmailService {
      */
     void sendEmailRatingChanged(String username, Long ideaId);
 
-    /**
-     * Sends an email to notify the subscribed users of a certain idea that its title has changed
-     *
-     *
-     * @param usernames The usernames of the users which are subscribed to the idea
-     * @param ideaId the id of the idea whose title has changed
-     */
-    void sendEmailChangedIdeaTitle(List<User> usernames, Long ideaId);
 
     /**
      * Sends an email to notify the subscribed users of a certain idea that its text has changed
@@ -116,8 +108,10 @@ public interface SendEmailService {
      *
      * @param usernames The usernames of the users which are subscribed to the idea
      * @param ideaId the id of the idea whose text has changed
+     * @param oldText the text of the idea before it was updated
+     * @param oldTitle the title of the idea before it was updated
      */
-    void sendEmailChangedIdeaText(List<User> usernames, Long ideaId);
+    void sendEmailUpdatedIdea(List<User> usernames, Long ideaId, String oldText, String oldTitle);
 
     /**
      * Sends an email to notify the subscribed users of a certain idea that its comment has changed

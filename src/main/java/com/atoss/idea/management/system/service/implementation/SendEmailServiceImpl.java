@@ -101,37 +101,18 @@ public class SendEmailServiceImpl implements SendEmailService {
 
 
     /**
-     * Sends an email to notify the subscribed users of a certain idea that its text has changed
+     * Sends an email to notify the subscribed users of a certain idea that it has been updated
      *
      * @param usernames The usernames of the users which are subscribed to the idea
      * @param ideaId    the id of the idea whose text has changed
+     * @param oldText the text of the idea before it was updated
+     * @param oldTitle the title of the idea before it was updated
      */
-    public void sendEmailChangedIdeaText(List<User> usernames, Long ideaId) {
+    public void sendEmailUpdatedIdea(List<User> usernames, Long ideaId, String oldText, String oldTitle) {
         Idea idea = ideaRepository.findById(ideaId).get();
         for (User user : usernames) {
             String username = user.getUsername();
-            sendEmailIdeaSubscription("text-change-subscription-template.ftl", username, idea.getTitle(), idea.getText(), ideaId, "Idea text change");
-        }
-    }
-
-    /**
-     * Sends an email to notify the subscribed users of a certain idea that its title has changed
-     *
-     * @param usernames The usernames of the users which are subscribed to the idea
-     * @param ideaId    the id of the idea whose title has changed
-     */
-    public void sendEmailChangedIdeaTitle(List<User> usernames, Long ideaId) {
-        Idea idea = ideaRepository.findById(ideaId).get();
-        for (User user : usernames) {
-            String username = user.getUsername();
-            sendEmailIdeaSubscription(
-                    "title-change-subscription-template.ftl",
-                    username,
-                    idea.getTitle(),
-                    idea.getText(),
-                    ideaId,
-                    "Idea title change"
-            );
+            sendEmailIdeaSubscription("text-change-subscription-template.ftl", username, oldTitle, oldText, ideaId, "AIMS Updated Idea");
         }
     }
 
@@ -306,7 +287,7 @@ public class SendEmailServiceImpl implements SendEmailService {
         }
     }
 
-    private void sendEmailIdeaSubscription(String fileName, String username, String title, String text, Long ideaId, String subject) {
+    private void sendEmailIdeaSubscription(String fileName, String username, String oldTitle, String oldText, Long ideaId, String subject) {
         User user = getUserByUsername(username);
         String emailTo = user.getEmail();
         Idea idea = getIdeaById(ideaId);
@@ -317,6 +298,8 @@ public class SendEmailServiceImpl implements SendEmailService {
         mapUser.put("companyName", companyName);
         mapUser.put("newTitle", idea.getTitle());
         mapUser.put("newText", idea.getText());
+        mapUser.put("oldText", oldText);
+        mapUser.put("oldTitle", oldTitle);
         mapUser.put("imageUrl", "./welcome.jpg");
         try {
             Template template = configuration.getTemplate(fileName);
@@ -402,6 +385,48 @@ public class SendEmailServiceImpl implements SendEmailService {
             sendEmail(emailTo, subject, htmlTemplate);
         } catch (IOException | TemplateException exception) {
             System.out.println(exception.getMessage());
+        }
+    }
+
+    private void sendEmailAddedDocument(String fileName, String username, Long ideaId, String files, String subject) {
+        User user = getUserByUsername(username);
+        String emailTo = user.getEmail();
+        Idea idea = getIdeaById(ideaId);
+
+        Map<String, Object> mapDocuments = new HashMap<>();
+        mapDocuments.put("username", username);
+        mapDocuments.put("email", user.getEmail());
+        mapDocuments.put("companyName", companyName);
+        mapDocuments.put("title", idea.getTitle());
+        mapDocuments.put("fileNames", files);
+        mapDocuments.put("imageUrl", "./welcome.jpg");
+        try {
+            Template template = configuration.getTemplate(fileName);
+            String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapDocuments);
+            sendEmail(emailTo, subject, htmlTemplate);
+        } catch (IOException | TemplateException exception) {
+            System.out.println(exception.getMessage());
+        }
+    }
+
+    /**
+     * Sends an email when a document is added
+     *
+     * @param ideaId The id of the idea to retrieve.
+     * @param usernames the usernames of the users who are subscribed to the idea
+     * @param fileNames the document names that have been added
+     */
+    public void sendEmailIdeaDocuments(List<User> usernames, Long ideaId, List<Document> fileNames) {
+        Idea idea = ideaRepository.findById(ideaId).get();
+        //List<Document> names = idea.getDocumentList();
+        String files = new String();
+        for (Document docs : fileNames) {
+            files = files + "\n" + docs.getFileName() + "\n";
+        }
+
+        for (User user : usernames) {
+            String username = user.getUsername();
+            sendEmailAddedDocument("added-documents-subscription-template.ftl", username, ideaId, files, "AIMS Updated Idea");
         }
     }
 }

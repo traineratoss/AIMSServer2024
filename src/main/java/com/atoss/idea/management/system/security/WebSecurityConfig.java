@@ -1,7 +1,9 @@
 package com.atoss.idea.management.system.security;
 
 import com.atoss.idea.management.system.repository.entity.Role;
+import com.atoss.idea.management.system.security.token.JwtService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,9 +31,13 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     private final JwtService jwtService;
 
-    private CookieService cookieService;
+    private final SessionService sessionService;
 
+    @Value("${aims.app.publicRoutes}")
+    private String[] publicRoutes;
 
+    @Value("${aims.app.privateRoutes}")
+    private String[] privateRoutes;
 
 
     /**
@@ -54,7 +60,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
      */
     @Bean
     public AuthFilter authenticationJwtTokenFilter() {
-        return new AuthFilter(jwtService, userDetailsService, cookieService);
+        return new AuthFilter(jwtService, userDetailsService, sessionService);
     }
 
     /**
@@ -102,23 +108,11 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->
-                        req.requestMatchers(
-                                "/api/v1/auth/**",
-                                        "/users/change-password/**",
-                                        "/users/verify-otp",
-                                        "/users/send-forgot-password")
+                        req.requestMatchers(publicRoutes)
                                 .permitAll()
                                 .requestMatchers(HttpMethod.OPTIONS, "/**")
                                 .permitAll()
-                                .requestMatchers(
-                                        "/users/all",
-                                        "/users/update-profile",
-                                        "/users/idByUsername",
-                                        "/aims/api/v1/ideas/**",
-                                        "/aims/api/v1/documents/**",
-                                        "/aims/api/v1/avatars/**",
-                                        "/aims/api/v1/images/**",
-                                        "/aims/api/v1/statistics/**")
+                                .requestMatchers(privateRoutes)
                                 .hasAnyRole(Role.STANDARD.name(), Role.ADMIN.name())
                                 .requestMatchers("/**")
                                 .hasRole(Role.ADMIN.name())

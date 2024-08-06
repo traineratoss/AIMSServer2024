@@ -18,7 +18,7 @@ public interface DocumentService {
      * @return it returns an DocumentDTO that represents the added document data.
      * @throws IOException it throws when the I/O operation fails, or it was interrupted.
      */
-    DocumentDTO addDocument(MultipartFile file, Long ideaId, Long userId) throws IOException;
+    List<DocumentDTO> addDocument(MultipartFile[] file, Long ideaId, Long userId) throws IOException;
 
     /**
      * Gets the document that is requested by the id of the document.
