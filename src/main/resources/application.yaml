@@ -6,12 +6,14 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    show-sql: true
+#    show-sql: true
     hibernate:
       ddl-auto: update
       default-schema: public
     properties:
       dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate: show_sql=false
+
 
   mail:
     default-encoding: UTF-8
@@ -55,6 +57,7 @@ aims:
 logging:
   level:
     root: INFO
+
 
 cors:
   allowedOrigins: "http://localhost:5173"

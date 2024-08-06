@@ -1,0 +1,35 @@
+2024-08-06 13:45:14 [main] INFO  c.a.i.m.s.AtossIdeaManagementSystemApplication - Starting AtossIdeaManagementSystemApplication using Java 17.0.2 with PID 3792 (C:\Users\tarisadm\Desktop\AIMSServer2024\target\classes started by tarisadm in C:\Users\tarisadm\Desktop\AIMSServer2024)
+2024-08-06 13:45:14 [main] INFO  c.a.i.m.s.AtossIdeaManagementSystemApplication - No active profile set, falling back to 1 default profile: "default"
+2024-08-06 13:45:17 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2024-08-06 13:45:18 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 247 ms. Found 12 JPA repository interfaces.
+2024-08-06 13:45:19 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+2024-08-06 13:45:19 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2024-08-06 13:45:19 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2024-08-06 13:45:19 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.11]
+2024-08-06 13:45:19 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2024-08-06 13:45:19 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 4974 ms
+2024-08-06 13:45:20 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2024-08-06 13:45:20 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.2.6.Final
+2024-08-06 13:45:20 [main] INFO  org.hibernate.cfg.Environment - HHH000406: Using bytecode reflection optimizer
+2024-08-06 13:45:20 [main] INFO  o.h.b.i.BytecodeProviderInitiator - HHH000021: Bytecode provider name : bytebuddy
+2024-08-06 13:45:21 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2024-08-06 13:45:21 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2024-08-06 13:45:21 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@636dbfe7
+2024-08-06 13:45:21 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2024-08-06 13:45:22 [main] INFO  o.h.b.i.BytecodeProviderInitiator - HHH000021: Bytecode provider name : bytebuddy
+2024-08-06 13:45:24 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2024-08-06 13:45:25 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2024-08-06 13:45:26 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2024-08-06 13:45:28 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-08-06 13:45:29 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@765d2d4d, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@377fca35, org.springframework.security.web.context.SecurityContextHolderFilter@4a547f9d, org.springframework.security.web.header.HeaderWriterFilter@22938166, org.springframework.security.web.authentication.logout.LogoutFilter@660dcd17, com.atoss.idea.management.system.security.AuthFilter@47cf41d7, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@1dbb3001, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@d6de944, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@7a9df9b2, org.springframework.security.web.session.SessionManagementFilter@3f41a1f3, org.springframework.security.web.access.ExceptionTranslationFilter@519f6adb, org.springframework.security.web.access.intercept.AuthorizationFilter@737652a9]
+2024-08-06 13:45:29 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2024-08-06 13:45:29 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+2024-08-06 13:45:29 [main] INFO  c.a.i.m.s.AtossIdeaManagementSystemApplication - Started AtossIdeaManagementSystemApplication in 16.955 seconds (process running for 17.943)
+2024-08-06 13:46:01 [http-nio-8080-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2024-08-06 13:46:01 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2024-08-06 13:46:01 [http-nio-8080-exec-2] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 0 ms
+2024-08-06 13:47:24 [http-nio-8080-exec-8] INFO  c.a.i.m.s.c.CommentController - Received request to add comment: RequestCommentDTO(username=adrian22, ideaId=2, commentText=iiiiiiiiiiiiiiiiiiiii)
+2024-08-06 13:47:24 [http-nio-8080-exec-8] DEBUG c.a.i.m.s.c.CommentController - Successfully added comment: ResponseCommentDTO(id=702, username=adrian22, ideaId=2, commentText=iiiiiiiiiiiiiiiiiiiii, hasReplies=false, elapsedTime=null)
+2024-08-06 13:50:00 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2024-08-06 13:50:00 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2024-08-06 13:50:00 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
