@@ -89,6 +89,7 @@ public class UserServiceImpl implements UserService {
         user.setIsFirstLogin(true);
         userRepository.save(user);
         sendEmailService.sendEmailToUser(username);
+        sendEmailService.sendEmailToAdmins(username);
 
         return modelMapper.map(user, UserResponseDTO.class);
     }
