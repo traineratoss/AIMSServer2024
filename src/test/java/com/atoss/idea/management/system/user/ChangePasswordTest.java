@@ -1,6 +1,7 @@
 package com.atoss.idea.management.system.user;
 
 import com.atoss.idea.management.system.controller.UserController;
+import com.atoss.idea.management.system.exception.IncorrectPasswordException;
 import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
@@ -24,6 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 
@@ -106,10 +108,9 @@ public class ChangePasswordTest {
         Mockito.when(mockUserRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
         Mockito.when(mockUserRepository.save(any(User.class))).thenReturn(user);
 
-        ResponseEntity<Object> response = spyUserController.changePassword(changePasswordDTO);
-
-        Mockito.verify(spyUserController).changePassword(changePasswordDTO);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertThrows(IncorrectPasswordException.class, () -> {
+            spyUserController.changePassword(changePasswordDTO);
+            Mockito.verify(spyUserController).changePassword(changePasswordDTO);
+        });
     }
 }

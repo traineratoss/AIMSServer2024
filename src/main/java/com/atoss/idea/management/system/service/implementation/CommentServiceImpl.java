@@ -227,11 +227,12 @@ public class CommentServiceImpl implements CommentService {
         newComment.setIdea(idea);
         newComment.setParent(null);
         newComment.setCommentText(requestCommentDTO.getCommentText());
-        String htmlContent = htmlService.markdownToHtml(requestCommentDTO.getCommentText());
-        newComment.setCommentText(htmlContent);
+
         newComment.setCreationDate(creationDate);
         String filteredCommentText = filterBadWords(newComment.getCommentText());
-        newComment.setCommentText(filteredCommentText);
+        String htmlContent = htmlService.markdownToHtml(filteredCommentText);
+
+        newComment.setCommentText(htmlContent);
 
         commentRepository.save(newComment);
 
@@ -444,24 +445,27 @@ public class CommentServiceImpl implements CommentService {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
-        String commentText = commentRepository.findById(commentId).get().getCommentText();
+
+
+        Optional<Comment> optionalComment = commentRepository.findById(commentId);
+        String commentText = optionalComment.get().getCommentText();
         Comment comment = commentRepository.findById(commentId).get();
 
-       if(comment.getIdea() != null){
-           Long ideaId = comment.getIdea().getId();
-           List<Long> subscribedUsersIds = subscriptionRepository.findUserIdByIdeaId(ideaId);
+        if (comment.getIdea() != null) {
+            Long ideaId = comment.getIdea().getId();
+            List<Long> subscribedUsersIds = subscriptionRepository.findUserIdByIdeaId(ideaId);
 
-           List<User> subscribedUsers = new ArrayList<>();
+            List<User> subscribedUsers = new ArrayList<>();
 
 
-           for (Long userId : subscribedUsersIds) {
-               subscribedUsers.add(userRepository.findById(userId).get());
-           }
+            for (Long userId : subscribedUsersIds) {
+                subscribedUsers.add(userRepository.findById(userId).get());
+            }
 
-           if (!subscribedUsers.isEmpty()) {
-               sendEmailService.sendEmailDeletedComment(subscribedUsers, commentId, commentText);
-           }
-       }
+            if (!subscribedUsers.isEmpty()) {
+                sendEmailService.sendEmailDeletedComment(subscribedUsers, commentId, commentText);
+            }
+        }
         commentRepository.deleteById(commentId);
     }
 
@@ -703,5 +707,16 @@ public class CommentServiceImpl implements CommentService {
         }
         return commentRepository.getReviewStatusByCommentId(commentId);
     }
+
+    @Override
+    public Long countNumberOfLikes() {
+        return commentRepository.countAllLikes();
+    }
+
+    @Override
+    public Long countNumberOfReports() {
+        return commentRepository.countAllReports();
+    }
+
 
 }

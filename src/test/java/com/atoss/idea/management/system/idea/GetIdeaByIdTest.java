@@ -7,6 +7,7 @@ import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
+import com.atoss.idea.management.system.service.implementation.HtmlServiceImpl;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,8 @@ public class GetIdeaByIdTest {
     @Mock
     private IdeaRepository ideaRepository;
 
+    @Mock
+    private HtmlServiceImpl htmlService;
     @InjectMocks
     public IdeaServiceImpl ideaService;
 

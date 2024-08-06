@@ -6,6 +6,7 @@ import com.atoss.idea.management.system.repository.dto.AvatarDTO;
 import com.atoss.idea.management.system.service.AvatarService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class AvatarServiceImpl implements AvatarService {
     private final UserRepository userRepository;
     private final AvatarRepository avatarRepository;
     private final ModelMapper modelMapper;
+
 
     /**
      * Constructs a new instance of the AvatarServiceImpl.
@@ -27,7 +29,9 @@ public class AvatarServiceImpl implements AvatarService {
      * @param avatarRepository The AvatarRepository instance for accessing avatar data.
      * @param modelMapper      The ModelMapper instance for mapping objects between different types.
      */
-    public AvatarServiceImpl(UserRepository userRepository, AvatarRepository avatarRepository, ModelMapper modelMapper) {
+    public AvatarServiceImpl(UserRepository userRepository,
+                             AvatarRepository avatarRepository,
+                             ModelMapper modelMapper) {
         this.userRepository = userRepository;
         this.avatarRepository = avatarRepository;
         this.modelMapper = modelMapper;
