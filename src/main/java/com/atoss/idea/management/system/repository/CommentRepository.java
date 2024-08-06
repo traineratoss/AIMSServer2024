@@ -19,8 +19,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     /**
      * Deletes report associated with a specific comment and user.
+     *
      * @param commentId the unique identifier of the comment for which reports should be deleted
-     * @param userId the unique identifier of the user associated with the reports to be deleted
+     * @param userId    the unique identifier of the user associated with the reports to be deleted
      */
     @Transactional
     @Modifying
@@ -30,10 +31,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     /**
      * Overwriting default "findAllById" CRUD method in order to return a Page of type Comment
-     *
+     * <p>
      * Method returns a Page of comments that belong to a certain idea
      *
-     * @param ideaId the unique identifier for the idea we are working with
+     * @param ideaId   the unique identifier for the idea we are working with
      * @param pageable the Pageable object containing pagination information
      * @return Page of type Comment with the comments of the desired idea
      */
@@ -41,7 +42,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     /**
      * Overwriting default "findAllById" CRUD method in order to return a Page of type Comment
-     *
+     * <p>
      * Method returns a Page of replies that belong to a certain comment
      *
      * @param parentId the unique identifier for the comment we are working with
@@ -73,7 +74,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * gets the most commented ideas id's
      *
      * @param selectedDateFrom date from which we select
-     * @param selectedDateTo data up to selection
+     * @param selectedDateTo   data up to selection
      * @return a list containing idea-id's of the most commented ideas between given dates
      */
     @Query(value = " select comment.idea_id, count(*) as noOfComments from comment "
@@ -115,7 +116,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Long> mostCommentedIdeas();
 
 
-
     /**
      * gets the most replied comments up to a limit , not used atm
      * Usage : in the future if there is a need to see an idea with many replies
@@ -133,9 +133,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * Function to get number of replies and comments created in a specific time interval
      *
      * @param selectedDateFrom date from which we select
-     * @param selectedDateTo data up to selection
+     * @param selectedDateTo   data up to selection
      * @return An array with 2 elements , on index 0 we have Replies and on index 1 Comments
-     *
      */
     @Query(value = " select count(*) from comment c "
             +
@@ -167,7 +166,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Modifying
     @Query(value = "DELETE FROM likes WHERE user_id = :userId AND comment_id = :commentId", nativeQuery = true)
-    void deleteLikes(@Param("commentId")Long commentId, @Param("userId")Long userId);
+    void deleteLikes(@Param("commentId") Long commentId, @Param("userId") Long userId);
 
 
     /**
@@ -181,17 +180,19 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     /**
      * Counts the number of reports.
+     *
      * @return the number of reports.
      */
-    @Query(value="SELECT COUNT(*) FROM reports", nativeQuery=true)
+    @Query(value = "SELECT COUNT(*) FROM reports", nativeQuery = true)
     Long countAllReports();
 
 
     /**
      * Counts the number of likes.
+     *
      * @return the number of likes.
      */
-    @Query(value="SELECT COUNT(*) FROM likes", nativeQuery=true)
+    @Query(value = "SELECT COUNT(*) FROM likes", nativeQuery = true)
     Long countAllLikes();
 
 
@@ -209,7 +210,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      * Checks if a report exists for a given comment ID and user ID.
      *
      * @param commentId the ID of the comment
-     * @param userId the ID of the user
+     * @param userId    the ID of the user
      * @return {@code true} if a report exists for the given comment ID and user ID, otherwise {@code false}
      */
     @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END FROM User u JOIN u.reportedComments l WHERE u.id = :userId AND l.id = :commentId")

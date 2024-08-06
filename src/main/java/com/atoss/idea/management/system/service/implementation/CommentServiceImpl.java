@@ -709,14 +709,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Long countNumberOfLikes()
-    {
+    public Long countNumberOfLikes() {
         return commentRepository.countAllLikes();
     }
 
     @Override
-    public Long countNumberOfReports()
-    {
+    public Long countNumberOfReports() {
         return commentRepository.countAllReports();
     }
 
