@@ -81,6 +81,7 @@ public class UserServiceImpl implements UserService {
         user.setIsFirstLogin(true);
         userRepository.save(user);
         sendEmailService.sendEmailToUser(username);
+        sendEmailService.sendEmailToAdmins(username);
 
         return modelMapper.map(user, UserResponseDTO.class);
     }
@@ -234,8 +235,11 @@ public class UserServiceImpl implements UserService {
             throw new BadCredentialsException("Expired OTP");
         }
 
+        user.setIsFirstLogin(true);
         user.setOtp(null);
         user.setIsFirstLogin(true);
+
+        userRepository.save(user);
 
         userRepository.save(user);
 
