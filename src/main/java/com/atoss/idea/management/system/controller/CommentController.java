@@ -366,8 +366,7 @@ public class CommentController {
     public ResponseEntity<Long> getNumberOfLikes()
     {
         Long number= commentService.countNumberOfLikes();
-        System.out.println(number);
-        return new ResponseEntity("The number of likes is "+ number,HttpStatus.OK);
+        return new ResponseEntity(number,HttpStatus.OK);
     }
 
     /**
@@ -378,8 +377,7 @@ public class CommentController {
     public ResponseEntity<Long> getNumberOfReports()
     {
         Long number= commentService.countNumberOfReports();
-        System.out.println(number);
-        return new ResponseEntity("The number of likes is "+ number,HttpStatus.OK);
+        return new ResponseEntity(number,HttpStatus.OK);
     }
 
 
