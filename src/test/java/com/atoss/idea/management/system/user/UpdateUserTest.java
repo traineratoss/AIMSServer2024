@@ -64,6 +64,7 @@ public class UpdateUserTest {
         spyUserController = spy(new UserController(spyUserService, mockSendEmailService));
 
         userUpdateDTO = new UserUpdateDTO();
+        userUpdateDTO.setUpdatedImage(false);
         user = new User();
     }
 

@@ -112,6 +112,9 @@ public class UserServiceImpl implements UserService {
                     );
             user.setAvatar(modelMapper.map(avatar, Avatar.class));
         }
+        if (userUpdateDTO.getUpdatedImage()) {
+            user.setImage(userUpdateDTO.getImage());
+        }
         if (userUpdateDTO.getFullName() != null) {
             user.setFullName(userUpdateDTO.getFullName());
         }
