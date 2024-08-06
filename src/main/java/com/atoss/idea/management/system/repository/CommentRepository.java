@@ -179,6 +179,21 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT COUNT(l) FROM User u JOIN u.likedComments l WHERE l.id = :commentId")
     int countLikesByCommentId(@Param("commentId") Long commentId);
 
+    /**
+     * Counts the number of reports.
+     * @return the number of reports.
+     */
+    @Query(value="SELECT COUNT(*) FROM reports", nativeQuery=true)
+    Long countAllReports();
+
+
+    /**
+     * Counts the number of likes.
+     * @return the number of likes.
+     */
+    @Query(value="SELECT COUNT(*) FROM likes", nativeQuery=true)
+    Long countAllLikes();
+
 
     /**
      * Checks if a like exists for a given user and comment.

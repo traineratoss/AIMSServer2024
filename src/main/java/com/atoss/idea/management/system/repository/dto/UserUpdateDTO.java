@@ -8,4 +8,6 @@ public class UserUpdateDTO {
     private String fullName;
     private String email;
     private Long avatarId;
+    private ImageDTO image;
+    private Boolean updatedImage;
 }
