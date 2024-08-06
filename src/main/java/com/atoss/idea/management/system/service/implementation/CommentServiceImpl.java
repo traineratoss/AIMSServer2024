@@ -702,4 +702,17 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.getReviewStatusByCommentId(commentId);
     }
 
+    @Override
+    public Long countNumberOfLikes()
+    {
+        return commentRepository.countAllLikes();
+    }
+
+    @Override
+    public Long countNumberOfReports()
+    {
+        return commentRepository.countAllReports();
+    }
+
+
 }

@@ -357,4 +357,31 @@ public class CommentController {
         ReviewStatus reviewStatus = commentService.getReviewStatusByCommentId(commentId);
         return ResponseEntity.ok(reviewStatus);
     }
+
+    /**
+     * Retrieves the number of likes from table.
+     * @return a ResponseEntity containing the number of likes
+     */
+    @GetMapping("/likes/count")
+    public ResponseEntity<Long> getNumberOfLikes()
+    {
+        Long number= commentService.countNumberOfLikes();
+        System.out.println(number);
+        return new ResponseEntity("The number of likes is "+ number,HttpStatus.OK);
+    }
+
+    /**
+     * Retrieves the number of reports from table.
+     * @return a ResponseEntity containing the number of reports
+     */
+    @GetMapping("/reports/count")
+    public ResponseEntity<Long> getNumberOfReports()
+    {
+        Long number= commentService.countNumberOfReports();
+        System.out.println(number);
+        return new ResponseEntity("The number of likes is "+ number,HttpStatus.OK);
+    }
+
+
+
 }
