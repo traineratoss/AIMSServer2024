@@ -4,6 +4,8 @@ import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.ReviewStatus;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequestMapping("/aims/api/v1/ideas")
 public class CommentController {
 
+    private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
     private final CommentService commentService;
 
     /**
@@ -44,10 +47,15 @@ public class CommentController {
     @PostMapping("/comments")
     @ResponseBody
     public ResponseEntity<ResponseCommentDTO> addComment(@RequestBody RequestCommentDTO newComment) throws UnsupportedEncodingException {
-
-        ResponseCommentDTO responseCommentDTO = commentService.addComment(newComment);
-
-        return new ResponseEntity<ResponseCommentDTO>(responseCommentDTO, HttpStatus.OK);
+        logger.info("Received request to add comment: {}", newComment);
+        try {
+            ResponseCommentDTO responseCommentDTO = commentService.addComment(newComment);
+            logger.debug("Successfully added comment: {}", responseCommentDTO);
+            return new ResponseEntity<>(responseCommentDTO, HttpStatus.OK);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Error adding comment: {}", e.getMessage());
+            throw e;
+        }
     }
 
     /**
