@@ -8,7 +8,6 @@ import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
-import com.atoss.idea.management.system.service.implementation.HtmlServiceImpl;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,9 +45,6 @@ public class GetAllIdeasTest {
 
     @Spy
     public ModelMapper modelMapper;
-
-    @Mock
-    private HtmlServiceImpl htmlService;
 
 
     @BeforeEach
@@ -75,9 +74,7 @@ public class GetAllIdeasTest {
         idea.setCommentList(commentList);
         when(ideaRepository.findAll()).thenReturn(Arrays.asList(idea));
         when(ideaRepository.findAll(PageRequest.of(0, 10))).thenReturn(ideaPage);
-        when(ideaRepository.findById(any(Long.class))).thenReturn(Optional.of(idea));
         when(commentServiceImpl.getElapsedTime(any(Date.class))).thenReturn("1 day elapsed");
-
 
         Page<IdeaResponseDTO> result = ideaServiceImpl.getAllIdeas(PageRequest.of(0, 10));
 

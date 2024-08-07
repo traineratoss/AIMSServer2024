@@ -68,7 +68,7 @@ public class GetAllRepliesByCommentIdTest {
         Long commentId = 1L;
         Pageable pageable = PageRequest.of(0, 10); //prima pag cu 10 el pe ea
 
-        when(commentRepository.existsById(any(Long.class))).thenReturn(true);
+        when(commentRepository.existsById(commentId)).thenReturn(true);
         when(commentRepository.findById(parentComment.getId())).thenReturn(Optional.of(parentComment));
         when(commentRepository.findById(replyComment.getId())).thenReturn(Optional.of(replyComment));
         when(commentRepository.findAllByParentId(commentId, pageable))

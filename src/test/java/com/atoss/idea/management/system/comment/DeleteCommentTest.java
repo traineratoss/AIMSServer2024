@@ -10,8 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -27,8 +25,6 @@ public class DeleteCommentTest {
 
     private Comment comment;
 
-
-
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -39,9 +35,6 @@ public class DeleteCommentTest {
     {
         comment=new Comment();
         comment.setId(1L);
-
-        when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
-
         doReturn(true).when(commentRepository).existsById(comment.getId());
         commentService.deleteComment(comment.getId());
         verify(commentRepository, times(1)).deleteById(any(Long.class));

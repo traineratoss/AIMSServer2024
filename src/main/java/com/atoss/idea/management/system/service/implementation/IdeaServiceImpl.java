@@ -338,12 +338,8 @@ public class IdeaServiceImpl implements IdeaService {
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
                     responseDTO.setUsername(idea.getUser().getUsername());
-
-                    Optional<Idea> optionalIdea = ideaRepository.findById(idea.getId());
-                    if (optionalIdea.isPresent()) {
-                        String htmlContent = htmlService.markdownToHtml(optionalIdea.get().getText());
-                        responseDTO.setText(htmlContent);
-                    }
+                    String htmlContent = htmlService.markdownToHtml(ideaRepository.findById(idea.getId()).get().getText());
+                    responseDTO.setText(htmlContent);
                     responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
                     responseDTO.setCommentsNumber(idea.getCommentList().size());
                     return responseDTO;
@@ -366,12 +362,8 @@ public class IdeaServiceImpl implements IdeaService {
                 .map(idea -> {
                     IdeaResponseDTO responseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
                     responseDTO.setUsername(user.getUsername());
-
-                    Optional<Idea> optionalIdea = ideaRepository.findById(idea.getId());
-                    if (optionalIdea.isPresent()) {
-                        String htmlContent = htmlService.markdownToHtml(optionalIdea.get().getText());
-                        responseDTO.setText(htmlContent);
-                    }
+                    String htmlContent = htmlService.markdownToHtml(ideaRepository.findById(idea.getId()).get().getText());
+                    responseDTO.setText(htmlContent);
                     responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
                     responseDTO.setCommentsNumber(idea.getCommentList().size());
                     return responseDTO;

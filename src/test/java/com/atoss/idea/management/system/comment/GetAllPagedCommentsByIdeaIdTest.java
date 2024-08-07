@@ -94,7 +94,7 @@ public class GetAllPagedCommentsByIdeaIdTest {
         when(ideaRepository.existsById(ideaId)).thenReturn(true);
         when(commentRepository.findAllByIdeaId(any(Long.class),any(Pageable.class))).thenReturn(commentPage);
         when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment1));
-        when(commentRepository.existsById(any(Long.class))).thenReturn(true);
+
 
         Page<ResponseCommentDTO> resultPage = commentService.getAllPagedCommentsByIdeaId(ideaId, pageable);
 

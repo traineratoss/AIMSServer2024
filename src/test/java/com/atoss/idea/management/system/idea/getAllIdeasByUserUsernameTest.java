@@ -105,7 +105,6 @@ public class getAllIdeasByUserUsernameTest {
         when(ideaRepository.findAllByUserUsername(any(String.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(idea)));
         when(commentServiceImpl.getElapsedTime(any(Date.class))).thenReturn("5 minutes ago");
-        when(ideaRepository.findById(any(Long.class))).thenReturn(Optional.of(idea));
 
         Page<IdeaResponseDTO> result = ideaServiceImpl.getAllIdeasByUserUsername("user12", Pageable.unpaged());
 

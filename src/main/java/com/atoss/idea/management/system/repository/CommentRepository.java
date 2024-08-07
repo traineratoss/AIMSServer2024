@@ -118,10 +118,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     /**
      * gets the most replied comments up to a limit , not used atm
-     * Usage : in the future if there is a need to see an idea with many replies
+     * @return List of objects
      *
-     * @return List of objects that contains on [0] the comment_id and on [1]
-     *         the frequency  as the number of replies per comment
      */
     @Query(value = "SELECT parent_id, COUNT(*) AS frequency FROM comment c WHERE parent_id IS NOT NULL GROUP BY"
             +

@@ -227,12 +227,11 @@ public class CommentServiceImpl implements CommentService {
         newComment.setIdea(idea);
         newComment.setParent(null);
         newComment.setCommentText(requestCommentDTO.getCommentText());
-
+        String htmlContent = htmlService.markdownToHtml(requestCommentDTO.getCommentText());
+        newComment.setCommentText(htmlContent);
         newComment.setCreationDate(creationDate);
         String filteredCommentText = filterBadWords(newComment.getCommentText());
-        String htmlContent = htmlService.markdownToHtml(filteredCommentText);
-
-        newComment.setCommentText(htmlContent);
+        newComment.setCommentText(filteredCommentText);
 
         commentRepository.save(newComment);
 
@@ -445,10 +444,7 @@ public class CommentServiceImpl implements CommentService {
         if (!commentRepository.existsById(commentId)) {
             throw new CommentNotFoundException();
         }
-
-
-        Optional<Comment> optionalComment = commentRepository.findById(commentId);
-        String commentText = optionalComment.get().getCommentText();
+        String commentText = commentRepository.findById(commentId).get().getCommentText();
         Comment comment = commentRepository.findById(commentId).get();
 
         if (comment.getIdea() != null) {
@@ -542,7 +538,7 @@ public class CommentServiceImpl implements CommentService {
     public void displayPlaceholder(Long commentId) {
         Optional<Comment> comment = commentRepository.findById(commentId);
         if (comment.isPresent()) {
-            comment.get().setCommentText("This comment was deleted by admin for being offensive");
+            comment.get().setCommentText("Content was deleted by admin for being offensive");
             commentRepository.save(comment.get());
         } else {
             throw new CommentNotFoundException();

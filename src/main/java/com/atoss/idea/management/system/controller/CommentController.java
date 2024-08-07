@@ -4,8 +4,7 @@ import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.ReviewStatus;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +17,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @RestController
+@Log4j2
 @RequestMapping("/aims/api/v1/ideas")
 public class CommentController {
 
-    private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
+
     private final CommentService commentService;
 
     /**
@@ -35,7 +35,7 @@ public class CommentController {
 
     /**
      * Performs a Post Request in order to create a new comment
-     * <p>
+     *
      * Method receives data in json format from the client's request (as a @RequestBody)
      * Then a responseCommentDTO object is created and saved in the database using the CommentService "addComment" method
      * In the end, a ResponseEntity of type ResponseCommentDTO is returned
@@ -47,20 +47,22 @@ public class CommentController {
     @PostMapping("/comments")
     @ResponseBody
     public ResponseEntity<ResponseCommentDTO> addComment(@RequestBody RequestCommentDTO newComment) throws UnsupportedEncodingException {
-        logger.info("Received request to add comment: {}", newComment);
+        log.info("Received request to add comment: {}", newComment);
         try {
             ResponseCommentDTO responseCommentDTO = commentService.addComment(newComment);
-            logger.debug("Successfully added comment: {}", responseCommentDTO);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully added comment: {}", responseCommentDTO);
+            }
             return new ResponseEntity<>(responseCommentDTO, HttpStatus.OK);
         } catch (UnsupportedEncodingException e) {
-            logger.error("Error adding comment: {}", e.getMessage());
+            log.error("Error adding comment: {}", e.getMessage());
             throw e;
         }
     }
 
     /**
      * Performs a Post Request in order to create a new reply
-     * <p>
+     *
      * Method receives data in json format from the client's request (as a @RequestBody)
      * Then a responseCommentReplyDTO object is created and saved in the database using the CommentService "addReply" method
      * In the end, a ResponseEntity of type ResponseCommentReplyDTO is returned
@@ -80,7 +82,7 @@ public class CommentController {
 
     /**
      * Performs a Get Request in order to get all comments of a certain idea in a paginated form
-     * <p>
+     *
      * Method takes the paging parametres: pageSize, pageNumber and sortCategory to create a Pageable object
      * The CommentService method "getAllPagedCommentsByIdeaId" gets all the comments that belong to a certain idea in the pageable object format
      * In the end, a ResponseEntity is returned
@@ -106,7 +108,7 @@ public class CommentController {
 
     /**
      * Performs a Get Request in order to get all replies of a certain comment in a paginated form
-     * <p>
+     *
      * Method takes the paging parametres: pageSize, pageNumber and sortCategory to create a Pageable object
      * The CommentService method "getAllRepliesByCommentId" gets all the replies that belong to a certain comment in the pageable object format
      * In the end, a ResponseEntity is returned
@@ -131,7 +133,7 @@ public class CommentController {
 
     /**
      * Performs a Get Request in order to get the time that has passed since a comment was created
-     * <p>
+     *
      * Method gets the comment id as a RequestParam
      * Then, the id is used in the CommentService method "getTimeForComment" and the result is returned
      *
@@ -146,7 +148,7 @@ public class CommentController {
 
     /**
      * Performs a Delete Request in order to delete a certain comment
-     * <p>
+     *
      * Method gets the id of the comment that is going to be deleted as a RequestParam
      * The, the id is used in the CommentService method "deleteComment" and the deleting operation happens
      *
@@ -290,7 +292,7 @@ public class CommentController {
 
     /**
      * Adds a report to a specific comment from a specific user
-     * <p>
+     *
      * This method handles the HTTP POST request to add a report for a comment by a user
      * It calls the CommentService to perform the actual report addition logic
      *
@@ -338,7 +340,7 @@ public class CommentController {
 
     /**
      * Sets the review status for a specific comment identified by its ID via a PATCH request.
-     * <p>
+     *
      * This method is transactional to ensure that the operation is completed successfully or rolled back in case of failure.
      * The endpoint for this method is "/comments/reports/review/set".
      *
@@ -354,7 +356,7 @@ public class CommentController {
 
     /**
      * Retrieves the review status for a specific comment identified by its ID via a GET request.
-     * <p>
+     *
      * The endpoint for this method is "/comments/reports/review/get/{commentId}" where {commentId} is a path variable.
      *
      * @param commentId the ID of the comment whose review status is to be retrieved, passed as a path variable
@@ -375,21 +377,19 @@ public class CommentController {
     @GetMapping("/likes/count")
     public ResponseEntity<Long> getNumberOfLikes() {
         Long number = commentService.countNumberOfLikes();
-        System.out.println(number);
-        return new ResponseEntity("The number of likes is " + number, HttpStatus.OK);
+        return new ResponseEntity(number, HttpStatus.OK);
     }
 
     /**
      * Retrieves the number of reports from table.
-     *
      * @return a ResponseEntity containing the number of reports
      */
     @GetMapping("/reports/count")
     public ResponseEntity<Long> getNumberOfReports() {
         Long number = commentService.countNumberOfReports();
-        System.out.println(number);
-        return new ResponseEntity("The number of likes is " + number, HttpStatus.OK);
+        return new ResponseEntity(number, HttpStatus.OK);
     }
+
 
 
 }
