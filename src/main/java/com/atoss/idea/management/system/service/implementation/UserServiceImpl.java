@@ -234,9 +234,6 @@ public class UserServiceImpl implements UserService {
 
         user.setIsFirstLogin(true);
         user.setOtp(null);
-        user.setIsFirstLogin(true);
-
-        userRepository.save(user);
 
         userRepository.save(user);
 
@@ -369,6 +366,9 @@ public class UserServiceImpl implements UserService {
     public ImageDTO getAvatarByUsername(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found!"));
+        if (user.getImage() == null) {
+            throw new AvatarNotFoundException("Avatar not found!");
+        }
         return user.getImage();
     }
 }

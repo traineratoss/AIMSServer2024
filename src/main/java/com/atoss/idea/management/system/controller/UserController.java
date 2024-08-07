@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -267,12 +266,8 @@ public class UserController {
     @Transactional
     @PostMapping("/change-password")
     public ResponseEntity<Object> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
-        boolean passwordChanged = userService.changePassword(changePasswordDTO);
-        if (passwordChanged) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        ResponseEntity<Object> entity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        return entity;
+        userService.changePassword(changePasswordDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**

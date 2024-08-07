@@ -12,6 +12,7 @@ import com.atoss.idea.management.system.security.SessionService;
 import com.atoss.idea.management.system.security.response.AuthResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -44,6 +45,7 @@ public class RefreshTokenService {
      * @throws UserNotFoundException If no user is found with the given username.
      */
 
+    @Transactional
     public RefreshToken createRefreshToken(String username) {
         refreshTokenRepository.findByUser_Username(username).ifPresent(refreshTokenRepository::delete);
         refreshTokenRepository.flush();
