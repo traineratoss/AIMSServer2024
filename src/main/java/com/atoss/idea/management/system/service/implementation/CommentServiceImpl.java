@@ -538,7 +538,7 @@ public class CommentServiceImpl implements CommentService {
     public void displayPlaceholder(Long commentId) {
         Optional<Comment> comment = commentRepository.findById(commentId);
         if (comment.isPresent()) {
-            comment.get().setCommentText("This comment was deleted by admin for being offensive");
+            comment.get().setCommentText("Content was deleted by admin for being offensive");
             commentRepository.save(comment.get());
         } else {
             throw new CommentNotFoundException();
@@ -705,14 +705,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Long countNumberOfLikes()
-    {
+    public Long countNumberOfLikes() {
         return commentRepository.countAllLikes();
     }
 
     @Override
-    public Long countNumberOfReports()
-    {
+    public Long countNumberOfReports() {
         return commentRepository.countAllReports();
     }
 

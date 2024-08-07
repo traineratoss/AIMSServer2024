@@ -4,8 +4,7 @@ import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.ReviewStatus;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +17,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 @RestController
+@Log4j2
 @RequestMapping("/aims/api/v1/ideas")
 public class CommentController {
 
-    private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
+
     private final CommentService commentService;
 
     /**
@@ -47,13 +47,15 @@ public class CommentController {
     @PostMapping("/comments")
     @ResponseBody
     public ResponseEntity<ResponseCommentDTO> addComment(@RequestBody RequestCommentDTO newComment) throws UnsupportedEncodingException {
-        logger.info("Received request to add comment: {}", newComment);
+        log.info("Received request to add comment: {}", newComment);
         try {
             ResponseCommentDTO responseCommentDTO = commentService.addComment(newComment);
-            logger.debug("Successfully added comment: {}", responseCommentDTO);
+            if (log.isDebugEnabled()) {
+                log.debug("Successfully added comment: {}", responseCommentDTO);
+            }
             return new ResponseEntity<>(responseCommentDTO, HttpStatus.OK);
         } catch (UnsupportedEncodingException e) {
-            logger.error("Error adding comment: {}", e.getMessage());
+            log.error("Error adding comment: {}", e.getMessage());
             throw e;
         }
     }
@@ -373,10 +375,9 @@ public class CommentController {
      * @return a ResponseEntity containing the number of likes
      */
     @GetMapping("/likes/count")
-    public ResponseEntity<Long> getNumberOfLikes()
-    {
-        Long number= commentService.countNumberOfLikes();
-        return new ResponseEntity(number,HttpStatus.OK);
+    public ResponseEntity<Long> getNumberOfLikes() {
+        Long number = commentService.countNumberOfLikes();
+        return new ResponseEntity(number, HttpStatus.OK);
     }
 
     /**
@@ -384,10 +385,9 @@ public class CommentController {
      * @return a ResponseEntity containing the number of reports
      */
     @GetMapping("/reports/count")
-    public ResponseEntity<Long> getNumberOfReports()
-    {
-        Long number= commentService.countNumberOfReports();
-        return new ResponseEntity(number,HttpStatus.OK);
+    public ResponseEntity<Long> getNumberOfReports() {
+        Long number = commentService.countNumberOfReports();
+        return new ResponseEntity(number, HttpStatus.OK);
     }
 
 
