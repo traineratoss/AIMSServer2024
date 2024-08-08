@@ -5,6 +5,7 @@ import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.service.UserService;
 import jakarta.transaction.Transactional;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +18,7 @@ import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 
 @RestController
+@Log4j2
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
@@ -35,24 +37,6 @@ public class UserController {
         this.sendEmailService = sendEmailService;
     }
 
-    /**
-     * Adds a new user to the database.
-     *
-     * @param username The unique parameter representing the username of the new user.
-     * @param email    The unique parameter representing the email address of the new user.
-     * @return A ResponseEntity with the UserResponseDTO containing information about the newly added user.
-     * @throws UserAlreadyExistException If the provided username or email is already used by another user in the database.
-     *
-     * @see UserResponseDTO
-     * @see UserAlreadyExistException
-     * @see UserService#addUser(String, String)
-     */
-    @Transactional
-    @PostMapping
-    public ResponseEntity<UserResponseDTO> addUser(@RequestParam(name = "username") String username,
-                                                   @RequestParam(name = "email") String email) {
-        return new ResponseEntity<>(userService.addUser(username, email), HttpStatus.CREATED);
-    }
 
     /**
      * Send email to all admins.
@@ -62,7 +46,13 @@ public class UserController {
     @Transactional
     @PostMapping("/send-email-to-admin")
     public ResponseEntity<String> sendEmailToAdmins(@RequestParam(name = "username") String username) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to send email to all admins");
+        }
         sendEmailService.sendEmailToAdmins(username);
+        if (log.isInfoEnabled()) {
+            log.info("Send email to all admins successfully");
+        }
         return new ResponseEntity<>("Email send to all admins!", HttpStatus.OK);
     }
 
@@ -80,7 +70,14 @@ public class UserController {
     @Transactional
     @PatchMapping("/update-profile")
     public UserResponseDTO updateUserByUsername(@RequestParam(value = "username") String username, @RequestBody UserUpdateDTO userUpdateDTO) {
-        return userService.updateUserByUsername(username, userUpdateDTO);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to updated user by username");
+        }
+        UserResponseDTO userResponseDTO = userService.updateUserByUsername(username, userUpdateDTO);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully updated user by username");
+        }
+        return userResponseDTO;
     }
 
     /**
@@ -97,24 +94,14 @@ public class UserController {
     @Transactional
     @PatchMapping("/update-role")
     public UserResponseDTO updateUserRole(@RequestParam(value = "username") String username) {
-        return userService.updateUserRole(username);
-    }
-
-    /**
-     * Retrieves the user's profile information based on the provided username.
-     *
-     * @param username The username of the user whose profile information needs to be retrieved.
-     * @return A UserResponseDTO object representing the user's profile information.
-     * @throws UserNotFoundException If the user with the given username is not found in the system.
-     *
-     * @see UserResponseDTO
-     * @see UserNotFoundException
-     * @see UserService#getUserByUsername(String, Class)
-     */
-    @Transactional
-    @GetMapping
-    public UserResponseDTO getUserByUsername(@RequestParam(name = "username") String username) {
-        return userService.getUserByUsername(username, UserResponseDTO.class);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to updated user role");
+        }
+        UserResponseDTO userResponseDTO = userService.updateUserRole(username);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully updated user role");
+        }
+        return userResponseDTO;
     }
 
     /**
@@ -133,19 +120,24 @@ public class UserController {
      */
     @Transactional
     @GetMapping("/allUsers")
-    public  ResponseEntity<UserPageDTO> getAllUsersForAdmin(@RequestParam(required = true) int pageSize,
-                                                            @RequestParam(required = true) int pageNumber,
-                                                            @RequestParam(required = true) String sortCategory) {
-        return new ResponseEntity<>(
-                userService.getAllUsersForAdmin(
-                        PageRequest.of(
-                                pageNumber,
-                                pageSize,
-                                Sort.by(Sort.Direction.ASC, sortCategory)
-                        )
-                ),
-                HttpStatus.OK
+    public ResponseEntity<UserPageDTO> getAllUsersForAdmin(@RequestParam(required = true) int pageSize,
+                                                           @RequestParam(required = true) int pageNumber,
+                                                           @RequestParam(required = true) String sortCategory) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to retrieved all users for admin");
+        }
+        UserPageDTO userPageDTO = userService.getAllUsersForAdmin(
+                PageRequest.of(
+                        pageNumber,
+                        pageSize,
+                        Sort.by(Sort.Direction.ASC, sortCategory)
+                )
         );
+        if (log.isInfoEnabled()) {
+            log.info("Retrieved all users for admin successfully");
+        }
+
+        return new ResponseEntity<>(userPageDTO, HttpStatus.OK);
     }
 
     /**
@@ -164,20 +156,26 @@ public class UserController {
      */
     @Transactional
     @GetMapping("/all")
-    public  ResponseEntity<Page<UserResponseDTO>> getAllUsers(@RequestParam(required = true) int pageSize,
-                                                              @RequestParam(required = true) int pageNumber,
-                                                              @RequestParam(required = true) String sortCategory) {
-        return new ResponseEntity<>(
-                userService.getAllUsers(
-                        PageRequest.of(
-                                pageNumber,
-                                //10
-                                pageSize,
-                                Sort.by(Sort.Direction.ASC, sortCategory)
-                        )
-                ),
-                HttpStatus.OK
+    public ResponseEntity<Page<UserResponseDTO>> getAllUsers(@RequestParam(required = true) int pageSize,
+                                                             @RequestParam(required = true) int pageNumber,
+                                                             @RequestParam(required = true) String sortCategory) {
+
+        if (log.isInfoEnabled()) {
+            log.info("Received request to retrieved all users");
+        }
+
+        Page<UserResponseDTO> userResponseDTOPage = userService.getAllUsers(
+                PageRequest.of(
+                        pageNumber,
+                        //10
+                        pageSize,
+                        Sort.by(Sort.Direction.ASC, sortCategory)
+                )
         );
+        if (log.isInfoEnabled()) {
+            log.info("Retrieved all users successfully");
+        }
+        return new ResponseEntity<>(userResponseDTOPage, HttpStatus.OK);
     }
 
     /**
@@ -204,51 +202,23 @@ public class UserController {
                                                             @RequestParam(required = true) String sortCategory,
                                                             @RequestParam(name = "username") String username,
                                                             @RequestParam(name = "currentUsername") String currentUsername) {
-        return new ResponseEntity<>(
-                userService.getAllUsersByUsernamePageable(
-                    PageRequest.of(
-                            pageNumber,
-                            pageSize,
-                            Sort.by(Sort.Direction.ASC, sortCategory)
-                    ),
-                    username
-                ),
-                HttpStatus.OK
-        );
-    }
 
-    /**
-     * Retrieves a paginated list of users based on their active status.
-     *
-     * @param isActive      The boolean flag indicating whether to retrieve active (true) or inactive (false) users.
-     * @param pageSize      The number of users to be included in each page of the result.
-     * @param pageNumber    The page number of the result set to retrieve.
-     * @param sortCategory  The field by which the users should be sorted. It can be any valid property of the User entity.
-     * @return A ResponseEntity containing a Page of UserResponseDTO objects representing a paginated list of users with the specified active status.
-     * @throws IllegalArgumentException        If pageSize or pageNumber is less than 1.
-     *
-     * @see UserResponseDTO
-     * @see PageRequest
-     * @see Sort
-     * @see UserService#getAllPendingUsers(boolean, Pageable)
-     */
-    @Transactional
-    @GetMapping("/allByIsActive")
-    public ResponseEntity<Page<UserResponseDTO>> getAllUserByIsActive(@RequestParam(name = "isActive") boolean isActive,
-                                                                      @RequestParam(required = true) int pageSize,
-                                                                      @RequestParam(required = true) int pageNumber,
-                                                                      @RequestParam(required = true) String sortCategory) {
-        return new ResponseEntity<>(
-                userService.getAllPendingUsers(
-                        isActive,
-                        PageRequest.of(
-                            pageNumber,
-                            pageSize,
-                            Sort.by(Sort.Direction.ASC, sortCategory)
-                        )
+        if (log.isInfoEnabled()) {
+            log.info("Received request to retrieved all users by username");
+        }
+        UserPageDTO userPageDTO = userService.getAllUsersByUsernamePageable(
+                PageRequest.of(
+                        pageNumber,
+                        pageSize,
+                        Sort.by(Sort.Direction.ASC, sortCategory)
                 ),
-                HttpStatus.OK
+                username
         );
+        if (log.isInfoEnabled()) {
+            log.info("Retrieved all users by username successfully");
+        }
+
+        return new ResponseEntity<>(userPageDTO, HttpStatus.OK);
     }
 
     /**
@@ -266,7 +236,15 @@ public class UserController {
     @Transactional
     @PostMapping("/change-password")
     public ResponseEntity<Object> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to changed password");
+        }
+
         userService.changePassword(changePasswordDTO);
+
+        if (log.isInfoEnabled()) {
+            log.info("Password successfully changed");
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -280,7 +258,14 @@ public class UserController {
     @Transactional
     @PostMapping("/send-approve-email")
     public ResponseEntity<Object> sendApproveEmail(@RequestBody String username) {
-        return userService.sendApproveEmail(username);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to send approve email");
+        }
+        ResponseEntity<Object> responseEntity = userService.sendApproveEmail(username);
+        if (log.isInfoEnabled()) {
+            log.info("Approval email successfully sent");
+        }
+        return responseEntity;
     }
 
     /**
@@ -294,21 +279,14 @@ public class UserController {
     @Transactional
     @PostMapping("/send-decline-email")
     public ResponseEntity<Object> sendDeclineEmail(@RequestBody String username) {
-        return userService.sendDeclineEmail(username);
-    }
-
-    /**
-     * Method used to check if the user's credentials are in the database
-     * @param username the user's username
-     * @param hashPassword the encrypted password obtained by using bcrypt algorithm
-     * @return UserSecurityDTO with the user's credentials
-     * @throws UserAlreadyDeactivatedException if the user account is deactivated
-     * @throws BadCredentialsException if the credentials entered are not valid
-     */
-    @PostMapping("/login")
-    public UserSecurityDTO login(@RequestParam(name = "username") String username,
-                                                         @RequestBody String hashPassword) {
-        return userService.login(username, hashPassword);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to send decline email");
+        }
+        ResponseEntity<Object> responseEntity = userService.sendDeclineEmail(username);
+        if (log.isInfoEnabled()) {
+            log.info("Decline email successfully sent");
+        }
+        return responseEntity;
     }
 
     /**
@@ -320,33 +298,35 @@ public class UserController {
     @Transactional
     @PostMapping("/send-forgot-password")
     public ResponseEntity<Object> sendForgotPassword(@RequestBody String usernameOrEmail) {
-        return userService.sendForgotPassword(usernameOrEmail);
-    }
-
-    /**
-     * Deletes the user
-     * @param username the username of the user which will be deleted
-     * @return ResponseEntity with delete result and OK HTTP status
-     * @throws UserNotFoundException if the user specified by username is not found
-     */
-    @Transactional
-    @DeleteMapping
-    public ResponseEntity<Boolean> deleteUser(@RequestBody String username) {
-        return new ResponseEntity<>(userService.deleteUser(username), HttpStatus.OK);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to send forgot password email");
+        }
+        ResponseEntity<Object> responseEntity = userService.sendForgotPassword(usernameOrEmail);
+        if (log.isInfoEnabled()) {
+            log.info("Forgot password email successfully sent");
+        }
+        return responseEntity;
     }
 
     /**
      * Sends an email to the user whose account has been deactivated
      * @param username the username of the user to which the email will be sent
      * @return ResponseEntity with the "Email send" message and OK HTTP Status
-     * @throws UserNotFoundException if the user is not found in the database
-     * @throws EmailFailedException if the email is not sent
+     * @throws UserNotFoundException           if the user is not found in the database
+     * @throws EmailFailedException            if the email is not sent
      * @throws UserAlreadyDeactivatedException if the user has already been deactivated
      */
     @Transactional
     @PostMapping("/send-deactivate-message")
     public ResponseEntity<Object> sendDeactivateMessage(@RequestBody String username) {
-        return userService.sendDeactivateEmail(username);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to send deactivate message");
+        }
+        ResponseEntity<Object> responseEntity = userService.sendDeactivateEmail(username);
+        if (log.isInfoEnabled()) {
+            log.info("Deactivate email successfully sent");
+        }
+        return responseEntity;
     }
 
     /**
@@ -360,24 +340,16 @@ public class UserController {
     @Transactional
     @PostMapping("/send-activate-message")
     public ResponseEntity<Object> sendActivateMessage(@RequestBody String username) {
-        return userService.sendActivateEmail(username);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to send activate message");
+        }
+        ResponseEntity<Object> responseEntity = userService.sendActivateEmail(username);
+        if (log.isInfoEnabled()) {
+            log.info("Activate email successfully sent");
+        }
+        return responseEntity;
     }
 
-    /**
-     * Checks whether the user identified by the provided username or email has logged in for the first time.
-     *
-     * @param usernameOrEmail The username or email of the user to be checked.
-     *
-     * @return ResponseEntity containing a Boolean value indicating whether it's the user's first login.
-     *         Returns HttpStatus.OK if the request is successful.
-     *
-     * @see UserService#isFirstLogin(String)
-     */
-    @Transactional
-    @GetMapping("/is-first-login")
-    public ResponseEntity<Boolean> isFirstLogin(@RequestParam(name = "usernameOrEmail") String usernameOrEmail) {
-        return new ResponseEntity<>(userService.isFirstLogin(usernameOrEmail), HttpStatus.OK);
-    }
 
     /**
      * Checks whether the provided OTP is valid for the specified user.
@@ -394,18 +366,14 @@ public class UserController {
     @Transactional
     @PostMapping("/verify-otp")
     public ResponseEntity<UserSecurityDTO> verifyOTP(@RequestBody VerifyOtpDTO verifyOtpDTO) {
-        return new ResponseEntity<>(userService.verifyOTP(verifyOtpDTO), HttpStatus.OK);
-    }
-
-    /**
-     * Retrieves the ID of a user by their username.
-     *
-     * @param username the username of the user whose ID is to be retrieved
-     * @return the ID of the user with the specified username
-     */
-    @GetMapping("/idByUsername")
-    public Long getIdByUsername(@RequestParam(name = "username") String username) {
-        return userService.getIdByUsername(username);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to verify one-time password");
+        }
+        UserSecurityDTO userSecurityDTO = userService.verifyOTP(verifyOtpDTO);
+        if (log.isInfoEnabled()) {
+            log.info("Verify one-time password");
+        }
+        return new ResponseEntity<>(userSecurityDTO, HttpStatus.OK);
     }
 
     /**
@@ -418,7 +386,13 @@ public class UserController {
      */
     @PostMapping("/change-password/abort")
     public ResponseEntity<Object> abortChangePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to abort password change");
+        }
         userService.abortChangePassword(changePasswordDTO);
+        if (log.isInfoEnabled()) {
+            log.info("Password change successfully aborted");
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

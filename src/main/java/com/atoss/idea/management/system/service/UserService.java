@@ -153,24 +153,6 @@ public interface UserService {
     ResponseEntity<Object> sendDeclineEmail(String user);
 
     /**
-     * Authenticates a user's login credentials and returns security-related information.
-     *
-     * @param usernameOrEmail The username or email of the user trying to log in.
-     * @param password        The password provided by the user for authentication.
-     *
-     * @return A UserSecurityDTO object containing security-related information after successful authentication.
-     *         If the login credentials are valid, the UserSecurityDTO object will hold security-related data,
-     *         such as access tokens, refresh tokens, or other security-related information.
-     *         If the login credentials are invalid, the method may return null or throw an exception, depending on the implementation.
-     *
-     * @throws UserAlreadyDeactivatedException if the user account is deactivated
-     * @throws BadCredentialsException if the credentials entered are not valid
-     *
-     * @see ResponseEntity
-     */
-    UserSecurityDTO login(String usernameOrEmail, String password);
-
-    /**
      * Sends a forgot password email to the user with the specified username or email.
      *
      * @param usernameOrEmail The username or email of the user for whom the forgot password email will be sent.
@@ -234,14 +216,6 @@ public interface UserService {
      * @throws UserNotFoundException If the user with the given username or email is not found.
      */
     Boolean isFirstLogin(String usernameOrEmail);
-
-    /**
-     * Retrieves the ID of a user by their username.
-     *
-     * @param username the username of the user whose ID is to be retrieved
-     * @return the ID of the user with the specified username
-     */
-    Long getIdByUsername(String username);
 
     /**
      * Resets the user's state if the change password process is aborted.

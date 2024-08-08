@@ -11,6 +11,7 @@ import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.SendEmailService;
 import com.atoss.idea.management.system.service.UserService;
 import com.atoss.idea.management.system.utils.PasswordGenerator;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+@Log4j2
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -60,10 +62,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO addUser(String username, String email) {
         if (userRepository.findByUsernameOrEmail(username, email).isPresent()) {
+            if (log.isErrorEnabled()) {
+                log.error("Attempt to add user failed: User '{}' already exists", username);
+            }
             throw new UserAlreadyExistException("User already exists!");
         }
 
         if (userRepository.findByEmail(email).isPresent()) {
+            if (log.isErrorEnabled()) {
+                log.error("Attempt to add user failed: Email '{}' already exists", email);
+            }
             throw new EmailAlreadyExistException("Email already exist!");
         }
 
@@ -74,6 +82,11 @@ public class UserServiceImpl implements UserService {
         user.setHasPassword(false);
         user.setIsFirstLogin(true);
         userRepository.save(user);
+
+        if (log.isInfoEnabled()) {
+            log.info("New user added successfully: Username '{}', Email '{}'", username, email);
+        }
+
         sendEmailService.sendEmailToUser(username);
         sendEmailService.sendEmailToAdmins(username);
 
@@ -82,18 +95,35 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDTO updateUserByUsername(String username, UserUpdateDTO userUpdateDTO) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            if (log.isErrorEnabled()) {
+                log.error("User not found with username: {}", username);
+            }
+            return new UserNotFoundException("User not found");
+        });
         if (userUpdateDTO.getUsername() != null) {
             if (userRepository.findByUsername(userUpdateDTO.getUsername()).isEmpty()) {
                 user.setUsername(userUpdateDTO.getUsername());
+                if (log.isInfoEnabled()) {
+                    log.info("Updated username to: {}", userUpdateDTO.getUsername());
+                }
             } else {
+                if (log.isErrorEnabled()) {
+                    log.error("Username '{}' already exists", userUpdateDTO.getUsername());
+                }
                 throw new UsernameAlreadyExistException("Username already exists!");
             }
         }
         if (userUpdateDTO.getEmail() != null) {
             if (userRepository.findByEmail(userUpdateDTO.getEmail()).isEmpty()) {
                 user.setEmail(userUpdateDTO.getEmail());
+                if (log.isInfoEnabled()) {
+                    log.info("Updated email to: {}", userUpdateDTO.getEmail());
+                }
             } else {
+                if (log.isErrorEnabled()) {
+                    log.error("Email '{}' already exists", userUpdateDTO.getEmail());
+                }
                 throw new EmailAlreadyExistException("Email already exists!");
             }
         }
@@ -102,24 +132,47 @@ public class UserServiceImpl implements UserService {
                     .findById(
                         userUpdateDTO.getAvatarId()
                     )
-                    .orElseThrow(
-                            () -> new AvatarNotFoundException("Avatar not found!")
-                    );
+                    .orElseThrow(() -> {
+                        if (log.isErrorEnabled()) {
+                            log.error("Avatar not found with id: {}", userUpdateDTO.getAvatarId());
+                        }
+                        return new AvatarNotFoundException("Avatar not found!");
+                    });
             user.setAvatar(modelMapper.map(avatar, Avatar.class));
+            if (log.isInfoEnabled()) {
+                log.info("Updated avatar with file name: {}", avatar.getFileName());
+            }
         }
         if (userUpdateDTO.getUpdatedImage()) {
             user.setImage(userUpdateDTO.getImage());
+            if (log.isInfoEnabled()) {
+                log.info("Updated user image");
+            }
         }
         if (userUpdateDTO.getFullName() != null) {
             user.setFullName(userUpdateDTO.getFullName());
+            if (log.isInfoEnabled()) {
+                log.info("Updated full name to: {}", userUpdateDTO.getFullName());
+            }
         }
         userRepository.save(user);
+
+        if (log.isInfoEnabled()) {
+            log.info("User with username '{}' successfully updated", username);
+        }
+
         return modelMapper.map(user, UserResponseDTO.class);
     }
 
     @Override
     public UserResponseDTO updateUserRole(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found "));
+
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            if (log.isErrorEnabled()) {
+                log.error("User not found with username: {}", username);
+            }
+            return new UserNotFoundException("User not found");
+        });
 
         if (user.getRole() == Role.ADMIN) {
             user.setRole(Role.STANDARD);
@@ -128,28 +181,52 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.save(user);
 
+        if (log.isInfoEnabled()) {
+            log.info("Updated role for user with username: {}", username);
+        }
+
         return modelMapper.map(user, UserResponseDTO.class);
     }
 
     @Override
     public <T> T getUserByUsername(String username, Class<T> type) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            if (log.isErrorEnabled()) {
+                log.error("User not found with username: {}", username);
+            }
+            return new UserNotFoundException("User not found");
+        });
+
+        if (log.isInfoEnabled()) {
+            log.info("User with username: {} found", username);
+        }
+
         return modelMapper.map(user, type);
     }
 
     @Override
     public UserPageDTO getAllUsersForAdmin(Pageable pageable) {
         UserPageDTO userPageDTO = new UserPageDTO();
-        userPageDTO.setTotal(userRepository.findAll().size());
+        int totalUsers = userRepository.findAll().size();
+        userPageDTO.setTotal(totalUsers);
         List<UserAdminDashboardResponseDTO> result = userRepository.findAll(pageable)
-                                    .stream()
-                                    .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
-                                    .toList();
+                .stream()
+                .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
+                .toList();
+
+        if (log.isInfoEnabled()) {
+            log.info("Retrieved {} users for admin: {}", result.size(), result);
+        }
+
         return new UserPageDTO(userPageDTO.getTotal(), new PageImpl(result, pageable, result.size()));
     }
 
     @Override
     public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
+        if (log.isInfoEnabled()) {
+            log.info("Retrieved all users");
+        }
         return new PageImpl<>(
                 userRepository.findAll(pageable)
                         .stream()
@@ -170,27 +247,19 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
                 .toList();
+
+        if (log.isInfoEnabled()) {
+            log.info("Retrieved {} users with username starting with: {}", result.size(), username);
+        }
+
         return new UserPageDTO(userPageDTO.getTotal(), new PageImpl(result, pageable, result.size()));
     }
 
-    //    @Override
-    //    public Page<UserAdminDashboardResponseDTO> getAllUsersByUsername(String username) {
-    //        List<UserAdminDashboardResponseDTO> list = userRepository
-    //                .findByUsernameStartsWith(username)
-    //                .stream()
-    //                .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
-    //                .toList();
-    //        System.out.println(list);
-    //        return new PageImpl<>(
-    //                userRepository.findByUsernameStartsWith(username)
-    //                        .stream()
-    //                        .map(user -> modelMapper.map(user, UserAdminDashboardResponseDTO.class))
-    //                        .toList()
-    //        );
-    //    }
-
     @Override
     public Page<UserResponseDTO> getAllPendingUsers(boolean isActive, Pageable pageable) {
+        if (log.isInfoEnabled()) {
+            log.info("Retrieved all pending users with isActive: {}", isActive);
+        }
         return new PageImpl<>(
           userRepository.findAll(pageable)
                   .stream()
@@ -203,17 +272,33 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean changePassword(ChangePasswordDTO changePasswordDTO) {
         String username = changePasswordDTO.getUsername();
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            if (log.isErrorEnabled()) {
+                log.error("User not found with username: {}", username);
+            }
+            return new UserNotFoundException("User not found!");
+        });
         if (!user.getIsFirstLogin() && !BCrypt.checkpw(changePasswordDTO.getOldPassword(), user.getPassword())) {
+            if (log.isErrorEnabled()) {
+                log.error("Incorrect old password for user with username: {}", username);
+            }
             throw new IncorrectPasswordException("The old password is incorrect!");
         }
         if (user.getIsFirstLogin() && BCrypt.checkpw(changePasswordDTO.getNewPassword(), user.getPassword())) {
+            if (log.isErrorEnabled()) {
+                log.error("New password is the same as the old password for user with username: {}", username);
+            }
             throw new IncorrectPasswordException("The new password cannot be the same as the old password!");
         }
         String hashFrontendNewPassword = BCrypt.hashpw(changePasswordDTO.getNewPassword(), bcryptSalt);
         user.setPassword(hashFrontendNewPassword);
         user.setIsFirstLogin(false);
         userRepository.save(user);
+
+        if (log.isInfoEnabled()) {
+            log.info("Password successfully changed for user with username: {}", username);
+        }
+
         return true;
     }
 
@@ -221,14 +306,25 @@ public class UserServiceImpl implements UserService {
     public UserSecurityDTO verifyOTP(VerifyOtpDTO verifyOtpDTO) {
         String usernameOrEmail = verifyOtpDTO.getUsernameOrEmail();
         User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-                .orElseThrow(() -> new UserNotFoundException("User not found!"));
+                .orElseThrow(() -> {
+                    if (log.isErrorEnabled()) {
+                        log.error("User not found with username or email: {}", usernameOrEmail);
+                    }
+                    return new UserNotFoundException("User not found!");
+                });
 
         OTP otp = user.getOtp();
         if (otp == null || !otp.getCode().equals(verifyOtpDTO.getOtpCode())) {
+            if (log.isErrorEnabled()) {
+                log.error("Bad credentials: one-time password is null or does not match for user: {}", usernameOrEmail);
+            }
             throw new BadCredentialsException("Bad credentials");
         }
 
         if (System.currentTimeMillis() - otp.getCreationDate() >= TimeUnit.MINUTES.toMillis(3)) {
+            if (log.isErrorEnabled()) {
+                log.error("Expired one-time password for user: {}", usernameOrEmail);
+            }
             throw new BadCredentialsException("Expired OTP");
         }
 
@@ -237,55 +333,76 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
+        if (log.isInfoEnabled()) {
+            log.info("One-time password verified successfully for user: {}", usernameOrEmail);
+        }
+
         return modelMapper.map(user, UserSecurityDTO.class);
     }
 
     @Override
     public ResponseEntity<Object> sendApproveEmail(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found exception"));
+        User user = userRepository.findByUsername(username) .orElseThrow(() -> {
+            if (log.isErrorEnabled()) {
+                log.error("User not found with username: {}", username);
+            }
+            return new UserNotFoundException("User not found exception");
+        });
         if (!user.getHasPassword()) {
             sendEmailService.sendApproveEmailToUser(username);
+
+            if (log.isInfoEnabled()) {
+                log.info("Approve email sent successfully to user with username: {}", username);
+            }
+
             return new ResponseEntity<>("User approve successfully", HttpStatus.OK);
+        }
+        if (log.isErrorEnabled()) {
+            log.error("Approve already granted for user with username: {}", username);
         }
         throw new ApproveAlreadyGrantedException("Approve already granted exception");
     }
 
     @Override
     public ResponseEntity<Object> sendDeclineEmail(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found exception"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            if (log.isErrorEnabled()) {
+                log.error("User not found with username: {}", username);
+            }
+            return new UserNotFoundException("User not found exception");
+        });
         if (!user.getHasPassword()) {
             sendEmailService.sendDeclineEmailToUser(username);
+            if (log.isInfoEnabled()) {
+                log.info("Decline email sent successfully to user with username: {}", username);
+            }
             if (deleteUser(username)) {
+                if (log.isInfoEnabled()) {
+                    log.info("User with username: {} deleted successfully", username);
+                }
                 return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+            }
+            if (log.isErrorEnabled()) {
+                log.info("Failed to delete user with username: {}", username);
             }
             throw new UserAlreadyActivatedException("User status is active");
         }
-        throw new ApproveAlreadyGrantedException("Approve already granted exception");
-    }
-
-    @Override
-    public UserSecurityDTO login(String usernameOrEmail, String password) {
-        Optional<User> optionalUser = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            if (user.getIsActive() && password.equals(user.getPassword())) {
-                return modelMapper.map(
-                        user,
-                        UserSecurityDTO.class
-                );
-            }
-            if (!user.getIsActive() && password.equals(user.getPassword())) {
-                throw new UserAlreadyDeactivatedException("User was deactivated");
-            }
+        if (log.isErrorEnabled()) {
+            log.error("Approve already granted for user with username: {}", username);
         }
-        throw new BadCredentialsException("Bad credentials");
+        throw new ApproveAlreadyGrantedException("Approve already granted exception");
     }
 
     @Override
     public ResponseEntity<Object> sendForgotPassword(String usernameOrEmail) {
         User user = userRepository
                 .findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-                .orElseThrow(() -> new UserNotFoundException("User or email not found"));
+                .orElseThrow(() -> {
+                    if (log.isErrorEnabled()) {
+                        log.error("User or email not found: {}", usernameOrEmail);
+                    }
+                    return new UserNotFoundException("User or email not found");
+                });
         if (user.getIsActive()) {
             OTP otp = new OTP();
             otp.setCode(PasswordGenerator.generateOTP(6));
@@ -293,12 +410,22 @@ public class UserServiceImpl implements UserService {
 
             sendEmailService.sendEmailForgotPassword(user.getUsername(), otp.getCode());
 
+            if (log.isInfoEnabled()) {
+                log.info("Forgot password email sent to user with username: {} one-time password code: {}", user.getUsername(), otp.getCode());
+            }
+
             user.setOtp(otp);
             userRepository.save(user);
             return new ResponseEntity<>("Email sent", HttpStatus.OK);
         } else {
             if (user.getHasPassword()) {
+                if (log.isErrorEnabled()) {
+                    log.error("User with username or email: {} was deactivated", usernameOrEmail);
+                }
                 throw new UserAlreadyDeactivatedException("User was deactivated");
+            }
+            if (log.isErrorEnabled()) {
+                log.error("User with username or email: {} not activated", usernameOrEmail);
             }
             throw new BadCredentialsException("User not activated");
         }
@@ -306,34 +433,75 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean deleteUser(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            if (log.isErrorEnabled()) {
+                log.error("User not found with username: {}", username);
+            }
+            return new UserNotFoundException("User not found!");
+        });
         if (user.getIsActive()) {
+            if (log.isInfoEnabled()) {
+                log.info("User with username: {} is active and cannot be deleted", username);
+            }
             return false;
         }
         userRepository.delete(user);
+
+        if (log.isInfoEnabled()) {
+            log.info("User with username: {} has been deleted successfully", username);
+        }
+
         return true;
     }
 
     @Override
     public ResponseEntity<Object> sendDeactivateEmail(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            if (log.isErrorEnabled()) {
+                log.error("User not found with username: {}", username);
+            }
+            return new UserNotFoundException("User not found!");
+        });
         if (user.getIsActive()) {
             if (sendEmailService.sendDeactivateEmailToUser(username)) {
+                if (log.isInfoEnabled()) {
+                    log.info("Deactivation email successfully sent to user with username: {}", username);
+                }
                 return new ResponseEntity<>("Email send", HttpStatus.OK);
             }
+            if (log.isErrorEnabled()) {
+                log.error("Failed to send deactivation email to user with username: {}", username);
+            }
             throw new EmailFailedException("Sending email failed");
+        }
+        if (log.isInfoEnabled()) {
+            log.info("User with username: {} is already deactivated", username);
         }
         throw new UserAlreadyDeactivatedException("User already deactivate exception");
     }
 
     @Override
     public ResponseEntity<Object> sendActivateEmail(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
+            if (log.isErrorEnabled()) {
+                log.error("User not found with username: {}", username);
+            }
+            return new UserNotFoundException("User not found!");
+        });
         if (!user.getIsActive()) {
             if (sendEmailService.sendActivateEmailToUser(username)) {
+                if (log.isInfoEnabled()) {
+                    log.info("Activation email successfully sent to user with username: {}", username);
+                }
                 return new ResponseEntity<>("Email send", HttpStatus.OK);
             }
+            if (log.isErrorEnabled()) {
+                log.error("Failed to send activation email to user with username: {}", username);
+            }
             throw new EmailFailedException("Sending email failed");
+        }
+        if (log.isErrorEnabled()) {
+            log.error("User with username: {} is already activated", username);
         }
         throw new UserAlreadyActivatedException("User already activate exception");
     }
@@ -341,25 +509,38 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean isFirstLogin(String usernameOrEmail) {
         User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-                .orElseThrow(() -> new UserNotFoundException("User not found!"));
-        return user.getIsFirstLogin();
-    }
+                .orElseThrow(() -> {
+                    if (log.isErrorEnabled()) {
+                        log.error("User not found with username or email: {}", usernameOrEmail);
+                    }
+                    return new UserNotFoundException("User not found!");
+                });
 
+        Boolean isFirstLogin = user.getIsFirstLogin();
 
-    @Override
-    public Long getIdByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found!"));
-        return user.getId();
+        if (log.isInfoEnabled()) {
+            log.info("User with username or email: {} first login status: {}", usernameOrEmail, isFirstLogin);
+        }
+
+        return isFirstLogin;
     }
 
     @Override
     public void abortChangePassword(ChangePasswordDTO changePasswordDTO) {
         User user = userRepository.findByUsername(changePasswordDTO.getUsername())
-                .orElseThrow(() -> new UserNotFoundException("User not found!"));
+                .orElseThrow(() -> {
+                    if (log.isErrorEnabled()) {
+                        log.error("User not found with username: {}", changePasswordDTO.getUsername());
+                    }
+                    return new UserNotFoundException("User not found!");
+                });
 
         user.setIsFirstLogin(false);
         userRepository.save(user);
+
+        if (log.isInfoEnabled()) {
+            log.info("Password change aborted for user with username: {}", changePasswordDTO.getUsername());
+        }
     }
 
     @Override

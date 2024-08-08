@@ -13,6 +13,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -29,6 +30,7 @@ import java.util.function.Function;
 @Service
 @Configuration
 @EnableScheduling
+@Log4j2
 @RequiredArgsConstructor
 public class JwtService {
 
@@ -52,6 +54,11 @@ public class JwtService {
      */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         Claims claims = extractAllClaims(token);
+
+        if (log.isInfoEnabled()) {
+            log.info("Successfully extracted claims from token");
+        }
+
         return claimsResolver.apply(claims);
     }
 
@@ -61,7 +68,13 @@ public class JwtService {
      * @return  Return the username from JWT token.
      */
     public String extractUsername(String token) {
-        return extractClaim(token, claims -> claims.get("username", String.class));
+        String username = extractClaim(token, claims -> claims.get("username", String.class));
+
+        if (log.isInfoEnabled()) {
+            log.info("Extracted username from token: {}", username);
+        }
+
+        return username;
     }
 
     /**
@@ -70,7 +83,13 @@ public class JwtService {
      * @return  Return the expiration date from JWT token.
      */
     public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+        Date expiration = extractClaim(token, Claims::getExpiration);
+
+        if (log.isInfoEnabled()) {
+            log.info("Extracted expiration date from token: {}", expiration);
+        }
+
+        return expiration;
     }
 
     /**
@@ -79,12 +98,18 @@ public class JwtService {
      * @return  Return claims from JWT token.
      */
     private Claims extractAllClaims(String token) {
-        return Jwts
+        Claims claims = Jwts
                 .parserBuilder()
                 .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+
+        if (log.isInfoEnabled()) {
+            log.info("Claims extracted successfully: {}", claims);
+        }
+
+        return claims;
     }
 
     /**
@@ -95,7 +120,18 @@ public class JwtService {
      */
     public Boolean validateToken(String token, UserDetails userDetails) {
         String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && !isTokenBlacklisted(token));
+        if (log.isDebugEnabled()) {
+            log.debug("Validating token for username: {}", username);
+        }
+        boolean isUsernameValid = username.equals(userDetails.getUsername());
+        boolean isTokenExpired = isTokenExpired(token);
+        boolean isTokenBlacklisted = isTokenBlacklisted(token);
+
+        if (log.isInfoEnabled()) {
+            log.info("Token validation results: {}", isUsernameValid && !isTokenExpired && !isTokenBlacklisted);
+        }
+
+        return isUsernameValid && !isTokenExpired && !isTokenBlacklisted;
     }
 
     /**
@@ -109,7 +145,13 @@ public class JwtService {
                 userSecurityDTO,
                 HashMap.class);
 
-        return createToken(claims, userSecurityDTO.getId().toString());
+        String token = createToken(claims, userSecurityDTO.getId().toString());
+
+        if (log.isInfoEnabled()) {
+            log.info("Token generated successfully: {}", token);
+        }
+
+        return token;
     }
 
     /**
@@ -119,11 +161,32 @@ public class JwtService {
      */
 
     private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+
+        Date expirationDate = extractExpiration(token);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Token expiration date: {}", expirationDate);
+            log.debug("Current date: {}", new Date());
+        }
+
+        boolean isExpired = expirationDate.before(new Date());
+
+        if (log.isInfoEnabled()) {
+            log.info("Token is expired: {}", isExpired);
+        }
+
+        return isExpired;
+
     }
 
     private Boolean isTokenBlacklisted(String token) {
-        return blacklistedAccessTokenRepository.findByToken(token).isPresent();
+        boolean isBlacklisted = blacklistedAccessTokenRepository.findByToken(token).isPresent();
+
+        if (log.isInfoEnabled()) {
+            log.info("Token is blacklisted: {}", isBlacklisted);
+        }
+
+        return isBlacklisted;
     }
 
     /**
@@ -133,13 +196,19 @@ public class JwtService {
      * @return Return the created jwt token
      */
     private String createToken(Map<String, Object> claims, String id) {
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setClaims(claims)
                 .setSubject(id)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + tokenConfig.getExpiryMs()))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
+
+        if (log.isInfoEnabled()) {
+            log.info("Created token: {}", token);
+        }
+
+        return token;
     }
 
     /**
@@ -149,7 +218,13 @@ public class JwtService {
      */
     private Key getSignKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBytes);
+        Key key = Keys.hmacShaKeyFor(keyBytes);
+
+        if (log.isInfoEnabled()) {
+            log.info("Generated hmac key using BASE64 decoded key bytes.");
+        }
+
+        return key;
     }
 
 
@@ -168,8 +243,14 @@ public class JwtService {
 
         try {
             blacklistedAccessToken.setExpiry(extractExpiration(token));
+            if (log.isInfoEnabled()) {
+                log.info("Token invalidated. Expiration set to {}.", blacklistedAccessToken.getExpiry());
+            }
         } catch (ExpiredJwtException e) {
             blacklistedAccessToken.setExpiry(e.getClaims().getExpiration());
+            if (log.isWarnEnabled()) {
+                log.warn("Token has expired and was invalidated. Expiration from exception: {}.", blacklistedAccessToken.getExpiry());
+            }
         }
 
         blacklistedAccessTokenRepository.save(blacklistedAccessToken);
@@ -182,6 +263,17 @@ public class JwtService {
      */
     @Scheduled(cron = "0 0 12 * * ?")
     private void deleteExpiredTokens() {
-        blacklistedAccessTokenRepository.deleteAllByExpiryLessThan(new Date());
+
+        try {
+            blacklistedAccessTokenRepository.deleteAllByExpiryLessThan(new Date());
+            if (log.isInfoEnabled()) {
+                log.info("Deleted expired tokens");
+            }
+        } catch (Exception e) {
+            if (log.isErrorEnabled()) {
+                log.error("Error occurred while deleting expired tokens: {}",e.getMessage());
+            }
+        }
+
     }
 }
