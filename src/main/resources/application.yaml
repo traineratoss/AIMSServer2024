@@ -12,6 +12,8 @@ spring:
       default-schema: public
     properties:
       dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate: show_sql=false
+
 
   mail:
     default-encoding: UTF-8
@@ -32,18 +34,31 @@ spring:
 aims:
   app:
     jwt:
-      accessTokenExpirationMs: 18000000
-      refreshTokenExpirationMs: 18000000
+      accessTokenExpiryMs: 300000       # 5 minutes
+      refreshTokenExpiryMs: 7200000     # 2 hours
       secret: 9eadbfa9ea1aa2cfa839853167ed1c9f11fcd0f4977ea84993e7ad2ac338b490
-    cookie:
-      maxAgeAccessTokenCookieSeconds: 10000
-      maxAgeRefreshTokenCookieSeconds: 10000
     bcrypt:
       salt: $2a$10$QkRidA35ea0Fzm/ObrOEgO
+    sessionIdHeader: "Session-ID"
+    publicRoutes:
+      /api/v1/auth/**,
+      /users/change-password/**,
+      /users/verify-otp,
+      /users/send-forgot-password
+    privateRoutes:
+      /users/all,
+      /users/update-profile,
+      /users/idByUsername,
+      /aims/api/v1/ideas/**,
+      /aims/api/v1/documents/**,
+      /aims/api/v1/avatars/**,
+      /aims/api/v1/images/**,
+      /users/get-avatar-by-username
 
 logging:
   level:
     root: INFO
+
 
 cors:
   allowedOrigins: "http://localhost:5173"

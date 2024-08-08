@@ -1,23 +1,9 @@
 package com.atoss.idea.management.system.service.implementation;
 
-import com.atoss.idea.management.system.exception.ApproveAlreadyGrantedException;
-import com.atoss.idea.management.system.exception.AvatarNotFoundException;
-import com.atoss.idea.management.system.exception.EmailAlreadyExistException;
-import com.atoss.idea.management.system.exception.EmailFailedException;
-import com.atoss.idea.management.system.exception.UserAlreadyActivatedException;
-import com.atoss.idea.management.system.exception.UserAlreadyDeactivatedException;
-import com.atoss.idea.management.system.exception.UserAlreadyExistException;
-import com.atoss.idea.management.system.exception.UserNotFoundException;
-import com.atoss.idea.management.system.exception.UsernameAlreadyExistException;
+import com.atoss.idea.management.system.exception.*;
 import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
-import com.atoss.idea.management.system.repository.dto.UserAdminDashboardResponseDTO;
-import com.atoss.idea.management.system.repository.dto.UserPageDTO;
-import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
-import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
-import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
-import com.atoss.idea.management.system.repository.dto.VerifyOtpDTO;
+import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.OTP;
 import com.atoss.idea.management.system.repository.entity.Role;
@@ -89,6 +75,7 @@ public class UserServiceImpl implements UserService {
         user.setIsFirstLogin(true);
         userRepository.save(user);
         sendEmailService.sendEmailToUser(username);
+        sendEmailService.sendEmailToAdmins(username);
 
         return modelMapper.map(user, UserResponseDTO.class);
     }
@@ -119,6 +106,9 @@ public class UserServiceImpl implements UserService {
                             () -> new AvatarNotFoundException("Avatar not found!")
                     );
             user.setAvatar(modelMapper.map(avatar, Avatar.class));
+        }
+        if (userUpdateDTO.getUpdatedImage()) {
+            user.setImage(userUpdateDTO.getImage());
         }
         if (userUpdateDTO.getFullName() != null) {
             user.setFullName(userUpdateDTO.getFullName());
@@ -214,10 +204,13 @@ public class UserServiceImpl implements UserService {
     public boolean changePassword(ChangePasswordDTO changePasswordDTO) {
         String username = changePasswordDTO.getUsername();
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found!"));
-        String hashFrontendNewPassword = BCrypt.hashpw(changePasswordDTO.getNewPassword(), bcryptSalt);
         if (!user.getIsFirstLogin() && !BCrypt.checkpw(changePasswordDTO.getOldPassword(), user.getPassword())) {
-            return false;
+            throw new IncorrectPasswordException("The old password is incorrect!");
         }
+        if (user.getIsFirstLogin() && BCrypt.checkpw(changePasswordDTO.getNewPassword(), user.getPassword())) {
+            throw new IncorrectPasswordException("The new password cannot be the same as the old password!");
+        }
+        String hashFrontendNewPassword = BCrypt.hashpw(changePasswordDTO.getNewPassword(), bcryptSalt);
         user.setPassword(hashFrontendNewPassword);
         user.setIsFirstLogin(false);
         userRepository.save(user);
@@ -239,7 +232,10 @@ public class UserServiceImpl implements UserService {
             throw new BadCredentialsException("Expired OTP");
         }
 
+        user.setIsFirstLogin(true);
         user.setOtp(null);
+
+        userRepository.save(user);
 
         return modelMapper.map(user, UserSecurityDTO.class);
     }
@@ -298,7 +294,6 @@ public class UserServiceImpl implements UserService {
             sendEmailService.sendEmailForgotPassword(user.getUsername(), otp.getCode());
 
             user.setOtp(otp);
-            user.setIsFirstLogin(true);
             userRepository.save(user);
             return new ResponseEntity<>("Email sent", HttpStatus.OK);
         } else {
@@ -365,5 +360,15 @@ public class UserServiceImpl implements UserService {
 
         user.setIsFirstLogin(false);
         userRepository.save(user);
+    }
+
+    @Override
+    public ImageDTO getAvatarByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found!"));
+        if (user.getImage() == null) {
+            throw new AvatarNotFoundException("Avatar not found!");
+        }
+        return user.getImage();
     }
 }

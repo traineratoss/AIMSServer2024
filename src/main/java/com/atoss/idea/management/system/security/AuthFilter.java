@@ -1,13 +1,15 @@
 package com.atoss.idea.management.system.security;
 
 import com.atoss.idea.management.system.exception.RefreshTokenExpiredException;
+import com.atoss.idea.management.system.security.token.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,29 +18,32 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Log4j2
 public class AuthFilter extends OncePerRequestFilter {
 
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
-    private CookieService cookieService;
+    private final SessionService sessionService;
+
+    @Value("${aims.app.publicRoutes}")
+    private String[] publicRoutes;
 
     /**
      * Performs filtering on the incoming HTTP request and response to set user information as a cookie.
      *
-     * @param request      The HttpServletRequest object representing the incoming request.
-     * @param response     The HttpServletResponse object representing the response to be sent to the client.
-     * @param filterChain  The FilterChain to continue the filter chain with the next filter or servlet in the chain.
-     *
+     * @param request     The HttpServletRequest object representing the incoming request.
+     * @param response    The HttpServletResponse object representing the response to be sent to the client.
+     * @param filterChain The FilterChain to continue the filter chain with the next filter or servlet in the chain.
      * @throws ServletException If a general servlet exception occurs during the processing of the request or response.
      * @throws IOException      If an input or output exception occurs during the processing of the request or response.
-     *
      * @see HttpServletRequest
      * @see HttpServletResponse
      * @see FilterChain
@@ -51,28 +56,33 @@ public class AuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         try {
-            cookieService.getTokenFromCookies(request.getCookies(), "accessToken").ifPresent(
-                    token -> {
-                        if (request.getRequestURI().contains("/api/v1/auth/")) {
-                            return;
-                        }
+            sessionService.extractToken(request, jwtService.getTokenConfig())
+                    .ifPresent(
+                            token -> {
+                                if (Arrays.stream(publicRoutes)
+                                        .map(route -> route.replaceAll("\\*", ""))
+                                        .anyMatch(route -> request.getRequestURI().contains(route))) {
+                                    return;
+                                }
 
-                        String username = jwtService.extractUsername(token);
 
-                        if (username != null) {
-                            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                            if (jwtService.validateToken(token, userDetails)) {
-                                UsernamePasswordAuthenticationToken authenticationToken =
-                                        new UsernamePasswordAuthenticationToken(
-                                                userDetails,
-                                                null,
-                                                userDetails.getAuthorities());
-                                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                                String username = jwtService.extractUsername(token);
+
+                                if (username != null) {
+                                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                                    if (jwtService.validateToken(token, userDetails)) {
+                                        UsernamePasswordAuthenticationToken authenticationToken =
+                                                new UsernamePasswordAuthenticationToken(
+                                                        userDetails,
+                                                        null,
+                                                        userDetails.getAuthorities());
+                                        authenticationToken.setDetails(new WebAuthenticationDetailsSource()
+                                                .buildDetails(request));
+                                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                                    }
+                                }
                             }
-                        }
-                    }
-            );
+                );
 
             filterChain.doFilter(request, response);
 

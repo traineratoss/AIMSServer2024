@@ -1,4 +1,4 @@
-package com.atoss.idea.management.system.security;
+package com.atoss.idea.management.system.security.token;
 
 import com.atoss.idea.management.system.repository.BlacklistedAccessTokenRepository;
 import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
@@ -11,6 +11,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -34,12 +35,12 @@ public class JwtService {
     @Value("${aims.app.jwt.secret}")
     private String secret;
 
-    @Value("${aims.app.jwt.accessTokenExpirationMs}")
-    private Long expirationMs;
-
     private final ObjectMapper objectMapper;
     private final UserService userService;
     private final BlacklistedAccessTokenRepository blacklistedAccessTokenRepository;
+
+    @Getter
+    private final AccessTokenConfig tokenConfig;
 
     /**
      * Extracts of any claim for JWT token
@@ -60,7 +61,7 @@ public class JwtService {
      * @return  Return the username from JWT token.
      */
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractClaim(token, claims -> claims.get("username", String.class));
     }
 
     /**
@@ -103,11 +104,12 @@ public class JwtService {
      * @return Return generated Jwt token
      */
     public String generateToken(String username) {
+        UserSecurityDTO userSecurityDTO = userService.getUserByUsername(username, UserSecurityDTO.class);
         Map<String, Object> claims = objectMapper.convertValue(
-                    userService.getUserByUsername(username, UserSecurityDTO.class),
-                    HashMap.class);
+                userSecurityDTO,
+                HashMap.class);
 
-        return createToken(claims, username);
+        return createToken(claims, userSecurityDTO.getId().toString());
     }
 
     /**
@@ -127,15 +129,15 @@ public class JwtService {
     /**
      * Creates a Jwt token with the specified claims and username
      * @param claims The claims which are included into Jwt token
-     * @param username The username which is included into Jwt TOKEN
+     * @param id The user id which is included into Jwt TOKEN
      * @return Return the created jwt token
      */
-    private String createToken(Map<String, Object> claims, String username) {
+    private String createToken(Map<String, Object> claims, String id) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(username)
+                .setSubject(id)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenConfig.getExpiryMs()))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -205,6 +205,19 @@ public interface CommentService {
      */
     void deleteLikesForDeletedComment(Long commentId);
 
+
+    /**
+     * Counts the number of likes.
+     * @return the number of likes.
+     */
+    Long countNumberOfLikes();
+
+    /**
+     * Counts the number of reports.
+     * @return the number of reports.
+     */
+    Long countNumberOfReports();
+
     /**
      * Deletes reports associated with a deleted comment.
      *

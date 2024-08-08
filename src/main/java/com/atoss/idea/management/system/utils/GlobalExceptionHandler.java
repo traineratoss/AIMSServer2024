@@ -177,8 +177,8 @@ public class GlobalExceptionHandler {
      */
 
     @ExceptionHandler(value = IncorrectPasswordException.class)
-    public ResponseEntity<IncorrectPasswordException> incorrectPasswordException(IncorrectPasswordException incorrectPasswordException) {
-        return new ResponseEntity<>(incorrectPasswordException, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> incorrectPasswordException(IncorrectPasswordException incorrectPasswordException) {
+        return new ResponseEntity<>(incorrectPasswordException.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     /**

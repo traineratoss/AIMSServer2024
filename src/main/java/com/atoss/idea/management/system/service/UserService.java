@@ -250,4 +250,12 @@ public interface UserService {
      * @throws UserNotFoundException if the user is not found in the database
      */
     void abortChangePassword(ChangePasswordDTO changePasswordDTO);
+
+    /**
+     * Retrieves the avatar image data transfer object (DTO) for a given username.
+     *
+     * @param username the username of the user whose avatar is to be retrieved
+     * @return a ResponseEntity containing the ImageDTO
+     */
+    ImageDTO getAvatarByUsername(String username);
 }
