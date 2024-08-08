@@ -48,6 +48,8 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     private final CommentRepository commentRepository;
 
+    private final HtmlServiceImpl htmlService;
+
 
     /**
      * Constructor
@@ -62,13 +64,14 @@ public class StatisticsServiceImpl implements StatisticsService {
     public StatisticsServiceImpl(ModelMapper modelMapper,
                                  IdeaService ideaService,
                                  IdeaRepository ideaRepository,
-                                 CommentServiceImpl commentService, UserRepository userRepository, CommentRepository commentRepository) {
+                                 CommentServiceImpl commentService, UserRepository userRepository, CommentRepository commentRepository, HtmlServiceImpl htmlService) {
         this.modelMapper = modelMapper;
         this.ideaService = ideaService;
         this.ideaRepository = ideaRepository;
         this.commentService = commentService;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
+        this.htmlService = htmlService;
     }
 
     @Override
@@ -140,7 +143,11 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .map(idea_id -> {
                     Idea idea = ideaRepository.findById(idea_id).get();
                     IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
+                    String htmlContent1 = htmlService.markdownToHtml(idea.getTitle());
+                    ideaResponseDTO.setTitle(htmlContent1);
                     ideaResponseDTO.setUsername(idea.getUser().getUsername());
+                    String htmlContent2 = htmlService.markdownToHtml(idea.getText());
+                    ideaResponseDTO.setText(htmlContent2);
                     ideaResponseDTO.setElapsedTime(commentService.getElapsedTime(idea.getCreationDate()));
                     ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
                     return ideaResponseDTO;
@@ -191,7 +198,8 @@ public class StatisticsServiceImpl implements StatisticsService {
                 .map(comment -> {
                     CommentStatisticsDTO dto = new CommentStatisticsDTO();
                     dto.setCommentId(comment.getId());
-                    dto.setCommentText(comment.getCommentText());
+                    String htmlContent = htmlService.markdownToHtml(comment.getCommentText());
+                    dto.setCommentText(htmlContent);
                     dto.setNrLikes(commentRepository.countLikesByCommentId(comment.getId()));
                     return dto;
                 })
