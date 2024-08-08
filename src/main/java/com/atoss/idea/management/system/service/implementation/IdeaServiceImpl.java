@@ -66,6 +66,8 @@ public class IdeaServiceImpl implements IdeaService {
 
     private final HtmlServiceImpl htmlService;
 
+    private final DocumentRepository documentRepository;
+
 
     /**
      * Constructor for the Idea Service Implementation
@@ -81,6 +83,7 @@ public class IdeaServiceImpl implements IdeaService {
      * @param subscriptionRepository repository for the Subscription Entity
      * @param documentService    service for documents
      * @param htmlService            for handling HTML content and processing
+     * @param documentRepository document repo
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
                            ImageRepository imageRepository, UserRepository userRepository,
@@ -91,7 +94,8 @@ public class IdeaServiceImpl implements IdeaService {
                            SendEmailService sendEmailService,
                            SubscriptionRepository subscriptionRepository,
                            DocumentServiceImpl documentService,
-                           HtmlServiceImpl htmlService) {
+                           HtmlServiceImpl htmlService,
+                           DocumentRepository documentRepository) {
         this.ratingRepository = ratingRepository;
         this.ideaRepository = ideaRepository;
         this.imageRepository = imageRepository;
@@ -103,6 +107,7 @@ public class IdeaServiceImpl implements IdeaService {
         this.subscriptionRepository = subscriptionRepository;
         this.documentService = documentService;
         this.htmlService = htmlService;
+        this.documentRepository = documentRepository;
     }
 
     private String filterBadWords(String text) {
@@ -190,6 +195,29 @@ public class IdeaServiceImpl implements IdeaService {
         ideaRepository.save(savedIdea);
         IdeaResponseDTO responseDTO = modelMapper.map(savedIdea, IdeaResponseDTO.class);
         responseDTO.setUsername(username);
+
+        if (idea.getDocuments() != null) {
+            for (DocumentDTO documentDTO : idea.getDocuments()) {
+                Document existingDocument = documentRepository.findDocumentByFileName(documentDTO.getFileName());
+                if (existingDocument == null) {
+                    Document newDocument = modelMapper.map(documentDTO, Document.class);
+                    if (savedIdea.getDocumentList() == null) {
+                        savedIdea.setDocumentList(new ArrayList<>());
+                        newDocument.setUser(user);
+                        newDocument.setIdea(savedIdea);
+                    } else {
+                        newDocument.setUser(user);
+                        newDocument.setIdea(savedIdea);
+                        savedIdea.getDocumentList().add(newDocument);
+                        documentRepository.save(newDocument);
+                    }
+                    savedIdea.getDocumentList().add(newDocument);
+                    documentRepository.save(newDocument);
+                }
+            }
+            ideaRepository.save(savedIdea);
+        }
+
         return responseDTO;
     }
 
@@ -309,6 +337,30 @@ public class IdeaServiceImpl implements IdeaService {
 
                 idea.setCategoryList(newList);
             }
+
+            if (ideaUpdateDTO.getDocuments() != null) {
+                for (DocumentDTO documentDTO : ideaUpdateDTO.getDocuments()) {
+                    Document existingDocument = documentRepository.findDocumentByFileName(documentDTO.getFileName());
+                    if (existingDocument == null) {
+                        Document newDocument = modelMapper.map(documentDTO, Document.class);
+                        if (idea.getDocumentList() == null) {
+                            idea.setDocumentList(new ArrayList<>());
+                            newDocument.setIdea(idea);
+                            newDocument.setUser(idea.getUser());
+                        } else {
+                            newDocument.setIdea(idea);
+                            newDocument.setUser(idea.getUser());
+                            idea.getDocumentList().add(newDocument);
+                            documentRepository.save(newDocument);
+                        }
+                        idea.getDocumentList().add(newDocument);
+                        documentRepository.save(newDocument);
+                    }
+                }
+                ideaRepository.save(idea);
+            }
+
+
             IdeaResponseDTO responseDTO = modelMapper.map(ideaRepository.save(idea), IdeaResponseDTO.class);
             responseDTO.setUsername(ideaRepository.findById(id).get().getUser().getUsername());
             responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));

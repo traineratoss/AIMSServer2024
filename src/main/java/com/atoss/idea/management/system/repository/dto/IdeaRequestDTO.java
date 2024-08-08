@@ -24,4 +24,5 @@ public class IdeaRequestDTO {
 
     private Double ratingAvg;
 
+    private DocumentDTO[] documents;
 }

@@ -33,5 +33,7 @@ public class IdeaResponseDTO {
 
     private Double ratingAvg;
 
+    private DocumentDTO[] documents;
+
 }
 
