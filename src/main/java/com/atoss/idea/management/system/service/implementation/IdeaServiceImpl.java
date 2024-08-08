@@ -230,6 +230,8 @@ public class IdeaServiceImpl implements IdeaService {
             responseDTO.setUsername(ideaRepository.findById(id).get().getUser().getUsername());
             String htmlContent = htmlService.markdownToHtml(ideaRepository.findById(id).get().getText());
             responseDTO.setText(htmlContent);
+            String htmlContent2 = htmlService.markdownToHtml(ideaRepository.findById(id).get().getTitle());
+            responseDTO.setTitle(htmlContent2);
             responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
             responseDTO.setCommentsNumber(idea.getCommentList().size());
             return responseDTO;
@@ -392,6 +394,8 @@ public class IdeaServiceImpl implements IdeaService {
                     responseDTO.setUsername(idea.getUser().getUsername());
                     String htmlContent = htmlService.markdownToHtml(ideaRepository.findById(idea.getId()).get().getText());
                     responseDTO.setText(htmlContent);
+                    String htmlContent2 = htmlService.markdownToHtml(ideaRepository.findById(idea.getId()).get().getTitle());
+                    responseDTO.setTitle(htmlContent2);
                     responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
                     responseDTO.setCommentsNumber(idea.getCommentList().size());
                     return responseDTO;
@@ -416,6 +420,8 @@ public class IdeaServiceImpl implements IdeaService {
                     responseDTO.setUsername(user.getUsername());
                     String htmlContent = htmlService.markdownToHtml(ideaRepository.findById(idea.getId()).get().getText());
                     responseDTO.setText(htmlContent);
+                    String htmlContent2 = htmlService.markdownToHtml(ideaRepository.findById(idea.getId()).get().getTitle());
+                    responseDTO.setTitle(htmlContent2);
                     responseDTO.setElapsedTime(commentServiceImpl.getElapsedTime(idea.getCreationDate()));
                     responseDTO.setCommentsNumber(idea.getCommentList().size());
                     return responseDTO;

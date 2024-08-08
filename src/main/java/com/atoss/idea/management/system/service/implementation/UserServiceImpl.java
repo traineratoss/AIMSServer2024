@@ -24,7 +24,6 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Log4j2
@@ -44,8 +43,9 @@ public class UserServiceImpl implements UserService {
 
     /**
      * CONSTRUCTOR
-     * @param userRepository for accessing CRUD repository methods for User Entity
-     * @param modelMapper for mapping entity-dto relationships
+     *
+     * @param userRepository   for accessing CRUD repository methods for User Entity
+     * @param modelMapper      for mapping entity-dto relationships
      * @param sendEmailService service used for sending emails
      * @param avatarRepository for accessing CRUD repository methods for Avatar Entity
      */
@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
         if (userUpdateDTO.getAvatarId() != null) {
             Avatar avatar = avatarRepository
                     .findById(
-                        userUpdateDTO.getAvatarId()
+                            userUpdateDTO.getAvatarId()
                     )
                     .orElseThrow(() -> {
                         if (log.isErrorEnabled()) {
@@ -261,11 +261,11 @@ public class UserServiceImpl implements UserService {
             log.info("Retrieved all pending users with isActive: {}", isActive);
         }
         return new PageImpl<>(
-          userRepository.findAll(pageable)
-                  .stream()
-                  .filter(user -> user.getIsActive() != null && user.getIsActive().equals(isActive))
-                  .map(user -> modelMapper.map(user, UserResponseDTO.class))
-                  .toList()
+                userRepository.findAll(pageable)
+                        .stream()
+                        .filter(user -> user.getIsActive() != null && user.getIsActive().equals(isActive))
+                        .map(user -> modelMapper.map(user, UserResponseDTO.class))
+                        .toList()
         );
     }
 
@@ -342,7 +342,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<Object> sendApproveEmail(String username) {
-        User user = userRepository.findByUsername(username) .orElseThrow(() -> {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> {
             if (log.isErrorEnabled()) {
                 log.error("User not found with username: {}", username);
             }

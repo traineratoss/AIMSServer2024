@@ -271,7 +271,7 @@ public class JwtService {
             }
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
-                log.error("Error occurred while deleting expired tokens: {}",e.getMessage());
+                log.error("Error occurred while deleting expired tokens: {}", e.getMessage());
             }
         }
 

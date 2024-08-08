@@ -2,7 +2,6 @@ package com.atoss.idea.management.system.service.implementation;
 
 import com.atoss.idea.management.system.exception.AvatarNotFoundException;
 import com.atoss.idea.management.system.exception.CommentNotFoundException;
-import com.atoss.idea.management.system.exception.EmailFailedException;
 import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.entity.*;
@@ -111,10 +110,10 @@ public class SendEmailServiceImpl implements SendEmailService {
 
     @Override
     public void sendDeclineEmailToUser(String username) {
-            sendEmailUtils("registration-reject-template.ftl", username, "", "Registration Request - Rejected");
-            if (log.isInfoEnabled()) {
-                log.info("Decline email successfully sent to user with username: {}", username);
-            }
+        sendEmailUtils("registration-reject-template.ftl", username, "", "Registration Request - Rejected");
+        if (log.isInfoEnabled()) {
+            log.info("Decline email successfully sent to user with username: {}", username);
+        }
     }
 
 
@@ -123,8 +122,8 @@ public class SendEmailServiceImpl implements SendEmailService {
      *
      * @param usernames The usernames of the users which are subscribed to the idea
      * @param ideaId    the id of the idea whose text has changed
-     * @param oldText the text of the idea before it was updated
-     * @param oldTitle the title of the idea before it was updated
+     * @param oldText   the text of the idea before it was updated
+     * @param oldTitle  the title of the idea before it was updated
      */
     public void sendEmailUpdatedIdea(List<User> usernames, Long ideaId, String oldText, String oldTitle) {
         Idea idea = ideaRepository.findById(ideaId).get();
@@ -134,10 +133,10 @@ public class SendEmailServiceImpl implements SendEmailService {
         for (User user : usernames) {
             String username = user.getUsername();
 
-                sendEmailIdeaSubscription("text-change-subscription-template.ftl", username, oldTitle, oldText, ideaId, "AIMS Updated Idea");
-                if (log.isInfoEnabled()) {
-                    log.info("Successfully sent update idea email to user with username: {}", username);
-                }
+            sendEmailIdeaSubscription("text-change-subscription-template.ftl", username, oldTitle, oldText, ideaId, "AIMS Updated Idea");
+            if (log.isInfoEnabled()) {
+                log.info("Successfully sent update idea email to user with username: {}", username);
+            }
 
         }
     }
@@ -330,7 +329,7 @@ public class SendEmailServiceImpl implements SendEmailService {
             }
         } catch (IOException | TemplateException exception) {
             if (log.isErrorEnabled()) {
-                log.error("Failed to send email to admin, error: {}",exception.getMessage());
+                log.error("Failed to send email to admin, error: {}", exception.getMessage());
             }
 
         }
@@ -408,12 +407,13 @@ public class SendEmailServiceImpl implements SendEmailService {
      * <p>
      * This method fetches an idea from the idea repository using the given id. If the idea does not exist,
      * a RuntimeException is thrown.
+     *
      * @param ideaId The id of the idea to retrieve.
      * @return The Idea object corresponding to the given id.
      * @throws RuntimeException If the user does not exist in the repository.
      */
     private Idea getIdeaById(Long ideaId) {
-        Idea idea=ideaRepository.findById(ideaId)
+        Idea idea = ideaRepository.findById(ideaId)
                 .orElseThrow(() -> {
                     if (log.isErrorEnabled()) {
                         log.error("Idea with id: {} does not exist!", ideaId);
@@ -431,7 +431,7 @@ public class SendEmailServiceImpl implements SendEmailService {
      * This method fetches a idea from the comment repository using the given id. If the comment does not exist,
      *
      * @param commentId The id of the idea to retrieve.
-     * @param comment The comment text
+     * @param comment   The comment text
      * @throws RuntimeException If the user does not exist in the repository.
      */
     @Override
@@ -454,7 +454,7 @@ public class SendEmailServiceImpl implements SendEmailService {
      *
      * @param commentId The id of the comment to retrieve.
      * @param usernames the usernames of the users who are subscribed to the idea
-     * @param comment the text of the comment that has been added
+     * @param comment   the text of the comment that has been added
      */
     @Override
     public void sendEmailAddedComment(List<User> usernames, Long commentId, String comment) {
@@ -471,7 +471,7 @@ public class SendEmailServiceImpl implements SendEmailService {
     }
 
     private Comment getCommentById(Long commentId) {
-        Comment comment =commentRepository.findById(commentId)
+        Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> {
                     if (log.isErrorEnabled()) {
                         log.error("Comment with id: {} does not exist!", commentId);
@@ -505,8 +505,8 @@ public class SendEmailServiceImpl implements SendEmailService {
                 log.info("Email sent successfully to {} regarding the change in comment with text: {}", emailTo, comment.getCommentText());
             }
         } catch (IOException | TemplateException exception) {
-            if(log.isErrorEnabled()){
-                log.error("Failed to send email to {} regarding the change in comment with text: {} error: {}", emailTo, comment.getCommentText(), exception.getMessage());
+            if (log.isErrorEnabled()) {
+                log.error("Failed to send email to {} regarding the change in comment, error: {}", emailTo, exception.getMessage());
             }
         }
     }
@@ -542,7 +542,7 @@ public class SendEmailServiceImpl implements SendEmailService {
     /**
      * Sends an email when a document is added
      *
-     * @param ideaId The id of the idea to retrieve.
+     * @param ideaId    The id of the idea to retrieve.
      * @param usernames the usernames of the users who are subscribed to the idea
      * @param fileNames the document names that have been added
      */

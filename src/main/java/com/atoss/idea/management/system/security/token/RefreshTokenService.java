@@ -121,7 +121,7 @@ public class RefreshTokenService {
         Optional<String> token = sessionService.extractToken(request, tokenConfig);
 
         if (token.isEmpty()) {
-            if(log.isErrorEnabled()){
+            if (log.isErrorEnabled()) {
                 log.error("Token is empty or not found");
             }
             throw new InvalidRefreshTokenException("Invalid refresh token");
@@ -129,13 +129,13 @@ public class RefreshTokenService {
 
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token.get())
                 .orElseThrow(() -> {
-                            if(log.isErrorEnabled()) {
-                                log.error("Token not found in repository");
-                            }
+                    if (log.isErrorEnabled()) {
+                        log.error("Token not found in repository");
+                    }
                     return new InvalidRefreshTokenException("Invalid refresh token");
                 });
 
-        if(log.isInfoEnabled()){
+        if (log.isInfoEnabled()) {
             log.info("Found refresh token: {}", refreshToken.getToken());
         }
         verifyExpiration(refreshToken);
@@ -145,11 +145,11 @@ public class RefreshTokenService {
         User user;
         if (userOptional.isPresent()) {
             user = userOptional.get();
-            if(log.isInfoEnabled()){
+            if (log.isInfoEnabled()) {
                 log.info("User found: {}", user.getUsername());
             }
         } else {
-            if(log.isErrorEnabled()){
+            if (log.isErrorEnabled()) {
                 log.error("User not found for refresh token: {}", refreshToken.getToken());
             }
             throw new UserNotFoundException("User not found " + refreshToken.getUser().getUsername());
@@ -159,7 +159,7 @@ public class RefreshTokenService {
 
         refreshTokenRepository.delete(refreshToken);
 
-        if(log.isDebugEnabled()){
+        if (log.isDebugEnabled()) {
             log.debug("Deleted old refresh token: {}", refreshToken.getToken());
         }
 
@@ -185,7 +185,7 @@ public class RefreshTokenService {
                 Date.from(newRefreshToken.getExpiryDate()),
                 new UserSecurityDTO());
 
-        if(log.isInfoEnabled()) {
+        if (log.isInfoEnabled()) {
             log.info("Generated new access token and refresh token");
         }
         return authResponse;
@@ -199,7 +199,7 @@ public class RefreshTokenService {
      */
     public void invalidateToken(String token) {
         refreshTokenRepository.findByToken(token).ifPresent(refreshTokenRepository::delete);
-        if(log.isInfoEnabled()){
+        if (log.isInfoEnabled()) {
             log.info("Refresh token invalidated successfully");
         }
     }

@@ -60,11 +60,15 @@ public class StatisticsServiceImpl implements StatisticsService {
      * @param commentService ==
      * @param userRepository ==
      * @param commentRepository ==
+     * @param htmlService ==
      */
     public StatisticsServiceImpl(ModelMapper modelMapper,
                                  IdeaService ideaService,
                                  IdeaRepository ideaRepository,
-                                 CommentServiceImpl commentService, UserRepository userRepository, CommentRepository commentRepository, HtmlServiceImpl htmlService) {
+                                 CommentServiceImpl commentService,
+                                 UserRepository userRepository,
+                                 CommentRepository commentRepository,
+                                 HtmlServiceImpl htmlService) {
         this.modelMapper = modelMapper;
         this.ideaService = ideaService;
         this.ideaRepository = ideaRepository;
