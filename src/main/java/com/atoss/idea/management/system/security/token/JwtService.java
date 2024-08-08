@@ -61,7 +61,7 @@ public class JwtService {
      * @return  Return the username from JWT token.
      */
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractClaim(token, claims -> claims.get("username", String.class));
     }
 
     /**
@@ -104,11 +104,12 @@ public class JwtService {
      * @return Return generated Jwt token
      */
     public String generateToken(String username) {
+        UserSecurityDTO userSecurityDTO = userService.getUserByUsername(username, UserSecurityDTO.class);
         Map<String, Object> claims = objectMapper.convertValue(
-                    userService.getUserByUsername(username, UserSecurityDTO.class),
-                    HashMap.class);
+                userSecurityDTO,
+                HashMap.class);
 
-        return createToken(claims, username);
+        return createToken(claims, userSecurityDTO.getId().toString());
     }
 
     /**
@@ -128,13 +129,13 @@ public class JwtService {
     /**
      * Creates a Jwt token with the specified claims and username
      * @param claims The claims which are included into Jwt token
-     * @param username The username which is included into Jwt TOKEN
+     * @param id The user id which is included into Jwt TOKEN
      * @return Return the created jwt token
      */
-    private String createToken(Map<String, Object> claims, String username) {
+    private String createToken(Map<String, Object> claims, String id) {
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(username)
+                .setSubject(id)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + tokenConfig.getExpiryMs()))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
