@@ -112,6 +112,7 @@ public interface IdeaService {
                                            String sortDirection,
                                            String username,
                                            String rating,
+                                           String subscription,
                                            Pageable pageable);
 
     /**

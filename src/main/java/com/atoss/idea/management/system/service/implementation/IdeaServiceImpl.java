@@ -22,6 +22,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -70,16 +72,16 @@ public class IdeaServiceImpl implements IdeaService {
     /**
      * Constructor for the Idea Service Implementation
      *
-     * @param ideaRepository     repository for the Idea Entity
-     * @param imageRepository    repository for the Image Entity
-     * @param userRepository     repository for the User Entity
-     * @param ratingRepository   repository for Rating Entity
-     * @param categoryRepository repository for the Category Entity
-     * @param modelMapper        responsible for mapping our entities
-     * @param commentServiceImpl ======
-     * @param sendEmailService   responsible for sending emails to users who have subscriptions
+     * @param ideaRepository         repository for the Idea Entity
+     * @param imageRepository        repository for the Image Entity
+     * @param userRepository         repository for the User Entity
+     * @param ratingRepository       repository for Rating Entity
+     * @param categoryRepository     repository for the Category Entity
+     * @param modelMapper            responsible for mapping our entities
+     * @param commentServiceImpl     ======
+     * @param sendEmailService       responsible for sending emails to users who have subscriptions
      * @param subscriptionRepository repository for the Subscription Entity
-     * @param documentService    service for documents
+     * @param documentService        service for documents
      * @param htmlService            for handling HTML content and processing
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
@@ -383,6 +385,7 @@ public class IdeaServiceImpl implements IdeaService {
                                                   String sortDirection,
                                                   String username,
                                                   String ratingAvg,
+                                                  String subscription,
                                                   Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
@@ -421,6 +424,10 @@ public class IdeaServiceImpl implements IdeaService {
             float lowerBound = rating;
             float upperBound = rating + 0.99f;
             predicatesList.add(cb.between(root.get("ratingAvg"), lowerBound, upperBound));
+        }
+        if (subscription != null) {
+            Long userId = userRepository.findByUsername(username).get().getId();
+            predicatesList.add(cb.equal(root.join("subscription").get("userId"), userId));
         }
         predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
         List<Order> orders = new ArrayList<>();
