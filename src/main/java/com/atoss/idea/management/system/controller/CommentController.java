@@ -38,7 +38,7 @@ public class CommentController {
 
     /**
      * Performs a Post Request in order to create a new comment
-     *
+     * <p>
      * Method receives data in json format from the client's request (as a @RequestBody)
      * Then a responseCommentDTO object is created and saved in the database using the CommentService "addComment" method
      * In the end, a ResponseEntity of type ResponseCommentDTO is returned
@@ -70,7 +70,7 @@ public class CommentController {
 
     /**
      * Performs a Post Request in order to create a new reply
-     *
+     * <p>
      * Method receives data in json format from the client's request (as a @RequestBody)
      * Then a responseCommentReplyDTO object is created and saved in the database using the CommentService "addReply" method
      * In the end, a ResponseEntity of type ResponseCommentReplyDTO is returned
@@ -92,10 +92,9 @@ public class CommentController {
     }
 
 
-
     /**
      * Performs a Get Request in order to get all comments of a certain idea in a paginated form
-     *
+     * <p>
      * Method takes the paging parametres: pageSize, pageNumber and sortCategory to create a Pageable object
      * The CommentService method "getAllPagedCommentsByIdeaId" gets all the comments that belong to a certain idea in the pageable object format
      * In the end, a ResponseEntity is returned
@@ -127,10 +126,9 @@ public class CommentController {
     }
 
 
-
     /**
      * Performs a Get Request in order to get all replies of a certain comment in a paginated form
-     *
+     * <p>
      * Method takes the paging parametres: pageSize, pageNumber and sortCategory to create a Pageable object
      * The CommentService method "getAllRepliesByCommentId" gets all the replies that belong to a certain comment in the pageable object format
      * In the end, a ResponseEntity is returned
@@ -162,11 +160,9 @@ public class CommentController {
     }
 
 
-
-
     /**
      * Performs a Get Request in order to get the time that has passed since a comment was created
-     *
+     * <p>
      * Method gets the comment id as a RequestParam
      * Then, the id is used in the CommentService method "getTimeForComment" and the result is returned
      *
@@ -189,11 +185,8 @@ public class CommentController {
     }
 
 
-
-
     /**
      * Performs a Delete Request in order to delete a certain comment
-     *
      * Method gets the id of the comment that is going to be deleted as a RequestParam
      * The, the id is used in the CommentService method "deleteComment" and the deleting operation happens
      *
@@ -215,11 +208,8 @@ public class CommentController {
     }
 
 
-
-
     /**
      * Retrieves the list of users who liked a specific comment.
-     *
      * @param commentId the ID of the comment
      * @return ResponseEntity containing the list of UserResponseDTOs who liked the comment
      */
@@ -234,8 +224,6 @@ public class CommentController {
         }
         return ResponseEntity.ok(likes);
     }
-
-
 
 
     /**
@@ -255,8 +243,6 @@ public class CommentController {
         }
         return ResponseEntity.ok(likesCount);
     }
-
-
 
 
     /**
@@ -282,8 +268,6 @@ public class CommentController {
     }
 
 
-
-
     /**
      * Deletes a like from a specific comment by a specific user.
      *
@@ -302,8 +286,6 @@ public class CommentController {
         }
         return new ResponseEntity<>("Like succesfully deleted", HttpStatus.OK);
     }
-
-
 
 
     /**
@@ -327,8 +309,6 @@ public class CommentController {
     }
 
 
-
-
     /**
      * Checks if a specific user has liked a specific comment.
      *
@@ -342,11 +322,11 @@ public class CommentController {
             log.info("Received request to check the existence of like by comment and user");
         }
         boolean exists = commentService.existsLikeByCommentIdAndUserId(commentId, userId);
-        if(exists){
+        if (exists) {
             if (log.isInfoEnabled()) {
                 log.info("Like exists by comment id and user id");
             }
-        }else{
+        } else {
             if (log.isInfoEnabled()) {
                 log.info("Like doesn't exists by comment id and user id");
             }
@@ -371,19 +351,17 @@ public class CommentController {
             log.info("Received request to check the existence of report by comment and user");
         }
         boolean exists = commentService.existsReportByCommentIdAndUserId(commentId, userId);
-        if(exists){
+        if (exists) {
             if (log.isInfoEnabled()) {
                 log.info("Report exists by comment id and user id");
             }
-        }else{
+        } else {
             if (log.isInfoEnabled()) {
                 log.info("Report doesn't exists by comment id and user id");
             }
         }
         return exists;
     }
-
-
 
 
     /**
@@ -395,7 +373,7 @@ public class CommentController {
     @GetMapping("/comments/reports/count/{commentId}")
     public ResponseEntity<Integer> getReportsCountForComment(@PathVariable Long commentId) {
         if (log.isInfoEnabled()) {
-           log.info("Received request to get the number of reports for the comment");
+            log.info("Received request to get the number of reports for the comment");
         }
         int reportsCount = commentService.getReportsCountForComment(commentId);
         if (log.isInfoEnabled()) {
@@ -403,8 +381,6 @@ public class CommentController {
         }
         return ResponseEntity.ok(reportsCount);
     }
-
-
 
 
     /**
@@ -437,12 +413,9 @@ public class CommentController {
     }
 
 
-
-
-
     /**
      * Adds a report to a specific comment from a specific user
-     *
+     * <p>
      * This method handles the HTTP POST request to add a report for a comment by a user
      * It calls the CommentService to perform the actual report addition logic
      *
@@ -454,7 +427,7 @@ public class CommentController {
     @PostMapping("/comments/report/{commentId}/{userId}")
     public ResponseEntity<String> addReport(@PathVariable Long commentId, @PathVariable Long userId) {
         if (log.isInfoEnabled()) {
-           log.info("Received request to add report for comment");
+            log.info("Received request to add report for comment");
         }
         commentService.addReport(commentId, userId);
         if (log.isInfoEnabled()) {
@@ -462,9 +435,6 @@ public class CommentController {
         }
         return new ResponseEntity<>("Report added successfully", HttpStatus.OK);
     }
-
-
-
 
 
     /**
@@ -478,7 +448,7 @@ public class CommentController {
     @PatchMapping("/comments/report/patch/{commentId}")
     public ResponseEntity<String> updateReportedComment(@PathVariable Long commentId) {
         if (log.isInfoEnabled()) {
-           log.info("Received request to update reported comment");
+            log.info("Received request to update reported comment");
         }
         if (commentService.getReportsCountForComment(commentId) <= 5) {
             if (log.isInfoEnabled()) {
@@ -494,8 +464,6 @@ public class CommentController {
     }
 
 
-
-
     /**
      * Deletes all reports associated with a specific comment ID.
      *
@@ -506,7 +474,7 @@ public class CommentController {
     @DeleteMapping("/comments/reports/delete/{commentId}")
     public ResponseEntity<String> deleteReportsByCommentId(@PathVariable Long commentId) {
         if (log.isInfoEnabled()) {
-           log.info("Received request to delete all reports for comment");
+            log.info("Received request to delete all reports for comment");
         }
         commentService.deleteReportsByCommentId(commentId);
         if (log.isInfoEnabled()) {
@@ -516,10 +484,9 @@ public class CommentController {
     }
 
 
-
     /**
      * Sets the review status for a specific comment identified by its ID via a PATCH request.
-     *
+     * <p>
      * This method is transactional to ensure that the operation is completed successfully or rolled back in case of failure.
      * The endpoint for this method is "/comments/reports/review/set".
      *
@@ -531,7 +498,7 @@ public class CommentController {
     @PatchMapping("/comments/reports/review/set")
     public void setReviewStatusByCommentId(@RequestParam(required = true) ReviewStatus reviewStatus, @RequestParam(required = true) Long commentId) {
         if (log.isInfoEnabled()) {
-           log.info("Received request to set review status for comment");
+            log.info("Received request to set review status for comment");
         }
         commentService.setReviewStatusByCommentId(reviewStatus, commentId);
         if (log.isInfoEnabled()) {
@@ -540,11 +507,9 @@ public class CommentController {
     }
 
 
-
-
     /**
      * Retrieves the review status for a specific comment identified by its ID via a GET request.
-     *
+     * <p>
      * The endpoint for this method is "/comments/reports/review/get/{commentId}" where {commentId} is a path variable.
      *
      * @param commentId the ID of the comment whose review status is to be retrieved, passed as a path variable
@@ -554,7 +519,7 @@ public class CommentController {
     @GetMapping("/comments/reports/review/get/{commentId}")
     public ResponseEntity<ReviewStatus> getReviewStatusByCommentId(@PathVariable Long commentId) {
         if (log.isInfoEnabled()) {
-           log.info("Received request to get review status for comment");
+            log.info("Received request to get review status for comment");
         }
         ReviewStatus reviewStatus = commentService.getReviewStatusByCommentId(commentId);
         if (log.isInfoEnabled()) {
@@ -562,9 +527,6 @@ public class CommentController {
         }
         return ResponseEntity.ok(reviewStatus);
     }
-
-
-
 
 
     /**
@@ -581,10 +543,8 @@ public class CommentController {
         if (log.isInfoEnabled()) {
             log.info("Successfully retrieved the total number of likes");
         }
-        return new ResponseEntity("The number of likes is " + number, HttpStatus.OK);
+        return new ResponseEntity(number, HttpStatus.OK);
     }
-
-
 
 
     /**
@@ -601,7 +561,7 @@ public class CommentController {
         if (log.isInfoEnabled()) {
             log.info("Successfully retrieved the total number of reports");
         }
-        return new ResponseEntity("The number of reports is " + number, HttpStatus.OK);
+        return new ResponseEntity(number, HttpStatus.OK);
     }
 
 }

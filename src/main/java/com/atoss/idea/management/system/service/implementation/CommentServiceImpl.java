@@ -210,7 +210,7 @@ public class CommentServiceImpl implements CommentService {
             }
             bufferedReader.close();
         } catch (IOException e) {
-//            e.printStackTrace();
+            //e.printStackTrace();
             if (log.isErrorEnabled()) {
                 log.error("Error reading bad words from file ERROR: {}", e.getMessage());
             }
@@ -233,13 +233,13 @@ public class CommentServiceImpl implements CommentService {
             log.info("Adding a new comment from: {}", requestCommentDTO.getUsername());
         }
         User user = userRepository.findByUsername(requestCommentDTO.getUsername()).orElseThrow(() -> {
-            if(log.isErrorEnabled()) {
+            if (log.isErrorEnabled()) {
                 log.error("User not found: {}", requestCommentDTO.getUsername());
             }
             return new UserNotFoundException("User not found!");
         });
         Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).orElseThrow(() -> {
-            if(log.isErrorEnabled()) {
+            if (log.isErrorEnabled()) {
                 log.error("Idea not found");
             }
             return new IdeaNotFoundException("Idea not found!");
@@ -253,7 +253,7 @@ public class CommentServiceImpl implements CommentService {
             String filePath = URLDecoder.decode(resourceUrl.getFile(), "UTF-8");
             readBadWordsFromFile(filePath);
         } else {
-            if(log.isWarnEnabled()) {
+            if (log.isWarnEnabled()) {
                 log.warn("Bad words file not found");
             }
         }
@@ -315,14 +315,14 @@ public class CommentServiceImpl implements CommentService {
 
         User user = userRepository.findByUsername(requestCommentReplyDTO.getUsername())
                 .orElseThrow(() -> {
-                    if(log.isErrorEnabled()) {
+                    if (log.isErrorEnabled()) {
                         log.error("User not found: {}", requestCommentReplyDTO.getUsername());
                     }
                     return new UserNotFoundException("User not found!");
                 });
 
         if (!commentRepository.existsById(requestCommentReplyDTO.getParentId())) {
-            if(log.isErrorEnabled()) {
+            if (log.isErrorEnabled()) {
                 log.error("Parent comment not found");
             }
             throw new CommentNotFoundException();
@@ -401,9 +401,9 @@ public class CommentServiceImpl implements CommentService {
                     return responseCommentReplyDTO;
                 }).toList();
 
-            if (log.isInfoEnabled()) {
-                log.info("Successfully retrieved all the replies for the comment");
-            }
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved all the replies for the comment");
+        }
         return new PageImpl<>(replyList, pageable, replyList.size());
     }
 
@@ -422,7 +422,7 @@ public class CommentServiceImpl implements CommentService {
         }
 
         if (!ideaRepository.existsById(ideaId)) {
-            if(log.isErrorEnabled()){
+            if (log.isErrorEnabled()) {
                 log.error("Idea not found");
             }
             throw new IdeaNotFoundException();
@@ -471,18 +471,18 @@ public class CommentServiceImpl implements CommentService {
         }
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> {
-                    if(log.isErrorEnabled()) {
+                    if (log.isErrorEnabled()) {
                         log.error("Comment not found");
                     }
                     return new CommentNotFoundException();
                 });
 
         boolean isOwner = comment.getUser().getId().equals(userId);
-        if(isOwner){
+        if (isOwner) {
             if (log.isInfoEnabled()) {
                 log.info("User is  the owner of comment");
             }
-        }else{
+        } else {
             if (log.isInfoEnabled()) {
                 log.info("User is not the owner of comment");
             }
@@ -821,7 +821,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public int getReportsCountForComment(Long commentId) {
-        if(log.isInfoEnabled()){
+        if (log.isInfoEnabled()) {
             log.info("Retrieving the number of reports for the comment");
         }
         if (!commentRepository.existsById(commentId)) {
@@ -866,7 +866,7 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      * Adds a report from a user to a comment.
-     *
+     * <p>
      * This method performs the following actions:
      * - Verifies that the comment exists and throws an exception if not found.
      * - Verifies that the user exists and throws an exception if not found.

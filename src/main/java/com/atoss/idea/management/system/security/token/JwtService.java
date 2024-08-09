@@ -46,11 +46,11 @@ public class JwtService {
 
     /**
      * Extracts of any claim for JWT token
-     * @param token The Jwt token from which to extract the claim
-     * @param claimsResolver A function which takes the claims and returns the desired claims
-     * @param <T> The type of the claim to extracted
-     * @return Return the value of the claim
      *
+     * @param token          The Jwt token from which to extract the claim
+     * @param claimsResolver A function which takes the claims and returns the desired claims
+     * @param <T>            The type of the claim to extracted
+     * @return Return the value of the claim
      */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         Claims claims = extractAllClaims(token);
@@ -64,8 +64,9 @@ public class JwtService {
 
     /**
      * Gets the username from JWT token
+     *
      * @param token The JWT Token from which to extract the username
-     * @return  Return the username from JWT token.
+     * @return Return the username from JWT token.
      */
     public String extractUsername(String token) {
         String username = extractClaim(token, Claims::getSubject);
@@ -79,8 +80,9 @@ public class JwtService {
 
     /**
      * Gets the expiration date from JWT token
+     *
      * @param token The JWT Token from which to extract the expiration date
-     * @return  Return the expiration date from JWT token.
+     * @return Return the expiration date from JWT token.
      */
     public Date extractExpiration(String token) {
         Date expiration = extractClaim(token, Claims::getExpiration);
@@ -94,8 +96,9 @@ public class JwtService {
 
     /**
      * Gets all the claims from JWT token
+     *
      * @param token The JWT Token from which to extract all the claims
-     * @return  Return claims from JWT token.
+     * @return Return claims from JWT token.
      */
     private Claims extractAllClaims(String token) {
         Claims claims = Jwts
@@ -114,9 +117,10 @@ public class JwtService {
 
     /**
      * Validates the JWT token
+     *
      * @param userDetails The user details
-     * @param token The JWT Token to validate
-     * @return  Return true if the token is valid and false otherwise
+     * @param token       The JWT Token to validate
+     * @return Return true if the token is valid and false otherwise
      */
     public Boolean validateToken(String token, UserDetails userDetails) {
         String username = extractUsername(token);
@@ -136,11 +140,11 @@ public class JwtService {
 
     /**
      * Generates a JWT token for an username
+     *
      * @param username The username for which to generate the token
      * @return Return generated Jwt token
      */
     public String generateToken(String username) {
-        UserSecurityDTO userSecurityDTO = userService.getUserByUsername(username, UserSecurityDTO.class);
         Map<String, Object> claims = objectMapper.convertValue(
                 userService.getUserByUsername(username, UserSecurityDTO.class),
                 HashMap.class);
@@ -156,6 +160,7 @@ public class JwtService {
 
     /**
      * Checks if the JWT token is expired
+     *
      * @param token The Jwt token for checking
      * @return Return true if the token is expired and false otherwise
      */
@@ -191,6 +196,7 @@ public class JwtService {
 
     /**
      * Creates a Jwt token with the specified claims and username
+     *
      * @param claims The claims which are included into Jwt token
      * @param username The username which is included into Jwt TOKEN
      * @return Return the created jwt token
@@ -214,6 +220,7 @@ public class JwtService {
     /**
      * Recovers the signing key used for jwt token
      * This method decodes the key from base64
+     *
      * @return Return the signing key used for jwt operations
      */
     private Key getSignKey() {
@@ -229,13 +236,11 @@ public class JwtService {
 
 
     /**
-     *
      * Invalidates an access token by blacklisting it.
      *
      * @param token The token to be blacklisted.
      * @see BlacklistedAccessToken
      * @see BlacklistedAccessTokenRepository
-     *
      */
     public void invalidateToken(String token) {
         BlacklistedAccessToken blacklistedAccessToken = new BlacklistedAccessToken();
@@ -258,6 +263,7 @@ public class JwtService {
 
     /**
      * Regularly deletes the blacklisted tokens from the database.
+     *
      * @see BlacklistedAccessToken
      * @see Scheduled
      */
@@ -265,7 +271,7 @@ public class JwtService {
     private void deleteExpiredTokens() {
 
         try {
-        blacklistedAccessTokenRepository.deleteAllByExpiryLessThan(new Date());
+            blacklistedAccessTokenRepository.deleteAllByExpiryLessThan(new Date());
             if (log.isInfoEnabled()) {
                 log.info("Deleted expired tokens");
             }
