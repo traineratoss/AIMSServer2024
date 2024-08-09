@@ -55,6 +55,12 @@ aims:
       /aims/api/v1/images/**,
       /users/get-avatar-by-username
 
+
+#example for seeing the logs only for our package
+#logging:
+#  level:
+#    com.atoss.idea.management.system:
+#                                      DEBUG
 logging:
   level:
     root: INFO

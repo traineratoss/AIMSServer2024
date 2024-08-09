@@ -143,7 +143,7 @@ public class JwtService {
         UserSecurityDTO userSecurityDTO = userService.getUserByUsername(username, UserSecurityDTO.class);
         Map<String, Object> claims = objectMapper.convertValue(
                 userSecurityDTO,
-                HashMap.class);
+                    HashMap.class);
 
         String token = createToken(claims, userSecurityDTO.getId().toString());
 
@@ -265,7 +265,7 @@ public class JwtService {
     private void deleteExpiredTokens() {
 
         try {
-            blacklistedAccessTokenRepository.deleteAllByExpiryLessThan(new Date());
+        blacklistedAccessTokenRepository.deleteAllByExpiryLessThan(new Date());
             if (log.isInfoEnabled()) {
                 log.info("Deleted expired tokens");
             }

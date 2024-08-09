@@ -4,6 +4,7 @@ import com.atoss.idea.management.system.repository.dto.*;
 import com.atoss.idea.management.system.repository.entity.ReviewStatus;
 import com.atoss.idea.management.system.service.CommentService;
 import jakarta.transaction.Transactional;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +25,7 @@ public class CommentController {
 
     private final CommentService commentService;
 
+
     /**
      * CONSTRUCTOR: for constructor dependency injection
      *
@@ -32,6 +34,7 @@ public class CommentController {
     public CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
+
 
     /**
      * Performs a Post Request in order to create a new comment
@@ -47,18 +50,23 @@ public class CommentController {
     @PostMapping("/comments")
     @ResponseBody
     public ResponseEntity<ResponseCommentDTO> addComment(@RequestBody RequestCommentDTO newComment) throws UnsupportedEncodingException {
-        log.info("Received request to add comment: {}", newComment);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to add comment");
+        }
         try {
             ResponseCommentDTO responseCommentDTO = commentService.addComment(newComment);
-            if (log.isDebugEnabled()) {
-                log.debug("Successfully added comment: {}", responseCommentDTO);
+            if (log.isInfoEnabled()) {
+                log.info("Successfully added comment");
             }
             return new ResponseEntity<>(responseCommentDTO, HttpStatus.OK);
         } catch (UnsupportedEncodingException e) {
-            log.error("Error adding comment: {}", e.getMessage());
+            if (log.isErrorEnabled()) {
+                log.error("Error adding comment");
+            }
             throw e;
         }
     }
+
 
     /**
      * Performs a Post Request in order to create a new reply
@@ -73,11 +81,16 @@ public class CommentController {
     @Transactional
     @PostMapping("/comments/reply")
     public ResponseEntity<ResponseCommentReplyDTO> addReply(@RequestBody RequestCommentReplyDTO requestCommentReplyDTO) {
-
+        if (log.isInfoEnabled()) {
+            log.info("Received request to add reply");
+        }
         ResponseCommentReplyDTO responseCommentReplyDTO = commentService.addReply(requestCommentReplyDTO);
-
+        if (log.isInfoEnabled()) {
+            log.info("Successfully added reply");
+        }
         return new ResponseEntity<ResponseCommentReplyDTO>(responseCommentReplyDTO, HttpStatus.OK);
     }
+
 
 
     /**
@@ -100,11 +113,20 @@ public class CommentController {
             @RequestParam(required = true) int pageSize,
             @RequestParam(required = true) int pageNumber,
             @RequestParam(required = true) String sortCategory) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to get comments for idea");
+        }
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
+        Page<ResponseCommentDTO> commentsPage = commentService.getAllPagedCommentsByIdeaId(ideaId, pageable);
 
-        return new ResponseEntity<>(commentService.getAllPagedCommentsByIdeaId(ideaId, pageable), HttpStatus.OK);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved comments for idea");
+        }
+        return new ResponseEntity<>(commentsPage, HttpStatus.OK);
     }
+
+
 
     /**
      * Performs a Get Request in order to get all replies of a certain comment in a paginated form
@@ -125,11 +147,22 @@ public class CommentController {
                                                                                   @RequestParam(required = true) int pageSize,
                                                                                   @RequestParam(required = true) int pageNumber,
                                                                                   @RequestParam(required = true) String sortCategory) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to get all the replies for a comment");
+        }
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.DESC, sortCategory));
 
-        return new ResponseEntity<>(commentService.getAllRepliesByCommentId(commentId, pageable), HttpStatus.OK);
+        Page<ResponseCommentReplyDTO> repliesPage = commentService.getAllRepliesByCommentId(commentId, pageable);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved replies for comment");
+        }
+
+        return new ResponseEntity<>(repliesPage, HttpStatus.OK);
     }
+
+
+
 
     /**
      * Performs a Get Request in order to get the time that has passed since a comment was created
@@ -143,8 +176,20 @@ public class CommentController {
     @Transactional
     @GetMapping("/test")
     public String getTime(@RequestParam(name = "id") Long id) {
-        return commentService.getTimeForComment(id);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to get time for comment");
+        }
+
+        String elapsedTime = commentService.getTimeForComment(id);
+
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved time for comment");
+        }
+        return elapsedTime;
     }
+
+
+
 
     /**
      * Performs a Delete Request in order to delete a certain comment
@@ -158,9 +203,18 @@ public class CommentController {
     @Transactional
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to delete comment");
+        }
+
         commentService.deleteComment(commentId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully deleted comment");
+        }
         return new ResponseEntity<>("Comment likes, reports and replies will also be deleted for deleted comment", HttpStatus.OK);
     }
+
+
 
 
     /**
@@ -171,9 +225,18 @@ public class CommentController {
      */
     @GetMapping("/comments/{commentId}/likes")
     public ResponseEntity<List<UserResponseDTO>> getLikesForComment(@PathVariable Long commentId) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to get likes for comment");
+        }
         List<UserResponseDTO> likes = commentService.getLikesForComment(commentId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved likes for comment");
+        }
         return ResponseEntity.ok(likes);
     }
+
+
+
 
     /**
      * Retrieves the count of likes for a specific comment.
@@ -183,9 +246,18 @@ public class CommentController {
      */
     @GetMapping("/comments/{commentId}/likes/count")
     public ResponseEntity<Integer> getLikesCountForComment(@PathVariable Long commentId) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to get number of likes for the comment");
+        }
         int likesCount = commentService.getLikesCountForComment(commentId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved likes count for comment");
+        }
         return ResponseEntity.ok(likesCount);
     }
+
+
+
 
     /**
      * Adds a like to a specific comment from a specific user.
@@ -197,9 +269,20 @@ public class CommentController {
     @Transactional
     @PostMapping("/comments/like/{commentId}/{userId}")
     public ResponseEntity<String> addLike(@PathVariable Long commentId, @PathVariable Long userId) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to add like to comment");
+        }
+
         commentService.addLike(commentId, userId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully added like to comment");
+        }
+
         return new ResponseEntity<>("Like added successfully", HttpStatus.OK);
     }
+
+
+
 
     /**
      * Deletes a like from a specific comment by a specific user.
@@ -210,9 +293,18 @@ public class CommentController {
      */
     @DeleteMapping("/comments/like/delete/{commentId}/{userId}")
     public ResponseEntity<String> deleteLikes(@PathVariable Long commentId, @PathVariable Long userId) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to delete like from comment");
+        }
         commentService.deleteLikes(commentId, userId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully deleted like from comment");
+        }
         return new ResponseEntity<>("Like succesfully deleted", HttpStatus.OK);
     }
+
+
+
 
     /**
      * Deletes a report from a specific comment by a specific user.
@@ -224,9 +316,17 @@ public class CommentController {
     @Transactional
     @DeleteMapping("/comments/report/delete/{commentId}/{userId}")
     public ResponseEntity<String> deleteReport(@PathVariable Long commentId, @PathVariable Long userId) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to delete report from comment");
+        }
         commentService.deleteReport(commentId, userId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully deleted report from comment");
+        }
         return new ResponseEntity<>("Report succesfully deleted", HttpStatus.OK);
     }
+
+
 
 
     /**
@@ -238,7 +338,23 @@ public class CommentController {
      */
     @GetMapping("/comments/like/find/{commentId}/{userId}")
     public boolean existsLikeByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
-        return commentService.existsLikeByCommentIdAndUserId(commentId, userId);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to check the existence of like by comment and user");
+        }
+        boolean exists = commentService.existsLikeByCommentIdAndUserId(commentId, userId);
+        if(exists){
+            if (log.isInfoEnabled()) {
+                log.info("Like exists by comment id and user id");
+            }
+        }else{
+            if (log.isInfoEnabled()) {
+                log.info("Like doesn't exists by comment id and user id");
+            }
+        }
+        if (log.isInfoEnabled()) {
+            log.info("Successfully checked the existence of like by comment and user");
+        }
+        return exists;
     }
 
 
@@ -251,8 +367,24 @@ public class CommentController {
      */
     @GetMapping("/comments/report/find/{commentId}/{userId}")
     public boolean existsReportByCommentIdAndUserId(@PathVariable Long commentId, @PathVariable Long userId) {
-        return commentService.existsReportByCommentIdAndUserId(commentId, userId);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to check the existence of report by comment and user");
+        }
+        boolean exists = commentService.existsReportByCommentIdAndUserId(commentId, userId);
+        if(exists){
+            if (log.isInfoEnabled()) {
+                log.info("Report exists by comment id and user id");
+            }
+        }else{
+            if (log.isInfoEnabled()) {
+                log.info("Report doesn't exists by comment id and user id");
+            }
+        }
+        return exists;
     }
+
+
+
 
     /**
      * Retrieves the count of reports for a specific comment.
@@ -262,9 +394,18 @@ public class CommentController {
      */
     @GetMapping("/comments/reports/count/{commentId}")
     public ResponseEntity<Integer> getReportsCountForComment(@PathVariable Long commentId) {
+        if (log.isInfoEnabled()) {
+           log.info("Received request to get the number of reports for the comment");
+        }
         int reportsCount = commentService.getReportsCountForComment(commentId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved reports count for comment");
+        }
         return ResponseEntity.ok(reportsCount);
     }
+
+
+
 
     /**
      * Retrieves all comments sorted by the number of reports.
@@ -273,21 +414,30 @@ public class CommentController {
      * @param pageNumber the page number to retrieve
      * @return ResponseEntity with a CommentPageDTO containing the comments
      */
-
     @GetMapping("/comments/allByReportsNr")
     public ResponseEntity<CommentPageDTO> getAllCommentsByReportsNr(@RequestParam(required = true) int pageSize,
                                                                     @RequestParam(required = true) int pageNumber) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to get retrieve all the comments sorted by reports number");
+        }
+        CommentPageDTO commentPageDTO = commentService.getAllCommentsByReportsNr(
+                PageRequest.of(
+                        pageNumber,
+                        pageSize,
+                        Sort.by(Sort.Direction.DESC, "id")
+                )
+        );
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved comments sorted by reports number");
+        }
         return new ResponseEntity<>(
-                commentService.getAllCommentsByReportsNr(
-                        PageRequest.of(
-                                pageNumber,
-                                pageSize,
-                                Sort.by(Sort.Direction.DESC, "id")
-                        )
-                ),
+                commentPageDTO,
                 HttpStatus.OK
         );
     }
+
+
+
 
 
     /**
@@ -303,9 +453,19 @@ public class CommentController {
     @Transactional
     @PostMapping("/comments/report/{commentId}/{userId}")
     public ResponseEntity<String> addReport(@PathVariable Long commentId, @PathVariable Long userId) {
+        if (log.isInfoEnabled()) {
+           log.info("Received request to add report for comment");
+        }
         commentService.addReport(commentId, userId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully added report for comment");
+        }
         return new ResponseEntity<>("Report added successfully", HttpStatus.OK);
     }
+
+
+
+
 
     /**
      * Updates the status of a reported comment. If the comment has more than 5 reports,
@@ -317,13 +477,24 @@ public class CommentController {
     @Transactional
     @PatchMapping("/comments/report/patch/{commentId}")
     public ResponseEntity<String> updateReportedComment(@PathVariable Long commentId) {
+        if (log.isInfoEnabled()) {
+           log.info("Received request to update reported comment");
+        }
         if (commentService.getReportsCountForComment(commentId) <= 5) {
+            if (log.isInfoEnabled()) {
+                log.info("Comment does not have enough reports to be reviewed");
+            }
             return new ResponseEntity<>("This comment does not have enough reports to be reviewed!", HttpStatus.OK);
         }
+
         commentService.deleteReportsByCommentId(commentId);
         commentService.displayPlaceholder(commentId);
+
         return new ResponseEntity<>("Comment with id " + commentId + " is under review by admin", HttpStatus.OK);
     }
+
+
+
 
     /**
      * Deletes all reports associated with a specific comment ID.
@@ -334,9 +505,17 @@ public class CommentController {
     @Transactional
     @DeleteMapping("/comments/reports/delete/{commentId}")
     public ResponseEntity<String> deleteReportsByCommentId(@PathVariable Long commentId) {
+        if (log.isInfoEnabled()) {
+           log.info("Received request to delete all reports for comment");
+        }
         commentService.deleteReportsByCommentId(commentId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully deleted all reports for comment");
+        }
         return new ResponseEntity<>("Deleted reports for comment with id: " + commentId, HttpStatus.OK);
     }
+
+
 
     /**
      * Sets the review status for a specific comment identified by its ID via a PATCH request.
@@ -351,8 +530,17 @@ public class CommentController {
     @Transactional
     @PatchMapping("/comments/reports/review/set")
     public void setReviewStatusByCommentId(@RequestParam(required = true) ReviewStatus reviewStatus, @RequestParam(required = true) Long commentId) {
+        if (log.isInfoEnabled()) {
+           log.info("Received request to set review status for comment");
+        }
         commentService.setReviewStatusByCommentId(reviewStatus, commentId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully set review status for comment");
+        }
     }
+
+
+
 
     /**
      * Retrieves the review status for a specific comment identified by its ID via a GET request.
@@ -365,9 +553,19 @@ public class CommentController {
      */
     @GetMapping("/comments/reports/review/get/{commentId}")
     public ResponseEntity<ReviewStatus> getReviewStatusByCommentId(@PathVariable Long commentId) {
+        if (log.isInfoEnabled()) {
+           log.info("Received request to get review status for comment");
+        }
         ReviewStatus reviewStatus = commentService.getReviewStatusByCommentId(commentId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved review status for comment");
+        }
         return ResponseEntity.ok(reviewStatus);
     }
+
+
+
+
 
     /**
      * Retrieves the number of likes from table.
@@ -376,20 +574,34 @@ public class CommentController {
      */
     @GetMapping("/likes/count")
     public ResponseEntity<Long> getNumberOfLikes() {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to get the total number of likes");
+        }
         Long number = commentService.countNumberOfLikes();
-        return new ResponseEntity(number, HttpStatus.OK);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved the total number of likes");
+        }
+        return new ResponseEntity("The number of likes is " + number, HttpStatus.OK);
     }
+
+
+
 
     /**
      * Retrieves the number of reports from table.
+     *
      * @return a ResponseEntity containing the number of reports
      */
     @GetMapping("/reports/count")
     public ResponseEntity<Long> getNumberOfReports() {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to get the total number of reports");
+        }
         Long number = commentService.countNumberOfReports();
-        return new ResponseEntity(number, HttpStatus.OK);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved the total number of reports");
+        }
+        return new ResponseEntity("The number of reports is " + number, HttpStatus.OK);
     }
-
-
 
 }
