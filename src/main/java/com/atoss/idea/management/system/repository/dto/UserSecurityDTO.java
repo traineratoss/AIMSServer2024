@@ -12,5 +12,4 @@ public class UserSecurityDTO {
     private String fullName;
     private String avatarId;
     private Boolean isFirstLogin;
-    private ImageDTO image;
 }

@@ -3,6 +3,7 @@ package com.atoss.idea.management.system.security;
 import com.atoss.idea.management.system.exception.EmailAlreadyExistException;
 import com.atoss.idea.management.system.exception.UsernameAlreadyExistException;
 import com.atoss.idea.management.system.repository.UserRepository;
+import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
 import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
 import com.atoss.idea.management.system.repository.entity.RefreshToken;
 import com.atoss.idea.management.system.repository.entity.Role;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -36,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Date;
 
 @RestController
+@Log4j2
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
@@ -112,6 +115,10 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsernameOrEmail(),
                        loginRequest.getPassword()));
 
+        if (log.isInfoEnabled()) {
+            log.info("Received request to login");
+        }
+
         if (authentication.isAuthenticated()) {
 
             sessionService.createSession(
@@ -136,6 +143,10 @@ public class AuthController {
 
             UserSecurityDTO userData = userService.getUserByUsername(authentication.getName(), UserSecurityDTO.class);
 
+            if (log.isInfoEnabled()) {
+                log.info("Login successfully");
+            }
+
             return new ResponseEntity<>(
                     new AuthResponse(
                       jwtService.extractExpiration(accessToken),
@@ -145,6 +156,9 @@ public class AuthController {
                     HttpStatus.OK
             );
         } else {
+            if (log.isErrorEnabled()) {
+                log.error("Login attempt failed");
+            }
             throw new UsernameNotFoundException("Bad request");
         }
     }
@@ -169,9 +183,15 @@ public class AuthController {
     @Transactional
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest signUpRequest) {
-        return new ResponseEntity<>(
-                userService.addUser(signUpRequest.getUsername(), signUpRequest.getEmail()),
-                HttpStatus.CREATED);
+
+        if (log.isInfoEnabled()) {
+            log.info("Received request to register");
+        }
+        UserResponseDTO userResponseDTO = userService.addUser(signUpRequest.getUsername(), signUpRequest.getEmail());
+        if (log.isInfoEnabled()) {
+            log.info("Register successfully");
+        }
+        return new ResponseEntity<>(userResponseDTO, HttpStatus.CREATED);
     }
 
     /**
@@ -183,8 +203,13 @@ public class AuthController {
     @Transactional
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {
-
+        if (log.isInfoEnabled()) {
+            log.info("Received request to refresh token");
+        }
         AuthResponse authResponse = refreshTokenService.refreshAuthToken(request, response);
+        if (log.isInfoEnabled()) {
+            log.info("Refresh token successfully");
+        }
         return new ResponseEntity<>(authResponse, HttpStatus.OK);
 
     }
@@ -201,12 +226,19 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(HttpServletRequest request) {
 
+        if (log.isInfoEnabled()) {
+            log.info("Received request to log out");
+        }
+
         sessionService.extractToken(request, refreshTokenService.getTokenConfig())
                 .ifPresent(refreshTokenService::invalidateToken);
 
         sessionService.extractToken(request, jwtService.getTokenConfig())
                 .ifPresent(jwtService::invalidateToken);
 
+        if (log.isInfoEnabled()) {
+            log.info("Logged out successfully");
+        }
         return new ResponseEntity<>("Logged out successfully", HttpStatus.OK);
     }
 
