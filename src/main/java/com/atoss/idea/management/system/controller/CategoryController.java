@@ -3,6 +3,7 @@ package com.atoss.idea.management.system.controller;
 
 import com.atoss.idea.management.system.repository.dto.CategoryDTO;
 import com.atoss.idea.management.system.service.CategoryService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@Log4j2
 @RequestMapping("/aims/api/v1/ideas/categories")
 public class CategoryController {
     private final CategoryService categoryService;
@@ -35,7 +37,14 @@ public class CategoryController {
      */
     @PostMapping("/add")
     public ResponseEntity<CategoryDTO> addCategory(@RequestBody CategoryDTO category) {
-        return new ResponseEntity<>(categoryService.addCategory(category), HttpStatus.OK);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to add a new category");
+        }
+        CategoryDTO categoryDTO = categoryService.addCategory(category);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully added new category");
+        }
+        return new ResponseEntity<>(categoryDTO, HttpStatus.OK);
     }
 
     /**
@@ -47,7 +56,14 @@ public class CategoryController {
      */
     @GetMapping("/get")
     public ResponseEntity<CategoryDTO> getCategory(@RequestParam Long id) {
-        return new ResponseEntity<>(categoryService.getCategory(id), HttpStatus.OK);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to retrieve the category");
+        }
+        CategoryDTO categoryDTO = categoryService.getCategory(id);
+        if (log.isInfoEnabled()) {
+            log.info("Retrieved the category successfully");
+        }
+        return new ResponseEntity<>(categoryDTO, HttpStatus.OK);
     }
 
     /**
@@ -58,6 +74,14 @@ public class CategoryController {
      */
     @GetMapping("/all")
     public ResponseEntity<List<CategoryDTO>> getAllCategory()  {
-        return new ResponseEntity<>(categoryService.getAllCategory(), HttpStatus.OK);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to retrieve all categories");
+        }
+        List<CategoryDTO> categoryDTOList = categoryService.getAllCategory();
+        if (log.isInfoEnabled()) {
+            log.info("Retrieved all categories successfully");
+        }
+
+        return new ResponseEntity<>(categoryDTOList, HttpStatus.OK);
     }
 }
