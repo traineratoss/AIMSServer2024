@@ -54,6 +54,7 @@ aims:
       /aims/api/v1/avatars/**,
       /aims/api/v1/images/**,
       /users/get-avatar-by-username
+    otpExpiryMinutes: 3
 
 logging:
   level:

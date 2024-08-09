@@ -40,6 +40,9 @@ public class UserServiceImpl implements UserService {
     @Value("${aims.app.bcrypt.salt}")
     private String bcryptSalt;
 
+    @Value("${aims.app.otpExpiryMinutes}")
+    private Long otpExpiryMinutes;
+
     /**
      * CONSTRUCTOR
      * @param userRepository for accessing CRUD repository methods for User Entity
@@ -228,7 +231,7 @@ public class UserServiceImpl implements UserService {
             throw new BadCredentialsException("Bad credentials");
         }
 
-        if (System.currentTimeMillis() - otp.getCreationDate() >= TimeUnit.MINUTES.toMillis(3)) {
+        if (System.currentTimeMillis() - otp.getCreationDate() >= TimeUnit.MINUTES.toMillis(otpExpiryMinutes)) {
             throw new BadCredentialsException("Expired OTP");
         }
 

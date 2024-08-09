@@ -430,6 +430,10 @@ public class UserController {
      */
     @GetMapping("/get-avatar-by-username")
     public ResponseEntity<ImageDTO> getAvatarByUsername(@RequestParam(name = "username") String username) {
-        return new ResponseEntity<>(userService.getAvatarByUsername(username), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(userService.getAvatarByUsername(username), HttpStatus.OK);
+        } catch (AvatarNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
     }
 }
