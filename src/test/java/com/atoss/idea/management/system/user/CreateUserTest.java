@@ -1,6 +1,5 @@
 package com.atoss.idea.management.system.user;
 
-import com.atoss.idea.management.system.controller.UserController;
 import com.atoss.idea.management.system.exception.UserAlreadyExistException;
 import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
@@ -16,7 +15,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -28,8 +26,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.spy;
 
 public class CreateUserTest {
-    UserController spyUserController;
-
     UserService spyUserService;
 
     @Mock
@@ -59,7 +55,6 @@ public class CreateUserTest {
                         mockAvatarRepository
                 )
         );
-        spyUserController = spy(new UserController(spyUserService, mockSendEmailService));
     }
 
     @Test
@@ -70,7 +65,7 @@ public class CreateUserTest {
         Mockito.when(mockUserRepository.findByUsernameOrEmail(any(String.class), any(String.class)))
                 .thenReturn(Optional.empty());
 
-        UserResponseDTO responseDTO = spyUserController.addUser(username, email).getBody();
+        UserResponseDTO responseDTO = spyUserService.addUser(username, email);
 
         assertNotNull(responseDTO);
         assertEquals(username, responseDTO.getUsername());
@@ -89,6 +84,6 @@ public class CreateUserTest {
         Mockito.when(mockUserRepository.findByUsernameOrEmail(any(String.class), any(String.class)))
                 .thenReturn(Optional.of(new User()));
 
-        assertThrows(UserAlreadyExistException.class, () -> spyUserController.addUser(username, email));
+        assertThrows(UserAlreadyExistException.class, () -> spyUserService.addUser(username, email));
     }
 }

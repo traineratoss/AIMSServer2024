@@ -69,7 +69,7 @@ public class JwtService {
      * @return Return the username from JWT token.
      */
     public String extractUsername(String token) {
-        String username = extractClaim(token, claims -> claims.get("username", String.class));
+        String username = extractClaim(token, Claims::getSubject);
 
         if (log.isInfoEnabled()) {
             log.info("Extracted username from token: {}", username);
@@ -145,12 +145,11 @@ public class JwtService {
      * @return Return generated Jwt token
      */
     public String generateToken(String username) {
-        UserSecurityDTO userSecurityDTO = userService.getUserByUsername(username, UserSecurityDTO.class);
         Map<String, Object> claims = objectMapper.convertValue(
-                userSecurityDTO,
+                userService.getUserByUsername(username, UserSecurityDTO.class),
                 HashMap.class);
 
-        String token = createToken(claims, userSecurityDTO.getId().toString());
+        String token = createToken(claims, username);
 
         if (log.isInfoEnabled()) {
             log.info("Token generated successfully: {}", token);
@@ -199,13 +198,13 @@ public class JwtService {
      * Creates a Jwt token with the specified claims and username
      *
      * @param claims The claims which are included into Jwt token
-     * @param id     The user id which is included into Jwt TOKEN
+     * @param username The user id which is included into Jwt TOKEN
      * @return Return the created jwt token
      */
-    private String createToken(Map<String, Object> claims, String id) {
+    private String createToken(Map<String, Object> claims, String username) {
         String token = Jwts.builder()
                 .setClaims(claims)
-                .setSubject(id)
+                .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + tokenConfig.getExpiryMs()))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
