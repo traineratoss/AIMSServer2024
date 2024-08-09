@@ -1,9 +1,25 @@
 package com.atoss.idea.management.system.service.implementation;
 
-import com.atoss.idea.management.system.exception.*;
+import com.atoss.idea.management.system.exception.ApproveAlreadyGrantedException;
+import com.atoss.idea.management.system.exception.AvatarNotFoundException;
+import com.atoss.idea.management.system.exception.EmailAlreadyExistException;
+import com.atoss.idea.management.system.exception.EmailFailedException;
+import com.atoss.idea.management.system.exception.IncorrectPasswordException;
+import com.atoss.idea.management.system.exception.UserAlreadyActivatedException;
+import com.atoss.idea.management.system.exception.UserAlreadyDeactivatedException;
+import com.atoss.idea.management.system.exception.UserAlreadyExistException;
+import com.atoss.idea.management.system.exception.UserNotFoundException;
+import com.atoss.idea.management.system.exception.UsernameAlreadyExistException;
 import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.*;
+import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
+import com.atoss.idea.management.system.repository.dto.ImageDTO;
+import com.atoss.idea.management.system.repository.dto.UserAdminDashboardResponseDTO;
+import com.atoss.idea.management.system.repository.dto.UserPageDTO;
+import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
+import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
+import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.VerifyOtpDTO;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.OTP;
 import com.atoss.idea.management.system.repository.entity.Role;
@@ -40,6 +56,9 @@ public class UserServiceImpl implements UserService {
 
     @Value("${aims.app.bcrypt.salt}")
     private String bcryptSalt;
+
+    @Value("${aims.app.otpExpiryMinutes}")
+    private Long otpExpiryMinutes;
 
     /**
      * CONSTRUCTOR
@@ -322,7 +341,7 @@ public class UserServiceImpl implements UserService {
             throw new BadCredentialsException("Bad credentials");
         }
 
-        if (System.currentTimeMillis() - otp.getCreationDate() >= TimeUnit.MINUTES.toMillis(3)) {
+        if (System.currentTimeMillis() - otp.getCreationDate() >= TimeUnit.MINUTES.toMillis(otpExpiryMinutes)) {
             if (log.isErrorEnabled()) {
                 log.error("Expired one-time password for user: {}", usernameOrEmail);
             }

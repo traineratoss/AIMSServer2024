@@ -210,7 +210,6 @@ public class CommentServiceImpl implements CommentService {
             }
             bufferedReader.close();
         } catch (IOException e) {
-            //e.printStackTrace();
             if (log.isErrorEnabled()) {
                 log.error("Error reading bad words from file ERROR: {}", e.getMessage());
             }

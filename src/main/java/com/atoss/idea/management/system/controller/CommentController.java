@@ -187,6 +187,7 @@ public class CommentController {
 
     /**
      * Performs a Delete Request in order to delete a certain comment
+     * <p>
      * Method gets the id of the comment that is going to be deleted as a RequestParam
      * The, the id is used in the CommentService method "deleteComment" and the deleting operation happens
      *
@@ -210,6 +211,7 @@ public class CommentController {
 
     /**
      * Retrieves the list of users who liked a specific comment.
+     *
      * @param commentId the ID of the comment
      * @return ResponseEntity containing the list of UserResponseDTOs who liked the comment
      */
@@ -372,6 +374,7 @@ public class CommentController {
      */
     @GetMapping("/comments/reports/count/{commentId}")
     public ResponseEntity<Integer> getReportsCountForComment(@PathVariable Long commentId) {
+
         if (log.isInfoEnabled()) {
             log.info("Received request to get the number of reports for the comment");
         }
@@ -426,6 +429,7 @@ public class CommentController {
     @Transactional
     @PostMapping("/comments/report/{commentId}/{userId}")
     public ResponseEntity<String> addReport(@PathVariable Long commentId, @PathVariable Long userId) {
+
         if (log.isInfoEnabled()) {
             log.info("Received request to add report for comment");
         }
@@ -447,6 +451,7 @@ public class CommentController {
     @Transactional
     @PatchMapping("/comments/report/patch/{commentId}")
     public ResponseEntity<String> updateReportedComment(@PathVariable Long commentId) {
+
         if (log.isInfoEnabled()) {
             log.info("Received request to update reported comment");
         }
@@ -473,6 +478,7 @@ public class CommentController {
     @Transactional
     @DeleteMapping("/comments/reports/delete/{commentId}")
     public ResponseEntity<String> deleteReportsByCommentId(@PathVariable Long commentId) {
+
         if (log.isInfoEnabled()) {
             log.info("Received request to delete all reports for comment");
         }
@@ -497,6 +503,7 @@ public class CommentController {
     @Transactional
     @PatchMapping("/comments/reports/review/set")
     public void setReviewStatusByCommentId(@RequestParam(required = true) ReviewStatus reviewStatus, @RequestParam(required = true) Long commentId) {
+
         if (log.isInfoEnabled()) {
             log.info("Received request to set review status for comment");
         }
@@ -518,6 +525,7 @@ public class CommentController {
      */
     @GetMapping("/comments/reports/review/get/{commentId}")
     public ResponseEntity<ReviewStatus> getReviewStatusByCommentId(@PathVariable Long commentId) {
+
         if (log.isInfoEnabled()) {
             log.info("Received request to get review status for comment");
         }
@@ -536,6 +544,7 @@ public class CommentController {
      */
     @GetMapping("/likes/count")
     public ResponseEntity<Long> getNumberOfLikes() {
+
         if (log.isInfoEnabled()) {
             log.info("Received request to get the total number of likes");
         }
@@ -543,7 +552,7 @@ public class CommentController {
         if (log.isInfoEnabled()) {
             log.info("Successfully retrieved the total number of likes");
         }
-        return new ResponseEntity(number, HttpStatus.OK);
+        return new ResponseEntity("The number of likes is " + number, HttpStatus.OK);
     }
 
 
@@ -554,6 +563,7 @@ public class CommentController {
      */
     @GetMapping("/reports/count")
     public ResponseEntity<Long> getNumberOfReports() {
+
         if (log.isInfoEnabled()) {
             log.info("Received request to get the total number of reports");
         }
@@ -561,7 +571,7 @@ public class CommentController {
         if (log.isInfoEnabled()) {
             log.info("Successfully retrieved the total number of reports");
         }
-        return new ResponseEntity(number, HttpStatus.OK);
+        return new ResponseEntity("The number of reports is " + number, HttpStatus.OK);
     }
 
 }
