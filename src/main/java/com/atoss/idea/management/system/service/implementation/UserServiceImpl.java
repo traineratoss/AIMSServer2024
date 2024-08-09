@@ -286,11 +286,12 @@ public class UserServiceImpl implements UserService {
         }
         if (user.getIsFirstLogin() && BCrypt.checkpw(changePasswordDTO.getNewPassword(), user.getPassword())) {
             if (log.isErrorEnabled()) {
-                log.error("New password is the same as the old password for user with username: {}", username);
+                log.error("This password has already being used! {}", username);
             }
-            throw new IncorrectPasswordException("The new password cannot be the same as the old password!");
+            throw new IncorrectPasswordException("This password has already being used!");
         }
-        String hashFrontendNewPassword = BCrypt.hashpw(changePasswordDTO.getNewPassword(), bcryptSalt);
+        String salt = BCrypt.gensalt();
+        String hashFrontendNewPassword = BCrypt.hashpw(changePasswordDTO.getNewPassword(), salt);
         user.setPassword(hashFrontendNewPassword);
         user.setIsFirstLogin(false);
         userRepository.save(user);
