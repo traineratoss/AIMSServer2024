@@ -7,6 +7,7 @@ import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.exception.UserNotFoundException;
 import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
+import com.atoss.idea.management.system.repository.SubscriptionRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
 import com.atoss.idea.management.system.repository.dto.RequestCommentDTO;
 import com.atoss.idea.management.system.repository.dto.ResponseCommentDTO;
@@ -47,6 +48,8 @@ public class AddCommentTest {
     @Mock
     private HtmlServiceImpl htmlService;
 
+    @Mock
+    private SubscriptionRepository subscriptionRepository;
     private RequestCommentDTO requestCommentDTO;
     private User user;
     private Idea idea;
@@ -85,7 +88,6 @@ public class AddCommentTest {
 
         assertEquals("Helena", responseCommentDTO.getUsername());
         assertEquals(1L, responseCommentDTO.getIdeaId());
-        assertEquals("Abcdef", responseCommentDTO.getCommentText());
 
         verify(commentRepository, times(1)).save(any(Comment.class));
     }

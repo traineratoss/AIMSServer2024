@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Log4j2
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
@@ -53,12 +55,22 @@ public class RefreshTokenService {
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(userRepository
                         .findByUsername(username)
-                        .orElseThrow(() -> new UserNotFoundException("User not found")))
+                        .orElseThrow(() -> {
+                            if (log.isErrorEnabled()) {
+                                log.error("User not found during refresh token creation: {}", username);
+                            }
+                            return new UserNotFoundException("User not found");
+                        }))
                 .token(UUID.randomUUID().toString())
                 .expiryDate(Instant.now().plusMillis(tokenConfig.getExpiryMs()))
                 .build();
 
-        return refreshTokenRepository.save(refreshToken);
+        RefreshToken savedToken = refreshTokenRepository.save(refreshToken);
+        if (log.isInfoEnabled()) {
+            log.info("Created and saved new refresh token: {}", savedToken.getToken());
+        }
+
+        return savedToken;
     }
 
     /**
@@ -68,6 +80,9 @@ public class RefreshTokenService {
      * @return Return a {@link Optional} containing the found {@link RefreshToken} if present, otherwise {@link Optional#empty()}
      */
     public Optional<RefreshToken> findByToken(String token) {
+        if (log.isInfoEnabled()) {
+            log.info("Searching for refresh token");
+        }
         return refreshTokenRepository.findByToken(token);
     }
 
@@ -80,8 +95,14 @@ public class RefreshTokenService {
      */
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+            if (log.isWarnEnabled()) {
+                log.warn("Refresh token has expired, expiry date: {}", token.getExpiryDate());
+            }
             refreshTokenRepository.delete(token);
             throw new RefreshTokenExpiredException(token, "Expired refresh token");
+        }
+        if (log.isInfoEnabled()) {
+            log.info("Refresh token is still valid.");
         }
         return token;
     }
@@ -100,12 +121,23 @@ public class RefreshTokenService {
         Optional<String> token = sessionService.extractToken(request, tokenConfig);
 
         if (token.isEmpty()) {
+            if (log.isErrorEnabled()) {
+                log.error("Token is empty or not found");
+            }
             throw new InvalidRefreshTokenException("Invalid refresh token");
         }
 
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token.get())
-                .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
+                .orElseThrow(() -> {
+                    if (log.isErrorEnabled()) {
+                        log.error("Token not found in repository");
+                    }
+                    return new InvalidRefreshTokenException("Invalid refresh token");
+                });
 
+        if (log.isInfoEnabled()) {
+            log.info("Found refresh token: {}", refreshToken.getToken());
+        }
         verifyExpiration(refreshToken);
 
         Optional<User> userOptional = userRepository.findUserByRefreshToken(refreshToken);
@@ -113,13 +145,23 @@ public class RefreshTokenService {
         User user;
         if (userOptional.isPresent()) {
             user = userOptional.get();
+            if (log.isInfoEnabled()) {
+                log.info("User found: {}", user.getUsername());
+            }
         } else {
+            if (log.isErrorEnabled()) {
+                log.error("User not found for refresh token: {}", refreshToken.getToken());
+            }
             throw new UserNotFoundException("User not found " + refreshToken.getUser().getUsername());
         }
 
         String username = user.getUsername();
 
         refreshTokenRepository.delete(refreshToken);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Deleted old refresh token: {}", refreshToken.getToken());
+        }
 
         String newAccessToken = jwtService.generateToken(username);
         RefreshToken newRefreshToken = createRefreshToken(username);
@@ -138,11 +180,15 @@ public class RefreshTokenService {
                         tokenConfig)
                 .toString());
 
-
-        return new AuthResponse(
+        AuthResponse authResponse = new AuthResponse(
                 jwtService.extractExpiration(newAccessToken),
                 Date.from(newRefreshToken.getExpiryDate()),
                 new UserSecurityDTO());
+
+        if (log.isInfoEnabled()) {
+            log.info("Generated new access token and refresh token");
+        }
+        return authResponse;
 
     }
 
@@ -153,6 +199,9 @@ public class RefreshTokenService {
      */
     public void invalidateToken(String token) {
         refreshTokenRepository.findByToken(token).ifPresent(refreshTokenRepository::delete);
+        if (log.isInfoEnabled()) {
+            log.info("Refresh token invalidated successfully");
+        }
     }
 
 }

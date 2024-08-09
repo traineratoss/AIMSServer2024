@@ -56,6 +56,12 @@ aims:
       /users/get-avatar-by-username
     otpExpiryMinutes: 3
 
+
+#example for seeing the logs only for our package
+#logging:
+#  level:
+#    com.atoss.idea.management.system:
+#                                      DEBUG
 logging:
   level:
     root: INFO
