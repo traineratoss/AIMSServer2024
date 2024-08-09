@@ -39,11 +39,11 @@ public class DocumentServiceImpl implements DocumentService {
     /**
      * Constructor
      *
-     * @param documentRepository accessing CRUD Repository for Document Entity
-     * @param modelMapper mapping Entity-DTO relationship
-     * @param userRepository repository of the user entity
-     * @param ideaRepository repository idea entity
-     * @param sendEmailService service used for sending emails
+     * @param documentRepository     accessing CRUD Repository for Document Entity
+     * @param modelMapper            mapping Entity-DTO relationship
+     * @param userRepository         repository of the user entity
+     * @param ideaRepository         repository idea entity
+     * @param sendEmailService       service used for sending emails
      * @param subscriptionRepository repository of subscription entity
      */
     public DocumentServiceImpl(DocumentRepository documentRepository,
@@ -68,16 +68,16 @@ public class DocumentServiceImpl implements DocumentService {
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
             Document document = new Document(fileName, file.getContentType(), file.getBytes());
             User user = userRepository.findById(userId).orElseThrow(() -> {
-                if(log.isErrorEnabled()) {
+                if (log.isErrorEnabled()) {
                     log.error("User with id {} not found", userId);
                 }
                 return new UserNotFoundException("User not found.");
             });
             document.setUser(user);
             Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> {
-                        if(log.isErrorEnabled()) {
-                            log.error("Idea with id {} not found", ideaId);
-                        }
+                if (log.isErrorEnabled()) {
+                    log.error("Idea with id {} not found", ideaId);
+                }
                 return new IdeaNotFoundException("Idea not found");
             });
             document.setIdea(idea);
@@ -93,7 +93,7 @@ public class DocumentServiceImpl implements DocumentService {
             subscribedUsers.add(userRepository.findById(users).get());
         }
         if (!subscribedUsers.isEmpty()) {
-            if(log.isInfoEnabled()) {
+            if (log.isInfoEnabled()) {
                 log.info("Sending email notifications to {} subscribed users about new documents", subscribedUsers.size());
             }
             sendEmailService.sendEmailIdeaDocuments(subscribedUsers, ideaId, documents);
@@ -120,7 +120,7 @@ public class DocumentServiceImpl implements DocumentService {
             }
             return modelMapper.map(document, DocumentDTO.class);
         } else {
-            if(log.isErrorEnabled()){
+            if (log.isErrorEnabled()) {
                 log.error("Document does not exist");
             }
             throw new DocumentNotFoundException("Document does not exist");
@@ -158,7 +158,7 @@ public class DocumentServiceImpl implements DocumentService {
             documentRepository.deleteById(id);
             if (log.isInfoEnabled()) {
                 log.info("Document was successfully deleted");
-            }else {
+            } else {
                 if (log.isWarnEnabled()) {
                     log.warn("Document was not found");
                 }

@@ -22,12 +22,12 @@ public class AvatarServiceImpl implements AvatarService {
 
     /**
      * Constructs a new instance of the AvatarServiceImpl.
-     *
+     * <p>
      * This constructor initializes the AvatarServiceImpl with the required dependencies, including the UserRepository
      * for accessing user data, the AvatarRepository for accessing avatar data, and the ModelMapper for mapping objects
      * between different types.
      *
-     * @param userRepository  The UserRepository instance for accessing user data.
+     * @param userRepository   The UserRepository instance for accessing user data.
      * @param avatarRepository The AvatarRepository instance for accessing avatar data.
      * @param modelMapper      The ModelMapper instance for mapping objects between different types.
      */
@@ -39,11 +39,10 @@ public class AvatarServiceImpl implements AvatarService {
         this.modelMapper = modelMapper;
     }
 
-
     @Override
     public List<AvatarDTO> getAllAvatars() {
         List<AvatarDTO> avatars = Arrays.asList(modelMapper.map(avatarRepository.findAll(), AvatarDTO[].class));
-        if(log.isInfoEnabled()){
+        if (log.isInfoEnabled()) {
             log.info("Successfully retrieved {} avatars from the database.", avatars.size());
         }
         return avatars;

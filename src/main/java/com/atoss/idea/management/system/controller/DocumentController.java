@@ -36,7 +36,7 @@ public class DocumentController {
     /**
      * Uploads an document to the database in the form of an DocumentDTO.
      *
-     * @param files the multipart file representing the document to be uploaded.
+     * @param files  the multipart file representing the document to be uploaded.
      * @param ideaId id of the idea to which the documents are attached
      * @param userId id of the user which attached the documents
      * @return it returns an DocumentDTO that represents the added document.
@@ -58,14 +58,13 @@ public class DocumentController {
     }
 
 
-
     /**
      * Gets a document from the database by the provided document id
      *
      * @param id it is for getting the document by id.
      * @return it returns a response entity with the selected document by the id of the document.
      * @throws DocumentNotFoundException if the document we want to get doesn't exist into the database
-     *                                it will throw an exception
+     *                                   it will throw an exception
      */
     @GetMapping("/get")
     public ResponseEntity<byte[]> getDocument(@RequestParam Long id) throws DocumentNotFoundException {
@@ -74,8 +73,6 @@ public class DocumentController {
         }
 
         DocumentDTO document = documentService.getDocument(id);
-        byte[] fileContent = document.getDocument();
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDisposition(ContentDisposition.builder("attachment")
@@ -84,12 +81,13 @@ public class DocumentController {
         if (log.isInfoEnabled()) {
             log.info("Successfully retrieved document with file name: {}", document.getFileName());
         }
+        byte[] fileContent = document.getDocument();
         return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
     }
 
 
     /**
-     *  Gets an document by an idea id
+     * Gets an document by an idea id
      *
      * @param ideaId the id of the idea
      * @return it returns a response entity with the document.
@@ -99,7 +97,7 @@ public class DocumentController {
         if (log.isInfoEnabled()) {
             log.info("Received request to get documents for idea");
         }
-        List<DocumentDTO> documents =documentService.getDocumentsByIdeaId(ideaId);
+        List<DocumentDTO> documents = documentService.getDocumentsByIdeaId(ideaId);
 
         if (log.isInfoEnabled()) {
             log.info("Successfully retrieved {} documents for idea", documents.size());
@@ -109,7 +107,7 @@ public class DocumentController {
     }
 
     /**
-     *  Deletes a document by the id of the user who attached it and the id of the idea where it is attached
+     * Deletes a document by the id of the user who attached it and the id of the idea where it is attached
      *
      * @param id the id of the idea where the document is attached
      * @return it returns a response entity with confirmation.
