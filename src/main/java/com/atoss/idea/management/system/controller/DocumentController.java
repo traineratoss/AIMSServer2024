@@ -4,6 +4,7 @@ import com.atoss.idea.management.system.exception.DocumentNotFoundException;
 import com.atoss.idea.management.system.repository.dto.DocumentDTO;
 import com.atoss.idea.management.system.service.DocumentService;
 import jakarta.transaction.Transactional;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.*;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@Log4j2
 @RequestMapping("/aims/api/v1/documents")
 
 public class DocumentController {
@@ -44,7 +46,15 @@ public class DocumentController {
     public ResponseEntity<List<DocumentDTO>> addDocument(@RequestParam("files") MultipartFile[] files,
                                                          @RequestParam Long ideaId,
                                                          @RequestParam Long userId) throws IOException {
-        return new ResponseEntity<>(documentService.addDocument(files, ideaId, userId), HttpStatus.OK);
+
+        if (log.isInfoEnabled()) {
+            log.info("Received request to add {} documents", files.length);
+        }
+        List<DocumentDTO> addedDocuments = documentService.addDocument(files, ideaId, userId);
+        if (log.isInfoEnabled()) {
+            log.info("Successfully added {} documents", addedDocuments.size());
+        }
+        return new ResponseEntity<>(addedDocuments, HttpStatus.OK);
     }
 
 
@@ -59,6 +69,10 @@ public class DocumentController {
      */
     @GetMapping("/get")
     public ResponseEntity<byte[]> getDocument(@RequestParam Long id) throws DocumentNotFoundException {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to get the document");
+        }
+
         DocumentDTO document = documentService.getDocument(id);
         byte[] fileContent = document.getDocument();
 
@@ -67,7 +81,9 @@ public class DocumentController {
         headers.setContentDisposition(ContentDisposition.builder("attachment")
                 .filename(document.getFileName())
                 .build());
-
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved document with file name: {}", document.getFileName());
+        }
         return new ResponseEntity<>(fileContent, headers, HttpStatus.OK);
     }
 
@@ -80,7 +96,16 @@ public class DocumentController {
      */
     @GetMapping("/getByIdea")
     public ResponseEntity<List<DocumentDTO>> getDocumentsByIdeaId(@RequestParam Long ideaId) {
-        return new ResponseEntity<>(documentService.getDocumentsByIdeaId(ideaId), HttpStatus.OK);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to get documents for idea");
+        }
+        List<DocumentDTO> documents =documentService.getDocumentsByIdeaId(ideaId);
+
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved {} documents for idea", documents.size());
+        }
+
+        return new ResponseEntity<>(documents, HttpStatus.OK);
     }
 
     /**
@@ -92,7 +117,14 @@ public class DocumentController {
     @Transactional
     @DeleteMapping("/deleteDocument")
     public ResponseEntity<String> deleteDocumentByIds(@RequestParam Long id) {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to delete document");
+        }
+
         documentService.deleteDocumentById(id);
+        if (log.isInfoEnabled()) {
+            log.info("Document deleted successfully");
+        }
         return new ResponseEntity<>("Document deleted successfully", HttpStatus.OK);
     }
 }

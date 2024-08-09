@@ -13,6 +13,7 @@ import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.DocumentService;
 import jakarta.transaction.Transactional;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Service
+@Log4j2
 public class DocumentServiceImpl implements DocumentService {
     private final DocumentRepository documentRepository;
     private final ModelMapper modelMapper;
@@ -65,12 +67,25 @@ public class DocumentServiceImpl implements DocumentService {
         for (MultipartFile file : files) {
             String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
             Document document = new Document(fileName, file.getContentType(), file.getBytes());
-            User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found."));
+            User user = userRepository.findById(userId).orElseThrow(() -> {
+                if(log.isErrorEnabled()) {
+                    log.error("User with id {} not found", userId);
+                }
+                return new UserNotFoundException("User not found.");
+            });
             document.setUser(user);
-            Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
+            Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> {
+                        if(log.isErrorEnabled()) {
+                            log.error("Idea with id {} not found", ideaId);
+                        }
+                return new IdeaNotFoundException("Idea not found");
+            });
             document.setIdea(idea);
             documents.add(document);
             documentRepository.save(document);
+
+            log.info("Document {} successfully saved", fileName);
+
         }
         List<Long> subscribedUsersIds = subscriptionRepository.findUserIdByIdeaId(ideaId);
         List<User> subscribedUsers = new ArrayList<>();
@@ -78,11 +93,18 @@ public class DocumentServiceImpl implements DocumentService {
             subscribedUsers.add(userRepository.findById(users).get());
         }
         if (!subscribedUsers.isEmpty()) {
+            if(log.isInfoEnabled()) {
+                log.info("Sending email notifications to {} subscribed users about new documents", subscribedUsers.size());
+            }
             sendEmailService.sendEmailIdeaDocuments(subscribedUsers, ideaId, documents);
         }
         List<DocumentDTO> documentDTOs = documents.stream()
                 .map(document -> modelMapper.map(document, DocumentDTO.class))
                 .toList();
+        if (log.isInfoEnabled()) {
+            log.info("Successfully processed and mapped {} documents to DTOs", documentDTOs.size());
+        }
+
         return documentDTOs;
 
     }
@@ -91,8 +113,16 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public DocumentDTO getDocument(Long id) throws DocumentNotFoundException {
         if (documentRepository.findById(id).isPresent()) {
-            return modelMapper.map(documentRepository.findById(id).get(), DocumentDTO.class);
+
+            Document document = documentRepository.findById(id).get();
+            if (log.isInfoEnabled()) {
+                log.info("Document successfully retrieved");
+            }
+            return modelMapper.map(document, DocumentDTO.class);
         } else {
+            if(log.isErrorEnabled()){
+                log.error("Document does not exist");
+            }
             throw new DocumentNotFoundException("Document does not exist");
         }
     }
@@ -101,6 +131,11 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public List<DocumentDTO> getDocumentsByIdeaId(Long ideaId) {
         List<Document> documents = documentRepository.findDocumentsByIdeaId(ideaId);
+
+        if (documents.isEmpty() && log.isWarnEnabled()) {
+            log.warn("No documents found for idea");
+        }
+
         List<DocumentDTO> documentDTOs = documents.stream()
                 .map(document -> {
                     DocumentDTO responseDTO = modelMapper.map(document, DocumentDTO.class);
@@ -109,6 +144,10 @@ public class DocumentServiceImpl implements DocumentService {
                     return responseDTO;
                 })
                 .toList();
+        if (log.isInfoEnabled()) {
+            log.info("Retrieved {} documents", documentDTOs.size());
+        }
+
         return documentDTOs;
     }
 
@@ -117,6 +156,13 @@ public class DocumentServiceImpl implements DocumentService {
         Optional<Document> document = documentRepository.findById(id);
         if (document.isPresent()) {
             documentRepository.deleteById(id);
+            if (log.isInfoEnabled()) {
+                log.info("Document was successfully deleted");
+            }else {
+                if (log.isWarnEnabled()) {
+                    log.warn("Document was not found");
+                }
+            }
         }
     }
 }

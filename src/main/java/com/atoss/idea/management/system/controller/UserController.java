@@ -160,7 +160,7 @@ public class UserController {
                                                              @RequestParam(required = true) String sortCategory) {
 
         if (log.isInfoEnabled()) {
-            log.info("Received request to retrieved all users");
+            log.info("Received request to retrieve all users");
         }
 
         Page<UserResponseDTO> userResponseDTOPage = userService.getAllUsers(
