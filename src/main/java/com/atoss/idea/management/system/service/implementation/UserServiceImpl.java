@@ -1,9 +1,25 @@
 package com.atoss.idea.management.system.service.implementation;
 
-import com.atoss.idea.management.system.exception.*;
+import com.atoss.idea.management.system.exception.ApproveAlreadyGrantedException;
+import com.atoss.idea.management.system.exception.AvatarNotFoundException;
+import com.atoss.idea.management.system.exception.EmailAlreadyExistException;
+import com.atoss.idea.management.system.exception.EmailFailedException;
+import com.atoss.idea.management.system.exception.IncorrectPasswordException;
+import com.atoss.idea.management.system.exception.UserAlreadyActivatedException;
+import com.atoss.idea.management.system.exception.UserAlreadyDeactivatedException;
+import com.atoss.idea.management.system.exception.UserAlreadyExistException;
+import com.atoss.idea.management.system.exception.UserNotFoundException;
+import com.atoss.idea.management.system.exception.UsernameAlreadyExistException;
 import com.atoss.idea.management.system.repository.AvatarRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.dto.*;
+import com.atoss.idea.management.system.repository.dto.ChangePasswordDTO;
+import com.atoss.idea.management.system.repository.dto.ImageDTO;
+import com.atoss.idea.management.system.repository.dto.UserAdminDashboardResponseDTO;
+import com.atoss.idea.management.system.repository.dto.UserPageDTO;
+import com.atoss.idea.management.system.repository.dto.UserResponseDTO;
+import com.atoss.idea.management.system.repository.dto.UserSecurityDTO;
+import com.atoss.idea.management.system.repository.dto.UserUpdateDTO;
+import com.atoss.idea.management.system.repository.dto.VerifyOtpDTO;
 import com.atoss.idea.management.system.repository.entity.Avatar;
 import com.atoss.idea.management.system.repository.entity.OTP;
 import com.atoss.idea.management.system.repository.entity.Role;
@@ -24,7 +40,6 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Log4j2
