@@ -112,8 +112,9 @@ public interface IdeaService {
                                            String sortDirection,
                                            String username,
                                            String rating,
-                                           String subscription,
-                                           Pageable pageable);
+                                           Pageable pageable,
+                                           Boolean subscribed,
+                                           Long userId);
 
     /**
      * Function used to return a list of ideas by their id

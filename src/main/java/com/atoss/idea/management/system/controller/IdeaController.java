@@ -210,8 +210,9 @@ public class IdeaController {
             @RequestParam(required = true) int pageSize,
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String rating,
-            @RequestParam(required = false) String subscription,
-            @RequestParam(required = true) String sortDirection) {
+            @RequestParam(required = true) String sortDirection,
+            @RequestParam(required = false) Boolean subscribed,
+            @RequestParam(required = false) Long userId) {
         log.info("Received request to filter all ideas by given parameters");
 
         List<String> categories = new ArrayList<>();
@@ -234,7 +235,7 @@ public class IdeaController {
         Pageable pageableAsc = PageRequest.of(pageNumber, pageSize);
 
         return new ResponseEntity<>(ideaService.filterIdeasByAll(title,
-                text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, rating, subscription, pageableAsc), HttpStatus.OK);
+                text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, rating, pageableAsc, subscribed, userId), HttpStatus.OK);
     }
 
     /**
