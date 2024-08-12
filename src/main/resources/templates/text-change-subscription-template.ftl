@@ -23,18 +23,23 @@
                 <p style="font-size: 16px; line-height: 1.5;">
                     We hope you are doing well. It appears that an idea that you are subscribed to has been updated. Here is the new idea:
                 </p>
+              <div style="display: flex; justify-content: space-between;">
                 <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 25%; margin-left:20px;">
                                     <div style="background-color: rgba(180, 179, 179,0.4); padding: 10px; border-radius: 4px;">
                                         <p style="font-size: 16px; line-height: 1.5; margin: 0;">
                                             <b>Title: </b> ${oldTitle}
                                         </p>
                                     </div>
-                                    <div style="background-color: #e0f7fa; padding: 10px; border-radius: 4px;">
+                                    <div style="background-color: rgba(180, 179, 179,0.4); padding: 10px; border-radius: 4px;">
                                         <p style="font-size: 16px; line-height: 1.5; margin: 0;">
                                             <b>Text: </b> ${oldText}
                                         </p>
                                     </div>
-                                    <div style="background-color: rgba(180, 179, 179,0.4); padding: 10px; border-radius: 4px;">
+
+                 </div>
+               <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 25%; margin-left:20px;">
+
+                                    <div style="background-color: #e0f7fa; padding: 10px; border-radius: 4px;">
                                         <p style="font-size: 16px; line-height: 1.5; margin: 0;">
                                             <b>Title: </b> ${newTitle}
                                         </p>
@@ -45,6 +50,7 @@
                                         </p>
                                     </div>
                  </div>
+              </div>
                 <p style="font-size: 16px; line-height: 1.5;">
                     Best regards,<br>
                     <span style="font-style: italic;"><b>${companyName}</b></span>

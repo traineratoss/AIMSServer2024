@@ -12,18 +12,13 @@ import com.atoss.idea.management.system.service.SendEmailService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Order;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -203,7 +198,7 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (idea.getDocuments() != null) {
             for (DocumentDTO documentDTO : idea.getDocuments()) {
-                Document existingDocument = documentRepository.findDocumentByFileName(documentDTO.getFileName());
+                Document existingDocument = documentRepository.findDocumentById(documentDTO.getId());
                 if (existingDocument == null) {
                     Document newDocument = modelMapper.map(documentDTO, Document.class);
                     if (savedIdea.getDocumentList() == null) {
@@ -354,7 +349,7 @@ public class IdeaServiceImpl implements IdeaService {
 
             if (ideaUpdateDTO.getDocuments() != null) {
                 for (DocumentDTO documentDTO : ideaUpdateDTO.getDocuments()) {
-                    Document existingDocument = documentRepository.findDocumentByFileName(documentDTO.getFileName());
+                    Document existingDocument = documentRepository.findDocumentById(documentDTO.getId());
                     if (existingDocument == null) {
                         Document newDocument = modelMapper.map(documentDTO, Document.class);
                         if (idea.getDocumentList() == null) {
@@ -458,7 +453,9 @@ public class IdeaServiceImpl implements IdeaService {
                                                   String sortDirection,
                                                   String username,
                                                   String ratingAvg,
-                                                  Pageable pageable) {
+                                                  Pageable pageable,
+                                                  Boolean subscribed,
+                                                  Long userId) {
         log.info("Filter ideas by criterias");
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
@@ -498,6 +495,25 @@ public class IdeaServiceImpl implements IdeaService {
             float upperBound = rating + 0.99f;
             predicatesList.add(cb.between(root.get("ratingAvg"), lowerBound, upperBound));
         }
+
+
+        if (subscribed != null && userId != null) {
+            Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
+            Root<Subscription> subRoot = subquery.from(Subscription.class);
+            subquery.select(subRoot.get("idea").get("id"));
+            subquery.where(cb.and(
+                    cb.equal(subRoot.get("idea").get("id"), root.get("id")),
+                    cb.equal(subRoot.get("user").get("id"), userId)
+            ));
+
+            Predicate subscriptionPredicate = root.get("id").in(subquery);
+
+            if (subscribed) {
+                predicatesList.add(subscriptionPredicate);
+            }
+        }
+
+
         predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
         List<Order> orders = new ArrayList<>();
         if (Objects.equals(sortDirection, "ASC")) {

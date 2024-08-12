@@ -286,7 +286,7 @@ public class CommentController {
         if (log.isInfoEnabled()) {
             log.info("Successfully deleted like from comment");
         }
-        return new ResponseEntity<>("Like succesfully deleted", HttpStatus.OK);
+        return new ResponseEntity<>("Like successfully deleted", HttpStatus.OK);
     }
 
 
@@ -307,7 +307,7 @@ public class CommentController {
         if (log.isInfoEnabled()) {
             log.info("Successfully deleted report from comment");
         }
-        return new ResponseEntity<>("Report succesfully deleted", HttpStatus.OK);
+        return new ResponseEntity<>("Report successfully deleted", HttpStatus.OK);
     }
 
 
@@ -552,7 +552,7 @@ public class CommentController {
         if (log.isInfoEnabled()) {
             log.info("Successfully retrieved the total number of likes");
         }
-        return new ResponseEntity(number, HttpStatus.OK);
+        return new ResponseEntity("The number of likes is " + number, HttpStatus.OK);
     }
 
 
@@ -571,7 +571,7 @@ public class CommentController {
         if (log.isInfoEnabled()) {
             log.info("Successfully retrieved the total number of reports");
         }
-        return new ResponseEntity(number, HttpStatus.OK);
+        return new ResponseEntity("The number of reports is " + number, HttpStatus.OK);
     }
 
 }
