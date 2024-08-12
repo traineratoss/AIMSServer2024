@@ -198,7 +198,7 @@ public class IdeaServiceImpl implements IdeaService {
 
         if (idea.getDocuments() != null) {
             for (DocumentDTO documentDTO : idea.getDocuments()) {
-                Document existingDocument = documentRepository.findDocumentByFileName(documentDTO.getFileName());
+                Document existingDocument = documentRepository.findDocumentById(documentDTO.getId());
                 if (existingDocument == null) {
                     Document newDocument = modelMapper.map(documentDTO, Document.class);
                     if (savedIdea.getDocumentList() == null) {
@@ -342,7 +342,7 @@ public class IdeaServiceImpl implements IdeaService {
 
             if (ideaUpdateDTO.getDocuments() != null) {
                 for (DocumentDTO documentDTO : ideaUpdateDTO.getDocuments()) {
-                    Document existingDocument = documentRepository.findDocumentByFileName(documentDTO.getFileName());
+                    Document existingDocument = documentRepository.findDocumentById(documentDTO.getId());
                     if (existingDocument == null) {
                         Document newDocument = modelMapper.map(documentDTO, Document.class);
                         if (idea.getDocumentList() == null) {
