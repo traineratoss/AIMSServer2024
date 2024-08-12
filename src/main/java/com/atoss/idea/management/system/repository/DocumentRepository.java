@@ -56,6 +56,19 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
      */
     Document findDocumentByFileName(String fileName);
 
+    /**
+     * Retrieves a document based on the specified file id.
+     *
+     * This method searches for a document in the system using the provided
+     * file id as a key. If a document with the given file id exists,
+     * it returns the corresponding doc object. If no such
+     * document is found, it returns null.
+     *
+     * @param id the name of the file to search for (must not be null)
+     * @return the Document object associated with the specified file name,
+     *         or if no such document exists
+     * @throws IllegalArgumentException if the fileName is null
+     */
     Document findDocumentById(Long id);
 
 }
