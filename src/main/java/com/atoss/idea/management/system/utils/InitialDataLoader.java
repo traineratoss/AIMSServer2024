@@ -253,25 +253,25 @@ public class InitialDataLoader implements CommandLineRunner {
                     "Raise compensation to raise employee quality", image4, new Date(), categories);
 
             Idea idea5 = createIdea(user3, Status.OPEN, "Offering professional development **opportunities** for employees can significantly "
-                    + "increase both their job satisfaction and their productivity. By investing in your employees' skills and knowledge, you "
-                    + "also invest in the company's overall performance.",
+                            + "increase both their job satisfaction and their productivity. By investing in your employees' skills and knowledge, "
+                            + "you also invest in the company's overall performance.",
                     "Promote *professional* development", image5, staticDate4, categories1);
 
-            Idea idea6 = createIdea(user2, Status.IMPLEMENTED, "Flexible working hours can ***improve*** work-life balance for employees, which in "
-                    + "turn can enhance their overall well-being and productivity. Allowing employees to have a say in their work schedules can reduce"
-                    + "stress and burnout, leading to a happier and more effective workforce.",
+            Idea idea6 = createIdea(user2, Status.IMPLEMENTED, "Flexible working hours can ***improve*** work-life balance for employees, which "
+                            + "in turn can enhance their overall well-being and productivity. Allowing employees to have a say in their work "
+                            + "schedules can reduce stress and burnout, leading to a happier and more effective workforce.",
                     "Implement flexible work schedules", image6, staticDate3, categories);
 
             Idea idea7 = createIdea(user4, Status.OPEN, "Providing a clear career path within your company is essential for retaining talent. "
-                    + "Employees are more likely to stay long-term if they see potential for growth and advancement. This not only motivates them to "
-                    + "perform better but also creates a sense of loyalty to the company.",
+                            + "Employees are more likely to stay long-term if they see potential for growth and advancement. This not only "
+                            + "motivates them to perform better but also creates a sense of loyalty to the company.",
                     "Define clear career progression paths", image7, new Date(), categories);
 
             Idea idea8 = createIdea(user3, Status.OPEN, "![Wellness](https://static.vecteezy.com/system/resources/previews/004/413/150/non_2x/simple"
-                    + "-illustration-that-prevent-heart-attack-heart-health-cardiology-outlined-icon-free-vector.jpg)"
-                    + "Introducing wellness programs in the workplace can have a positive impact on employee"
-                    + "health and reduce absenteeism. Wellness initiatives like fitness challenges, mental health support, and healthy eating programs "
-                    + "can lead to a more energized and engaged workforce.",
+                            + "-illustration-that-prevent-heart-attack-heart-health-cardiology-outlined-icon-free-vector.jpg)"
+                            + "Introducing wellness programs in the workplace can have a positive impact on employee"
+                            + "health and reduce absenteeism. Wellness initiatives like fitness challenges, mental health support, and "
+                            + "healthy eating programs can lead to a more energized and engaged workforce.",
                     "Introduce wellness programs", image3, staticDate2, categories1);
 
             ideaRepository.save(idea1);
@@ -342,7 +342,6 @@ public class InitialDataLoader implements CommandLineRunner {
             Comment comment14 = createComment(staticDate4, idea5, null,
                     user5, "I have some concerns about how this will be implemented.");
             commentRepository.save(comment14);
-
 
 
             Comment reply1 = createReply(staticDate3, comment2, idea2,
@@ -463,11 +462,11 @@ public class InitialDataLoader implements CommandLineRunner {
                 userList.add(user);
                 userRepository.save(user);
 
-                addLike(comment3,user);
+                addLike(comment3, user);
 
-                if(j%2==1){
-                    addLike(comment13,user);
-                    addLike(comment11,user);
+                if (j % 2 == 1) {
+                    addLike(comment13, user);
+                    addLike(comment11, user);
 
                     addReport(reply5, user);
                     addReport(comment12, user);
