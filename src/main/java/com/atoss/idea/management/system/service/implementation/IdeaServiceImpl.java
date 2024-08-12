@@ -143,7 +143,7 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws IOException {
 
-        log.info("Adding a idea");
+        log.info("Add a idea");
         if (idea.getTitle() == null || idea.getTitle().isEmpty()) {
             throw new FieldValidationException("Please enter a valid title for the idea.");
         }
@@ -230,7 +230,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO getIdeaById(Long id) throws FieldValidationException {
-        log.info("Return a idea by id");
+        log.info("Return an idea by id");
 
         if (ideaRepository.findById(id).isPresent()) {
             Idea idea = ideaRepository.findById(id).get();
@@ -250,7 +250,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO getIdeaByIdForUpdateIdea(Long id) throws FieldValidationException {
-        log.info("Return a idea by id for updating");
+        log.info("Return an idea by id for updating");
 
         if (ideaRepository.findById(id).isPresent()) {
             Idea idea = ideaRepository.findById(id).get();
@@ -289,7 +289,7 @@ public class IdeaServiceImpl implements IdeaService {
             String oldTitle = idea.getTitle();
 
             for (Long userId : subscribedUsersIds) {
-                log.info("User subscried succesfully to a idea");
+                log.info("User subsbscribed succesfully to an idea");
                 subscribedUsers.add(userRepository.findById(userId).get());
             }
 
@@ -588,7 +588,7 @@ public class IdeaServiceImpl implements IdeaService {
             } catch (ParseException e) {
                 // e.printStackTrace();
                 if (log.isErrorEnabled()) {
-                    log.error("A error occured when trying to filter by date");
+                    log.error("An error occured when trying to filter by date");
                 }
             }
         }
@@ -601,7 +601,7 @@ public class IdeaServiceImpl implements IdeaService {
             } catch (ParseException e) {
                 // e.printStackTrace();
                 if (log.isErrorEnabled()) {
-                    log.error("A error occured when trying to filter by date");
+                    log.error("An error occured when trying to filter by date");
                 }
             }
         }
@@ -732,7 +732,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO getIdeaByCommentId(Long commentId) {
-        log.info("Get a idea by comment id");
+        log.info("Get an idea by comment id");
         Optional<Idea> idea = ideaRepository.findIdeaByCommentId(commentId);
 
         if (idea.isEmpty()) {
@@ -754,7 +754,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Long getNumberOfRatingsForIdea(Long ideaId) {
-        log.info("Return the number of ratings for a idea");
+        log.info("Return the number of ratings for an idea");
         return ratingRepository.countByIdeaId(ideaId);
     }
 
