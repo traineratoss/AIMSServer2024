@@ -453,14 +453,10 @@ public class IdeaServiceImpl implements IdeaService {
                                                   String sortDirection,
                                                   String username,
                                                   String ratingAvg,
-<<<<<<< HEAD
                                                   Pageable pageable,
                                                   Boolean subscribed,
                                                   Long userId) {
-=======
-                                                  Pageable pageable) {
         log.info("Filter ideas by criterias");
->>>>>>> a5aa152f57d033fd37ec71e999570690805b3f23
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
         Root<Idea> root = criteriaQuery.from(Idea.class);
