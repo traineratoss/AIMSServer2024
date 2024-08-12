@@ -24,7 +24,7 @@
                     We hope this message finds you well. We are pleased to inform you that the rating for the idea titled <br>"<b>${ideaTitle}</b>"<br> has been updated as of <span>${date}</span>.
                 </p>
                 <p style="font-size: 16px; line-height: 1.5;">
-                    The new rating is now: <span style="font-weight: bold; color: #ffa941;">${newRating} stars</span>.
+                    The new rating is now: <span style="font-weight: bold; color: #000000;">${newRating} star(s)</span>.
                 </p>
                 <p style="font-size: 16px; line-height: 1.5;">
                     Your engagement and feedback are highly valued, and we encourage you to continue sharing your thoughts and ideas with our community.

@@ -57,13 +57,13 @@ public class StatisticsServiceImpl implements StatisticsService {
     /**
      * Constructor
      *
-     * @param modelMapper       ==
-     * @param ideaService       ==
-     * @param ideaRepository    ==
-     * @param commentService    ==
-     * @param userRepository    ==
+     * @param modelMapper ==
+     * @param ideaService ==
+     * @param ideaRepository ==
+     * @param commentService ==
+     * @param userRepository ==
      * @param commentRepository ==
-     * @param htmlService       ==
+     * @param htmlService ==
      */
     public StatisticsServiceImpl(ModelMapper modelMapper,
                                  IdeaService ideaService,

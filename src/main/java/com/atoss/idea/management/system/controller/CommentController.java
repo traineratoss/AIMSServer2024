@@ -552,7 +552,7 @@ public class CommentController {
         if (log.isInfoEnabled()) {
             log.info("Successfully retrieved the total number of likes");
         }
-        return new ResponseEntity(number, HttpStatus.OK);
+        return new ResponseEntity("The number of likes is " + number, HttpStatus.OK);
     }
 
 
@@ -571,7 +571,7 @@ public class CommentController {
         if (log.isInfoEnabled()) {
             log.info("Successfully retrieved the total number of reports");
         }
-        return new ResponseEntity(number, HttpStatus.OK);
+        return new ResponseEntity("The number of reports is " + number, HttpStatus.OK);
     }
 
 }
