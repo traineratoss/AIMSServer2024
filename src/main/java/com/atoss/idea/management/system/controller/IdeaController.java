@@ -6,6 +6,7 @@ import com.atoss.idea.management.system.repository.entity.Status;
 import com.atoss.idea.management.system.repository.entity.Subscription;
 import com.atoss.idea.management.system.service.IdeaService;
 import jakarta.transaction.Transactional;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,9 +25,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/aims/api/v1/ideas")
+@Log4j2
 public class IdeaController {
 
     private final IdeaService ideaService;
+
 
     /**
      * Constructor for the Idea Controller
@@ -48,6 +51,7 @@ public class IdeaController {
     @Transactional
     public ResponseEntity<IdeaResponseDTO> addIdea(@RequestBody IdeaRequestDTO idea,
                                                    @RequestParam String username) throws IOException {
+        log.info("Received request to post idea");
         return new ResponseEntity<>(ideaService.addIdea(idea, username), HttpStatus.OK);
     }
 
@@ -60,6 +64,7 @@ public class IdeaController {
     @GetMapping("/get")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> getIdeaById(@RequestParam(required = true) Long id) {
+        log.info("Received request to get idea");
         return new ResponseEntity<>(ideaService.getIdeaById(id), HttpStatus.OK);
     }
 
@@ -76,6 +81,7 @@ public class IdeaController {
     @GetMapping("/get/updateIdea")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> getIdeaByIdForUpdateIdea(@RequestParam(required = true) Long id) {
+        log.info("Received request to get idea");
         return new ResponseEntity<>(ideaService.getIdeaByIdForUpdateIdea(id), HttpStatus.OK);
     }
 
@@ -90,32 +96,30 @@ public class IdeaController {
     @Transactional
     public ResponseEntity<IdeaResponseDTO> updateIdeaById(@RequestParam(required = true) Long id,
                                                           @RequestBody IdeaUpdateDTO ideaUpdateDTO) throws UnsupportedEncodingException {
+        log.info("Received request to update idea");
         return new ResponseEntity<>(ideaService.updateIdeaById(id, ideaUpdateDTO), HttpStatus.OK);
     }
 
     /**
      * Deletes an idea by a given id
-     *
-     * @param       id the id of the idea we want to delete
-     * @return      a Response Entity containing a text that suggests the fact that we successfully
-     *              deleted the idea
+     * @param id the id of the idea we want to delete
+     * @return a Response Entity containing a text that suggests the fact that we successfully
      */
     @DeleteMapping("/delete")
     @Transactional
     public ResponseEntity<String> deleteIdeaById(@RequestParam(required = true) Long id) {
+        log.info("Received request to delete idea");
         ideaService.deleteIdeaById(id);
         return new ResponseEntity<>("Idea successfully deleted", HttpStatus.OK);
     }
 
     /**
      * Returns all the ideas paged
-     *
      * @param pageSize      the size of the page
      * @param pageNumber    the number of the page
      * @param sortCategory  the category we sort the ideas by
      * @param sortDirection the direction we want the ideas to be sorted by
-     * @return              a Response Entity containing an IdeaPage DTO (the total number of ideas in all the pages +
-     *                      the page containing the list of ideas)
+     * @return a Response Entity containing an IdeaPage DTO (the total number of ideas in all the pages +
      */
     @Transactional
     @GetMapping("/all")
@@ -123,6 +127,7 @@ public class IdeaController {
                                                              @RequestParam(required = true) int pageNumber,
                                                              @RequestParam(required = true) String sortCategory,
                                                              @RequestParam(required = true) Sort.Direction sortDirection) {
+        log.info("Received request to get all ideas");
         switch (sortDirection) {
             case ASC -> {
                 Pageable pageableAsc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
@@ -146,8 +151,7 @@ public class IdeaController {
      * @param pageNumber    the number of the page
      * @param sortCategory  the category we sort the ideas by
      * @param sortDirection the direction we want the ideas to be sorted by
-     * @return              a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     *                      the page containing the list of ideas)
+     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
      */
     @Transactional
     @GetMapping("/allByUser")
@@ -156,6 +160,7 @@ public class IdeaController {
                                                                            @RequestParam(required = true) int pageNumber,
                                                                            @RequestParam(required = true) String sortCategory,
                                                                            @RequestParam(required = true) Sort.Direction sortDirection) {
+        log.info("Received request to get all ideas by username");
         switch (sortDirection) {
             case ASC -> {
                 Pageable pageableAsc = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, sortCategory));
@@ -188,9 +193,8 @@ public class IdeaController {
      * @param pageNumber       the number of the page
      * @param username         if not null, returns filtered ideas belonging to the specified username
      * @param sortDirection    the direction we want the ideas to be sorted by
-     * @param rating            rating to filter the ideas
-     * @return                  a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
-     *                          the page containing the list of ideas )
+     * @param rating           rating to filter the ideas
+     * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
      */
     @Transactional
     @GetMapping("/filter")
@@ -208,6 +212,7 @@ public class IdeaController {
             @RequestParam(required = false) String rating,
             @RequestParam(required = false) String subscription,
             @RequestParam(required = true) String sortDirection) {
+        log.info("Received request to filter all ideas by given parameters");
 
         List<String> categories = new ArrayList<>();
         if (category != null && !category.isEmpty()) {
@@ -224,7 +229,6 @@ public class IdeaController {
             statusStrings = Arrays.asList(status.split(","));
         }
         List<Status> statusEnums = statusStrings.stream().map(s -> Status.valueOf(s)).toList();
-        // pentru a converti corect, din String in Status nu stie in QueryCreator
 
 
         Pageable pageableAsc = PageRequest.of(pageNumber, pageSize);
@@ -236,9 +240,9 @@ public class IdeaController {
     /**
      * add a rating to a idea
      *
-     * @param ideaId            the id of the idea to modify thhe rating
-     * @param userId            the id of the user to be modify the rating
-     * @param ratingValue        a value which is the rating of that idea for that specific user
+     * @param ideaId      the id of the idea to modify thhe rating
+     * @param userId      the id of the user to be modify the rating
+     * @param ratingValue a value which is the rating of that idea for that specific user
      * @return a Response Entity containing a response which includes the rating added for that user and idea
      */
     @Transactional
@@ -247,6 +251,7 @@ public class IdeaController {
             @RequestParam(required = true) Long ideaId,
             @RequestParam(required = true) Long userId,
             @RequestParam(required = true) double ratingValue) {
+        log.info("Received request to add or update a rating");
         Rating rating = ideaService.addOrUpdateRating(ideaId, userId, ratingValue);
         return new ResponseEntity<>(rating, HttpStatus.OK);
     }
@@ -261,6 +266,7 @@ public class IdeaController {
     @Transactional
     @GetMapping("/getAllRatings")
     public ResponseEntity<List<RatingDTO>> getAllRatings(@RequestParam(required = true) Long userId) {
+        log.info("Received request to get all of the ratings");
         return new ResponseEntity<>(ideaService.getAllRatings(userId), HttpStatus.OK);
     }
 
@@ -275,6 +281,7 @@ public class IdeaController {
     @Transactional
     @GetMapping("/getRating")
     public ResponseEntity<Double> getRating(@RequestParam Long ideaId, @RequestParam Long userId) {
+        log.info("Received request to get a rating");
         return new ResponseEntity<>(ideaService.getRatingByUserAndByIdea(ideaId, userId), HttpStatus.OK);
     }
 
@@ -285,6 +292,7 @@ public class IdeaController {
      */
     @GetMapping("/countRatings")
     public ResponseEntity<List<Map<Long, Object>>> getNumberOfRatings() {
+        log.info("Received request to get the number of ratings");
         return new ResponseEntity<>(ideaService.getRatingsCountForEachIdea(), HttpStatus.OK);
     }
 
@@ -301,6 +309,7 @@ public class IdeaController {
     public ResponseEntity<Subscription> addSubscription(@RequestParam(required = true) Long ideaId,
                                                         @RequestParam(required = true) Long userId)
             throws UnsupportedEncodingException {
+        log.info("Received request to post a subscription");
         return new ResponseEntity<>(ideaService.addSubscription(ideaId, userId), HttpStatus.OK);
     }
 
@@ -315,6 +324,7 @@ public class IdeaController {
     @DeleteMapping("/deleteSubscription")
     public ResponseEntity<String> deleteSubscriptionById(@RequestParam(required = true) Long ideaId,
                                                          @RequestParam(required = true) Long userId) {
+        log.info("Received request to delete a subscription");
         ideaService.removeSubscription(ideaId, userId);
         return new ResponseEntity<>("Subscription successfully deleted", HttpStatus.OK);
     }
@@ -328,12 +338,13 @@ public class IdeaController {
     @Transactional
     @GetMapping("/getAllSubscriptions")
     public ResponseEntity<List<SubscriptionDTO>> getAllSubscriptions(@RequestParam Long userId) {
+        log.info("Received a request to get all of subscriptions");
         return new ResponseEntity<>(ideaService.getAllSubscriptions(userId), HttpStatus.OK);
     }
 
     /**
      * Retrieves an idea based on the provided comment ID.
-     *
+     * <p>
      * This method handles HTTP GET requests to the "/getByComment" endpoint.
      * It expects a query parameter "commentId" which is mandatory.
      * The method is transactional, meaning that it will be executed within a database transaction context.
@@ -344,6 +355,7 @@ public class IdeaController {
     @GetMapping("/getByComment")
     @Transactional
     public ResponseEntity<IdeaResponseDTO> getIdeaByCommentId(@RequestParam(required = true) Long commentId) {
+        log.info("Received request to get a idea by comment id");
         return new ResponseEntity<>(ideaService.getIdeaByCommentId(commentId), HttpStatus.OK);
     }
 }

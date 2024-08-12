@@ -55,7 +55,6 @@ public class AuthController {
      * @param userService           The UserRepository used for accessing user-related data and operations.
      * @param refreshTokenService   The RefreshTokenService used for handling refresh tokens.
      * @param jwtService            The JwtService used for generating and verifying tokens.
-     * @param cookieService         The SessionService used for creating access and refresh token
      * @param sessionService        The SessionService used for managing the user's session.
      * @see AuthenticationManager
      * @see UserRepository
@@ -67,7 +66,6 @@ public class AuthController {
             UserService userService,
             RefreshTokenService refreshTokenService,
             JwtService jwtService,
-            SessionService cookieService,
             SessionService sessionService) {
         this.authenticationManager = authenticationManager;
         this.refreshTokenService = refreshTokenService;

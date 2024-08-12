@@ -38,7 +38,6 @@ public class UserControllerTest {
     @BeforeEach
     public void setup(){
         MockitoAnnotations.openMocks(this);
-        userController = new UserController(userServiceImpl, sendEmailServiceImpl);
     }
 
     @Test
@@ -53,8 +52,8 @@ public class UserControllerTest {
 
         when(userRepository.save(any(User.class))).thenReturn(user);
 
-        ResponseEntity<UserResponseDTO> user2 = userController.addUser( "catallinu", "afasf@gmail.com");
-        assertEquals(user2.getBody().getUsername(), "catallinu");
+        UserResponseDTO user2 = userServiceImpl.addUser( "catallinu", "afasf@gmail.com");
+        assertEquals(user2.getUsername(), "catallinu");
     }
 
 }

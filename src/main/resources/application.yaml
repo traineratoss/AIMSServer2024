@@ -6,7 +6,7 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    show-sql: true
+#    show-sql: true
     hibernate:
       ddl-auto: update
       default-schema: public
@@ -54,6 +54,7 @@ aims:
       /aims/api/v1/avatars/**,
       /aims/api/v1/images/**,
       /users/get-avatar-by-username
+    otpExpiryMinutes: 3
 
 
 #example for seeing the logs only for our package

@@ -6,6 +6,7 @@ import com.atoss.idea.management.system.repository.dto.StatisticsDTO;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.service.StatisticsService;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@Log4j2
 @RequestMapping("/aims/api/v1/statistics")
 public class StatisticsController {
 
@@ -53,8 +55,17 @@ public class StatisticsController {
      */
     @GetMapping("/stats")
     public ResponseEntity<StatisticsDTO> getStats() {
+        if (log.isInfoEnabled()) {
+            log.info("Received request to retrieve general statistics");
+        }
 
-        return new ResponseEntity<>(statisticsService.getGeneralStatistics(), HttpStatus.OK);
+        StatisticsDTO stats = statisticsService.getGeneralStatistics();
+
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved general statistics");
+        }
+
+        return new ResponseEntity<>(stats, HttpStatus.OK);
 
     }
 
@@ -71,9 +82,17 @@ public class StatisticsController {
             @RequestParam(required = false) String selectedDateFrom,
             @RequestParam(required = false) String selectedDateTo) {
 
-        return new ResponseEntity<>(statisticsService.getStatisticsByDate(
-                selectedDateFrom,
-                selectedDateTo), HttpStatus.OK);
+        if (log.isInfoEnabled()) {
+            log.info("Received request to filter statistics from {} to {}", selectedDateFrom, selectedDateTo);
+        }
+
+        StatisticsDTO stats = statisticsService.getStatisticsByDate(selectedDateFrom, selectedDateTo);
+
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved filtered stats");
+        }
+
+        return new ResponseEntity<>(stats, HttpStatus.OK);
 
     }
 
@@ -88,7 +107,17 @@ public class StatisticsController {
     public List<Idea> getIdeaList(@RequestParam(required = false) String selectedDateFrom,
                                   @RequestParam(required = false) String selectedDateTo) {
 
-        return ideaServiceImpl.findIdeasByIds(commentRepository.mostCommentedIdeasIdsByDate(selectedDateFrom, selectedDateTo));
+        if (log.isInfoEnabled()) {
+            log.info("Received request for idea list from {} to {}", selectedDateFrom, selectedDateTo);
+        }
+
+        List<Idea> ideas = ideaServiceImpl.findIdeasByIds(commentRepository.mostCommentedIdeasIdsByDate(selectedDateFrom, selectedDateTo));
+
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved idea list");
+        }
+
+        return ideas;
 
     }
 
