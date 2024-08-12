@@ -323,11 +323,11 @@ public class StatisticsServiceImpl implements StatisticsService {
         System.out.println(selectedDateToAux);
         StatisticsDTO filteredStatisticsDTO = new StatisticsDTO();
 
-        List<Long> listOfRepliesAndComments = commentRepository.getRepliesAndCommentsCount(selectedDateFrom, selectedDateToAux);
+
 
         Long noOfReplies;
         try {
-            noOfReplies = listOfRepliesAndComments.get(1);
+            noOfReplies = getSelectionRepliesNumber(selectedDateFrom, selectedDateToAux);
         } catch (Exception e) {
             noOfReplies = 0L;
             if (log.isWarnEnabled()) {
@@ -338,7 +338,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         Long noOfComments;
         try {
-            noOfComments = listOfRepliesAndComments.get(0);
+            noOfComments = getSelectionCommentNumber(selectedDateFrom, selectedDateToAux);
         } catch (Exception e) {
             noOfComments = 0L;
             if (log.isWarnEnabled()) {
