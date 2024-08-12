@@ -120,6 +120,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     private void readBadWordsFromFile(String path) {
         try {
+            log.info("Reading bad words from file");
             FileReader fileReader = new FileReader(path);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
@@ -132,13 +133,18 @@ public class IdeaServiceImpl implements IdeaService {
 
             bufferedReader.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
+            if(log.isErrorEnabled())
+            {
+              log.error("An error occured when reading bad words from file");
+            }
         }
     }
 
     @Override
     public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws IOException {
 
+        log.info("Adding a idea");
         if (idea.getTitle() == null || idea.getTitle().isEmpty()) {
             throw new FieldValidationException("Please enter a valid title for the idea.");
         }
@@ -212,9 +218,11 @@ public class IdeaServiceImpl implements IdeaService {
                         documentRepository.save(newDocument);
                     }
                     savedIdea.getDocumentList().add(newDocument);
+                    log.info("Document succesfully saved");
                     documentRepository.save(newDocument);
                 }
             }
+            log.info("Idea saved succesfully");
             ideaRepository.save(savedIdea);
         }
 
@@ -223,6 +231,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO getIdeaById(Long id) throws FieldValidationException {
+        log.info("Return a idea by id");
 
         if (ideaRepository.findById(id).isPresent()) {
             Idea idea = ideaRepository.findById(id).get();
@@ -242,6 +251,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO getIdeaByIdForUpdateIdea(Long id) throws FieldValidationException {
+        log.info("Return a idea by id for updating");
 
         if (ideaRepository.findById(id).isPresent()) {
             Idea idea = ideaRepository.findById(id).get();
@@ -257,6 +267,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO updateIdeaById(Long id, IdeaUpdateDTO ideaUpdateDTO) throws UnsupportedEncodingException {
+        log.info("Update idea by id");
         String wordsFilePath = "textTerms/badWords.txt";
         URL resourceUrl = classLoader.getResource(wordsFilePath);
         if (resourceUrl != null) {
@@ -279,6 +290,7 @@ public class IdeaServiceImpl implements IdeaService {
             String oldTitle = idea.getTitle();
 
             for (Long userId : subscribedUsersIds) {
+                log.info("User subscried succesfully to a idea");
                 subscribedUsers.add(userRepository.findById(userId).get());
             }
 
@@ -329,6 +341,7 @@ public class IdeaServiceImpl implements IdeaService {
                     if (newCategory == null) {
                         Category addedCategory = new Category();
                         addedCategory.setText(category.getText());
+                        log.info("Category succesfully saved");
                         categoryRepository.save(addedCategory);
                         newList.add(addedCategory);
                     } else {
@@ -356,9 +369,11 @@ public class IdeaServiceImpl implements IdeaService {
                             documentRepository.save(newDocument);
                         }
                         idea.getDocumentList().add(newDocument);
+                        log.info("Document added succesfully");
                         documentRepository.save(newDocument);
                     }
                 }
+                log.info("Idea succesfully saved");
                 ideaRepository.save(idea);
             }
 
@@ -376,6 +391,7 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public void deleteIdeaById(Long id) {
         if (ideaRepository.existsById(id)) {
+            log.info("Idea succesfully deleted by id");
             ideaRepository.deleteById(id);
         } else {
             throw new IdeaNotFoundException("Idea doesn't exist.");
@@ -384,6 +400,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Page<IdeaResponseDTO> getAllIdeas(Pageable pageable) {
+        log.info("Return all ideas");
         if (ideaRepository.findAll().size() <= 0) {
             throw new FieldValidationException("No ideas found.");
         }
@@ -406,6 +423,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Page<IdeaResponseDTO> getAllIdeasByUserUsername(String username, Pageable pageable) {
+        log.info("Return all ideas by username");
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
@@ -442,6 +460,7 @@ public class IdeaServiceImpl implements IdeaService {
                                                   String username,
                                                   String ratingAvg,
                                                   Pageable pageable) {
+        log.info("Filter ideas by criterias");
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
         Root<Idea> root = criteriaQuery.from(Idea.class);
@@ -533,6 +552,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public List<Idea> findIdeasByIds(List<Long> ideaIds) {
+        log.info("Returned a list of ideas");
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
         Root<Idea> root = criteriaQuery.from(Idea.class);
@@ -547,6 +567,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public List<Predicate> filterByDate(String selectedDateFrom, String selectedDateTo, Root<?> root, CriteriaBuilder cb, String columnName) {
+        log.info("Filter by date");
         List<Predicate> predicatesList = new ArrayList<>();
         if (selectedDateFrom != null && selectedDateTo == null) {
             try {
@@ -554,7 +575,11 @@ public class IdeaServiceImpl implements IdeaService {
                 Date fromDate = simpleDateFormat.parse(selectedDateFrom + " 00:00:00");
                 predicatesList.add(cb.greaterThanOrEqualTo(root.get(columnName), fromDate));
             } catch (ParseException e) {
-                e.printStackTrace();
+               // e.printStackTrace();
+                if(log.isErrorEnabled())
+                {
+                    log.error("A error occured when trying to filter by date");
+                }
             }
         }
         if (selectedDateFrom == null && selectedDateTo != null) {
@@ -563,7 +588,11 @@ public class IdeaServiceImpl implements IdeaService {
                 Date toDate = simpleDateFormat.parse(selectedDateTo + " 23:59:59");
                 predicatesList.add(cb.lessThanOrEqualTo(root.get(columnName), toDate));
             } catch (ParseException e) {
-                e.printStackTrace();
+               // e.printStackTrace();
+                if(log.isErrorEnabled())
+                {
+                    log.error("A error occured when trying to filter by date");
+                }
             }
         }
         if (selectedDateFrom != null && selectedDateTo != null) {
@@ -573,7 +602,11 @@ public class IdeaServiceImpl implements IdeaService {
                 Date toDate = simpleDateFormat.parse(selectedDateTo + " 23:59:59");
                 predicatesList.add(cb.between(root.get(columnName), fromDate, toDate));
             } catch (ParseException e) {
-                e.printStackTrace();
+               // e.printStackTrace();
+                if(log.isErrorEnabled())
+                {
+                    log.error("A error occured when trying to filter by date");
+                }
             }
         }
         return predicatesList;
@@ -582,6 +615,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Rating addOrUpdateRating(Long ideaId, Long userId, Double ratingValue) {
+        log.info("Add or update a rating");
         Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
         Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElse(new Rating());
@@ -592,6 +626,7 @@ public class IdeaServiceImpl implements IdeaService {
         rating.setIdea(idea);
         rating.setUser(user);
         rating.setRating(ratingValue);
+        log.info("Rating succesfully saved");
         Rating ratingRepositorySave = ratingRepository.save(rating);
         idea.setRatingAvg(getAverage(ideaId));
         Integer newRating = idea.getRatingAvg().intValue();
@@ -604,6 +639,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Double getAverage(Long ideaId) {
+        log.info("Return average rating");
         List<Rating> ratings = ratingRepository.findByIdeaId(ideaId);
         Double sum = 0D;
         Double count = 0D;
@@ -616,6 +652,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Double getRatingByUserAndByIdea(Long ideaId, Long userId) {
+        log.info("Return rating by user and by idea");
         return ratingRepository.findByIdeaIdAndUserId(ideaId, userId)
                 .map(Rating::getRating)
                 .orElse(0.0);
@@ -623,6 +660,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public void sendEmailForRating(Long ideaId) {
+        log.info("Send email for rating");
         List<Long> userIds = subscriptionRepository.findUserIdByIdeaId(ideaId);
         for (Long userId : userIds) {
             User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
@@ -632,19 +670,23 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Subscription addSubscription(Long ideaId, Long userId) {
+        log.info("Add a subscription");
         Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea not found"));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         Subscription subscription = subscriptionRepository.findByIdeaIdAndUserId(ideaId, userId).orElse(new Subscription());
         subscription.setIdea(idea);
         subscription.setUser(user);
+        log.info("Subscription succesfully saved");
         Subscription subscriptionRepositorySave = subscriptionRepository.save(subscription);
         return subscriptionRepositorySave;
     }
 
     @Override
     public void removeSubscription(Long ideaId, Long userId) {
+        log.info("Delete a subscription");
         Optional<Subscription> subscription = subscriptionRepository.findByIdeaIdAndUserId(ideaId, userId);
         if (subscription.isPresent()) {
+            log.info("Subscription succesfully deleted");
             subscriptionRepository.deleteByIdeaIdAndUserId(ideaId, userId);
         } else {
             throw new SubscriptionNotFoundException("Subscription doesn't exist");
@@ -654,6 +696,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public List<SubscriptionDTO> getAllSubscriptions(Long userId) {
+        log.info("Return a list of all subscriptions");
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("User not found");
         }
@@ -672,6 +715,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public List<RatingDTO> getAllRatings(Long userId) {
+        log.info("Return a list of all ratings");
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException("User not found");
         }
@@ -692,6 +736,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO getIdeaByCommentId(Long commentId) {
+        log.info("Get a idea by comment id");
         Optional<Idea> idea = ideaRepository.findIdeaByCommentId(commentId);
 
         if (idea.isEmpty()) {
@@ -713,11 +758,13 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Long getNumberOfRatingsForIdea(Long ideaId) {
+        log.info("Return the number of ratings for a idea");
         return ratingRepository.countByIdeaId(ideaId);
     }
 
     @Override
     public List<Map<Long, Object>> getRatingsCountForEachIdea() {
+        log.info("Return the number of ratings for each idea");
         return ratingRepository.countRatingsForEachIdea();
     }
 
