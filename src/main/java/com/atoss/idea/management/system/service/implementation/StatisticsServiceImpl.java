@@ -1,6 +1,7 @@
 package com.atoss.idea.management.system.service.implementation;
 
 
+import com.atoss.idea.management.system.exception.IdeaNotFoundException;
 import com.atoss.idea.management.system.repository.CommentRepository;
 import com.atoss.idea.management.system.repository.IdeaRepository;
 import com.atoss.idea.management.system.repository.UserRepository;
@@ -20,6 +21,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Log4j2
 public class StatisticsServiceImpl implements StatisticsService {
 
     @PersistenceContext
@@ -54,13 +57,13 @@ public class StatisticsServiceImpl implements StatisticsService {
     /**
      * Constructor
      *
-     * @param modelMapper ==
-     * @param ideaService ==
-     * @param ideaRepository ==
-     * @param commentService ==
-     * @param userRepository ==
+     * @param modelMapper       ==
+     * @param ideaService       ==
+     * @param ideaRepository    ==
+     * @param commentService    ==
+     * @param userRepository    ==
      * @param commentRepository ==
-     * @param htmlService ==
+     * @param htmlService       ==
      */
     public StatisticsServiceImpl(ModelMapper modelMapper,
                                  IdeaService ideaService,
@@ -80,6 +83,9 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public Long getSelectionRepliesNumber(String selectedDateFrom, String selectedDateTo) {
+        if (log.isInfoEnabled()) {
+            log.info("Counting selected replies between {} - {}", selectedDateFrom, selectedDateTo);
+        }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date = LocalDate.parse(selectedDateTo, formatter);
@@ -105,6 +111,10 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public Long getSelectionCommentNumber(String selectedDateFrom, String selectedDateTo) {
+        if (log.isInfoEnabled()) {
+            log.info("Counting selected comments between {} - {}", selectedDateFrom, selectedDateTo);
+        }
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date = LocalDate.parse(selectedDateTo, formatter);
         LocalDate updatedDate = date.plusDays(1);
@@ -142,14 +152,31 @@ public class StatisticsServiceImpl implements StatisticsService {
      * @return list of most commented ideas
      */
     public List<IdeaResponseDTO> getMostCommentedIdeas(List<Long> mostCommentedIdeasIds) {
+        if (log.isInfoEnabled()) {
+            log.info("Getting most commented ideas");
+        }
 
         List<IdeaResponseDTO> sortedIdeas = mostCommentedIdeasIds.stream()
                 .map(idea_id -> {
-                    Idea idea = ideaRepository.findById(idea_id).get();
+                    Idea idea = ideaRepository.findById(idea_id).orElseThrow(() -> {
+                        if (log.isErrorEnabled()) {
+                            log.error("Idea not found");
+                        }
+                        return new IdeaNotFoundException("Idea not found");
+                    });
+
                     IdeaResponseDTO ideaResponseDTO = modelMapper.map(idea, IdeaResponseDTO.class);
+
+                    if (log.isInfoEnabled()) {
+                        log.info("Converting idea title from markdown to HTML");
+                    }
                     String htmlContent1 = htmlService.markdownToHtml(idea.getTitle());
                     ideaResponseDTO.setTitle(htmlContent1);
                     ideaResponseDTO.setUsername(idea.getUser().getUsername());
+
+                    if (log.isInfoEnabled()) {
+                        log.info("Converting idea text from markdown to HTML");
+                    }
                     String htmlContent2 = htmlService.markdownToHtml(idea.getText());
                     ideaResponseDTO.setText(htmlContent2);
                     ideaResponseDTO.setElapsedTime(commentService.getElapsedTime(idea.getCreationDate()));
@@ -158,20 +185,38 @@ public class StatisticsServiceImpl implements StatisticsService {
                 })
                 .toList();
 
+        if (log.isInfoEnabled()) {
+            log.info("Successfully retrieved most commented ideas");
+        }
         return sortedIdeas;
     }
 
     @Override
     public StatisticsDTO getGeneralStatistics() {
-
-        StatisticsDTO statisticsDTO = new StatisticsDTO();
+        if (log.isInfoEnabled()) {
+            log.info("Retrieving general statistics");
+        }
 
         Long nrOfUsers = userRepository.count();
+        if (log.isInfoEnabled()) {
+            log.info("Total number of users: {}", nrOfUsers);
+        }
         Long nrOfIdeas = ideaRepository.count();
+        if (log.isInfoEnabled()) {
+            log.info("Total number of ideas: {}", nrOfIdeas);
+        }
         Long implIdeas = ideaRepository.countByStatus(Status.IMPLEMENTED);
+        if (log.isInfoEnabled()) {
+            log.info("Total number of implemented ideas: {}", implIdeas);
+        }
         Long draftedIdeas = ideaRepository.countByStatus(Status.DRAFT);
+        if (log.isInfoEnabled()) {
+            log.info("Total number of draft ideas: {}", draftedIdeas);
+        }
 
         double ideasPerUser = Math.round((double) nrOfIdeas / (double) nrOfUsers * 100.00) / 100.00;
+
+        StatisticsDTO statisticsDTO = new StatisticsDTO();
 
         statisticsDTO.setIdeasPerUser(ideasPerUser);
         statisticsDTO.setDraftIdeas(draftedIdeas);
@@ -180,9 +225,15 @@ public class StatisticsServiceImpl implements StatisticsService {
         statisticsDTO.setOpenIdeas(openIdeas);
 
         Long nrOfComments = commentRepository.countComments();
+        if (log.isInfoEnabled()) {
+            log.info("Total number of comments: {}", nrOfComments);
+        }
         statisticsDTO.setTotalNrOfComments(nrOfComments);
 
         Long nrOfReplies = commentRepository.countReplies();
+        if (log.isInfoEnabled()) {
+            log.info("Total number of replies: {}", nrOfReplies);
+        }
         statisticsDTO.setTotalNrOfReplies(nrOfReplies);
 
         double draftPercentage = ((double) draftedIdeas / (double) nrOfIdeas * 100);
@@ -224,7 +275,9 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public StatisticsDTO getStatisticsByDate(String selectedDateFrom,
                                              String selectedDateTo) {
-
+        if (log.isInfoEnabled()) {
+            log.info("Retrieving filtered statistics by date from {} to {}", selectedDateFrom, selectedDateTo);
+        }
         // This code checks if the penultimate character of the string is '-' and if the last character is a digit.
         // This is because the date may be transmitted in the format "2024-08-5" and needs to be standardized to "2024-08-05"
         // when filtering statistics. The condition ensures that a '0' is added before the last digit if it's preceded by a '-'.
@@ -254,6 +307,9 @@ public class StatisticsServiceImpl implements StatisticsService {
             noOfReplies = listOfRepliesAndComments.get(1);
         } catch (Exception e) {
             noOfReplies = 0L;
+            if (log.isWarnEnabled()) {
+                log.warn("No replies found for the selected date");
+            }
         }
         filteredStatisticsDTO.setTotalNrOfReplies(noOfReplies);
 
@@ -262,6 +318,9 @@ public class StatisticsServiceImpl implements StatisticsService {
             noOfComments = listOfRepliesAndComments.get(0);
         } catch (Exception e) {
             noOfComments = 0L;
+            if (log.isWarnEnabled()) {
+                log.warn("No comments found for the selected date");
+            }
         }
         filteredStatisticsDTO.setTotalNrOfComments(noOfComments);
 
@@ -276,18 +335,27 @@ public class StatisticsServiceImpl implements StatisticsService {
             openIdeasCount = listOfStatusesCount.get(0);
         } catch (Exception e) {
             openIdeasCount = 0L;
+            if (log.isWarnEnabled()) {
+                log.warn("No open ideas found for the selected date");
+            }
         }
 
         try {
             draftIdeasCount = listOfStatusesCount.get(1);
         } catch (Exception e) {
             draftIdeasCount = 0L;
+            if (log.isWarnEnabled()) {
+                log.warn("No draft ideas found for the selected date");
+            }
         }
 
         try {
             implIdeasCount = listOfStatusesCount.get(2);
         } catch (Exception e) {
             implIdeasCount = 0L;
+            if (log.isWarnEnabled()) {
+                log.warn("No implemented ideas found for the selected date");
+            }
         }
 
         Long totalIdeasCount = openIdeasCount + draftIdeasCount + implIdeasCount;
