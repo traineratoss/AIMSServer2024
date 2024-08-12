@@ -12,18 +12,13 @@ import com.atoss.idea.management.system.service.SendEmailService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Order;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -143,7 +138,7 @@ public class IdeaServiceImpl implements IdeaService {
     @Override
     public IdeaResponseDTO addIdea(IdeaRequestDTO idea, String username) throws IOException {
 
-        log.info("Adding a idea");
+        log.info("Add a idea");
         if (idea.getTitle() == null || idea.getTitle().isEmpty()) {
             throw new FieldValidationException("Please enter a valid title for the idea.");
         }
@@ -230,7 +225,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO getIdeaById(Long id) throws FieldValidationException {
-        log.info("Return a idea by id");
+        log.info("Return an idea by id");
 
         if (ideaRepository.findById(id).isPresent()) {
             Idea idea = ideaRepository.findById(id).get();
@@ -250,7 +245,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO getIdeaByIdForUpdateIdea(Long id) throws FieldValidationException {
-        log.info("Return a idea by id for updating");
+        log.info("Return an idea by id for updating");
 
         if (ideaRepository.findById(id).isPresent()) {
             Idea idea = ideaRepository.findById(id).get();
@@ -289,7 +284,7 @@ public class IdeaServiceImpl implements IdeaService {
             String oldTitle = idea.getTitle();
 
             for (Long userId : subscribedUsersIds) {
-                log.info("User subscried succesfully to a idea");
+                log.info("User subsbscribed succesfully to an idea");
                 subscribedUsers.add(userRepository.findById(userId).get());
             }
 
@@ -458,7 +453,9 @@ public class IdeaServiceImpl implements IdeaService {
                                                   String sortDirection,
                                                   String username,
                                                   String ratingAvg,
-                                                  Pageable pageable) {
+                                                  Pageable pageable,
+                                                  Boolean subscribed,
+                                                  Long userId) {
         log.info("Filter ideas by criterias");
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Idea> criteriaQuery = cb.createQuery(Idea.class);
@@ -498,6 +495,25 @@ public class IdeaServiceImpl implements IdeaService {
             float upperBound = rating + 0.99f;
             predicatesList.add(cb.between(root.get("ratingAvg"), lowerBound, upperBound));
         }
+
+
+        if (subscribed != null && userId != null) {
+            Subquery<Long> subquery = criteriaQuery.subquery(Long.class);
+            Root<Subscription> subRoot = subquery.from(Subscription.class);
+            subquery.select(subRoot.get("idea").get("id"));
+            subquery.where(cb.and(
+                    cb.equal(subRoot.get("idea").get("id"), root.get("id")),
+                    cb.equal(subRoot.get("user").get("id"), userId)
+            ));
+
+            Predicate subscriptionPredicate = root.get("id").in(subquery);
+
+            if (subscribed) {
+                predicatesList.add(subscriptionPredicate);
+            }
+        }
+
+
         predicatesList.addAll(filterByDate(selectedDateFrom, selectedDateTo, root, cb, "creationDate"));
         List<Order> orders = new ArrayList<>();
         if (Objects.equals(sortDirection, "ASC")) {
@@ -588,7 +604,7 @@ public class IdeaServiceImpl implements IdeaService {
             } catch (ParseException e) {
                 // e.printStackTrace();
                 if (log.isErrorEnabled()) {
-                    log.error("A error occured when trying to filter by date");
+                    log.error("An error occured when trying to filter by date");
                 }
             }
         }
@@ -601,7 +617,7 @@ public class IdeaServiceImpl implements IdeaService {
             } catch (ParseException e) {
                 // e.printStackTrace();
                 if (log.isErrorEnabled()) {
-                    log.error("A error occured when trying to filter by date");
+                    log.error("An error occured when trying to filter by date");
                 }
             }
         }
@@ -732,7 +748,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public IdeaResponseDTO getIdeaByCommentId(Long commentId) {
-        log.info("Get a idea by comment id");
+        log.info("Get an idea by comment id");
         Optional<Idea> idea = ideaRepository.findIdeaByCommentId(commentId);
 
         if (idea.isEmpty()) {
@@ -754,7 +770,7 @@ public class IdeaServiceImpl implements IdeaService {
 
     @Override
     public Long getNumberOfRatingsForIdea(Long ideaId) {
-        log.info("Return the number of ratings for a idea");
+        log.info("Return the number of ratings for an idea");
         return ratingRepository.countByIdeaId(ideaId);
     }
 

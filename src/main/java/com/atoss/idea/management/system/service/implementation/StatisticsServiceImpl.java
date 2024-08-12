@@ -57,13 +57,13 @@ public class StatisticsServiceImpl implements StatisticsService {
     /**
      * Constructor
      *
-     * @param modelMapper       ==
-     * @param ideaService       ==
-     * @param ideaRepository    ==
-     * @param commentService    ==
-     * @param userRepository    ==
+     * @param modelMapper ==
+     * @param ideaService ==
+     * @param ideaRepository ==
+     * @param commentService ==
+     * @param userRepository ==
      * @param commentRepository ==
-     * @param htmlService       ==
+     * @param htmlService ==
      */
     public StatisticsServiceImpl(ModelMapper modelMapper,
                                  IdeaService ideaService,
@@ -83,8 +83,12 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public Long getSelectionRepliesNumber(String selectedDateFrom, String selectedDateTo) {
+        if (log.isDebugEnabled()) {
+            log.debug("Counting selected replies between {} - {}", selectedDateFrom, selectedDateTo);
+        }
+
         if (log.isInfoEnabled()) {
-            log.info("Counting selected replies between {} - {}", selectedDateFrom, selectedDateTo);
+            log.info("Started counting replies");
         }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -111,8 +115,12 @@ public class StatisticsServiceImpl implements StatisticsService {
 
     @Override
     public Long getSelectionCommentNumber(String selectedDateFrom, String selectedDateTo) {
+        if (log.isDebugEnabled()) {
+            log.debug("Counting selected comments between {} - {}", selectedDateFrom, selectedDateTo);
+        }
+
         if (log.isInfoEnabled()) {
-            log.info("Counting selected comments between {} - {}", selectedDateFrom, selectedDateTo);
+            log.info("Started counting comments");
         }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -158,9 +166,13 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         List<IdeaResponseDTO> sortedIdeas = mostCommentedIdeasIds.stream()
                 .map(idea_id -> {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Processing idea with id: {}", idea_id);
+                    }
+
                     Idea idea = ideaRepository.findById(idea_id).orElseThrow(() -> {
                         if (log.isErrorEnabled()) {
-                            log.error("Idea not found");
+                            log.error("Idea not found with id: {}", idea_id);
                         }
                         return new IdeaNotFoundException("Idea not found");
                     });
@@ -181,6 +193,10 @@ public class StatisticsServiceImpl implements StatisticsService {
                     ideaResponseDTO.setText(htmlContent2);
                     ideaResponseDTO.setElapsedTime(commentService.getElapsedTime(idea.getCreationDate()));
                     ideaResponseDTO.setCommentsNumber(idea.getCommentList().size());
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Finished processing idea with id: {}", idea_id);
+                    }
                     return ideaResponseDTO;
                 })
                 .toList();
@@ -251,11 +267,18 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<Comment> topComments = commentRepository.findTop5CommentsByLikes();
         List<CommentStatisticsDTO> commentStatisticsDTOList = topComments.stream()
                 .map(comment -> {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Processing top comment with id: {}", comment.getId());
+                    }
                     CommentStatisticsDTO dto = new CommentStatisticsDTO();
                     dto.setCommentId(comment.getId());
                     String htmlContent = htmlService.markdownToHtml(comment.getCommentText());
                     dto.setCommentText(htmlContent);
                     dto.setNrLikes(commentRepository.countLikesByCommentId(comment.getId()));
+
+                    if (log.isDebugEnabled()) {
+                        log.debug("Processed top comment with id: {}", comment.getId());
+                    }
                     return dto;
                 })
                 .collect(Collectors.toList());

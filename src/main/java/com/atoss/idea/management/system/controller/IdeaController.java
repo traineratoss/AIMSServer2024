@@ -194,6 +194,8 @@ public class IdeaController {
      * @param username         if not null, returns filtered ideas belonging to the specified username
      * @param sortDirection    the direction we want the ideas to be sorted by
      * @param rating           rating to filter the ideas
+     * @param subscribed       subscribed filter
+     * @param userId           current userId
      * @return a Response Entity containing an IdeaPage DTO ( the total number of ideas in all the pages +
      */
     @Transactional
@@ -210,7 +212,9 @@ public class IdeaController {
             @RequestParam(required = true) int pageSize,
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String rating,
-            @RequestParam(required = true) String sortDirection) {
+            @RequestParam(required = true) String sortDirection,
+            @RequestParam(required = false) Boolean subscribed,
+            @RequestParam(required = false) Long userId) {
         log.info("Received request to filter all ideas by given parameters");
 
         List<String> categories = new ArrayList<>();
@@ -231,9 +235,21 @@ public class IdeaController {
 
 
         Pageable pageableAsc = PageRequest.of(pageNumber, pageSize);
-
         return new ResponseEntity<>(ideaService.filterIdeasByAll(title,
-                text, statusEnums, categories, users, selectedDateFrom, selectedDateTo, sortDirection, username, rating, pageableAsc), HttpStatus.OK);
+                text,
+                statusEnums,
+                categories,
+                users,
+                selectedDateFrom,
+                selectedDateTo,
+                sortDirection,
+                username,
+                rating,
+                pageableAsc,
+                subscribed,
+                userId),
+                HttpStatus.OK
+        );
     }
 
     /**

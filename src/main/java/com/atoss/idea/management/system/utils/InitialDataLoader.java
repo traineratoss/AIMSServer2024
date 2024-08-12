@@ -141,6 +141,10 @@ public class InitialDataLoader implements CommandLineRunner {
                     "Bogdan Sular", BCrypt.hashpw("sularbogdan", bcryptSalt), true, false);
             userRepository.save(user6);
 
+            User user7 = createUser(true, Role.STANDARD, avatar1, "clupascu003@gmail.com", "callinu",
+                    "Calin Lupascu", BCrypt.hashpw("calinlupascu", bcryptSalt), true, false);
+            userRepository.save(user7);
+
             //Category CONSTRUCTOR
             Category category1 = createCategory("Innovation");
             categoryRepository.save(category1);
