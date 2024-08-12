@@ -72,18 +72,18 @@ public class IdeaServiceImpl implements IdeaService {
     /**
      * Constructor for the Idea Service Implementation
      *
-     * @param ideaRepository     repository for the Idea Entity
-     * @param imageRepository    repository for the Image Entity
-     * @param userRepository     repository for the User Entity
-     * @param ratingRepository   repository for Rating Entity
-     * @param categoryRepository repository for the Category Entity
-     * @param modelMapper        responsible for mapping our entities
-     * @param commentServiceImpl ======
-     * @param sendEmailService   responsible for sending emails to users who have subscriptions
+     * @param ideaRepository         repository for the Idea Entity
+     * @param imageRepository        repository for the Image Entity
+     * @param userRepository         repository for the User Entity
+     * @param ratingRepository       repository for Rating Entity
+     * @param categoryRepository     repository for the Category Entity
+     * @param modelMapper            responsible for mapping our entities
+     * @param commentServiceImpl     ======
+     * @param sendEmailService       responsible for sending emails to users who have subscriptions
      * @param subscriptionRepository repository for the Subscription Entity
-     * @param documentService    service for documents
+     * @param documentService        service for documents
      * @param htmlService            for handling HTML content and processing
-     * @param documentRepository document repo
+     * @param documentRepository     document repo
      */
     public IdeaServiceImpl(IdeaRepository ideaRepository,
                            ImageRepository imageRepository, UserRepository userRepository,
@@ -134,9 +134,8 @@ public class IdeaServiceImpl implements IdeaService {
             bufferedReader.close();
         } catch (IOException e) {
             // e.printStackTrace();
-            if(log.isErrorEnabled())
-            {
-              log.error("An error occured when reading bad words from file");
+            if (log.isErrorEnabled()) {
+                log.error("An error occured when reading bad words from file");
             }
         }
     }
@@ -575,9 +574,8 @@ public class IdeaServiceImpl implements IdeaService {
                 Date fromDate = simpleDateFormat.parse(selectedDateFrom + " 00:00:00");
                 predicatesList.add(cb.greaterThanOrEqualTo(root.get(columnName), fromDate));
             } catch (ParseException e) {
-               // e.printStackTrace();
-                if(log.isErrorEnabled())
-                {
+                // e.printStackTrace();
+                if (log.isErrorEnabled()) {
                     log.error("A error occured when trying to filter by date");
                 }
             }
@@ -588,9 +586,8 @@ public class IdeaServiceImpl implements IdeaService {
                 Date toDate = simpleDateFormat.parse(selectedDateTo + " 23:59:59");
                 predicatesList.add(cb.lessThanOrEqualTo(root.get(columnName), toDate));
             } catch (ParseException e) {
-               // e.printStackTrace();
-                if(log.isErrorEnabled())
-                {
+                // e.printStackTrace();
+                if (log.isErrorEnabled()) {
                     log.error("A error occured when trying to filter by date");
                 }
             }
@@ -602,9 +599,8 @@ public class IdeaServiceImpl implements IdeaService {
                 Date toDate = simpleDateFormat.parse(selectedDateTo + " 23:59:59");
                 predicatesList.add(cb.between(root.get(columnName), fromDate, toDate));
             } catch (ParseException e) {
-               // e.printStackTrace();
-                if(log.isErrorEnabled())
-                {
+                // e.printStackTrace();
+                if (log.isErrorEnabled()) {
                     log.error("A error occured when trying to filter by date");
                 }
             }
