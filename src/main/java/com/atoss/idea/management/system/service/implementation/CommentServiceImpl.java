@@ -262,7 +262,6 @@ public class CommentServiceImpl implements CommentService {
         newComment.setUser(user);
         newComment.setIdea(idea);
         newComment.setParent(null);
-        newComment.setCommentText(requestCommentDTO.getCommentText());
         String htmlContent = htmlService.markdownToHtml(requestCommentDTO.getCommentText());
         newComment.setCommentText(htmlContent);
         newComment.setCreationDate(creationDate);
@@ -383,6 +382,7 @@ public class CommentServiceImpl implements CommentService {
                     responseCommentReplyDTO.setId(pagedReply.getId());
                     responseCommentReplyDTO.setUsername(username);
 
+
                     Long id = pagedReply.getId();
                     if (getReportsCountForComment(id) > 5) {
                         responseCommentReplyDTO.setCommentText("This reply is under review");
@@ -390,7 +390,8 @@ public class CommentServiceImpl implements CommentService {
                             log.info("Reply is under review", id);
                         }
                     } else {
-                        responseCommentReplyDTO.setCommentText(pagedReply.getCommentText());
+                        String htmlContent = htmlService.markdownToHtml(pagedReply.getCommentText());
+                        responseCommentReplyDTO.setCommentText(htmlContent);
                     }
 
                     String time = getTimeForComment(pagedReply.getId());
@@ -440,6 +441,8 @@ public class CommentServiceImpl implements CommentService {
                     responseCommentDTO.setUsername(username);
                     responseCommentDTO.setElapsedTime(time);
                     responseCommentDTO.setHasReplies(hasReplies);
+                    String htmlContent = htmlService.markdownToHtml(pagedComment.getCommentText());
+                    responseCommentDTO.setCommentText(htmlContent);
 
                     Long id = pagedComment.getId();
 
