@@ -97,6 +97,8 @@ public interface IdeaService {
      * @param sortDirection    the sorting direction of the pages
      * @param username         if not null, returns filtered ideas belonging to the specified username
      * @param rating           the rating to select
+     * @param subscribed        subscribed status
+     * @param userId            current userId
      * @param pageable         it contains all the necessary information about the
      *                         requested page, such as page size, page number,
      *                         sort category and sort direction

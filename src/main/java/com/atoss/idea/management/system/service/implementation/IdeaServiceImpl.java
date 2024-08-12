@@ -18,10 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -495,10 +492,7 @@ public class IdeaServiceImpl implements IdeaService {
 
             if (subscribed) {
                 predicatesList.add(subscriptionPredicate);
-            } else {
             }
-        } else {
-
         }
 
 
