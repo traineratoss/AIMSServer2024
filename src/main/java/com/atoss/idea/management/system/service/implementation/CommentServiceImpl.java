@@ -83,6 +83,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public String getTimeForComment(Long id) {
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving time for comment with id: {}", id);
+        }
         Optional<Comment> commentOptional = commentRepository.findById(id);
 
         if (commentOptional.isPresent()) {
@@ -94,7 +97,7 @@ public class CommentServiceImpl implements CommentService {
             return getElapsedTime(creationDate);
         } else {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", id);
             }
             throw new CommentNotFoundException();
         }
@@ -172,8 +175,8 @@ public class CommentServiceImpl implements CommentService {
      * @return filteredText the updated text
      */
     private String filterBadWords(String text) {
-        if (log.isDebugEnabled()) {
-            log.debug("Filtering bad words from text");
+        if (log.isInfoEnabled()) {
+            log.info("Filtering bad words from text");
         }
         for (String word : badWords) {
             String pattern = "\\b" + word + "\\b";
@@ -229,7 +232,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public ResponseCommentDTO addComment(RequestCommentDTO requestCommentDTO) throws UnsupportedEncodingException {
         if (log.isInfoEnabled()) {
-            log.info("Adding a new comment from: {}", requestCommentDTO.getUsername());
+            log.info("Adding a new comment from user: {}", requestCommentDTO.getUsername());
         }
         User user = userRepository.findByUsername(requestCommentDTO.getUsername()).orElseThrow(() -> {
             if (log.isErrorEnabled()) {
@@ -239,7 +242,7 @@ public class CommentServiceImpl implements CommentService {
         });
         Idea idea = ideaRepository.findById(requestCommentDTO.getIdeaId()).orElseThrow(() -> {
             if (log.isErrorEnabled()) {
-                log.error("Idea not found");
+                log.error("Idea not found with id: {}", requestCommentDTO.getIdeaId());
             }
             return new IdeaNotFoundException("Idea not found!");
         });
@@ -271,7 +274,7 @@ public class CommentServiceImpl implements CommentService {
         newComment.setCommentText(filteredCommentText);
 
         if (log.isDebugEnabled()) {
-            log.debug("Saving comment to repository");
+            log.debug("Saving comment to repository with content: {}", newComment.getCommentText());
         }
         commentRepository.save(newComment);
 
@@ -309,7 +312,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public ResponseCommentReplyDTO addReply(RequestCommentReplyDTO requestCommentReplyDTO) {
         if (log.isInfoEnabled()) {
-            log.info("Adding a new reply from: {}", requestCommentReplyDTO.getUsername());
+            log.info("Adding a new reply from user: {}", requestCommentReplyDTO.getUsername());
         }
 
         User user = userRepository.findByUsername(requestCommentReplyDTO.getUsername())
@@ -322,7 +325,7 @@ public class CommentServiceImpl implements CommentService {
 
         if (!commentRepository.existsById(requestCommentReplyDTO.getParentId())) {
             if (log.isErrorEnabled()) {
-                log.error("Parent comment not found");
+                log.error("Parent comment not found with id: {}", requestCommentReplyDTO.getParentId());
             }
             throw new CommentNotFoundException();
         }
@@ -341,7 +344,7 @@ public class CommentServiceImpl implements CommentService {
         newReply.setCommentText(filteredCommentText);
 
         if (log.isDebugEnabled()) {
-            log.debug("Saving reply to repository");
+            log.debug("Saving reply to repository with content: {}", newReply.getCommentText());
         }
         commentRepository.save(newReply);
 
@@ -365,10 +368,13 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Retrieving all replies for comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all replies for comment with id: {}", commentId);
+        }
 
         if (!commentRepository.existsById(commentId)) {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", commentId);
             }
             throw new CommentNotFoundException();
         }
@@ -419,10 +425,13 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Retrieving all paged comments for idea");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving all paged comments for idea with id: {}", ideaId);
+        }
 
         if (!ideaRepository.existsById(ideaId)) {
             if (log.isErrorEnabled()) {
-                log.error("Idea not found");
+                log.error("Idea not found with id: {}", ideaId);
             }
             throw new IdeaNotFoundException();
         }
@@ -448,6 +457,9 @@ public class CommentServiceImpl implements CommentService {
                         if (log.isInfoEnabled()) {
                             log.info("Comment is under review");
                         }
+                        if (log.isDebugEnabled()) {
+                            log.debug("Comment with id: {} is under review", id);
+                        }
                     }
 
                     return responseCommentDTO;
@@ -466,12 +478,12 @@ public class CommentServiceImpl implements CommentService {
      */
     private boolean verifyCommentOwner(Long commentId, Long userId) {
         if (log.isDebugEnabled()) {
-            log.debug("Verifying comment owner");
+            log.debug("Verifying comment owner of comment with id: {}", commentId);
         }
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> {
                     if (log.isErrorEnabled()) {
-                        log.error("Comment not found");
+                        log.error("Comment not found with id: {}", commentId);
                     }
                     return new CommentNotFoundException();
                 });
@@ -479,11 +491,17 @@ public class CommentServiceImpl implements CommentService {
         boolean isOwner = comment.getUser().getId().equals(userId);
         if (isOwner) {
             if (log.isInfoEnabled()) {
-                log.info("User is  the owner of comment");
+                log.info("User is the owner of comment");
+            }
+            if (log.isDebugEnabled()) {
+                log.info("User with id: {} is the owner of comment with id: {}", userId, commentId);
             }
         } else {
             if (log.isInfoEnabled()) {
                 log.info("User is not the owner of comment");
+            }
+            if (log.isDebugEnabled()) {
+                log.info("User with id: {} is not the owner of comment with id: {}", userId, commentId);
             }
         }
 
@@ -505,12 +523,15 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Adding like to comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Adding like to comment with id: {}", commentId);
+        }
 
         if (!verifyCommentOwner(commentId, userId)) {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> {
                         if (log.isErrorEnabled()) {
-                            log.error("User not found");
+                            log.error("User not found with id: {}", userId);
                         }
                         return new UserNotFoundException("User not found with id: " + userId);
                     });
@@ -524,8 +545,8 @@ public class CommentServiceImpl implements CommentService {
                     });
 
             if (user.getLikedComments().contains(comment)) {
-                if (log.isWarnEnabled()) {
-                    log.warn("User has already liked this comment");
+                if (log.isDebugEnabled()) {
+                    log.debug("User with id: {} has already liked comment with id: {}", userId, commentId);
                 }
                 throw new UserNotFoundException("User has already liked this comment!");
             }
@@ -536,8 +557,8 @@ public class CommentServiceImpl implements CommentService {
             userRepository.save(user);
             commentRepository.save(comment);
         } else {
-            if (log.isWarnEnabled()) {
-                log.warn("User tried to like their own comment");
+            if (log.isDebugEnabled()) {
+                log.debug("User with id: {} tried to like their own comment with id: {}", userId, commentId);
             }
             throw new UserNotFoundException("A user can't like his own comment !");
         }
@@ -554,6 +575,9 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Deleting comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting comment with ID: {}", commentId);
+        }
 
         deleteReportsByCommentId(commentId);
         deleteLikesForDeletedComment(commentId);
@@ -561,7 +585,7 @@ public class CommentServiceImpl implements CommentService {
 
         if (!commentRepository.existsById(commentId)) {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", commentId);
             }
             throw new CommentNotFoundException();
         }
@@ -602,11 +626,14 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Retrieving likes for comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving likes for comment with id: {}", commentId);
+        }
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> {
                     if (log.isErrorEnabled()) {
-                        log.error("Comment not found");
+                        log.error("Comment not found with id: {}", commentId);
                     }
                     return new RuntimeException("Comment not found");
                 });
@@ -628,6 +655,10 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Retrieving likes count for comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving likes count for comment with id: {}", commentId);
+        }
+
         return commentRepository.countLikesByCommentId(commentId);
     }
 
@@ -645,17 +676,20 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Deleting like for comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting like for comment with id: {}", commentId);
+        }
 
         if (!commentRepository.existsById(commentId)) {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", commentId);
             }
             throw new CommentNotFoundException();
         }
 
         if (!userRepository.existsById(userId)) {
             if (log.isErrorEnabled()) {
-                log.error("User not found");
+                log.error("User not found with id: {}", userId);
             }
             throw new UserNotFoundException("User not found!");
         }
@@ -678,17 +712,20 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Deleting report for comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting report for comment with id: {}", commentId);
+        }
 
         if (!commentRepository.existsById(commentId)) {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", commentId);
             }
             throw new CommentNotFoundException();
         }
 
         if (!userRepository.existsById(userId)) {
             if (log.isErrorEnabled()) {
-                log.error("User not found");
+                log.error("User not found with id: {}", userId);
             }
             throw new UserNotFoundException("User with id " + userId + " does not exist");
         }
@@ -701,6 +738,9 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Displaying placeholder for comment");
         }
+        if (log.isInfoEnabled()) {
+            log.info("Displaying placeholder for comment with id: {}", commentId);
+        }
 
         Optional<Comment> comment = commentRepository.findById(commentId);
         if (comment.isPresent()) {
@@ -712,7 +752,7 @@ public class CommentServiceImpl implements CommentService {
             }
         } else {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", commentId);
             }
             throw new CommentNotFoundException();
         }
@@ -729,10 +769,13 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Removing all likes when deleting the comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Removing all likes when deleting the comment with id: {}", commentId);
+        }
 
         if (!commentRepository.existsById(commentId)) {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", commentId);
             }
             throw new CommentNotFoundException();
         }
@@ -756,10 +799,13 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Removing all replies when deleting the comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Removing all replies when deleting the comment with id: {}", commentId);
+        }
 
         if (!commentRepository.existsById(commentId)) {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", commentId);
             }
             throw new CommentNotFoundException();
         }
@@ -786,10 +832,13 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Deleting reports for comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Deleting reports for comment with id: {}", commentId);
+        }
 
         if (!commentRepository.existsById(commentId)) {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", commentId);
             }
             throw new CommentNotFoundException();
         }
@@ -823,9 +872,13 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Retrieving the number of reports for the comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving the number of reports for the comment with id: {}", commentId);
+        }
+
         if (!commentRepository.existsById(commentId)) {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", commentId);
             }
             throw new CommentNotFoundException();
         }
@@ -886,12 +939,15 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Adding report for comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Adding report for comment with id: {}", commentId);
+        }
 
         if (!verifyCommentOwner(commentId, userId)) {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> {
                         if (log.isErrorEnabled()) {
-                            log.error("User not found");
+                            log.error("User not found with id: {}", userId);
                         }
                         return new UserNotFoundException("User not found with id: " + userId);
                     });
@@ -899,7 +955,7 @@ public class CommentServiceImpl implements CommentService {
             Comment comment = commentRepository.findById(commentId)
                     .orElseThrow(() -> {
                         if (log.isErrorEnabled()) {
-                            log.error("Comment not found");
+                            log.error("Comment not found with id: {}", commentId);
                         }
                         return new CommentNotFoundException();
                     });
@@ -932,13 +988,16 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Changing the review status for comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Changing the review status for comment with id: {}", commentId);
+        }
         Optional<Comment> comment = commentRepository.findById(commentId);
         if (comment.isPresent()) {
             comment.get().setReviewStatus(reviewStatus);
             commentRepository.save(comment.get());
         } else {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", commentId);
             }
             throw new CommentNotFoundException();
         }
@@ -949,9 +1008,12 @@ public class CommentServiceImpl implements CommentService {
         if (log.isInfoEnabled()) {
             log.info("Retrieving review status for comment");
         }
+        if (log.isDebugEnabled()) {
+            log.debug("Retrieving review status for comment with id: {}", commentId);
+        }
         if (!commentRepository.existsById(commentId)) {
             if (log.isErrorEnabled()) {
-                log.error("Comment not found");
+                log.error("Comment not found with id: {}", commentId);
             }
             throw new CommentNotFoundException();
         }
