@@ -452,7 +452,7 @@ public class InitialDataLoader implements CommandLineRunner {
             String emailDomain = "@gmail.com";
             String usernamePrefix = "standard";
             String namePrefix = "User Standard";
-            int numberOfUsers = 10;
+            int numberOfUsers = 12;
             for (int j = 1; j < numberOfUsers; j++) {
                 String email = emailPrefix + String.format("%02d", j) + emailDomain;
                 String username = usernamePrefix + String.format("%02d", j);
@@ -469,7 +469,7 @@ public class InitialDataLoader implements CommandLineRunner {
                     addLike(comment11, user);
 
                     addReport(reply5, user);
-                    addReport(comment12, user);
+                    addReport(comment11, user);
 
                 }
 
