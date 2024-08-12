@@ -3,6 +3,7 @@ package com.atoss.idea.management.system.controller;
 import com.atoss.idea.management.system.exception.ImageNotFoundException;
 import com.atoss.idea.management.system.repository.dto.ImageDTO;
 import com.atoss.idea.management.system.service.ImageService;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/aims/api/v1/images")
+@Log4j2
 
 public class ImageController {
     private final ImageService imageService;
@@ -39,6 +41,7 @@ public class ImageController {
      */
     @PostMapping("/addImage")
     public ResponseEntity<ImageDTO> addImage(@RequestBody MultipartFile file) throws IOException {
+        log.info("Received request to add a image");
         return new ResponseEntity<>(imageService.addImage(file), HttpStatus.OK);
     }
 
@@ -49,6 +52,7 @@ public class ImageController {
      */
     @GetMapping
     public ResponseEntity<List<ImageDTO>> getAllImages() {
+        log.info("Received request to get all images");
         return new ResponseEntity<>(imageService.getAllImage(), HttpStatus.OK);
     }
 
@@ -62,6 +66,7 @@ public class ImageController {
      */
     @GetMapping("/get")
     public ResponseEntity<ImageDTO> getImage(@RequestParam Long id) throws ImageNotFoundException {
+        log.info("Received request to get a image by id");
         return new ResponseEntity<>(imageService.getImage(id), HttpStatus.OK);
     }
 
@@ -73,6 +78,7 @@ public class ImageController {
      */
     @GetMapping("/getByIdea")
     public ResponseEntity<ImageDTO> getImageByIdeaId(@RequestParam Long id) {
+        log.info("Received request to get a image by idea id");
         return new ResponseEntity<>(imageService.getImageByIdeaId(id), HttpStatus.OK);
     }
 
