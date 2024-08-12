@@ -141,6 +141,10 @@ public class InitialDataLoader implements CommandLineRunner {
                     "Bogdan Sular", BCrypt.hashpw("sularbogdan", bcryptSalt), true, false);
             userRepository.save(user6);
 
+            User user7 = createUser(true, Role.STANDARD, avatar1, "clupascu003@gmail.com", "callinu",
+                    "Calin Lupascu", BCrypt.hashpw("calinlupascu", bcryptSalt), true, false);
+            userRepository.save(user7);
+
             //Category CONSTRUCTOR
             Category category1 = createCategory("Innovation");
             categoryRepository.save(category1);
@@ -203,14 +207,20 @@ public class InitialDataLoader implements CommandLineRunner {
 
             //static date CONSTRUCTOR
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String staticDateString = "2023-07-26 12:00:00";
+            String staticDateString1 = "2023-07-26 12:00:00";
             String staticDateString2 = "2023-06-26 12:00:00";
-            Date staticDate;
+            String staticDateString3 = "2024-03-27 17:50:00";
+            String staticDateString4 = "2024-02-10 10:00:00";
+            Date staticDate1;
             Date staticDate2;
+            Date staticDate3;
+            Date staticDate4;
 
             try {
-                staticDate = sdf.parse(staticDateString);
+                staticDate1 = sdf.parse(staticDateString1);
                 staticDate2 = sdf.parse(staticDateString2);
+                staticDate3 = sdf.parse(staticDateString3);
+                staticDate4 = sdf.parse(staticDateString4);
             } catch (ParseException e) {
                 e.printStackTrace();
                 return;
@@ -221,20 +231,20 @@ public class InitialDataLoader implements CommandLineRunner {
                             + "company is another effective way to improve morale and provide guidance to staff. "
                             + "Creating and publishing your company values and morals provides a clear guideline "
                             + "for what the company stands for and is working towards.",
-                    "Create clear company values", image1, staticDate, categories1);
+                    "Create **clear** company values", image1, staticDate1, categories1);
 
             Idea idea2 = createIdea(user1, Status.OPEN, "Communication within an organization is often one of the most"
-                            + " important elements of successful work. Providing staff with both the physical methods "
+                            + " important elements of ***successful work***. Providing staff with both the physical methods "
                             + "of communicating and a company culture that encourages communication can help staff do "
                             + "more efficiently find answers to any questions they have. ",
                     "Establish lines of communication", image2, staticDate2, categories);
 
-            Idea idea3 = createIdea(user1, Status.IMPLEMENTED, "Creating fair standards for employee performance assessment "
+            Idea idea3 = createIdea(user1, Status.IMPLEMENTED, "Creating **fair** standards for employee performance assessment "
                             + "within your organization can create a more fair and inclusive corporate culture. This can have two "
                             + "important benefits for improving your company. First, by applying standards in a fair and clearly "
                             + "described manner, you minimize the opportunity for employees to feel like a co-worker received benefits "
                             + "they did not.",
-                    "Apply standards equally", image3, new Date(), categories);
+                    "Apply standards equally", image3, staticDate1, categories);
 
             Idea idea4 = createIdea(user2, Status.IMPLEMENTED, "Changing your company's payment structure allows you to make more "
                             + "appealing offers to current and potential staff. Apart from allowing you to maintain your most essential "
@@ -242,16 +252,42 @@ public class InitialDataLoader implements CommandLineRunner {
                             + "Hiring more productive staff can compensate for the increased salary cost in the form of increased profit generation.",
                     "Raise compensation to raise employee quality", image4, new Date(), categories);
 
+            Idea idea5 = createIdea(user3, Status.OPEN, "Offering professional development **opportunities** for employees can significantly "
+                            + "increase both their job satisfaction and their productivity. By investing in your employees' skills and knowledge, "
+                            + "you also invest in the company's overall performance.",
+                    "Promote *professional* development", image5, staticDate4, categories1);
+
+            Idea idea6 = createIdea(user2, Status.IMPLEMENTED, "Flexible working hours can ***improve*** work-life balance for employees, which "
+                            + "in turn can enhance their overall well-being and productivity. Allowing employees to have a say in their work "
+                            + "schedules can reduce stress and burnout, leading to a happier and more effective workforce.",
+                    "Implement flexible work schedules", image6, staticDate3, categories);
+
+            Idea idea7 = createIdea(user4, Status.OPEN, "Providing a clear career path within your company is essential for retaining talent. "
+                            + "Employees are more likely to stay long-term if they see potential for growth and advancement. This not only "
+                            + "motivates them to perform better but also creates a sense of loyalty to the company.",
+                    "Define clear career progression paths", image7, new Date(), categories);
+
+            Idea idea8 = createIdea(user3, Status.OPEN, "![Wellness](https://static.vecteezy.com/system/resources/previews/004/413/150/non_2x/simple"
+                            + "-illustration-that-prevent-heart-attack-heart-health-cardiology-outlined-icon-free-vector.jpg)"
+                            + "Introducing wellness programs in the workplace can have a positive impact on employee"
+                            + "health and reduce absenteeism. Wellness initiatives like fitness challenges, mental health support, and "
+                            + "healthy eating programs can lead to a more energized and engaged workforce.",
+                    "Introduce wellness programs", image3, staticDate2, categories1);
+
             ideaRepository.save(idea1);
             ideaRepository.save(idea2);
             ideaRepository.save(idea3);
             ideaRepository.save(idea4);
+            ideaRepository.save(idea5);
+            ideaRepository.save(idea6);
+            ideaRepository.save(idea7);
+            ideaRepository.save(idea8);
 
             List<Idea> ideaList = new ArrayList<>();
 
 
             //Comment CONSTRUCTOR
-            Comment comment1 = createComment(staticDate, idea1, null,
+            Comment comment1 = createComment(staticDate1, idea1, null,
                     user1, "It's unnecessary");
             commentRepository.save(comment1);
 
@@ -259,53 +295,152 @@ public class InitialDataLoader implements CommandLineRunner {
                     user2, "It's a great idea");
             commentRepository.save(comment2);
 
-            Comment comment3 = createComment(staticDate, idea2, null,
+            Comment comment3 = createComment(staticDate4, idea2, null,
                     user3, "It's unnecessary");
             commentRepository.save(comment3);
 
-            Comment comment4 = createComment(staticDate2, idea3, null,
-                    user4, "It's a great idea");
+            Comment comment4 = createComment(new Date(), idea3, null,
+                    user4, "It's a ***great*** idea");
             commentRepository.save(comment4);
 
-            Comment comment5 = createComment(staticDate2, idea1, null,
-                    user4, "Comment 5");
+            Comment comment5 = createComment(staticDate4, idea1, null,
+                    user4, "I think this might be unnecessary at the moment.");
             commentRepository.save(comment5);
 
-            Comment comment6 = createComment(staticDate2, idea1, null,
-                    user4, "Comment 6");
+            Comment comment6 = createComment(staticDate3, idea1, null,
+                    user4, "This idea could greatly benefit our team.");
             commentRepository.save(comment6);
 
-            Comment comment7 = createComment(staticDate2, idea2, null, user4, "Comment 7 Comment 7 Comment 7");
+            Comment comment7 = createComment(new Date(), idea2, null,
+                    user4, "I'm not sure if this aligns with our *current goals*.");
             commentRepository.save(comment7);
 
-            Comment reply1 = createReply(new Date(), comment2, idea2, user1, "I don't think so");
+            Comment comment8 = createComment(staticDate4, idea5, null,
+                    user2, "I think this might be unnecessary at the moment.");
+            commentRepository.save(comment8);
+
+            Comment comment9 = createComment(staticDate3, idea6, null,
+                    user1, "This could really help our team");
+            commentRepository.save(comment9);
+
+            Comment comment10 = createComment(new Date(), idea7, null,
+                    user3, "Could use more details");
+            commentRepository.save(comment10);
+
+            Comment comment11 = createComment(staticDate2, idea8, null,
+                    user5, "Love this idea! ![Love](https://icons.iconarchive.com/icons/designbolts/free-valentine-heart/256/Heart-icon.png)");
+            commentRepository.save(comment11);
+
+            Comment comment12 = createComment(staticDate3, idea6, null,
+                    user4, "This ***suggestion*** could use more specific examples.");
+            commentRepository.save(comment12);
+
+            Comment comment13 = createComment(new Date(), idea4, null,
+                    user4, "I absolutely **love** this idea! It could make a big difference.");
+            commentRepository.save(comment13);
+
+            Comment comment14 = createComment(staticDate4, idea5, null,
+                    user5, "I have some concerns about how this will be implemented.");
+            commentRepository.save(comment14);
+
+
+            Comment reply1 = createReply(staticDate3, comment2, idea2,
+                    user1, "I don't think so");
             commentRepository.save(reply1);
 
-            Comment reply2 = createReply(new Date(), comment3, idea2, user3, "I think it is too");
+            Comment reply2 = createReply(new Date(), comment3, idea2,
+                    user3, "We should evaluate the resources and prioritize accordingly.");
             commentRepository.save(reply2);
 
-            Comment reply3 = createReply(new Date(), comment3, idea2, user4, "I think it is");
+            Comment reply3 = createReply(staticDate4, comment3, idea2,
+                    user4, "I think it is");
             commentRepository.save(reply3);
 
-            Comment reply4 = createReply(new Date(), comment5, idea2, user4, "Reply 4 for comment 5");
+            Comment reply4 = createReply(staticDate3, comment5, idea2,
+                    user4, "I believe with the right planning, we can implement it effectively.");
             commentRepository.save(reply4);
 
-            Comment reply5 = createReply(new Date(), comment5, idea2, user4, "Reply 5 for comment 5");
+            Comment reply5 = createReply(new Date(), comment5, idea2,
+                    user4, "Good point, adding more details could strengthen the proposal.");
             commentRepository.save(reply5);
+
+            Comment reply6 = createReply(new Date(), comment8, idea5,
+                    user4, "I understand your concern, but I think it's essential for growth.");
+            commentRepository.save(reply6);
+
+            Comment reply7 = createReply(new Date(), comment9, idea6,
+                    user2, "Absolutely, it could make a huge difference.");
+            commentRepository.save(reply7);
+
+            Comment reply8 = createReply(staticDate1, comment11, idea7,
+                    user1, "Good point, adding more details could strengthen the proposal.");
+            commentRepository.save(reply8);
+
+            Comment reply9 = createReply(staticDate2, comment12, idea6,
+                    user3, "I believe with the right planning, we can implement it *effectively*.");
+            commentRepository.save(reply9);
+
+            Comment reply10 = createReply(new Date(), comment13, idea6,
+                    user2, "We should evaluate the resources and **prioritize** accordingly.");
+            commentRepository.save(reply10);
+
 
             addLike(comment2, user1);
             addLike(comment2, user3);
             addLike(comment2, user4);
             addLike(comment2, user5);
 
+            addLike(comment5, user4);
+            addLike(comment7, user6);
+
+            addLike(comment7, user1);
+            addLike(comment7, user2);
+            addLike(comment7, user4);
+            addLike(comment7, user6);
+
+            addLike(comment9, user3);
+            addLike(comment9, user4);
+            addLike(comment9, user5);
+
+            addLike(comment10, user1);
+            addLike(comment10, user2);
+            addLike(comment10, user4);
+            addLike(comment10, user5);
+            addLike(comment10, user6);
+
+            addLike(comment14, user1);
+            addLike(comment14, user2);
+            addLike(comment14, user6);
+
+
             addLike(reply1, user3);
-            addLike(reply1, user5);
+            addLike(reply1, user6);
 
             addLike(reply3, user1);
             addLike(reply3, user2);
             addLike(reply3, user5);
 
-            addReport(reply2, user2);
+            addLike(reply6, user2);
+            addLike(reply6, user3);
+
+            addLike(reply7, user1);
+            addLike(reply7, user4);
+
+            addLike(reply8, user1);
+            addLike(reply8, user3);
+            addLike(reply8, user5);
+
+            addLike(reply10, user2);
+            addLike(reply10, user3);
+            addLike(reply10, user5);
+            addLike(reply10, user6);
+
+
+            addReport(reply8, user2);
+            addReport(reply8, user6);
+
+            addReport(comment14, user6);
+            addReport(reply6, user2);
 
             //initialize CommentList for using it in another Constructor (for replies)
             ArrayList<Comment> commentList = new ArrayList<>();
@@ -326,6 +461,18 @@ public class InitialDataLoader implements CommandLineRunner {
                 User user = createUser(true, Role.STANDARD, randomElementFromList(avatarList), email, username, name, password, true, false);
                 userList.add(user);
                 userRepository.save(user);
+
+                addLike(comment3, user);
+
+                if (j % 2 == 1) {
+                    addLike(comment13, user);
+                    addLike(comment11, user);
+
+                    addReport(reply5, user);
+                    addReport(comment12, user);
+
+                }
+
                 addReport(reply2, user);
                 addReport(comment6, user);
                 addReport(comment7, user);

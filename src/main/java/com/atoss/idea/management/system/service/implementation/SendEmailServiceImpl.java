@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -282,7 +284,8 @@ public class SendEmailServiceImpl implements SendEmailService {
         mapUser.put("date", new Date().toString());
         mapUser.put("imageUrl", "./welcome.jpg");
         mapUser.put("ideaTitle", idea.getTitle());
-        mapUser.put("newRating", idea.getRatingAvg().intValue());
+        BigDecimal rating = new BigDecimal(idea.getRatingAvg().floatValue()).setScale(2, RoundingMode.HALF_UP);
+        mapUser.put("newRating", rating.floatValue());
         try {
             Template template = configuration.getTemplate(fileName);
             String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapUser);
