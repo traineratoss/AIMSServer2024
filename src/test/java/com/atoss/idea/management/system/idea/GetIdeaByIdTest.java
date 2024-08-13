@@ -7,6 +7,7 @@ import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
+import com.atoss.idea.management.system.service.implementation.HtmlServiceImpl;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +43,9 @@ public class GetIdeaByIdTest {
     @Mock
     private CommentServiceImpl commentService;
 
+    @Spy
+    private HtmlServiceImpl htmlService;
+
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
@@ -57,8 +61,10 @@ public class GetIdeaByIdTest {
         idea.setId(100L);
         idea.setUser(user);
         idea.setCommentList(new ArrayList<>());
+        idea.setText("text");
+        idea.setTitle("title");
 
-
+        when(ideaRepository.findById(any(Long.class))).thenReturn(Optional.of(idea));
         when(ideaRepository.findById(100L)).thenReturn(Optional.of(idea));
         IdeaResponseDTO result = ideaService.getIdeaById(100L);
         //assertEquals(idea.getId(), 100L );
