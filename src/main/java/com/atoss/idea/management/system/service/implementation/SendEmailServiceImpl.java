@@ -126,8 +126,10 @@ public class SendEmailServiceImpl implements SendEmailService {
      * @param ideaId    the id of the idea whose text has changed
      * @param oldText   the text of the idea before it was updated
      * @param oldTitle  the title of the idea before it was updated
+     * @param oldDocs   the names of the documents attached to the idea before it was updated
+     * @param newDocs   the names of the documents attached to the idea after it was updated
      */
-    public void sendEmailUpdatedIdea(List<User> usernames, Long ideaId, String oldText, String oldTitle) {
+    public void sendEmailUpdatedIdea(List<User> usernames, Long ideaId, String oldText, String oldTitle, String oldDocs, String newDocs) {
         Idea idea = ideaRepository.findById(ideaId).get();
         if (log.isInfoEnabled()) {
             log.info("Retrieved idea with id: {} for updating subscribers", idea.getTitle());
@@ -135,7 +137,14 @@ public class SendEmailServiceImpl implements SendEmailService {
         for (User user : usernames) {
             String username = user.getUsername();
 
-            sendEmailIdeaSubscription("text-change-subscription-template.ftl", username, oldTitle, oldText, ideaId, "AIMS Updated Idea");
+            sendEmailIdeaSubscription("text-change-subscription-template.ftl",
+                    username,
+                    oldTitle,
+                    oldText,
+                    oldDocs,
+                    newDocs,
+                    ideaId,
+                    "AIMS Updated Idea");
             if (log.isInfoEnabled()) {
                 log.info("Successfully sent update idea email to user with username: {}", username);
             }
@@ -375,7 +384,14 @@ public class SendEmailServiceImpl implements SendEmailService {
         }
     }
 
-    private void sendEmailIdeaSubscription(String fileName, String username, String oldTitle, String oldText, Long ideaId, String subject) {
+    private void sendEmailIdeaSubscription(String fileName,
+                                           String username,
+                                           String oldTitle,
+                                           String oldText,
+                                           String oldDocs,
+                                           String newDocs,
+                                           Long ideaId,
+                                           String subject) {
         User user = getUserByUsername(username);
         String emailTo = user.getEmail();
         Idea idea = getIdeaById(ideaId);
@@ -388,7 +404,20 @@ public class SendEmailServiceImpl implements SendEmailService {
         mapUser.put("newText", idea.getText());
         mapUser.put("oldText", oldText);
         mapUser.put("oldTitle", oldTitle);
+        if (oldDocs.isEmpty()) {
+            mapUser.put("oldDocs", "No documents were attached");
+        } else {
+            mapUser.put("oldDocs", oldDocs);
+        }
+
+        if (newDocs.isEmpty()) {
+            mapUser.put("newDocs", "No documents were attached");
+        } else {
+            mapUser.put("newDocs", newDocs);
+        }
+
         mapUser.put("imageUrl", "./welcome.jpg");
+
         try {
             Template template = configuration.getTemplate(fileName);
             String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapUser);
@@ -510,58 +539,6 @@ public class SendEmailServiceImpl implements SendEmailService {
         } catch (IOException | TemplateException exception) {
             if (log.isErrorEnabled()) {
                 log.error("Failed to send email to {} regarding the change in comment, error: {}", emailTo, exception.getMessage());
-            }
-        }
-    }
-
-    private void sendEmailAddedDocument(String fileName, String username, Long ideaId, String files, String subject) {
-        User user = getUserByUsername(username);
-        String emailTo = user.getEmail();
-        Idea idea = getIdeaById(ideaId);
-
-        Map<String, Object> mapDocuments = new HashMap<>();
-        mapDocuments.put("username", username);
-        mapDocuments.put("email", user.getEmail());
-        mapDocuments.put("companyName", companyName);
-        mapDocuments.put("title", idea.getTitle());
-        mapDocuments.put("fileNames", files);
-        mapDocuments.put("imageUrl", "./welcome.jpg");
-        try {
-            Template template = configuration.getTemplate(fileName);
-            String htmlTemplate = FreeMarkerTemplateUtils.processTemplateIntoString(template, mapDocuments);
-            sendEmail(emailTo, subject, htmlTemplate);
-
-            if (log.isInfoEnabled()) {
-                log.info("Email about added documents sent successfully to {} for idea with title: {}", emailTo, idea.getTitle());
-            }
-
-        } catch (IOException | TemplateException exception) {
-            if (log.isErrorEnabled()) {
-                log.error("Failed to send email to {} for idea with title: {} error: {}", emailTo, idea.getTitle(), exception.getMessage());
-            }
-        }
-    }
-
-    /**
-     * Sends an email when a document is added
-     *
-     * @param ideaId    The id of the idea to retrieve.
-     * @param usernames the usernames of the users who are subscribed to the idea
-     * @param fileNames the document names that have been added
-     */
-    public void sendEmailIdeaDocuments(List<User> usernames, Long ideaId, List<Document> fileNames) {
-        Idea idea = ideaRepository.findById(ideaId).get();
-        //List<Document> names = idea.getDocumentList();
-        String files = new String();
-        for (Document docs : fileNames) {
-            files = files + "\n" + docs.getFileName() + "\n";
-        }
-
-        for (User user : usernames) {
-            String username = user.getUsername();
-            sendEmailAddedDocument("added-documents-subscription-template.ftl", username, ideaId, files, "AIMS Updated Idea");
-            if (log.isInfoEnabled()) {
-                log.info("Sent email about added documents to user: {} for idea with title: {}", username, idea.getTitle());
             }
         }
     }

@@ -278,15 +278,28 @@ public class IdeaServiceImpl implements IdeaService {
             List<User> subscribedUsers = new ArrayList<>();
 
             boolean diffText = false;
-            boolean diffTitle = false;
 
             String oldText = idea.getText();
             String oldTitle = idea.getTitle();
+            String oldDocs = "";
 
             for (Long userId : subscribedUsersIds) {
                 log.info("User subsbscribed succesfully to an idea");
                 subscribedUsers.add(userRepository.findById(userId).get());
             }
+
+            String newDocs = "";
+            for (DocumentDTO doc : ideaUpdateDTO.getDocuments()) {
+                newDocs = newDocs + "\n" + doc.getFileName();
+            }
+
+            if (!idea.getDocumentList().isEmpty()) {
+                for (Document doc : idea.getDocumentList()) {
+                    oldDocs = oldDocs + "\n" + doc.getFileName();
+                }
+            }
+
+            newDocs = oldDocs + "\n" + newDocs + "\n";
 
 
             if (ideaUpdateDTO.getText() != null) {
@@ -312,14 +325,11 @@ public class IdeaServiceImpl implements IdeaService {
 
             if (ideaUpdateDTO.getTitle() != null) {
                 if (!Objects.equals(idea.getTitle(), ideaUpdateDTO.getTitle())) {
-                    diffTitle = true;
+                    diffText = true;
                 }
                 idea.setTitle(ideaUpdateDTO.getTitle());
             }
 
-            if ((diffText == true || diffTitle == true) && (!subscribedUsers.isEmpty())) {
-                sendEmailService.sendEmailUpdatedIdea(subscribedUsers, id, oldText, oldTitle);
-            }
 
             if (ideaUpdateDTO.getCategoryList() != null) {
 
@@ -361,6 +371,7 @@ public class IdeaServiceImpl implements IdeaService {
                             newDocument.setUser(idea.getUser());
                             idea.getDocumentList().add(newDocument);
                             documentRepository.save(newDocument);
+                            diffText = true;
                         }
                         idea.getDocumentList().add(newDocument);
                         log.info("Document added succesfully");
@@ -369,6 +380,10 @@ public class IdeaServiceImpl implements IdeaService {
                 }
                 log.info("Idea succesfully saved");
                 ideaRepository.save(idea);
+            }
+
+            if (diffText && (!subscribedUsers.isEmpty())) {
+                sendEmailService.sendEmailUpdatedIdea(subscribedUsers, id, oldText, oldTitle, oldDocs, newDocs);
             }
 
 

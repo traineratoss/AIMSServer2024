@@ -909,7 +909,8 @@ public class CommentServiceImpl implements CommentService {
                     });
             CommentDashboardResponseDTO commentDashboardResponseDTO = new CommentDashboardResponseDTO();
             commentDashboardResponseDTO.setId(comment.getId());
-            commentDashboardResponseDTO.setContent(comment.getCommentText());
+            String htmlContent = htmlService.markdownToHtml(comment.getCommentText());
+            commentDashboardResponseDTO.setContent(htmlContent);
             commentDashboardResponseDTO.setNrReports(commentRepository.countReportsByCommentId(id));
             contents.add(commentDashboardResponseDTO);
         }
