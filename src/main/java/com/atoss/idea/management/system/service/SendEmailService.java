@@ -110,8 +110,10 @@ public interface SendEmailService {
      * @param ideaId the id of the idea whose text has changed
      * @param oldText the text of the idea before it was updated
      * @param oldTitle the title of the idea before it was updated
+     * @param oldDocs  the names of the documents attached to the idea before it was updated
+     * @param newDocs   the names of the documents attached to the idea after it was updated
      */
-    void sendEmailUpdatedIdea(List<User> usernames, Long ideaId, String oldText, String oldTitle);
+    void sendEmailUpdatedIdea(List<User> usernames, Long ideaId, String oldText, String oldTitle, String oldDocs, String newDocs);
 
     /**
      * Sends an email to notify the subscribed users of a certain idea that its comment has changed

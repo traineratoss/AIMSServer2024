@@ -24,7 +24,7 @@
                     We hope you are doing well. It appears that an idea that you are subscribed to has been updated. Here is the new idea:
                 </p>
               <div style="display: flex; justify-content: space-between;">
-                <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 25%; margin-left:20px;">
+                <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 30%; margin-left:20px;">
                                     <div style="background-color: rgba(180, 179, 179,0.4); padding: 10px; border-radius: 4px;">
                                         <p style="font-size: 16px; line-height: 1.5; margin: 0;">
                                             <b>Title: </b> ${oldTitle}
@@ -35,9 +35,14 @@
                                             <b>Text: </b> ${oldText}
                                         </p>
                                     </div>
+                                    <div style="background-color: rgba(180, 179, 179,0.4); padding: 10px; border-radius: 4px;">
+                                        <p style="font-size: 16px; line-height: 1.5; margin: 0;">
+                                            <b>Documents: </b> ${oldDocs}
+                                        </p>
+                                    </div>
 
                  </div>
-               <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 25%; margin-left:20px;">
+               <div align="left" style="background-color: rgba(180, 179, 179,0.4); border-left: 4px solid #ffa941; width: 30%; margin-left:20px;">
 
                                     <div style="background-color: #e0f7fa; padding: 10px; border-radius: 4px;">
                                         <p style="font-size: 16px; line-height: 1.5; margin: 0;">
@@ -47,6 +52,11 @@
                                     <div style="background-color: #e0f7fa; padding: 10px; border-radius: 4px;">
                                         <p style="font-size: 16px; line-height: 1.5; margin: 0;">
                                             <b>Text: </b> ${newText}
+                                        </p>
+                                    </div>
+                                    <div style="background-color: #e0f7fa; padding: 10px; border-radius: 4px;">
+                                        <p style="font-size: 16px; line-height: 1.5; margin: 0;">
+                                            <b>Documents: </b> ${newDocs}
                                         </p>
                                     </div>
                  </div>

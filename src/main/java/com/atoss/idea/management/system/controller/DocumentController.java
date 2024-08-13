@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-
-import java.io.IOException;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -33,29 +30,29 @@ public class DocumentController {
         this.documentService = documentService;
     }
 
-    /**
-     * Uploads an document to the database in the form of an DocumentDTO.
-     *
-     * @param files  the multipart file representing the document to be uploaded.
-     * @param ideaId id of the idea to which the documents are attached
-     * @param userId id of the user which attached the documents
-     * @return it returns an DocumentDTO that represents the added document.
-     * @throws IOException it throws when the I/O operation fails, or it was interrupted.
-     */
-    @PostMapping("/addDocument")
-    public ResponseEntity<List<DocumentDTO>> addDocument(@RequestParam("files") MultipartFile[] files,
-                                                         @RequestParam Long ideaId,
-                                                         @RequestParam Long userId) throws IOException {
-
-        if (log.isInfoEnabled()) {
-            log.info("Received request to add {} documents", files.length);
-        }
-        List<DocumentDTO> addedDocuments = documentService.addDocument(files, ideaId, userId);
-        if (log.isInfoEnabled()) {
-            log.info("Successfully added {} documents", addedDocuments.size());
-        }
-        return new ResponseEntity<>(addedDocuments, HttpStatus.OK);
-    }
+    //    /**
+    //     * Uploads an document to the database in the form of an DocumentDTO.
+    //     *
+    //     * @param files  the multipart file representing the document to be uploaded.
+    //     * @param ideaId id of the idea to which the documents are attached
+    //     * @param userId id of the user which attached the documents
+    //     * @return it returns an DocumentDTO that represents the added document.
+    //     * @throws IOException it throws when the I/O operation fails, or it was interrupted.
+    //     */
+    //    @PostMapping("/addDocument")
+    //    public ResponseEntity<List<DocumentDTO>> addDocument(@RequestParam("files") MultipartFile[] files,
+    //                                                         @RequestParam Long ideaId,
+    //                                                         @RequestParam Long userId) throws IOException {
+    //
+    //        if (log.isInfoEnabled()) {
+    //            log.info("Received request to add {} documents", files.length);
+    //        }
+    //        List<DocumentDTO> addedDocuments = documentService.addDocument(files, ideaId, userId);
+    //        if (log.isInfoEnabled()) {
+    //            log.info("Successfully added {} documents", addedDocuments.size());
+    //        }
+    //        return new ResponseEntity<>(addedDocuments, HttpStatus.OK);
+    //    }
 
 
     /**
