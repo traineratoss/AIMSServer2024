@@ -41,7 +41,7 @@ public class ImageController {
      */
     @PostMapping("/addImage")
     public ResponseEntity<ImageDTO> addImage(@RequestBody MultipartFile file) throws IOException {
-        log.info("Received request to add a image");
+        log.info("Received request to add an image");
         return new ResponseEntity<>(imageService.addImage(file), HttpStatus.OK);
     }
 
@@ -66,7 +66,7 @@ public class ImageController {
      */
     @GetMapping("/get")
     public ResponseEntity<ImageDTO> getImage(@RequestParam Long id) throws ImageNotFoundException {
-        log.info("Received request to get a image by id");
+        log.info("Received request to get an image");
         return new ResponseEntity<>(imageService.getImage(id), HttpStatus.OK);
     }
 
@@ -78,7 +78,7 @@ public class ImageController {
      */
     @GetMapping("/getByIdea")
     public ResponseEntity<ImageDTO> getImageByIdeaId(@RequestParam Long id) {
-        log.info("Received request to get a image by idea id");
+        log.info("Received request to get an image");
         return new ResponseEntity<>(imageService.getImageByIdeaId(id), HttpStatus.OK);
     }
 

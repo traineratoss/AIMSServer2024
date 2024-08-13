@@ -25,6 +25,9 @@ public class HtmlServiceImpl {
         HtmlRenderer renderer = HtmlRenderer.builder().build();
 
         String html = renderer.render(document);
+
+        html = html.replaceAll("<img", "<img style=\"width:5vw; height:auto;\"");
+
         html = html.replaceAll("^<p>|</p>$", "").trim();
 
         return html;
