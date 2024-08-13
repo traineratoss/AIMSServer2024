@@ -83,6 +83,8 @@ public class AddCommentTest {
 
         when(userRepository.findByUsername("Helena")).thenReturn(Optional.of(user));
         when(ideaRepository.findById(1L)).thenReturn(Optional.of(idea));
+        when(htmlService.markdownToHtml(anyString())).thenReturn(requestCommentDTO.getCommentText());
+
 
         ResponseCommentDTO responseCommentDTO = commentService.addComment(requestCommentDTO);
 
