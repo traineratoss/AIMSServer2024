@@ -9,6 +9,7 @@ import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
+import com.atoss.idea.management.system.service.implementation.HtmlServiceImpl;
 import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,9 @@ public class getAllIdeasByUserUsernameTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Spy
+    private HtmlServiceImpl htmlService;
 
     @Spy
     public ModelMapper modelMapper;
@@ -91,6 +95,9 @@ public class getAllIdeasByUserUsernameTest {
         user.setUsername("user12");
 
         Idea idea = new Idea();
+        idea.setId(1L);
+        idea.setTitle("title");
+        idea.setText("text");
         idea.setCreationDate(new Date());
         idea.setCommentList(Collections.emptyList());
 
@@ -102,6 +109,7 @@ public class getAllIdeasByUserUsernameTest {
         responseDTO.setCommentsNumber(0);
 
         when(userRepository.findByUsername(any(String.class))).thenReturn(Optional.of(user));
+        when(ideaRepository.findById(any(Long.class))).thenReturn(Optional.of(idea));
         when(ideaRepository.findAllByUserUsername(any(String.class), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(idea)));
         when(commentServiceImpl.getElapsedTime(any(Date.class))).thenReturn("5 minutes ago");

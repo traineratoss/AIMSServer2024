@@ -8,6 +8,7 @@ import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.repository.entity.Idea;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
+import com.atoss.idea.management.system.service.implementation.HtmlServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -37,6 +38,8 @@ public class GetAllPagedCommentsByIdeaIdTest {
     @InjectMocks
     private CommentServiceImpl commentService;
     private Idea idea;
+    @Spy
+    private HtmlServiceImpl htmlService;
 
 
 
@@ -94,7 +97,7 @@ public class GetAllPagedCommentsByIdeaIdTest {
         when(ideaRepository.existsById(ideaId)).thenReturn(true);
         when(commentRepository.findAllByIdeaId(any(Long.class),any(Pageable.class))).thenReturn(commentPage);
         when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment1));
-
+        when(commentRepository.existsById(any(Long.class))).thenReturn(true);
 
         Page<ResponseCommentDTO> resultPage = commentService.getAllPagedCommentsByIdeaId(ideaId, pageable);
 

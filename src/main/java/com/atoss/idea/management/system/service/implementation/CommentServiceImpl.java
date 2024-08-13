@@ -592,7 +592,7 @@ public class CommentServiceImpl implements CommentService {
             }
             throw new CommentNotFoundException();
         }
-        String commentText = commentRepository.findById(commentId).get().getCommentText();
+
         Comment comment = commentRepository.findById(commentId).get();
 
         if (comment.getIdea() != null) {
@@ -607,7 +607,7 @@ public class CommentServiceImpl implements CommentService {
             }
 
             if (!subscribedUsers.isEmpty()) {
-                sendEmailService.sendEmailDeletedComment(subscribedUsers, commentId, commentText);
+                sendEmailService.sendEmailDeletedComment(subscribedUsers, commentId, comment.getCommentText());
                 if (log.isInfoEnabled()) {
                     log.info("Sending email for deleted comment to subscribed users");
                 }

@@ -10,11 +10,13 @@ import com.atoss.idea.management.system.repository.dto.ResponseCommentReplyDTO;
 import com.atoss.idea.management.system.repository.entity.Comment;
 import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.service.implementation.CommentServiceImpl;
+import com.atoss.idea.management.system.service.implementation.HtmlServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +36,9 @@ public class GetAllRepliesByCommentIdTest {
 
 //    @Spy
 //    private ModelMapper modelMapper;
+
+    @Spy
+    private HtmlServiceImpl htmlService;
 
     private Comment replyComment;
     private Comment parentComment;
@@ -68,7 +73,7 @@ public class GetAllRepliesByCommentIdTest {
         Long commentId = 1L;
         Pageable pageable = PageRequest.of(0, 10); //prima pag cu 10 el pe ea
 
-        when(commentRepository.existsById(commentId)).thenReturn(true);
+        when(commentRepository.existsById(any(Long.class))).thenReturn(true);
         when(commentRepository.findById(parentComment.getId())).thenReturn(Optional.of(parentComment));
         when(commentRepository.findById(replyComment.getId())).thenReturn(Optional.of(replyComment));
         when(commentRepository.findAllByParentId(commentId, pageable))
