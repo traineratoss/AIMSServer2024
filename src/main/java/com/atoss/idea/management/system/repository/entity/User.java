@@ -103,11 +103,9 @@ public class User {
     @JsonManagedReference
     private List<Document> documentList;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private RefreshToken refreshToken;
-
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-    private Session sessionId;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JsonManagedReference
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     /**
      * Constructor for creating a User object with the provided username and email.

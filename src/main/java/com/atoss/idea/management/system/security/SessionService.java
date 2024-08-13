@@ -1,9 +1,6 @@
 package com.atoss.idea.management.system.security;
 
 
-import com.atoss.idea.management.system.repository.SessionRepository;
-import com.atoss.idea.management.system.repository.entity.Session;
-import com.atoss.idea.management.system.repository.entity.User;
 import com.atoss.idea.management.system.security.token.TokenConfig;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,8 +16,6 @@ import java.util.Optional;
 @Log4j2
 @RequiredArgsConstructor
 public class SessionService {
-
-    private final SessionRepository sessionRepository;
 
     @Value("${aims.app.sessionIdHeader}")
     private String sessionIDHeader;
@@ -114,26 +109,6 @@ public class SessionService {
         return identifier;
     }
 
-    /**
-     * Creates a session for a user by associating the session id to a user.
-     * @param sessionId The session's id for the authenticated user
-     * @param user The User entity of the user for whom the session is created
-     */
-    public void createSession(String sessionId, User user) {
-        sessionRepository.findByUser_Username(user.getUsername()).ifPresent(sessionRepository::delete);
-        sessionRepository.flush();
-
-        Session session = new Session(
-                sessionId,
-                user
-        );
-
-        sessionRepository.save(session);
-
-        if (log.isInfoEnabled()) {
-            log.info("Session created successfully for user: {}", user.getUsername());
-        }
-    }
 
     /**
      * Extracts the session id from a HttpServletRequest

@@ -49,8 +49,6 @@ public class RefreshTokenService {
 
     @Transactional
     public RefreshToken createRefreshToken(String username) {
-        refreshTokenRepository.findByUser_Username(username).ifPresent(refreshTokenRepository::delete);
-        refreshTokenRepository.flush();
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(userRepository
@@ -65,7 +63,12 @@ public class RefreshTokenService {
                 .expiryDate(Instant.now().plusMillis(tokenConfig.getExpiryMs()))
                 .build();
 
+        User user = refreshToken.getUser();
+        user.getRefreshTokens().add(refreshToken);
+
         RefreshToken savedToken = refreshTokenRepository.save(refreshToken);
+        userRepository.save(user);
+
         if (log.isInfoEnabled()) {
             log.info("Created and saved new refresh token: {}", savedToken.getToken());
         }
@@ -130,7 +133,7 @@ public class RefreshTokenService {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token.get())
                 .orElseThrow(() -> {
                     if (log.isErrorEnabled()) {
-                        log.error("Token not found in repository");
+                        log.error("Token not found in repository {}", token.get());
                     }
                     return new InvalidRefreshTokenException("Invalid refresh token");
                 });
@@ -198,9 +201,14 @@ public class RefreshTokenService {
      * @param token The refresh token to be deleted.
      */
     public void invalidateToken(String token) {
+
+        if (log.isInfoEnabled()) {
+            log.info("Trying to invalidate refresh token {}...", token);
+        }
+
         refreshTokenRepository.findByToken(token).ifPresent(refreshTokenRepository::delete);
         if (log.isInfoEnabled()) {
-            log.info("Refresh token invalidated successfully");
+            log.info("Refresh token {} invalidated successfully", token);
         }
     }
 

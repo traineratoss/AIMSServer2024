@@ -8,7 +8,7 @@ spring:
   jpa:
 #    show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
       default-schema: public
     properties:
       dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -34,7 +34,7 @@ spring:
 aims:
   app:
     jwt:
-      accessTokenExpiryMs: 300000       # 5 minutes
+      accessTokenExpiryMs: 10000       # 5 minutes
       refreshTokenExpiryMs: 7200000     # 2 hours
       secret: 9eadbfa9ea1aa2cfa839853167ed1c9f11fcd0f4977ea84993e7ad2ac338b490
     bcrypt:

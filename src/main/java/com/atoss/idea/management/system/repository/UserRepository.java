@@ -6,6 +6,8 @@ import com.atoss.idea.management.system.repository.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
@@ -77,5 +79,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @param refreshToken The email address to search for.
      * @return An Optional containing the User entity if a match is found, or an empty Optional if no match is found.
      */
-    Optional<User> findUserByRefreshToken(RefreshToken refreshToken);
+    @Query("SELECT u FROM User u JOIN u.refreshTokens rt WHERE rt = :refreshToken")
+    Optional<User> findUserByRefreshToken(@Param("refreshToken") RefreshToken refreshToken);
 }

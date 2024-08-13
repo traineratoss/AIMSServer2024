@@ -119,11 +119,6 @@ public class AuthController {
 
         if (authentication.isAuthenticated()) {
 
-            sessionService.createSession(
-                    sessionService.extractSessionHeader(request),
-                    userService.getUserByUsername(authentication.getName(), User.class)
-            );
-
             String accessToken = jwtService.generateToken(authentication.getName());
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(authentication.getName());
 
