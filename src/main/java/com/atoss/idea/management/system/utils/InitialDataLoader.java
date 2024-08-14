@@ -58,6 +58,8 @@ public class InitialDataLoader implements CommandLineRunner {
      * @param imageRepository    for saving a new entity of Image
      * @param commentRepository  for saving a new entity of Comment
      * @param ideaRepository     for saving a new entity of Idea
+     * @param ratingRepository   for saving the rating for entity of Idea
+     * @param ideaService        for saving a new entity of Idea
      */
 
     public InitialDataLoader(AvatarRepository avatarRepository,
@@ -88,13 +90,13 @@ public class InitialDataLoader implements CommandLineRunner {
         // Avatar CONSTRUCTOR
         if (ddlValue.equals("create")) {
             String[] avatarFileNames = {
-                    "avatar1.svg",
-                    "avatar2.svg",
-                    "avatar3.svg",
-                    "avatar4.svg",
-                    "avatar5.svg",
-                    "avatar6.svg",
-                    "avatar7.svg"
+                "avatar1.svg",
+                "avatar2.svg",
+                "avatar3.svg",
+                "avatar4.svg",
+                "avatar5.svg",
+                "avatar6.svg",
+                "avatar7.svg"
             };
             ArrayList<Avatar> avatarList = new ArrayList<>();
 
@@ -191,13 +193,13 @@ public class InitialDataLoader implements CommandLineRunner {
 
             //Image CONSTRUCTOR
             String[] imageFileNames = {
-                    "img.png",
-                    "img2.png",
-                    "img3.png",
-                    "img4.png",
-                    "img5.png",
-                    "img6.png",
-                    "img7.png"
+                "img.png",
+                "img2.png",
+                "img3.png",
+                "img4.png",
+                "img5.png",
+                "img6.png",
+                "img7.png"
             };
 
             ArrayList<Image> imageList = new ArrayList<>();
