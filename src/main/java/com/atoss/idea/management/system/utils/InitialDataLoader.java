@@ -1,12 +1,8 @@
 package com.atoss.idea.management.system.utils;
 
-import com.atoss.idea.management.system.repository.AvatarRepository;
-import com.atoss.idea.management.system.repository.UserRepository;
-import com.atoss.idea.management.system.repository.CommentRepository;
-import com.atoss.idea.management.system.repository.CategoryRepository;
-import com.atoss.idea.management.system.repository.ImageRepository;
-import com.atoss.idea.management.system.repository.IdeaRepository;
+import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.entity.*;
+import com.atoss.idea.management.system.service.implementation.IdeaServiceImpl;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +39,8 @@ public class InitialDataLoader implements CommandLineRunner {
     private final ImageRepository imageRepository;
     private final IdeaRepository ideaRepository;
     private final CommentRepository commentRepository;
+    private final RatingRepository ratingRepository;
+    private final IdeaServiceImpl ideaService;
 
 
     @Value("${spring.jpa.hibernate.ddl-auto}")
@@ -60,6 +58,8 @@ public class InitialDataLoader implements CommandLineRunner {
      * @param imageRepository    for saving a new entity of Image
      * @param commentRepository  for saving a new entity of Comment
      * @param ideaRepository     for saving a new entity of Idea
+     * @param ratingRepository   for saving the rating for entity of Idea
+     * @param ideaService        for saving a new entity of Idea
      */
 
     public InitialDataLoader(AvatarRepository avatarRepository,
@@ -67,13 +67,17 @@ public class InitialDataLoader implements CommandLineRunner {
                              CategoryRepository categoryRepository,
                              ImageRepository imageRepository,
                              CommentRepository commentRepository,
-                             IdeaRepository ideaRepository) {
+                             IdeaRepository ideaRepository,
+                             RatingRepository ratingRepository,
+                             IdeaServiceImpl ideaService) {
         this.avatarRepository = avatarRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.imageRepository = imageRepository;
         this.commentRepository = commentRepository;
         this.ideaRepository = ideaRepository;
+        this.ratingRepository = ratingRepository;
+        this.ideaService = ideaService;
     }
 
 
@@ -144,6 +148,22 @@ public class InitialDataLoader implements CommandLineRunner {
             User user7 = createUser(true, Role.STANDARD, avatar1, "clupascu003@gmail.com", "callinu",
                     "Calin Lupascu", BCrypt.hashpw("calinlupascu", bcryptSalt), true, false);
             userRepository.save(user7);
+
+            User user8 = createUser(true, Role.STANDARD, avatar1, "alex1234@gmail.com", "alex",
+                    "Alex Pop", BCrypt.hashpw("alexpop", bcryptSalt), true, false);
+            userRepository.save(user8);
+
+            User user9 = createUser(true, Role.STANDARD, avatar1, "ioana12@gmail.com", "ioana",
+                    "Ioana Popescu", BCrypt.hashpw("popescu", bcryptSalt), true, false);
+            userRepository.save(user9);
+
+            User user10 = createUser(true, Role.STANDARD, avatar1, "andreea@gmail.com", "andreea",
+                    "Andreea Duma", BCrypt.hashpw("andreaduma", bcryptSalt), true, false);
+            userRepository.save(user10);
+
+            User user11 = createUser(true, Role.STANDARD, avatar1, "matei@gmail.com", "matei",
+                    "Matei Ion", BCrypt.hashpw("matei", bcryptSalt), true, false);
+            userRepository.save(user11);
 
             //Category CONSTRUCTOR
             Category category1 = createCategory("Innovation");
@@ -284,6 +304,94 @@ public class InitialDataLoader implements CommandLineRunner {
             ideaRepository.save(idea8);
 
             List<Idea> ideaList = new ArrayList<>();
+
+            Rating rating1 = addRating(idea1, user1, 2d);
+            ratingRepository.save(rating1);
+
+            Rating rating2 = addRating(idea1, user2, 5d);
+            ratingRepository.save(rating2);
+
+            Rating rating3 = addRating(idea1, user3, 4d);
+            ratingRepository.save(rating3);
+
+            Rating rating4 = addRating(idea1, user4, 2d);
+            ratingRepository.save(rating4);
+
+            Rating rating5 = addRating(idea2, user1, 3d);
+            ratingRepository.save(rating5);
+
+            Rating rating6 = addRating(idea1, user5, 1d);
+            ratingRepository.save(rating6);
+
+            Rating rating7 = addRating(idea1, user6, 3d);
+            ratingRepository.save(rating7);
+
+
+            Rating rating8 = addRating(idea2, user2, 5d);
+            ratingRepository.save(rating8);
+
+            Rating rating9 = addRating(idea2, user1, 4d);
+            ratingRepository.save(rating9);
+
+            Rating rating10 = addRating(idea2, user4, 2d);
+            ratingRepository.save(rating10);
+
+            Rating rating11 = addRating(idea2, user5, 1d);
+            ratingRepository.save(rating11);
+
+            Rating rating12 = addRating(idea2, user6, 5d);
+            ratingRepository.save(rating12);
+
+            Rating rating13 = addRating(idea3, user1, 3d);
+            ratingRepository.save(rating13);
+
+            Rating rating14 = addRating(idea3, user2, 4d);
+            ratingRepository.save(rating14);
+
+            Rating rating15 = addRating(idea3, user3, 2d);
+            ratingRepository.save(rating15);
+
+            Rating rating16 = addRating(idea3, user4, 5d);
+            ratingRepository.save(rating16);
+
+            Rating rating17 = addRating(idea3, user5, 4d);
+            ratingRepository.save(rating17);
+
+            Rating rating18 = addRating(idea3, user6, 2d);
+            ratingRepository.save(rating18);
+
+            Rating rating19 = addRating(idea4, user1, 5d);
+            ratingRepository.save(rating19);
+
+            Rating rating20 = addRating(idea4, user2, 4d);
+            ratingRepository.save(rating20);
+
+            Rating rating21 = addRating(idea4, user3, 2d);
+            ratingRepository.save(rating21);
+
+            Rating rating22 = addRating(idea4, user4, 4d);
+            ratingRepository.save(rating22);
+
+            Rating rating23 = addRating(idea4, user5, 1d);
+            ratingRepository.save(rating23);
+
+            Rating rating24 = addRating(idea4, user6, 2d);
+            ratingRepository.save(rating24);
+
+            Rating rating25 = addRating(idea5, user1, 4d);
+            ratingRepository.save(rating25);
+
+            Rating rating26 = addRating(idea5, user2, 5d);
+            ratingRepository.save(rating26);
+
+            Rating rating27 = addRating(idea5, user3, 3d);
+            ratingRepository.save(rating27);
+
+            idea1.setRatingAvg(ideaService.getAverage(idea1.getId()));
+            idea2.setRatingAvg(ideaService.getAverage(idea2.getId()));
+            idea3.setRatingAvg(ideaService.getAverage(idea3.getId()));
+            idea4.setRatingAvg(ideaService.getAverage(idea4.getId()));
+            idea5.setRatingAvg(ideaService.getAverage(idea5.getId()));
 
 
             //Comment CONSTRUCTOR
@@ -520,7 +628,14 @@ public class InitialDataLoader implements CommandLineRunner {
                     }
                 }
             }
-
+            for (Idea idea : ideaList) {
+                for (long i = 1; i < 19; i++) {
+                    double rating = Math.floor(Math.random() * 5) + 1;
+                    Rating ratingT = addRating(idea, userRepository.findById(i).get(), rating);
+                    ratingRepository.save(ratingT);
+                    idea.setRatingAvg(ideaService.getAverage(idea.getId()));
+                }
+            }
         }
     }
 
@@ -812,6 +927,15 @@ public class InitialDataLoader implements CommandLineRunner {
         comment.setUser(user);
         comment.setCommentText(text);
         return comment;
+    }
+
+    private static Rating addRating(Idea idea, User user, Double rating) {
+        Rating newRating = new Rating();
+        newRating.setIdea(idea);
+        newRating.setUser(user);
+        newRating.setRating(rating);
+        return newRating;
+
     }
 
 }

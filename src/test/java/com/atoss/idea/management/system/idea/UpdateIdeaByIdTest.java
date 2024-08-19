@@ -3,6 +3,7 @@ package com.atoss.idea.management.system.idea;
 import com.atoss.idea.management.system.controller.IdeaController;
 import com.atoss.idea.management.system.repository.*;
 import com.atoss.idea.management.system.repository.dto.CategoryDTO;
+import com.atoss.idea.management.system.repository.dto.DocumentDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaResponseDTO;
 import com.atoss.idea.management.system.repository.dto.IdeaUpdateDTO;
 import com.atoss.idea.management.system.repository.entity.*;
@@ -47,6 +48,9 @@ public class UpdateIdeaByIdTest {
     @Mock
     private HtmlServiceImpl htmlService;
 
+    @Mock
+    private DocumentRepository documentRepository;
+
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
@@ -65,11 +69,15 @@ public class UpdateIdeaByIdTest {
         idea.setCommentList(List.of());
         idea.setCreationDate(new Date());
 
+        idea.setDocumentList(new ArrayList<>());
+        DocumentDTO[] documentDTO = new DocumentDTO[0];
+
         IdeaUpdateDTO ideaUpdateDTO = new IdeaUpdateDTO();
         ideaUpdateDTO.setText("Updated text");
         ideaUpdateDTO.setTitle("Updated title");
         ideaUpdateDTO.setStatus(Status.OPEN);
         ideaUpdateDTO.setCategoryList(Collections.singletonList(new CategoryDTO()));
+        ideaUpdateDTO.setDocuments(documentDTO);
 
         when(ideaRepository.findById(ideaId)).thenReturn(Optional.of(idea));
         when(ideaRepository.save(any(Idea.class))).thenReturn(idea);
