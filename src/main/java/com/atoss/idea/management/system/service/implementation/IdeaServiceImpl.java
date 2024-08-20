@@ -646,9 +646,9 @@ public class IdeaServiceImpl implements IdeaService {
         Idea idea = ideaRepository.findById(ideaId).orElseThrow(() -> new IdeaNotFoundException("Idea doesn't exist."));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User doesn't exist."));
         Rating rating = ratingRepository.findByIdeaIdAndUserId(ideaId, userId).orElse(new Rating());
-        Integer oldRating = 0;
+        Double oldRating = 0.0;
         if (idea.getRatingAvg() != null) {
-            oldRating = idea.getRatingAvg().intValue();
+            oldRating = idea.getRatingAvg();
         }
         rating.setIdea(idea);
         rating.setUser(user);
@@ -656,7 +656,7 @@ public class IdeaServiceImpl implements IdeaService {
         log.info("Rating succesfully saved");
         Rating ratingRepositorySave = ratingRepository.save(rating);
         idea.setRatingAvg(getAverage(ideaId));
-        Integer newRating = idea.getRatingAvg().intValue();
+        Double newRating = idea.getRatingAvg();
 
         if (newRating != oldRating && oldRating != 0) {
             sendEmailForRating(idea.getId());
