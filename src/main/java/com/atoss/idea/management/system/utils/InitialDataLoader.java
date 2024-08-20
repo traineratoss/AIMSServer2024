@@ -58,6 +58,8 @@ public class InitialDataLoader implements CommandLineRunner {
      * @param imageRepository    for saving a new entity of Image
      * @param commentRepository  for saving a new entity of Comment
      * @param ideaRepository     for saving a new entity of Idea
+     * @param ratingRepository   for saving the rating for entity of Idea
+     * @param ideaService        for saving a new entity of Idea
      */
 
     public InitialDataLoader(AvatarRepository avatarRepository,
@@ -88,13 +90,13 @@ public class InitialDataLoader implements CommandLineRunner {
         // Avatar CONSTRUCTOR
         if (ddlValue.equals("create")) {
             String[] avatarFileNames = {
-                    "avatar1.svg",
-                    "avatar2.svg",
-                    "avatar3.svg",
-                    "avatar4.svg",
-                    "avatar5.svg",
-                    "avatar6.svg",
-                    "avatar7.svg"
+                "avatar1.svg",
+                "avatar2.svg",
+                "avatar3.svg",
+                "avatar4.svg",
+                "avatar5.svg",
+                "avatar6.svg",
+                "avatar7.svg"
             };
             ArrayList<Avatar> avatarList = new ArrayList<>();
 
@@ -139,8 +141,8 @@ public class InitialDataLoader implements CommandLineRunner {
                     null, null, false, true);
             userRepository.save(user5);
 
-            User user6 = createUser(true, Role.STANDARD, avatar1, "sularbogdan@yahoo.com", "sularbogdan",
-                    "Bogdan Sular", BCrypt.hashpw("sularbogdan", bcryptSalt), true, false);
+            User user6 = createUser(true, Role.STANDARD, avatar1, "anadan@yahoo.com", "anadan",
+                    "Ana Dan", BCrypt.hashpw("Ana4455@", bcryptSalt), true, false);
             userRepository.save(user6);
 
             User user7 = createUser(true, Role.STANDARD, avatar1, "clupascu003@gmail.com", "callinu",
@@ -162,6 +164,10 @@ public class InitialDataLoader implements CommandLineRunner {
             User user11 = createUser(true, Role.STANDARD, avatar1, "matei@gmail.com", "matei",
                     "Matei Ion", BCrypt.hashpw("matei", bcryptSalt), true, false);
             userRepository.save(user11);
+
+            User user12 = createUser(true, Role.ADMIN, avatar1, "biancarusu181@gmail.com", "biancarusu",
+                    "Bianca Rusu", BCrypt.hashpw("AdminBianca12", bcryptSalt), true, false);
+            userRepository.save(user12);
 
             //Category CONSTRUCTOR
             Category category1 = createCategory("Innovation");
@@ -191,13 +197,13 @@ public class InitialDataLoader implements CommandLineRunner {
 
             //Image CONSTRUCTOR
             String[] imageFileNames = {
-                    "img.png",
-                    "img2.png",
-                    "img3.png",
-                    "img4.png",
-                    "img5.png",
-                    "img6.png",
-                    "img7.png"
+                "img.png",
+                "img2.png",
+                "img3.png",
+                "img4.png",
+                "img5.png",
+                "img6.png",
+                "img7.png"
             };
 
             ArrayList<Image> imageList = new ArrayList<>();
