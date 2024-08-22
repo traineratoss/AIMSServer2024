@@ -439,21 +439,45 @@ public class InitialDataLoader implements CommandLineRunner {
                     user3, "Could use more details");
             commentRepository.save(comment10);
 
-            Comment comment11 = createComment(staticDate2, idea8, null,
-                    user5, "Love this idea! ![Love](https://icons.iconarchive.com/icons/designbolts/free-valentine-heart/256/Heart-icon.png)");
+            Comment comment11 = createComment(staticDate2, idea3, null,
+                    user5, "I appreciate the emphasis on fairness in employee assessments.");
             commentRepository.save(comment11);
 
-            Comment comment12 = createComment(staticDate3, idea6, null,
-                    user4, "This ***suggestion*** could use more specific examples.");
+            Comment comment12 = createComment(staticDate3, idea4, null,
+                    user4, "Offering competitive salaries is a great way to attract top talent");
             commentRepository.save(comment12);
 
-            Comment comment13 = createComment(new Date(), idea4, null,
-                    user4, "I absolutely **love** this idea! It could make a big difference.");
+            Comment comment13 = createComment(new Date(), idea5, null,
+                    user4, "Investing in employees’ professional development is a win-win. ");
             commentRepository.save(comment13);
 
-            Comment comment14 = createComment(staticDate4, idea5, null,
-                    user5, "I have some concerns about how this will be implemented.");
+            Comment comment14 = createComment(staticDate4, idea3, null,
+                    user5, "Ensuring that standards are applied clearly and consistently can help reduce feelings of favoritism or bias within the team");
             commentRepository.save(comment14);
+
+            Comment comment15 = createComment(new Date(), idea4, null,
+                    user3, "This idea effectively shows employees that they are valued, which can increase loyalty and reduce turnover");
+            commentRepository.save(comment10);
+
+            Comment comment16 = createComment(staticDate2, idea5, null,
+                    user5, "This idea could significantly increase job satisfaction");
+            commentRepository.save(comment11);
+
+            Comment comment17 = createComment(staticDate3, idea3, null,
+                    user4, "It’s a smart move for company culture");
+            commentRepository.save(comment12);
+
+            Comment comment18 = createComment(new Date(), idea4, null,
+                    user4, "Higher quality staff can lead to better outcomes, which justifies the additional salary expense");
+            commentRepository.save(comment13);
+
+            Comment comment19 = createComment(staticDate4, idea5, null,
+                    user5, "It’s a forward-thinking strategy.");
+            commentRepository.save(comment14);
+
+            Comment comment20 = createComment(staticDate3, idea6, null,
+                    user1, "It would really be helpful!");
+            commentRepository.save(comment20);
 
 
             Comment reply1 = createReply(staticDate3, comment2, idea2,
@@ -609,7 +633,7 @@ public class InitialDataLoader implements CommandLineRunner {
             int m = 0;
             for (Idea idea : ideaList) {
                 // Because we want a random number of comments per idea
-                int numberOfCommentsPerIdea = givenList_shouldReturnARandomElement();
+                int numberOfCommentsPerIdea = 1;
                 for (int i = 0; i < numberOfCommentsPerIdea; i++) {
                     Date commentDate = randomDateAfter(idea.getCreationDate());
                     String commentText = "Comment " + n;
@@ -621,7 +645,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
                     // Dummy replies
                     // Because we want a random number of replies per comment
-                    int numberOfRepliesPerComment = givenList_shouldReturnARandomElement();
+                    int numberOfRepliesPerComment = 1;
                     for (int b = 0; b < numberOfRepliesPerComment; b++) {
                         String replyText = "Reply " + m;
                         Date replyDate = randomDateAfter(commentDate); // Generate reply date after parent comment date
